@@ -1,0 +1,19 @@
+pragma ton-solidity >= 0.57.1;
+
+interface INftChangeManager {
+
+    struct CallbackParams {
+        uint128 value;      // ever value will send to address
+        TvmCell payload;    // custom payload will proxying to address
+    }
+
+    /// @notice change owner callback processing
+    /// @param id Unique NFT id
+    /// @param owner Address of nft owner
+    /// @param oldManager Address of nft manager before manager changed
+    /// @param newManager Address of new nft manager
+    /// @param collection Address of collection smart contract that mint the NFT
+    /// @param sendGasTo - Address to send remaining gas
+    //  @param payload - Custom payload
+    function onNftChangeManager(uint256 id, address owner, address oldManager, address newManager, address collection, address sendGasTo, TvmCell payload) external;
+}

@@ -1,0 +1,28 @@
+{
+  "name": "everscale-tip4-market-demo",
+  "version": "0.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "test-remote": "NODE_OPTIONS='-r ts-node/register --no-warnings' locklift test --disable-build --network dev --config locklift.config.js --test test",
+    "test": "NODE_OPTIONS='-r ts-node/register --no-warnings' locklift test --disable-build --network local --config locklift.config.js --test test",
+    "build": "TVM_LINKER_LIB_PATH=$PWD/TON-Solidity-Compiler/lib/stdlib_sol.tvm locklift build --config locklift.config.js",
+    "deploy-local": "TVM_LINKER_LIB_PATH=$PWD/TON-Solidity-Compiler/lib/stdlib_sol.tvm NODE_OPTIONS='-r ts-node/register --no-warnings' locklift run --disable-build -n local --config locklift.config.js --script",
+    "deploy-dev": "TVM_LINKER_LIB_PATH=$PWD/TON-Solidity-Compiler/lib/stdlib_sol.tvm NODE_OPTIONS='-r ts-node/register --no-warnings' locklift run --disable-build -n dev --config locklift.config.js --script",
+    "deploy-main": "TVM_LINKER_LIB_PATH=$PWD/TON-Solidity-Compiler/lib/stdlib_sol.tvm NODE_OPTIONS='-r ts-node/register --no-warnings' locklift run --disable-build -n main --config locklift.config.js --script"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@broxus/contracts": "^1.0.4",
+    "ton-eth-bridge-token-contracts": "git://github.com/broxus/ton-eth-bridge-token-contracts#d3c1cd920c0320ffaab03b54c878dd0e06fed3c7",
+    "@types/mocha": "^9.1.0",
+    "bignumber.js": "^9.0.2",
+    "ipfs-core": "^0.14.2",
+    "locklift": "^1.5.3",
+    "mocha-logger": "^1.0.8",
+    "ora": "^3.4.0",
+    "prompts": "^2.4.1",
+    "ts-node": "^10.7.0"
+  }
+}

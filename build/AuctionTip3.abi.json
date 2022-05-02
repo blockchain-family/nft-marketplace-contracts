@@ -1,0 +1,218 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_markerRootAddr","type":"address"},
+				{"name":"_tokenRootAddr","type":"address"},
+				{"name":"_nftOwner","type":"address"},
+				{"name":"_deploymentFee","type":"uint128"},
+				{"name":"_marketFee","type":"uint128"},
+				{"name":"_marketFeeDecimals","type":"uint8"},
+				{"name":"_auctionStartTime","type":"uint64"},
+				{"name":"_auctionDuration","type":"uint64"},
+				{"name":"_bidDelta","type":"uint8"},
+				{"name":"_paymentTokenRoot","type":"address"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onTokenWallet",
+			"inputs": [
+				{"name":"value","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"token_root","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"sender_wallet","type":"address"},
+				{"name":"original_gas_to","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "finishAuction",
+			"inputs": [
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "buildPlaceBidPayload",
+			"inputs": [
+				{"name":"answerId","type":"uint32"},
+				{"name":"callbackId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "getInfo",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "price",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"price","type":"uint128"}
+			]
+		},
+		{
+			"name": "nft",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"nft","type":"address"}
+			]
+		},
+		{
+			"name": "markerRootAddr",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"markerRootAddr","type":"address"}
+			]
+		},
+		{
+			"name": "tokenRootAddr",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"tokenRootAddr","type":"address"}
+			]
+		},
+		{
+			"name": "nftOwner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"nftOwner","type":"address"}
+			]
+		},
+		{
+			"name": "deploymentFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"deploymentFee","type":"uint128"}
+			]
+		},
+		{
+			"name": "marketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"marketFee","type":"uint128"}
+			]
+		},
+		{
+			"name": "marketFeeDecimals",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"marketFeeDecimals","type":"uint8"}
+			]
+		},
+		{
+			"name": "bidDelta",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"bidDelta","type":"uint8"}
+			]
+		},
+		{
+			"name": "currentBid",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"addr","type":"address"},{"name":"value","type":"uint128"}],"name":"currentBid","type":"tuple"}
+			]
+		},
+		{
+			"name": "maxBidValue",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"maxBidValue","type":"uint128"}
+			]
+		},
+		{
+			"name": "nextBidValue",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"nextBidValue","type":"uint128"}
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"},
+		{"key":2,"name":"price","type":"uint128"},
+		{"key":3,"name":"nft","type":"address"}
+	],
+	"events": [
+		{
+			"name": "BidPlaced",
+			"inputs": [
+				{"name":"buyerAddress","type":"address"},
+				{"name":"value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "BidDeclined",
+			"inputs": [
+				{"name":"buyerAddress","type":"address"},
+				{"name":"value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"nonce_","type":"uint64"},
+		{"name":"price","type":"uint128"},
+		{"name":"nft","type":"address"},
+		{"name":"markerRootAddr","type":"address"},
+		{"name":"tokenRootAddr","type":"address"},
+		{"name":"nftOwner","type":"address"},
+		{"name":"deploymentFee","type":"uint128"},
+		{"name":"marketFee","type":"uint128"},
+		{"name":"marketFeeDecimals","type":"uint8"},
+		{"name":"paymentTokenRoot","type":"address"},
+		{"name":"tokenWallet","type":"address"},
+		{"name":"auctionStartTime","type":"uint64"},
+		{"name":"auctionDuration","type":"uint64"},
+		{"name":"auctionEndTime","type":"uint64"},
+		{"name":"bidDelta","type":"uint8"},
+		{"components":[{"name":"addr","type":"address"},{"name":"value","type":"uint128"}],"name":"currentBid","type":"tuple"},
+		{"name":"maxBidValue","type":"uint128"},
+		{"name":"nextBidValue","type":"uint128"},
+		{"name":"state","type":"uint8"}
+	]
+}

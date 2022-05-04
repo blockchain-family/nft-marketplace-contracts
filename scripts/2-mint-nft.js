@@ -8,19 +8,32 @@ const IPFS = require('ipfs-core')
 const {Migration} = require(process.cwd() + '/scripts/migration')
 const migration = new Migration();
 
-const { deployMarket, deployAccount, deployTokenRoot, getAccount, Contract, LockLift, getRandomNonce, isValidTonAddress, logContract, getTotalSupply } = require('../test/utils')
+const {
+    deployMarket,
+    deployAccount,
+    deployTokenRoot,
+    getAccount,
+    Contract,
+    LockLift,
+    getRandomNonce,
+    isValidTonAddress,
+    logContract,
+    getTotalSupply
+} = require(process.cwd() + '/test/utils')
 
 /** @type {LockLift} */
 var locklift = global.locklift;
 
 async function main() {
+    const account = await locklift.factory.getAccount("Wallet");
+    migration.load(account, 'Account')
 
     const response = await prompts([
         {
             type: 'text',
             name: 'owner',
-            message: 'Owner',
-            validate: value => isValidTonAddress(value) ? true : 'Invalid Everscale address'
+            message: 'Owner (default '+account.address+')',
+            validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
             type: 'text',
@@ -54,13 +67,16 @@ async function mint(response) {
     const collection = await locklift.factory.getContract("Collection")
     migration.load(collection, 'Collection')
 
+    console.log(`Collection: ${collection.address}`)
+    console.log(`Account: ${account.address}`)
+
     const nft_url = response.url
     const nft_name = response.name
     const nft_description = response.description
     const externalUrl = response.externalUrl
     const spinner = ora('Deploying NFT').start();
 
-    spinner.text = 'Minting Nfts to Market'
+    spinner.text = '[Minting NFT]'
 
     let item = {
         "type": "Basic NFT",
@@ -78,20 +94,24 @@ async function mint(response) {
         ],
         "external_url": externalUrl
     }
-    spinner.text = `Minting NFT ${i+start}/${amount+start}: ${item.image_url}:`
     let payload = JSON.stringify(item)
     let tx = await account.runTarget({
         contract: collection,
         method: 'mintNft',
-        params: { owner: response.owner, json: payload },
+        params: {_owner: response.owner, _json: payload},
         keyPair,
         value: locklift.utils.convertCrystal(5, 'nano')
     })
-    console.log(`Minted NFT: ${nft_url}: Tx: ${tx.transaction.id}`)
+    console.log(` Tx: ${tx.transaction.id}`)
 
-    migration.store(temp, 'Account');
+    let totalMinted = await collection.call({method: 'totalMinted', params: {}});
+    let nftAddress = await collection.call({method: 'nftAddress', params: {
+        id: totalMinted.minus(1).toFixed()
+    }});
 
-    spinner.stopAndPersist({text: 'Minting Completed, Outputting Result'})
+    console.log(` NFT: ${nftAddress}`)
+
+    spinner.stopAndPersist({text: 'Minting Completed'})
 }
 
 main()

@@ -1,8 +1,5 @@
-
 const {Migration} = require(process.cwd() + '/scripts/migration')
 const migration = new Migration();
-
-const { deployMarket, deployAccount, deployTokenRoot, getAccount, Contract, LockLift, getRandomNonce, isValidTonAddress, logContract, getTotalSupply } = require('../test/utils')
 
 async function main() {
 

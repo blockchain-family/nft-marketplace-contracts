@@ -4,7 +4,7 @@ const prompts = require('prompts')
 const {Migration} = require(process.cwd() + '/scripts/migration')
 const migration = new Migration();
 
-const {deployAccount, LockLift} = require('../test/utils')
+const {deployAccount, LockLift} = require( process.cwd() + '/test/utils.ts')
 
 /** @type {LockLift} */
 var locklift = global.locklift;

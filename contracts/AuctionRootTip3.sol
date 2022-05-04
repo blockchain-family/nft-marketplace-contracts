@@ -75,7 +75,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
         address expectedSender = _resolveNft(collection, id);
         bool isDeclined = false;
-        if (expectedSender == msg.sender && nftOwner == owner() && payload.toSlice().hasNBitsAndRefs(790, 1)) {
+        if (expectedSender == msg.sender && nftOwner == owner() && payload.toSlice().bits() == 523) {
             (
                 address _paymentTokenRoot,
                 uint128 _price,

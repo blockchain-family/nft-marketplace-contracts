@@ -151,7 +151,9 @@ export async function deployCollection(account: Account, config = {remainOnNft: 
       owner: account.address,
       remainOnNft: locklift.utils.convertCrystal(remainOnNft, 'nano'),
     },
-    initParams: {},
+    initParams: {
+      nonce_: getRandomNonce()
+    },
     keyPair: account.keyPair,
   }, locklift.utils.convertCrystal(4, 'nano'));
 }

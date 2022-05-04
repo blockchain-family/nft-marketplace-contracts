@@ -12,6 +12,8 @@ import "./interfaces/IBurnableCollection.sol";
 
 contract Collection is TIP4_3Collection, IBurnableCollection, OwnableInternal {
 
+	uint64 static nonce_;
+
 	uint8 constant value_is_less_than_required = 104;
 
 	/// _remainOnNft - the number of EVERs that will remain after the entire mint

@@ -183,6 +183,7 @@
 		}
 	],
 	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"}
 	],
 	"events": [
 		{
@@ -231,6 +232,7 @@
 		{"name":"_indexDestroyValue","type":"uint128"},
 		{"name":"_deployIndexBasisValue","type":"uint128"},
 		{"name":"owner_","type":"address"},
+		{"name":"nonce_","type":"uint64"},
 		{"name":"_remainOnNft","type":"uint128"},
 		{"name":"_totalMinted","type":"uint256"}
 	]

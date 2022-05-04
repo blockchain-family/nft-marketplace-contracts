@@ -119,6 +119,18 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         TvmCell payload					
     ) override external {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
+
+        TvmSlice payloadSlice = payload.toSlice();
+
+        uint32 callbackId = 0;
+        address buyer = sender;
+        if (payloadSlice.bits() >= 32) {
+            callbackId = payloadSlice.decode(uint32);
+        }
+        if (payloadSlice.bits() >= 267) {
+            buyer = payloadSlice.decode(address);
+        }
+
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
             amount >= nextBidValue &&
@@ -129,15 +141,15 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             now >= auctionStartTime &&
             state == AuctionStatus.Active
         ) {
-            processBid(sender, amount, payload, original_gas_to);
+            processBid(callbackId, buyer, amount, original_gas_to);
         } else {
-            emit BidDeclined(sender, amount);
-            sendBidResultCallback(sender, payload, false);
+            emit BidDeclined(buyer, amount);
+            sendBidResultCallback(callbackId, buyer, false);
             TvmCell empty;
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128 }(
                 amount,
-                sender,
-                0,
+                buyer,
+                0.1 ton,
                 original_gas_to,
                 true,
                 payload
@@ -146,9 +158,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     }
 
     function processBid(
+        uint32 _callbackId,
         address _newBidSender,
         uint128 _bid,
-        TvmCell _callbackPayload,
         address original_gas_to
     ) private {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
@@ -158,7 +170,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         currentBid = newBid;
         calculateAndSetNextBid();
         emit BidPlaced(_newBidSender, _bid);
-        sendBidResultCallback(_newBidSender, _callbackPayload, true);
+        sendBidResultCallback(_callbackId, _newBidSender, true);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             TvmCell empty;
@@ -213,15 +225,11 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     }
 
     function sendBidResultCallback(
+        uint32 callbackId,
         address _callbackTarget,
-        TvmCell _payload,
         bool _isBidPlaced
     ) private {
         if(_callbackTarget.value != 0) {
-            uint32 callbackId = 404;
-            if (_payload.toSlice().bits() >= 32) {
-                callbackId = _payload.toSlice().decode(uint32);
-            }
             if (_isBidPlaced) {
                 IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{value: 1, flag: 1, bounce: false}(callbackId);
             } else {
@@ -230,9 +238,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         }
     }
 
-    function buildPlaceBidPayload(uint32 callbackId) external pure responsible returns (TvmCell) {
+    function buildPlaceBidPayload(uint32 callbackId, address buyer) external pure responsible returns (TvmCell) {
         TvmBuilder builder;
         builder.store(callbackId);
+        builder.store(buyer);
         return builder.toCell();
     }
 

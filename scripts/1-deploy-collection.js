@@ -27,6 +27,8 @@ var locklift = global.locklift;
 
 async function main() {
 
+    const [keyPair] = await locklift.keys.getKeyPairs();
+
     const tempAdmin = await locklift.factory.getAccount("Wallet");
     migration.load(tempAdmin, 'Account')
     tempAdmin.setKeyPair(keyPair)
@@ -88,8 +90,6 @@ async function main() {
         config.nftOwner = response2.nftOwner;
 
     }
-
-    const [keyPair] = await locklift.keys.getKeyPairs();
 
     const tx_results = []
     /** @type {number} **/

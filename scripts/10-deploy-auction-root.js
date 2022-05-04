@@ -50,11 +50,16 @@ async function main() {
             _auctionBidDeltaDecimals: 1, // ???
             _sendGasTo: account.address
         },
+        initParams: {
+            nonce_: Math.random() * 6400 | 0,
+        },
         keyPair,
     }, locklift.utils.convertCrystal(10, 'nano'));
 
     console.log(`Account: ${account.address}`)
     console.log(`AuctionRootTip3: ${auctionRootTip3.address}`)
+
+    migration.store(auctionRootTip3, 'AuctionRootTip3');
 
     if (response.owner) {
         await account.runTarget({

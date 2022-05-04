@@ -14,6 +14,9 @@ import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
 import './AuctionTip3.sol';
 
 contract AuctionRootTip3 is OffersRoot, INftChangeManager {
+
+    uint64 static nonce_;
+
     struct MarketOffer {
         address collection;
         address nftOwner;

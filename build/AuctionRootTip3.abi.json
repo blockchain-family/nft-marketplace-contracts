@@ -132,6 +132,7 @@
 		}
 	],
 	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"}
 	],
 	"events": [
 		{
@@ -173,6 +174,7 @@
 		{"name":"deploymentFeePart","type":"uint128"},
 		{"name":"codeNft","type":"cell"},
 		{"name":"offerCode","type":"cell"},
+		{"name":"nonce_","type":"uint64"},
 		{"name":"auctionBidDelta","type":"uint8"},
 		{"name":"auctionBidDeltaDecimals","type":"uint8"}
 	]

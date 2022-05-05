@@ -4,12 +4,14 @@ pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
 import './libraries/Gas.sol';
+import './WeverAddresses.sol';
 
 import './abstract/Offer.sol';
 
-import 'ton-eth-bridge-token-contracts/contracts//interfaces/ITokenRoot.sol';
-import 'ton-eth-bridge-token-contracts/contracts//interfaces/ITokenWallet.sol';
-import 'ton-eth-bridge-token-contracts/contracts//interfaces/IAcceptTokensTransferCallback.sol';
+import 'ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol';
+import 'ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol';
+import 'ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol';
+import 'ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensBurnCallback.sol';
 import './modules/TIP4_1/interfaces/INftChangeManager.sol';
 import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
 
@@ -18,7 +20,7 @@ import './interfaces/IAuctionBidPlacedCallback.sol';
 import './errors/AuctionErrors.sol';
 import './errors/BaseErrors.sol';
 
-contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
+contract AuctionTip3 is WeverAddresses, Offer, IAcceptTokensTransferCallback, IAcceptTokensBurnCallback {
     
     address paymentTokenRoot;
     address tokenWallet;
@@ -146,14 +148,25 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             emit BidDeclined(buyer, amount);
             sendBidResultCallback(callbackId, buyer, false);
             TvmCell empty;
-            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128 }(
-                amount,
-                buyer,
-                0.1 ton,
-                original_gas_to,
-                true,
-                payload
-            );   
+            if (token_root == WEVER_ROOT && paymentTokenRoot == WEVER_ROOT) {
+                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                    amount,
+                    WEVER_VAULT,
+                    uint128(0),
+                    buyer,
+                    true,
+                    empty
+                );
+            } else {
+                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                    amount,
+                    buyer,
+                    Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                    original_gas_to,
+                    true,
+                    empty
+                );
+            }
         }
     }
 
@@ -174,16 +187,27 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             TvmCell empty;
-            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128 }(
-                _currentBid.value,
-                _currentBid.addr,
-                0,
-                original_gas_to,
-                false,
-                empty
-            );
+            if (paymentTokenRoot == WEVER_ROOT) {
+                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                    _currentBid.value,
+                    WEVER_VAULT,
+                    uint128(0),
+                    _currentBid.addr,
+                    true,
+                    empty
+                );
+            } else {
+                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                    _currentBid.value,
+                    _currentBid.addr,
+                    Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                    original_gas_to,
+                    false,
+                    empty
+                );
+            }
         } else {
-            original_gas_to.transfer({ value: 0, flag: 128 });
+            original_gas_to.transfer({ value: 0, flag: 128, bounce: false });
         }
     }
 
@@ -195,12 +219,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
             TvmCell empty;
-            ITIP4_1NFT(nft).transfer{value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1}(
+            ITIP4_1NFT(nft).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
                 currentBid.addr,
                 sendGasTo,
                 callbacks
             );
-            ITokenWallet(tokenWallet).transfer{ value: 0, flag: 64 }(
+            ITokenWallet(tokenWallet).transfer{ value: 0, flag: 64, bounce: false }(
                 maxBidValue,
                 nftOwner,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
@@ -212,7 +236,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         } else {
             state = AuctionStatus.Cancelled;
             TvmCell empty;
-            ITIP4_1NFT(nft).transfer{value: 0, flag: 64}(
+            ITIP4_1NFT(nft).transfer{ value: 0, flag: 64, bounce: false }(
                 nftOwner,
                 sendGasTo,
                 callbacks
@@ -247,5 +271,16 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
 
     function getInfo() external view responsible returns (AuctionDetails) {
         return AuctionDetails(nft, nftOwner, paymentTokenRoot, tokenWallet, auctionStartTime, auctionDuration, auctionEndTime);
+    }
+
+    function onAcceptTokensBurn(
+        uint128 /*amount*/,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    ) override external {
+        tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
+        user.transfer({ value: 0, flag: 128, bounce: false });
     }
 }

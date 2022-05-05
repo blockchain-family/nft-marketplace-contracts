@@ -71,6 +71,18 @@
 			]
 		},
 		{
+			"name": "onAcceptTokensBurn",
+			"inputs": [
+				{"name":"value0","type":"uint128"},
+				{"name":"value1","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"user","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "price",
 			"inputs": [
 			],

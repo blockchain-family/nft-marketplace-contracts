@@ -1,0 +1,67 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_owner","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "buildPayload",
+			"inputs": [
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"tokenRoot","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"originalGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "expectedAddressDirectBuy",
+			"inputs": [
+				{"name":"answerId","type":"uint32"},
+				{"name":"_owner","type":"address"},
+				{"name":"_spentTokenRoot","type":"address"},
+				{"name":"_nft","type":"address"},
+				{"name":"_nowTx","type":"uint64"},
+				{"name":"_amount","type":"uint128"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"},
+		{"key":2,"name":"owner","type":"address"}
+	],
+	"events": [
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"nonce_","type":"uint64"},
+		{"name":"owner","type":"address"},
+		{"name":"tokenPlatformCode","type":"cell"},
+		{"name":"codeNft","type":"cell"},
+		{"name":"directBuyCode","type":"cell"}
+	]
+}

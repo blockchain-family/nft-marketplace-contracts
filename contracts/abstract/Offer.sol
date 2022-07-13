@@ -7,7 +7,7 @@ import '../errors/BaseErrors.sol';
 import '../errors/OffersBaseErrors.sol';
 
 import '../interfaces/IOffersRoot.sol';
-import '../../true-nft/contracts/interfaces/IData.sol';
+// import '../../true-nft/contracts/interfaces/IData.sol';
 
 
 abstract contract Offer {

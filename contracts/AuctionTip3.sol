@@ -3,24 +3,23 @@ pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
-import './libraries/Gas.sol';
-import './WeverAddresses.sol';
+import "./libraries/Gas.sol";
 
 import './abstract/Offer.sol';
 
-import 'ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol';
-import 'ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol';
-import 'ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol';
-import 'ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensBurnCallback.sol';
-import './modules/TIP4_1/interfaces/INftChangeManager.sol';
-import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
+import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
+import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
+import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
-import './interfaces/IAuctionBidPlacedCallback.sol';
+import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
+import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
-import './errors/AuctionErrors.sol';
-import './errors/BaseErrors.sol';
+import "./interfaces/IAuctionBidPlacedCallback.sol";
 
-contract AuctionTip3 is WeverAddresses, Offer, IAcceptTokensTransferCallback, IAcceptTokensBurnCallback {
+import "./errors/AuctionErrors.sol";
+import "./errors/BaseErrors.sol";
+
+contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     
     address paymentTokenRoot;
     address tokenWallet;
@@ -126,12 +125,15 @@ contract AuctionTip3 is WeverAddresses, Offer, IAcceptTokensTransferCallback, IA
 
         uint32 callbackId = 0;
         address buyer = sender;
+        
+        //+ change as https://gitlab.bf.rocks/nft/revoland-lootboxes/-/blob/master/contracts/libraries/ExchangePayload.sol#L14
         if (payloadSlice.bits() >= 32) {
             callbackId = payloadSlice.decode(uint32);
         }
         if (payloadSlice.bits() >= 267) {
             buyer = payloadSlice.decode(address);
         }
+        //- change as https://gitlab.bf.rocks/nft/revoland-lootboxes/-/blob/master/contracts/libraries/ExchangePayload.sol#L14
 
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
@@ -148,25 +150,14 @@ contract AuctionTip3 is WeverAddresses, Offer, IAcceptTokensTransferCallback, IA
             emit BidDeclined(buyer, amount);
             sendBidResultCallback(callbackId, buyer, false);
             TvmCell empty;
-            if (token_root == WEVER_ROOT && paymentTokenRoot == WEVER_ROOT) {
-                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
-                    amount,
-                    WEVER_VAULT,
-                    uint128(0),
-                    buyer,
-                    true,
-                    empty
-                );
-            } else {
-                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
-                    amount,
-                    buyer,
-                    Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                    original_gas_to,
-                    true,
-                    empty
-                );
-            }
+            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                amount,
+                buyer,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                original_gas_to,
+                true,
+                empty
+            );
         }
     }
 
@@ -186,26 +177,15 @@ contract AuctionTip3 is WeverAddresses, Offer, IAcceptTokensTransferCallback, IA
         sendBidResultCallback(_callbackId, _newBidSender, true);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
-            TvmCell empty;
-            if (paymentTokenRoot == WEVER_ROOT) {
-                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
-                    _currentBid.value,
-                    WEVER_VAULT,
-                    uint128(0),
-                    _currentBid.addr,
-                    true,
-                    empty
-                );
-            } else {
-                ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
-                    _currentBid.value,
-                    _currentBid.addr,
-                    Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                    original_gas_to,
-                    false,
-                    empty
-                );
-            }
+            TvmCell empty;  
+            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                _currentBid.value,
+                _currentBid.addr,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                original_gas_to,
+                false,
+                empty
+            );
         } else {
             original_gas_to.transfer({ value: 0, flag: 128, bounce: false });
         }
@@ -269,18 +249,7 @@ contract AuctionTip3 is WeverAddresses, Offer, IAcceptTokensTransferCallback, IA
         return builder.toCell();
     }
 
-    function getInfo() external view responsible returns (AuctionDetails) {
+    function getInfo() external view returns (AuctionDetails) {
         return AuctionDetails(nft, nftOwner, paymentTokenRoot, tokenWallet, auctionStartTime, auctionDuration, auctionEndTime);
-    }
-
-    function onAcceptTokensBurn(
-        uint128 /*amount*/,
-        address /*walletOwner*/,
-        address /*wallet*/,
-        address user,
-        TvmCell payload
-    ) override external {
-        tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
-        user.transfer({ value: 0, flag: 128, bounce: false });
     }
 }

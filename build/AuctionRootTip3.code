@@ -133,29 +133,22 @@ CALLREF {
 	CALL $_resolveNft_internal_macro$
 }
 .loc ../contracts/AuctionRootTip3.sol, 80
+DROP
 FALSE
 .loc ../contracts/AuctionRootTip3.sol, 81
-SWAP
-GETGLOB 9
+PUSH S5
+CALLREF {
+	CALL $owner_internal_macro$
+}
 SDEQ
 DUP
 PUSHCONT {
 	DROP
-	PUSH S5
-	CALLREF {
-		CALL $owner_internal_macro$
-	}
-	SDEQ
-	DUP
-	PUSHCONT {
-		DROP
-		OVER
-		CTOS
-		SBITS
-		PUSHINT 523
-		EQUAL
-	}
-	IF
+	OVER
+	CTOS
+	SBITS
+	PUSHINT 523
+	EQUAL
 }
 IF
 PUSHCONT {

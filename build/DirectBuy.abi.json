@@ -1,0 +1,84 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_amount","type":"uint128"},
+				{"name":"_codeNft","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onTokenWallet",
+			"inputs": [
+				{"name":"_spentTokenWallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getBalanceSpentWallet",
+			"inputs": [
+				{"name":"balance","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getDetails",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"amount","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "onNftChangeManager",
+			"inputs": [
+				{"name":"id","type":"uint256"},
+				{"name":"nftOwner","type":"address"},
+				{"name":"oldManager","type":"address"},
+				{"name":"newManager","type":"address"},
+				{"name":"collection","type":"address"},
+				{"name":"sendGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "closedDirectBuy",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"factoryDirectBuy","type":"address"},
+		{"key":2,"name":"owner","type":"address"},
+		{"key":3,"name":"spentTokenRoot","type":"address"},
+		{"key":4,"name":"nftAddress","type":"address"},
+		{"key":5,"name":"nowTx","type":"uint64"}
+	],
+	"events": [
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"factoryDirectBuy","type":"address"},
+		{"name":"owner","type":"address"},
+		{"name":"spentTokenRoot","type":"address"},
+		{"name":"nftAddress","type":"address"},
+		{"name":"nowTx","type":"uint64"},
+		{"name":"expectedAmount","type":"uint128"},
+		{"name":"codeNft","type":"cell"},
+		{"name":"spentTokenWallet","type":"address"},
+		{"name":"currentStatus","type":"uint8"}
+	]
+}

@@ -64,22 +64,9 @@
 		{
 			"name": "getInfo",
 			"inputs": [
-				{"name":"answerId","type":"uint32"}
 			],
 			"outputs": [
 				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "onAcceptTokensBurn",
-			"inputs": [
-				{"name":"value0","type":"uint128"},
-				{"name":"value1","type":"address"},
-				{"name":"value2","type":"address"},
-				{"name":"user","type":"address"},
-				{"name":"payload","type":"cell"}
-			],
-			"outputs": [
 			]
 		},
 		{

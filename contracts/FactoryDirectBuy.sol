@@ -10,6 +10,8 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
 
+import "./interfaces/IDirectBuyCallback.sol";
+
 import "./DirectBuy.sol";
 
 contract FactoryDirectBuy is IAcceptTokensTransferCallback {
@@ -21,6 +23,9 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback {
     TvmCell codeNft;
     TvmCell directBuyCode;
     
+    event DirectBuyDeployed(address sender, address tokenRoot, address nft, uint64 nonce, uint128 amount);
+    event DirectBuyDeclined(address sender, address tokenRoot, uint128 amount);
+
     constructor(address _owner) public {
         require(_owner.value != 0);
         tvm.accept();
@@ -50,18 +55,22 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback {
             msg.sender == expectedAddressTokenRoot(tokenRoot, sender)) 
         {
            (address nft) = payloadSlice.decode(address);
-           
-           address directBuyAddress = new DirectBuy {
+            
+            uint64 nonce = uint64(now);
+            address directBuyAddress = new DirectBuy {
              stateInit: _buildDirectBuyStateInit(
                 sender, 
                 tokenRoot,
                 nft,
-                uint64(now)),
+                nonce),
             value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE
            }(
             amount,
             codeNft
             );
+
+            emit DirectBuyDeployed(sender, tokenRoot, nft, nonce, amount);
+            IDirectBuyCallback(sender).directBuyDeployed(sender, tokenRoot, nft, nonce, amount);
 
             ITokenWallet(msg.sender).transfer{
                 value: 0,
@@ -76,7 +85,10 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback {
                 payload
             );
         } else {
-             TvmCell emptyPayload;
+            emit DirectBuyDeclined(sender, tokenRoot, amount);
+            IDirectBuyCallback(sender).directBuyDeployedDeclined(sender, tokenRoot, amount);
+
+            TvmCell emptyPayload;
             ITokenWallet(msg.sender).transfer {
                 value: 0,
                 flag: 128,

@@ -53,6 +53,28 @@
 		{"key":2,"name":"owner","type":"address"}
 	],
 	"events": [
+		{
+			"name": "DirectBuyDeployed",
+			"inputs": [
+				{"name":"sender","type":"address"},
+				{"name":"tokenRoot","type":"address"},
+				{"name":"nft","type":"address"},
+				{"name":"nonce","type":"uint64"},
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "DirectBuyDeclined",
+			"inputs": [
+				{"name":"sender","type":"address"},
+				{"name":"tokenRoot","type":"address"},
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		}
 	],
 	"fields": [
 		{"name":"_pubkey","type":"uint256"},

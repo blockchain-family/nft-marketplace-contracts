@@ -41,16 +41,19 @@ contract DirectBuy is INftChangeManager {
         uint128 amount;
         address spentWallet;
         uint8 status;
+        address sender;
     }
 
+    event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyDetails);
+
     constructor(uint128 _amount, TvmCell _codeNft) public {
-        currentStatus = DirectBuyStatus.Create;
         if(msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
+            changeState(DirectBuyStatus.Create);
             tvm.rawReserve(address(this).balance - msg.value, 0);
 
             expectedAmount = _amount;
             codeNft = _codeNft;
-            
+
             ITokenRoot(spentTokenRoot).deployWallet{
                 value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
                 flag: 1,
@@ -86,7 +89,7 @@ contract DirectBuy is INftChangeManager {
         require(msg.sender.value != 0 && msg.sender == spentTokenWallet, DirectBuySellErrors.NOT_SPENT_WALLET_TOKEN);
 
         if (balance >= expectedAmount) {
-            currentStatus = DirectBuyStatus.Active;   
+            changeState(DirectBuyStatus.Active);
         }
     }
 
@@ -99,7 +102,8 @@ contract DirectBuy is INftChangeManager {
             nowTx,
             expectedAmount,
             spentTokenWallet,
-            currentStatus
+            currentStatus,
+            msg.sender
         );
     }
 
@@ -134,8 +138,7 @@ contract DirectBuy is INftChangeManager {
                 false,
                 empty
             );     
-            
-            currentStatus == DirectBuyStatus.Filled;
+            changeState(DirectBuyStatus.Filled);
         } else {
                 ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                 nftOwner,
@@ -145,7 +148,28 @@ contract DirectBuy is INftChangeManager {
         }
     }
 
-    function closedDirectBuy() external view onlyOwner {
+    function changeState(uint8 newState) private {
+		uint8 prevStateN = currentStatus;
+		currentStatus = newState;
+		emit DirectBuyStateChanged(prevStateN, newState, builderDetails());
+	}
+
+    function builderDetails() private view returns (DirectBuyDetails) {
+		return
+			DirectBuyDetails(
+                factoryDirectBuy,
+                owner,
+                spentTokenRoot,
+                nftAddress,
+                nowTx,
+                expectedAmount,
+                spentTokenWallet,
+                currentStatus,
+                msg.sender
+            );
+    }
+
+    function closedDirectBuy() external onlyOwner {
         require(currentStatus == DirectBuyStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
         
         TvmCell emptyPayload;
@@ -161,7 +185,7 @@ contract DirectBuy is INftChangeManager {
             true,
             emptyPayload
         );
-        currentStatus == DirectBuyStatus.Cancelled;
+        changeState(DirectBuyStatus.Cancelled);
     }
 
     function _resolveNft(

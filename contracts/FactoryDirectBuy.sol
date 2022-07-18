@@ -36,7 +36,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
         
         _transferOwnership(_owner);
-        
         sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     } 
 

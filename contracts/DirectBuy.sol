@@ -26,7 +26,7 @@ contract DirectBuy is INftChangeManager {
     address static nftAddress;
     uint64 static nowTx;
 
-    uint128 expectedAmount;
+    uint128 price;
     TvmCell codeNft;
 
     address spentTokenWallet;
@@ -38,7 +38,7 @@ contract DirectBuy is INftChangeManager {
         address spentToken;
         address nft;
         uint64 timeTx;
-        uint128 amount;
+        uint128 price;
         address spentWallet;
         uint8 status;
         address sender;
@@ -51,7 +51,7 @@ contract DirectBuy is INftChangeManager {
             changeState(DirectBuyStatus.Create);
             tvm.rawReserve(address(this).balance - msg.value, 0);
 
-            expectedAmount = _amount;
+            price = _amount;
             codeNft = _codeNft;
 
             ITokenRoot(spentTokenRoot).deployWallet{
@@ -88,7 +88,7 @@ contract DirectBuy is INftChangeManager {
     function getBalanceSpentWallet(uint128 balance) external {
         require(msg.sender.value != 0 && msg.sender == spentTokenWallet, DirectBuySellErrors.NOT_SPENT_WALLET_TOKEN);
 
-        if (balance >= expectedAmount) {
+        if (balance >= price) {
             changeState(DirectBuyStatus.Active);
         }
     }
@@ -100,7 +100,7 @@ contract DirectBuy is INftChangeManager {
             spentTokenRoot,
             nftAddress,
             nowTx,
-            expectedAmount,
+            price,
             spentTokenWallet,
             currentStatus,
             msg.sender
@@ -131,7 +131,7 @@ contract DirectBuy is INftChangeManager {
 
             TvmCell empty;
             ITokenWallet(spentTokenWallet).transfer{ value: 0, flag: 64, bounce: false }(
-                expectedAmount,
+                price,
                 nftOwner,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
                 sendGasTo,
@@ -162,7 +162,7 @@ contract DirectBuy is INftChangeManager {
                 spentTokenRoot,
                 nftAddress,
                 nowTx,
-                expectedAmount,
+                price,
                 spentTokenWallet,
                 currentStatus,
                 msg.sender
@@ -178,7 +178,7 @@ contract DirectBuy is INftChangeManager {
             flag: 128,
             bounce: false 
         }(
-            expectedAmount,
+            price,
             owner,
             0,
             owner,

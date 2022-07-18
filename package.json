@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@broxus/credit-processor": "https://github.com/broxus/ton-eth-bridge-credit-processor",
     "@broxus/contracts": "^1.0.4",
     "ton-eth-bridge-token-contracts": "git://github.com/broxus/ton-eth-bridge-token-contracts#d3c1cd920c0320ffaab03b54c878dd0e06fed3c7",
     "@types/mocha": "^9.1.0",

@@ -4,6 +4,7 @@ pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
+import "./libraries/ExchangePayload.sol";
 
 import './abstract/Offer.sol';
 
@@ -123,18 +124,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
 
         TvmSlice payloadSlice = payload.toSlice();
 
-        uint32 callbackId = 0;
-        address buyer = sender;
-        
-        //+ change as https://gitlab.bf.rocks/nft/revoland-lootboxes/-/blob/master/contracts/libraries/ExchangePayload.sol#L14
-        if (payloadSlice.bits() >= 32) {
-            callbackId = payloadSlice.decode(uint32);
-        }
-        if (payloadSlice.bits() >= 267) {
-            buyer = payloadSlice.decode(address);
-        }
-        //- change as https://gitlab.bf.rocks/nft/revoland-lootboxes/-/blob/master/contracts/libraries/ExchangePayload.sol#L14
-
+        (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload);
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
             amount >= nextBidValue &&

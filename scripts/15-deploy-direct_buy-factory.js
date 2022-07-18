@@ -16,45 +16,42 @@ async function main() {
         {
             type: 'text',
             name: 'owner',
-            message: 'AuctionRootTip3 owner',
+            message: 'FactoryDirectBuy owner',
             validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ])
 
     const account = migration.load(await locklift.factory.getAccount('Wallet'), 'Account1');
-    const AuctionRootTip3 = await locklift.factory.getContract('AuctionRootTip3');
+    const FactoryDirectBuy = await locklift.factory.getContract('FactoryDirectBuy');
     const [keyPair] = await locklift.keys.getKeyPairs();
 
+    const TokenWalletPlatform = await locklift.factory.getContract('TokenWalletPlatform', 'precompiled');
     const Nft = await locklift.factory.getContract('Nft');
+    const DirectBuy = await locklift.factory.getContract('DirectBuy');
 
-    const AuctionTip3 = await locklift.factory.getContract('AuctionTip3');
-    let auctionRootTip3 = await locklift.giver.deployContract({
-        contract: AuctionRootTip3,
+    let factoryDirectBuy = await locklift.giver.deployContract({
+        contract: FactoryDirectBuy,
         constructorParams: {
-            _codeNft: Nft.code,
             _owner: account.address,
-            _offerCode: AuctionTip3.code,
-            _deploymentFee: 0,
-            _marketFee: 0,
-            _marketFeeDecimals: 0,
-            _auctionBidDelta: 100, // ???
-            _auctionBidDeltaDecimals: 1, // ???
-            _sendGasTo: account.address
+            sendGasTo: account.address
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0,
+            tokenPlatformCode: TokenWalletPlatform.code,  
+            codeNft: Nft.code,
+            directBuyCode: DirectBuy.code
         },
         keyPair,
     }, locklift.utils.convertCrystal(10, 'nano'));
 
     console.log(`Account: ${account.address}`)
-    console.log(`AuctionRootTip3: ${auctionRootTip3.address}`)
+    console.log(`FactoryDirectBuy: ${factoryDirectBuy.address}`)
 
-    migration.store(auctionRootTip3, 'AuctionRootTip3');
+    migration.store(factoryDirectBuy, 'FactoryDirectBuy');
 
     if (response.owner) {
         await account.runTarget({
-            contract: auctionRootTip3,
+            contract: factoryDirectBuy,
             method: 'transferOwnership',
             params: {
                 newOwner: response.owner

@@ -11,13 +11,13 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransfe
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
 
 import "./interfaces/IDirectBuyCallback.sol";
+import "./modules/access/OwnableInternal.sol";
 
 import "./DirectBuy.sol";
 
-contract FactoryDirectBuy is IAcceptTokensTransferCallback {
+contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
     uint64 static nonce_;
-    address static owner;
 
     TvmCell tokenPlatformCode;
     TvmCell codeNft;
@@ -26,12 +26,18 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback {
     event DirectBuyDeployed(address sender, address tokenRoot, address nft, uint64 nonce, uint128 amount);
     event DirectBuyDeclined(address sender, address tokenRoot, uint128 amount);
 
-    constructor(address _owner) public {
-        require(_owner.value != 0);
+    constructor(
+        address _owner,
+        address sendGasTo
+    ) OwnableInternal (
+        _owner
+    ) public {
         tvm.accept();
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
         
-        owner = _owner;
+        _transferOwnership(_owner);
+        
+        sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     } 
 
     function buildPayload(address nft) external pure returns (TvmCell) {
@@ -48,7 +54,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback {
     ) external override {   
         tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);     
 
-        // Может быть через бридж???
         TvmSlice payloadSlice = payload.toSlice();
         if (payloadSlice.bits() == 267 &&
             msg.sender.value != 0 &&

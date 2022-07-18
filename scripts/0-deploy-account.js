@@ -1,35 +1,43 @@
-// @ts-check
-const prompts = require('prompts')
+const {Migration} = require(process.cwd()+'/scripts/migration');
+const { Command } = require('commander');
+const program = new Command();
 
-const {Migration} = require(process.cwd() + '/scripts/migration')
+const range = n => [...Array(n).keys()];
+
 const migration = new Migration();
 
-const {deployAccount, LockLift} = require( process.cwd() + '/test/utils.ts')
-
-/** @type {LockLift} */
-var locklift = global.locklift;
-
 async function main() {
-    const [keyPair] = await locklift.keys.getKeyPairs();
+  const Account = await locklift.factory.getAccount('Wallet');
+  const keyPairs = await locklift.keys.getKeyPairs();
 
-    const response = await prompts([
-        {
-            type: 'number',
-            name: 'amount',
-            message: 'Amount of Ever for Admin',
-            initial: 1
-        }
-    ])
+  program
+      .allowUnknownOption()
+      .option('-n, --key_number <key_number>', 'count of accounts')
+      .option('-b, --balance <balance>', 'count of accounts');
 
-    let temp = await deployAccount(keyPair, response.amount)
-    migration.store(temp, 'Account');
-    console.log('TempAccount', temp.address)
-    console.log(`Sent ${response.amount} Ever to Account: ${temp.address}`)
+  program.parse(process.argv);
+
+  const options = program.opts();
+
+  const key_number = +(options.key_number || '0');
+  const balance = +(options.balance || '10');
+
+  let account = await locklift.giver.deployContract({
+    contract: Account,
+    constructorParams: {},
+    initParams: {
+      _randomNonce: Math.random() * 6400 | 0,
+    },
+    keyPair: keyPairs[key_number],
+  }, locklift.utils.convertCrystal(balance, 'nano'));
+  const name = `Account${key_number+1}`;
+  migration.store(account, name);
+  console.log(`${name}: ${account.address}`);
 }
 
 main()
-    .then(() => process.exit(0))
-    .catch(e => {
-        console.log(e);
-        process.exit(1);
-    });
+  .then(() => process.exit(0))
+  .catch(e => {
+    console.log(e);
+    process.exit(1);
+  });

@@ -3,16 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "main": "",
-  "scripts": {
-    "build": "npx locklift build --config locklift.config.js",
-    "deploy-account": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/0-deploy-account.js",
-    "deploy-collection": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/1-deploy-collection.js",
-    "mint-nft": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/2-mint-nft.js",
-    "deploy-auction-root": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/10-deploy-auction-root.js",
-    "build-start-auction-payload": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/20-build-start-auction-payload.js",
-    "get-collection-ownership": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/88-get-collection-ownership.js",
-    "send-evers-to": "NODE_OPTIONS='-r ts-node/register --no-warnings' npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/100-send-evers-to.js",
-    "mint-as-transfer": "npx locklift run --config locklift.config.js --disable-build --network prod --script scripts/200-mint-as-transfer.js"
+   "scripts": {
   },
   "author": "",
   "license": "ISC",

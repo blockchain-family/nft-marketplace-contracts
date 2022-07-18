@@ -6,7 +6,8 @@
 		{
 			"name": "constructor",
 			"inputs": [
-				{"name":"_owner","type":"address"}
+				{"name":"_owner","type":"address"},
+				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
 			]
@@ -46,11 +47,26 @@
 			"outputs": [
 				{"name":"value0","type":"address"}
 			]
+		},
+		{
+			"name": "owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "transferOwnership",
+			"inputs": [
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"data": [
-		{"key":1,"name":"nonce_","type":"uint64"},
-		{"key":2,"name":"owner","type":"address"}
+		{"key":1,"name":"nonce_","type":"uint64"}
 	],
 	"events": [
 		{
@@ -74,14 +90,23 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "OwnershipTransferred",
+			"inputs": [
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
 		{"name":"_pubkey","type":"uint256"},
 		{"name":"_timestamp","type":"uint64"},
 		{"name":"_constructorFlag","type":"bool"},
+		{"name":"owner_","type":"address"},
 		{"name":"nonce_","type":"uint64"},
-		{"name":"owner","type":"address"},
 		{"name":"tokenPlatformCode","type":"cell"},
 		{"name":"codeNft","type":"cell"},
 		{"name":"directBuyCode","type":"cell"}

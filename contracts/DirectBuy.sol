@@ -27,7 +27,6 @@ contract DirectBuy is INftChangeManager {
     uint64 static nowTx;
 
     uint128 price;
-    TvmCell codeNft;
 
     address spentTokenWallet;
     uint8 currentStatus;
@@ -38,7 +37,7 @@ contract DirectBuy is INftChangeManager {
         address spentToken;
         address nft;
         uint64 timeTx;
-        uint128 price;
+        uint128 _price;
         address spentWallet;
         uint8 status;
         address sender;
@@ -46,13 +45,12 @@ contract DirectBuy is INftChangeManager {
 
     event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyDetails);
 
-    constructor(uint128 _amount, TvmCell _codeNft) public {
+    constructor(uint128 _amount) public {
         if(msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
             changeState(DirectBuyStatus.Create);
             tvm.rawReserve(address(this).balance - msg.value, 0);
 
             price = _amount;
-            codeNft = _codeNft;
 
             ITokenRoot(spentTokenRoot).deployWallet{
                 value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
@@ -62,7 +60,6 @@ contract DirectBuy is INftChangeManager {
                 address(this),
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS
             );
-
         } else {
             msg.sender.transfer(0, false, 128 + 32);
         }
@@ -94,17 +91,7 @@ contract DirectBuy is INftChangeManager {
     }
 
     function getDetails() external view returns(DirectBuyDetails){
-        return DirectBuyDetails(
-            factoryDirectBuy,
-            owner,
-            spentTokenRoot,
-            nftAddress,
-            nowTx,
-            price,
-            spentTokenWallet,
-            currentStatus,
-            msg.sender
-        );
+        return builderDetails();
     }
 
     function onNftChangeManager(
@@ -118,7 +105,6 @@ contract DirectBuy is INftChangeManager {
     ) external override {
         require(msg.sender.value != 0 && msg.sender == nftOwner, DirectBuySellErrors.NOT_NFT_OWNER);
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
-        require(nftAddress == _resolveNft(collection, id), DirectBuySellErrors.NOT_CORRECT_ADDRESS_NFT);
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
@@ -186,30 +172,5 @@ contract DirectBuy is INftChangeManager {
             emptyPayload
         );
         changeState(DirectBuyStatus.Cancelled);
-    }
-
-    function _resolveNft(
-        address collection,
-        uint256 id
-    ) internal virtual view returns (address nft) {
-        TvmCell code = _buildNftCode(collection);
-        TvmCell state = _buildNftState(code, id);
-        uint256 hashState = tvm.hash(state);
-        nft = address.makeAddrStd(address(this).wid, hashState);
-    }
-   function _buildNftCode(address collection) internal virtual view returns (TvmCell) {
-        TvmBuilder salt;
-        salt.store(collection);
-        return tvm.setCodeSalt(codeNft, salt.toCell());
-    }
-    function _buildNftState(
-        TvmCell code,
-        uint256 id
-    ) internal virtual pure returns (TvmCell) {
-        return tvm.buildStateInit({
-            contr: TIP4_1Nft,
-            varInit: {_id: id},
-            code: code
-        });
     }
 }

@@ -6,8 +6,7 @@
 		{
 			"name": "constructor",
 			"inputs": [
-				{"name":"_amount","type":"uint128"},
-				{"name":"_codeNft","type":"cell"}
+				{"name":"_amount","type":"uint128"}
 			],
 			"outputs": [
 			]
@@ -33,7 +32,7 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"amount","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{
@@ -71,7 +70,7 @@
 			"inputs": [
 				{"name":"from","type":"uint8"},
 				{"name":"to","type":"uint8"},
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"amount","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value2","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value2","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -86,8 +85,7 @@
 		{"name":"spentTokenRoot","type":"address"},
 		{"name":"nftAddress","type":"address"},
 		{"name":"nowTx","type":"uint64"},
-		{"name":"expectedAmount","type":"uint128"},
-		{"name":"codeNft","type":"cell"},
+		{"name":"price","type":"uint128"},
 		{"name":"spentTokenWallet","type":"address"},
 		{"name":"currentStatus","type":"uint8"}
 	]

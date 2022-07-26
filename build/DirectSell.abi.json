@@ -1,0 +1,103 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_auctionStart","type":"uint64"},
+				{"name":"_auctionEnd","type":"uint64"},
+				{"name":"_price","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onTokenWallet",
+			"inputs": [
+				{"name":"_wallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getDetails",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"token","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"start","type":"uint64"},{"name":"end","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"token_root","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"sender_wallet","type":"address"},
+				{"name":"original_gas_to","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onNftChangeManager",
+			"inputs": [
+				{"name":"id","type":"uint256"},
+				{"name":"nftOwner","type":"address"},
+				{"name":"oldManager","type":"address"},
+				{"name":"newManager","type":"address"},
+				{"name":"collection","type":"address"},
+				{"name":"sendGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "closedDirectSell",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"factoryDirectSell","type":"address"},
+		{"key":2,"name":"owner","type":"address"},
+		{"key":3,"name":"paymentToken","type":"address"},
+		{"key":4,"name":"nftAddress","type":"address"},
+		{"key":5,"name":"nowTx","type":"uint64"}
+	],
+	"events": [
+		{
+			"name": "DirectSellStateChanged",
+			"inputs": [
+				{"name":"from","type":"uint8"},
+				{"name":"to","type":"uint8"},
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"token","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"start","type":"uint64"},{"name":"end","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value2","type":"tuple"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"factoryDirectSell","type":"address"},
+		{"name":"owner","type":"address"},
+		{"name":"paymentToken","type":"address"},
+		{"name":"nftAddress","type":"address"},
+		{"name":"nowTx","type":"uint64"},
+		{"name":"auctionStart","type":"uint64"},
+		{"name":"auctionEnd","type":"uint64"},
+		{"name":"price","type":"uint128"},
+		{"name":"tokenWallet","type":"address"},
+		{"name":"currentStatus","type":"uint8"},
+		{"name":"receivedNFT","type":"bool"},
+		{"name":"state","type":"uint8"}
+	]
+}

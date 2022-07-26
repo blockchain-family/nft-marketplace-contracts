@@ -8,4 +8,5 @@ library DirectBuySellErrors {
     uint16 constant NOT_CORRECT_ADDRESS_NFT = 304;
     uint16 constant NOT_OWNER_DIRECT_BUY = 305;
     uint16 constant NOT_ACTIVE_CURRENT_STATUS = 306;
+    uint16 constant NOT_FACTORY_MSG_SENDER_NFT = 307;
 }

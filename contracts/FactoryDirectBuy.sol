@@ -20,7 +20,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     uint64 static nonce_;
 
     TvmCell tokenPlatformCode;
-    TvmCell codeNft;
     TvmCell directBuyCode;
     
     event DirectBuyDeployed(address sender, address tokenRoot, address nft, uint64 nonce, uint128 amount);
@@ -55,27 +54,27 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         bool needCancel = false;
 
         TvmSlice payloadSlice = payload.toSlice();
-        if (payloadSlice.bits() == 395 &&
+        address nftForBuy = payloadSlice.decode(address);
+        if (payloadSlice.bits() == 128 &&
             msg.sender.value != 0 &&
             msg.sender == expectedAddressTokenRoot(tokenRoot, sender)) 
         {
-           (address nft, uint128 price) = payloadSlice.decode(address, uint128);
+            (uint128 price) = payloadSlice.decode(uint128);
             if (amount >= price) {
                 uint64 nonce = uint64(now);
                 address directBuyAddress = new DirectBuy {
                 stateInit: _buildDirectBuyStateInit(
                     sender, 
                     tokenRoot,
-                    nft,
+                    nftForBuy,
                     nonce),
                 value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE
                  }(
-                    amount,
-                    codeNft
+                    amount
                 );
 
-                emit DirectBuyDeployed(sender, tokenRoot, nft, nonce, amount);
-                IDirectBuyCallback(sender).directBuyDeployed(sender, tokenRoot, nft, nonce, amount);
+                emit DirectBuyDeployed{dest: nftForBuy}(sender, tokenRoot, nftForBuy, nonce, amount);
+                IDirectBuyCallback(sender).directBuyDeployed(sender, tokenRoot, nftForBuy, nonce, amount);
 
                 ITokenWallet(msg.sender).transfer{
                     value: 0,
@@ -97,7 +96,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         }
 
         if (needCancel) {
-            emit DirectBuyDeclined(sender, tokenRoot, amount);
+            emit DirectBuyDeclined{dest: nftForBuy}(sender, tokenRoot, amount);
             IDirectBuyCallback(sender).directBuyDeployedDeclined(sender, tokenRoot, amount);
 
             TvmCell emptyPayload;

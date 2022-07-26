@@ -3,14 +3,12 @@
   "version": "0.0.0",
   "description": "",
   "main": "",
-   "scripts": {
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@broxus/credit-processor": "https://github.com/broxus/ton-eth-bridge-credit-processor",
     "@broxus/contracts": "^1.0.4",
-    "ton-eth-bridge-token-contracts": "git://github.com/broxus/ton-eth-bridge-token-contracts#d3c1cd920c0320ffaab03b54c878dd0e06fed3c7",
+    "@broxus/credit-processor": "https://github.com/broxus/ton-eth-bridge-credit-processor",
     "@types/mocha": "^9.1.0",
     "bignumber.js": "^9.0.2",
     "ipfs-core": "^0.14.2",
@@ -18,6 +16,7 @@
     "mocha-logger": "^1.0.8",
     "ora": "^3.4.0",
     "prompts": "^2.4.1",
+    "ton-eth-bridge-token-contracts": "git://github.com/broxus/ton-eth-bridge-token-contracts#d3c1cd920c0320ffaab03b54c878dd0e06fed3c7",
     "ts-node": "^10.7.0"
   }
 }

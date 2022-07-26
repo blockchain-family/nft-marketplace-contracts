@@ -109,7 +109,6 @@
 		{"name":"owner_","type":"address"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"tokenPlatformCode","type":"cell"},
-		{"name":"codeNft","type":"cell"},
 		{"name":"directBuyCode","type":"cell"}
 	]
 }

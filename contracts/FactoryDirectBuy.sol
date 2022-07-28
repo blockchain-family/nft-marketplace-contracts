@@ -7,6 +7,7 @@ pragma AbiHeader time;
 import "./libraries/Gas.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
+
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
 
@@ -22,7 +23,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     TvmCell tokenPlatformCode;
     TvmCell directBuyCode;
     
-    event DirectBuyDeployed(address sender, address tokenRoot, address nft, uint64 nonce, uint128 amount);
+    event DirectBuyDeployed(address directBuyAddress, address sender, address tokenRoot, address nft, uint64 nonce, uint128 amount);
     event DirectBuyDeclined(address sender, address tokenRoot, uint128 amount);
 
     constructor(
@@ -38,8 +39,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     } 
 
-    function buildPayload(address nft, uint128 price) external pure returns (TvmCell) {
-        return abi.encode(nft, price);
+    function buildPayload(address nft) external pure returns (TvmCell) {
+        return abi.encode(nft);
     }
 
     function onAcceptTokensTransfer(
@@ -49,53 +50,47 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         address, /*senderWallet*/
         address originalGasTo,
         TvmCell payload
-    ) external override {   
+    ) external override {  
+        require(msg.value >= Gas.DEPLOY_DIRECT_BUY_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW); 
         tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);     
+        
         bool needCancel = false;
 
         TvmSlice payloadSlice = payload.toSlice();
         address nftForBuy = payloadSlice.decode(address);
         if (payloadSlice.bits() == 128 &&
             msg.sender.value != 0 &&
-            msg.sender == expectedAddressTokenRoot(tokenRoot, sender)) 
+            msg.sender == getTokenWallet(tokenRoot, sender)) 
         {
             (uint128 price) = payloadSlice.decode(uint128);
-            if (amount >= price) {
-                uint64 nonce = uint64(now);
-                address directBuyAddress = new DirectBuy {
-                stateInit: _buildDirectBuyStateInit(
-                    sender, 
-                    tokenRoot,
-                    nftForBuy,
-                    nonce),
-                value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE
-                 }(
-                    amount
-                );
-
-                emit DirectBuyDeployed{dest: nftForBuy}(sender, tokenRoot, nftForBuy, nonce, amount);
-                IDirectBuyCallback(sender).directBuyDeployed(sender, tokenRoot, nftForBuy, nonce, amount);
-
-                ITokenWallet(msg.sender).transfer{
-                    value: 0,
-                    flag: 128,
-                    bounce: false
+            uint64 nonce = tx.timestamp;
+            address directBuyAddress = new DirectBuy {
+            stateInit: _buildDirectBuyStateInit(
+                sender, 
+                tokenRoot,
+                nftForBuy,
+                nonce),
+            value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE
                 }(
-                    amount,
-                    directBuyAddress,
-                    Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                    originalGasTo,
-                    true,
-                    payload
-                );
-            } else {
-                needCancel = true;
-            }   
-        } else {
-            needCancel = true;    
-        }
+                amount
+            );
 
-        if (needCancel) {
+            emit DirectBuyDeployed{dest: nftForBuy}(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
+            IDirectBuyCallback(sender).directBuyDeployed(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
+ 
+            ITokenWallet(msg.sender).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                amount,
+                directBuyAddress,
+                uint128(0),
+                originalGasTo,
+                true,
+                payload
+            ); 
+        } else {
             emit DirectBuyDeclined{dest: nftForBuy}(sender, tokenRoot, amount);
             IDirectBuyCallback(sender).directBuyDeployedDeclined(sender, tokenRoot, amount);
 
@@ -119,7 +114,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         address _owner, 
         address _spentTokenRoot, 
         address _nft, 
-        uint64 _nowTx
+        uint64 _timeTx
     ) private view returns (TvmCell) {
 		return
 			tvm.buildStateInit({
@@ -129,7 +124,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
                     owner: _owner, 
                     spentTokenRoot: _spentTokenRoot,
                     nftAddress: _nft,
-                    nowTx: _nowTx
+                    timeTx: _timeTx
                 },
 				code: directBuyCode
 			});
@@ -139,13 +134,13 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         address _owner, 
         address _spentTokenRoot, 
         address _nft, 
-        uint64 _nowTx, 
+        uint64 _timeTx, 
         uint128 _amount
     ) external view responsible returns(address) {
-        return address(tvm.hash((_buildDirectBuyStateInit(_owner, _spentTokenRoot, _nft, _nowTx))));
+        return address(tvm.hash((_buildDirectBuyStateInit(_owner, _spentTokenRoot, _nft, _timeTx))));
     } 
 
-    function expectedAddressTokenRoot(address _tokenRoot, address _sender) internal view returns (address) {
+    function getTokenWallet(address _tokenRoot, address _sender) internal view returns (address) {
         return address(tvm.hash(
             tvm.buildStateInit({
                 contr: TokenWalletPlatform,

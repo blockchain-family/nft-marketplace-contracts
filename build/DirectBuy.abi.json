@@ -20,31 +20,36 @@
 			]
 		},
 		{
-			"name": "getBalanceSpentWallet",
-			"inputs": [
-				{"name":"balance","type":"uint128"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "getDetails",
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"tokenRoot","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"originalGasTo","type":"address"},
+				{"name":"value5","type":"cell"}
+			],
+			"outputs": [
 			]
 		},
 		{
 			"name": "onNftChangeManager",
 			"inputs": [
-				{"name":"id","type":"uint256"},
+				{"name":"value0","type":"uint256"},
 				{"name":"nftOwner","type":"address"},
-				{"name":"oldManager","type":"address"},
+				{"name":"value2","type":"address"},
 				{"name":"newManager","type":"address"},
-				{"name":"collection","type":"address"},
+				{"name":"value4","type":"address"},
 				{"name":"sendGasTo","type":"address"},
-				{"name":"payload","type":"cell"}
+				{"name":"value6","type":"cell"}
 			],
 			"outputs": [
 			]
@@ -62,7 +67,7 @@
 		{"key":2,"name":"owner","type":"address"},
 		{"key":3,"name":"spentTokenRoot","type":"address"},
 		{"key":4,"name":"nftAddress","type":"address"},
-		{"key":5,"name":"nowTx","type":"uint64"}
+		{"key":5,"name":"timeTx","type":"uint64"}
 	],
 	"events": [
 		{
@@ -70,7 +75,7 @@
 			"inputs": [
 				{"name":"from","type":"uint8"},
 				{"name":"to","type":"uint8"},
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value2","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value2","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -84,7 +89,7 @@
 		{"name":"owner","type":"address"},
 		{"name":"spentTokenRoot","type":"address"},
 		{"name":"nftAddress","type":"address"},
-		{"name":"nowTx","type":"uint64"},
+		{"name":"timeTx","type":"uint64"},
 		{"name":"price","type":"uint128"},
 		{"name":"spentTokenWallet","type":"address"},
 		{"name":"currentStatus","type":"uint8"}

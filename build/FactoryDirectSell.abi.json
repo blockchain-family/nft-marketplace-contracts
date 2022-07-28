@@ -63,6 +63,7 @@
 		{
 			"name": "DirectSellDeployed",
 			"inputs": [
+				{"name":"_directSellAddress","type":"address"},
 				{"name":"sender","type":"address"},
 				{"name":"paymentToken","type":"address"},
 				{"name":"nft","type":"address"},

@@ -6,6 +6,7 @@ pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
 import "./libraries/DirectSellStatus.sol";
+import "./interfaces/IDirectSellCallback.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
@@ -22,7 +23,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     address static owner;
     address static paymentToken;
     address static nftAddress;
-    uint64 static nowTx;
+    uint64 static timeTx;
     
     uint64 auctionStart;
     uint64 auctionEnd;
@@ -38,7 +39,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         address creator;
         address token;
         address nft;
-        uint64 timeTx;
+        uint64 _timeTx;
         uint64 start;
         uint64 end;
         uint128 _price;
@@ -98,13 +99,14 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     }
 
     function onAcceptTokensTransfer(
-        address token_root,				
+        address /*token_root*/,				
         uint128 amount,					
         address sender,			 
-        address sender_wallet,			
+        address /*sender_wallet*/,			
         address original_gas_to,		
-        TvmCell payload					
+        TvmCell /*payload*/					
     ) override external {
+        require(msg.value >= Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW);
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
         TvmCell emptyPayload;
         if (currentStatus == DirectSellStatus.Active && msg.sender.value != 0 && msg.sender == tokenWallet && amount >= price){
@@ -132,6 +134,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
                 emptyPayload
             );
 
+            IDirectSellCallback(owner).directSellSuccess(owner, sender);
             changeState(DirectSellStatus.Filled);
         } else {
             ITokenWallet(msg.sender).transfer{
@@ -150,13 +153,13 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     }
 
     function onNftChangeManager(
-        uint256 id,
-        address nftOwner,
-        address oldManager,
+        uint256 /*id*/,
+        address /*nftOwner*/,
+        address /*oldManager*/,
         address newManager,
-        address collection,
-        address sendGasTo,
-        TvmCell payload
+        address /*collection*/,
+        address /*sendGasTo*/,
+        TvmCell /*payload*/
     ) external override {
         require(newManager == address(this));
         require(msg.sender.value != 0 && msg.sender == factoryDirectSell, DirectBuySellErrors.NOT_FACTORY_MSG_SENDER_NFT);
@@ -180,7 +183,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
                 owner,
                 paymentToken,
                 nftAddress,
-                nowTx,
+                timeTx,
                 auctionStart,
                 auctionEnd,
                 price,

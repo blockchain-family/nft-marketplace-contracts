@@ -116,14 +116,11 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         address token_root,				
         uint128 amount,					
         address sender,			 
-        address sender_wallet,			
+        address /*sender_wallet*/,			
         address original_gas_to,		
         TvmCell payload					
     ) override external {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
-
-        TvmSlice payloadSlice = payload.toSlice();
-
         (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload);
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
@@ -137,7 +134,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         ) {
             processBid(callbackId, buyer, amount, original_gas_to);
         } else {
-            emit BidDeclined(buyer, amount);
+            emit BidDeclined{dest: nft}(buyer, amount);
             sendBidResultCallback(callbackId, buyer, false);
             TvmCell empty;
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
@@ -163,7 +160,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         maxBidValue = _bid;
         currentBid = newBid;
         calculateAndSetNextBid();
-        emit BidPlaced(_newBidSender, _bid);
+        emit BidPlaced{dest: nft}(_newBidSender, _bid);
         sendBidResultCallback(_callbackId, _newBidSender, true);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
@@ -188,12 +185,13 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         require(msg.value >= Gas.FINISH_AUCTION_VALUE, BaseErrors.not_enough_value);
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
-            TvmCell empty;
             ITIP4_1NFT(nft).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
                 currentBid.addr,
                 sendGasTo,
                 callbacks
             );
+            
+            TvmCell empty;
             ITokenWallet(tokenWallet).transfer{ value: 0, flag: 64, bounce: false }(
                 maxBidValue,
                 nftOwner,
@@ -205,7 +203,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             state = AuctionStatus.Complete;
         } else {
             state = AuctionStatus.Cancelled;
-            TvmCell empty;
             ITIP4_1NFT(nft).transfer{ value: 0, flag: 64, bounce: false }(
                 nftOwner,
                 sendGasTo,
@@ -222,7 +219,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         uint32 callbackId,
         address _callbackTarget,
         bool _isBidPlaced
-    ) private {
+    ) private pure {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
                 IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{value: 1, flag: 1, bounce: false}(callbackId);

@@ -15,8 +15,7 @@
 		{
 			"name": "buildPayload",
 			"inputs": [
-				{"name":"nft","type":"address"},
-				{"name":"price","type":"uint128"}
+				{"name":"nft","type":"address"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
@@ -42,7 +41,7 @@
 				{"name":"_owner","type":"address"},
 				{"name":"_spentTokenRoot","type":"address"},
 				{"name":"_nft","type":"address"},
-				{"name":"_nowTx","type":"uint64"},
+				{"name":"_timeTx","type":"uint64"},
 				{"name":"_amount","type":"uint128"}
 			],
 			"outputs": [
@@ -73,6 +72,7 @@
 		{
 			"name": "DirectBuyDeployed",
 			"inputs": [
+				{"name":"directBuyAddress","type":"address"},
 				{"name":"sender","type":"address"},
 				{"name":"tokenRoot","type":"address"},
 				{"name":"nft","type":"address"},

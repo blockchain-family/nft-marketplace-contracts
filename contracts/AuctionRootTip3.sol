@@ -68,9 +68,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     }
 
     function onNftChangeManager(
-        uint256 id,
+        uint256 /*id*/,
         address nftOwner,
-        address oldManager,
+        address /*oldManager*/,
         address newManager,
         address collection,
         address sendGasTo,
@@ -78,7 +78,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     ) external override {
         require(newManager == address(this));
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
-        address expectedSender = _resolveNft(collection, id);
         bool isDeclined = false;
         if (nftOwner == owner() && payload.toSlice().bits() == 523) {
             (
@@ -138,7 +137,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             emit AuctionDeclined(nftOwner, msg.sender);
             IAuctionRootCallback(msg.sender).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false}(nftOwner, msg.sender);
 
-            TvmCell empty;
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
             ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
                 nftOwner,

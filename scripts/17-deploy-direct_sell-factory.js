@@ -12,39 +12,37 @@ async function main() {
         {
             type: 'text',
             name: 'owner',
-            message: 'FactoryDirectBuy owner',
-            validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            message: 'FactoryDirectSell owner',
+            validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'    
         }
     ])
 
     const account = migration.load(await locklift.factory.getAccount('Wallet'), 'Account1');
-    const FactoryDirectBuy = await locklift.factory.getContract('FactoryDirectBuy');
+    const FactoryDirectSell = await locklift.factory.getContract('FactoryDirectSell');
     const [keyPair] = await locklift.keys.getKeyPairs();
 
-    const TokenWalletPlatform = await locklift.factory.getContract('TokenWalletPlatform', 'precompiled');
-    const DirectBuy = await locklift.factory.getContract('DirectBuy');
+    const DirectSell = await locklift.factory.getContract('DirectSell');
 
-    let factoryDirectBuy = await locklift.giver.deployContract({
-        contract: FactoryDirectBuy,
+    let factoryDirectSell = await locklift.giver.deployContract({
+        contract: FactoryDirectSell,
         constructorParams: {
             _owner: account.address,
             sendGasTo: account.address
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0,
-            tokenPlatformCode: TokenWalletPlatform.code,  
-            directBuyCode: DirectBuy.code
-        },
+            directSellCode: DirectSell.code
+        }, 
         keyPair,
     }, locklift.utils.convertCrystal(10, 'nano'));
 
-    console.log(`FactoryDirectBuy: ${factoryDirectBuy.address}`);
+    console.log(`FactoryDirectSell: ${factoryDirectSell.address}`);
 
-    migration.store(factoryDirectBuy, 'FactoryDirectBuy');
+    migration.store(factoryDirectSell, 'FactoryDirectSell');
 
     if (response.owner) {
         await account.runTarget({
-            contract: factoryDirectBuy,
+            contract: factoryDirectSell,
             method: 'transferOwnership',
             params: {
                 newOwner: response.owner
@@ -53,6 +51,7 @@ async function main() {
             value: locklift.utils.convertCrystal(1, 'nano')
         });
     }
+
 }
 
 main()

@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.1;
+pragma ton-solidity >= 0.62.0;
 
 import "@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol";
 import "@broxus/credit-processor/contracts/interfaces/structures/ICreditEventDataStructure.sol";

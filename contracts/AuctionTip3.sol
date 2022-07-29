@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.57.1;
+pragma ton-solidity >=0.62.0;
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
@@ -233,7 +233,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         TvmBuilder builder;
         builder.store(callbackId);
         builder.store(buyer);
-        return builder.toCell();
+        return { value: 0, bounce: false, flag: 64} builder.toCell();
     }
 
     function getInfo() external view returns (AuctionDetails) {

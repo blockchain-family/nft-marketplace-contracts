@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.57.1;
+pragma ton-solidity >=0.62.0;
 
 library BaseErrors {
     uint8 constant message_sender_is_not_my_owner = 100;

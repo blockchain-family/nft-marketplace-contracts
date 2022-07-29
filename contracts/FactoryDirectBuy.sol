@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.57.1;
+pragma ton-solidity >=0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -137,7 +137,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         uint64 _timeTx, 
         uint128 _amount
     ) external view responsible returns(address) {
-        return address(tvm.hash((_buildDirectBuyStateInit(_owner, _spentTokenRoot, _nft, _timeTx))));
+        return {value: 0, bounce: false, flag: 64} address(tvm.hash((_buildDirectBuyStateInit(_owner, _spentTokenRoot, _nft, _timeTx))));
     } 
 
     function getTokenWallet(address _tokenRoot, address _sender) internal view returns (address) {

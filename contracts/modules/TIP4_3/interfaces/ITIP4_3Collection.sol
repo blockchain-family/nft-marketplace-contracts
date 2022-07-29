@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.1;
+pragma ton-solidity >= 0.62.0;
 
 interface ITIP4_3Collection {
     function indexBasisCode() external view responsible returns (TvmCell code);

@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.57.1;
+pragma ton-solidity >=0.62.0;
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
@@ -176,7 +176,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     ) external pure responsible returns(TvmCell) {
         TvmBuilder builder;
         builder.store(_paymentTokenRoot, _price, _auctionStartTime, _auctionDuration);
-        return builder.toCell();
+        return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
     function _resolveNft(

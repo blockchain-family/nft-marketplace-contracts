@@ -1,4 +1,4 @@
-.version sol 0.57.1
+.version sol 0.62.0
 
 .macro constructor
 DROP
@@ -37,7 +37,7 @@ PUSHCONT {
 	.loc ../contracts/DirectSell.sol, 64
 	PUSHINT 0
 	CALLREF {
-		CALL $changeState_internal_macro$
+		CALL $changeState_268f1153_internal_macro$
 	}
 	.loc ../contracts/DirectSell.sol, 65
 	PUSHINT 1000000000
@@ -59,8 +59,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x62_
 	STSLICE
-	PUSHSLICE x41dcd6500000000000000000000000000003_
-	STSLICER
+	PUSHINT 2868722788230934574387753789225109188247553
+	STUR 143
 	ROTREV
 	PUSHSLICE x31edd4c749b2f6d7
 	NEWC
@@ -112,7 +112,7 @@ LDMSGADDR
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
-	CALL $onTokenWallet_internal_macro$
+	CALL $onTokenWallet_e6d1bd58_internal_macro$
 }
 DROP
 CALLREF {
@@ -120,7 +120,7 @@ CALLREF {
 }
 THROW 0
 
-.macro onTokenWallet_internal_macro
+.macro onTokenWallet_e6d1bd58_internal_macro
 .loc ../contracts/DirectSell.sol, 89
 GETGLOB 9
 PARSEMSGADDR
@@ -140,7 +140,7 @@ PUSHCONT {
 	.loc ../contracts/DirectSell.sol, 93
 	PUSHINT 2
 	CALLREF {
-		CALL $changeState_internal_macro$
+		CALL $changeState_268f1153_internal_macro$
 	}
 	.loc ../contracts/DirectSell.sol, 0
 }
@@ -160,7 +160,7 @@ IFREF {
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
-	CALL $getDetails_internal_macro$
+	CALL $getDetails_fbbf93a0_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -221,9 +221,9 @@ IFREF {
 }
 THROW 0
 
-.macro getDetails_internal_macro
+.macro getDetails_fbbf93a0_internal_macro
 .loc ../contracts/DirectSell.sol, 98
-CALL $builderDetails_internal_macro$
+CALL $builderDetails_076a471c_internal_macro$
 .loc ../contracts/DirectSell.sol, 0
 
 .macro onAcceptTokensTransfer
@@ -261,7 +261,7 @@ LDREF
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
-	CALL $onAcceptTokensTransfer_internal_macro$
+	CALL $onAcceptTokensTransfer_e63f2284_internal_macro$
 }
 DROP
 CALLREF {
@@ -269,7 +269,7 @@ CALLREF {
 }
 THROW 0
 
-.macro onAcceptTokensTransfer_internal_macro
+.macro onAcceptTokensTransfer_e63f2284_internal_macro
 .loc ../contracts/DirectSell.sol, 109
 DROP
 DEPTH
@@ -319,11 +319,10 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x6_
 	STI 1
-	PUSHINT 3
-	STZEROES
+	STSLICECONST x1_
 	STSLICE
-	PUSHSLICE x44190ab00000000000000000000000000003_
-	STSLICER
+	PUSHINT 2966078354328462592422700595397985988247553
+	STUR 143
 	ROLLREV 3
 	NEWC
 	STSLICECONST x11dd9e92
@@ -349,8 +348,7 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x6_
 	STI 1
-	PUSHINT 3
-	STZEROES
+	STSLICECONST x1_
 	STSLICE
 	PUSHINT 1
 	STUR 111
@@ -377,8 +375,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x62_
 	STSLICE
-	PUSHSLICE x3989680000000000000000000000000003_
-	STSLICER
+	PUSHINT 9789369574394656757036770681243717074945
+	STUR 135
 	ROTREV
 	NEWC
 	STSLICECONST x460dcec2
@@ -394,7 +392,7 @@ PUSHCONT {
 	.loc ../contracts/DirectSell.sol, 138
 	PUSHINT 3
 	CALLREF {
-		CALL $changeState_internal_macro$
+		CALL $changeState_268f1153_internal_macro$
 	}
 }
 PUSHCONT {
@@ -409,8 +407,7 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x6_
 	STI 1
-	PUSHINT 3
-	STZEROES
+	STSLICECONST x1_
 	STSLICE
 	PUSHINT 1
 	STUR 111
@@ -428,7 +425,7 @@ PUSHCONT {
 	STBREFR
 	STBREFR
 	ENDC
-	PUSHINT 128
+	PUSHPOW2 7
 	SENDRAWMSG
 }
 IFELSE
@@ -474,7 +471,7 @@ LDREF
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
-	CALL $onNftChangeManager_internal_macro$
+	CALL $onNftChangeManager_3b8ea82d_internal_macro$
 }
 DROP
 CALLREF {
@@ -482,7 +479,7 @@ CALLREF {
 }
 THROW 0
 
-.macro onNftChangeManager_internal_macro
+.macro onNftChangeManager_3b8ea82d_internal_macro
 .loc ../contracts/DirectSell.sol, 164
 BLKDROP 3
 MYADDR
@@ -516,18 +513,18 @@ PUSHCONT {
 	.loc ../contracts/DirectSell.sol, 169
 	PUSHINT 2
 	CALLREF {
-		CALL $changeState_internal_macro$
+		CALL $changeState_268f1153_internal_macro$
 	}
 	.loc ../contracts/DirectSell.sol, 0
 }
 IF
 .loc ../contracts/DirectSell.sol, 0
 
-.globl	changeState_internal
-.type	changeState_internal, @function
-CALL $changeState_internal_macro$
+.globl	changeState_268f1153_internal
+.type	changeState_268f1153_internal, @function
+CALL $changeState_268f1153_internal_macro$
 
-.macro changeState_internal_macro
+.macro changeState_268f1153_internal_macro
 .loc ../contracts/DirectSell.sol, 174
 GETGLOB 19
 .loc ../contracts/DirectSell.sol, 175
@@ -535,7 +532,7 @@ OVER
 SETGLOB 19
 .loc ../contracts/DirectSell.sol, 176
 CALLREF {
-	CALL $builderDetails_internal_macro$
+	CALL $builderDetails_076a471c_internal_macro$
 }
 ROTREV
 PUSHSLICE xc0000000000000000000000001
@@ -581,11 +578,11 @@ PUSHINT 0
 SENDRAWMSG
 .loc ../contracts/DirectSell.sol, 0
 
-.globl	builderDetails_internal
-.type	builderDetails_internal, @function
-CALL $builderDetails_internal_macro$
+.globl	builderDetails_076a471c_internal
+.type	builderDetails_076a471c_internal, @function
+CALL $builderDetails_076a471c_internal_macro$
 
-.macro builderDetails_internal_macro
+.macro builderDetails_076a471c_internal_macro
 .loc ../contracts/DirectSell.sol, 181
 GETGLOB 10
 GETGLOB 11
@@ -614,7 +611,7 @@ IFREF {
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
-	CALL $closedDirectSell_internal_macro$
+	CALL $closedDirectSell_da5e42f9_internal_macro$
 }
 DROP
 CALLREF {
@@ -622,7 +619,7 @@ CALLREF {
 }
 THROW 0
 
-.macro closedDirectSell_internal_macro
+.macro closedDirectSell_da5e42f9_internal_macro
 .loc ../contracts/DirectSell.sol, 84
 GETGLOB 9
 PARSEMSGADDR
@@ -660,12 +657,12 @@ STDICT
 STBREFR
 STBREFR
 ENDC
-PUSHINT 128
+PUSHPOW2 7
 SENDRAWMSG
 .loc ../contracts/DirectSell.sol, 206
 PUSHINT 4
 CALLREF {
-	CALL $changeState_internal_macro$
+	CALL $changeState_268f1153_internal_macro$
 }
 .loc ../contracts/DirectSell.sol, 0
 
@@ -773,13 +770,11 @@ PUSHCONT {
 	PUSH S5
 	PUSHINT 64
 	DICTUGET
+	ZEROSWAPIFNOT
 	PUSHCONT {
 		PLDU 64
 	}
-	PUSHCONT {
-		PUSHINT 0
-	}
-	IFELSE
+	IF
 	PUSHINT 0
 	BLKPUSH 2, 0
 	PUSHREFSLICE {
@@ -925,12 +920,12 @@ CALLREF {
 LDU 1 ; haveSign msgSlice
 SWAP
 PUSHCONT {
-	PUSHINT 512
+	PUSHPOW2 9
 	LDSLICEX ; signatureSlice msgSlice
 	DUP
 	HASHSU ; signatureSlice msgSlice hashMsgSlice
 	SWAP
-	LDU 1 ; signatureSlice hashMsgSlice havePubkey msgSlice
+	LDU 1 ; signatureSlice hashMsgSlice hasPubkey msgSlice
 	SWAP
 	PUSHCONT {
 		LDU 256 ; signatureSlice hashMsgSlice pubkey msgSlice
@@ -946,7 +941,7 @@ PUSHCONT {
 	THROWIFNOT 40
 }
 PUSHCONT {
-	LDU 1 ; havePubkey msgSlice
+	LDU 1 ; hasPubkey msgSlice
 	SWAP
 	THROWIF 58
 }

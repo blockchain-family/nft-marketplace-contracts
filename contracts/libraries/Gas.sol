@@ -1,4 +1,4 @@
-pragma ton-solidity =0.57.1;
+pragma ton-solidity =0.62.0;
 
 library Gas {
     uint128 constant DEPLOY_AUCTION_VALUE            = 3 ton;

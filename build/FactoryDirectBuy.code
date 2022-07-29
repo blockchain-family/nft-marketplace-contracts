@@ -1,4 +1,4 @@
-.version sol 0.57.1
+.version sol 0.62.0
 
 .macro constructor
 DROP
@@ -25,7 +25,7 @@ ENDS
 OVER
 .loc ../contracts/modules/access/OwnableInternal.sol, 12
 CALLREF {
-	CALL $_transferOwnership_internal_macro$
+	CALL $_transferOwnership_d29d44ee_internal_macro$
 }
 .loc ../contracts/FactoryDirectBuy.sol, 35
 ACCEPT
@@ -36,7 +36,7 @@ RAWRESERVE
 .loc ../contracts/FactoryDirectBuy.sol, 38
 SWAP
 CALLREF {
-	CALL $_transferOwnership_internal_macro$
+	CALL $_transferOwnership_d29d44ee_internal_macro$
 }
 .loc ../contracts/FactoryDirectBuy.sol, 39
 NEWC
@@ -45,7 +45,7 @@ STSLICE
 PUSHINT 111
 STZEROES
 ENDC
-PUSHINT 128
+PUSHPOW2 7
 SENDRAWMSG
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
@@ -69,7 +69,7 @@ LDMSGADDR
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
-	CALL $buildPayload_internal_macro$
+	CALL $buildPayload_a07ccb71_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -82,8 +82,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST xc
 	STSLICE
-	PUSHSLICE x00000000000000000000000026503307a_
-	STSLICER
+	PUSHINT 2571160606
+	STUR 130
 	STREF
 	ENDC
 	PUSHINT 0
@@ -98,7 +98,7 @@ IFREF {
 }
 THROW 0
 
-.macro buildPayload_internal_macro
+.macro buildPayload_a07ccb71_internal_macro
 .loc ../contracts/FactoryDirectBuy.sol, 43
 NEWC
 STSLICE
@@ -140,7 +140,7 @@ LDREF
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
-	CALL $onAcceptTokensTransfer_internal_macro$
+	CALL $onAcceptTokensTransfer_e63f2284_internal_macro$
 }
 DROP
 CALLREF {
@@ -148,7 +148,7 @@ CALLREF {
 }
 THROW 0
 
-.macro onAcceptTokensTransfer_internal_macro
+.macro onAcceptTokensTransfer_e63f2284_internal_macro
 .loc ../contracts/FactoryDirectBuy.sol, 54
 DEPTH
 ADDCONST -2
@@ -173,7 +173,7 @@ POP S2
 .loc ../contracts/FactoryDirectBuy.sol, 61
 OVER
 SBITS
-PUSHINT 128
+PUSHPOW2 7
 EQUAL
 DUP
 PUSHCONT {
@@ -189,7 +189,7 @@ PUSHCONT {
 		GETGLOB 9
 		PUSH2 S8, S6
 		CALLREF {
-			CALL $getTokenWallet_internal_macro$
+			CALL $getTokenWallet_111a8b45_internal_macro$
 		}
 		SDEQ
 	}
@@ -208,7 +208,7 @@ PUSHCONT {
 	BLKPUSH 2, 7
 	PUSH3 S10, S3, S2
 	CALLREF {
-		CALL $_buildDirectBuyStateInit_internal_macro$
+		CALL $_buildDirectBuyStateInit_e0440b3d_internal_macro$
 	}
 	DUP
 	HASHCU
@@ -222,8 +222,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x62_
 	STSLICE
-	PUSHSLICE x477359400000000000000000000000000007_
-	STSLICER
+	PUSHINT 3112111703474754619475120804657301188247555
+	STUR 143
 	OVER
 	CALLREF {
 		CTOS
@@ -292,8 +292,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x62_
 	STSLICE
-	PUSHSLICE x3989680000000000000000000000000003_
-	STSLICER
+	PUSHINT 9789369574394656757036770681243717074945
+	STUR 135
 	ROLLREV 6
 	NEWC
 	STSLICECONST x010da66c
@@ -352,8 +352,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST x62_
 	STSLICE
-	PUSHSLICE x3989680000000000000000000000000003_
-	STSLICER
+	PUSHINT 9789369574394656757036770681243717074945
+	STUR 135
 	ROLLREV 3
 	NEWC
 	STSLICECONST x74ff183a
@@ -382,8 +382,7 @@ FALSE
 NEWC
 STSLICECONST x6_
 STI 1
-PUSHINT 3
-STZEROES
+STSLICECONST x1_
 STSLICE
 PUSHINT 1
 STUR 111
@@ -401,16 +400,16 @@ STREF
 STBREFR
 STBREFR
 ENDC
-PUSHINT 128
+PUSHPOW2 7
 SENDRAWMSG
 .loc ../contracts/FactoryDirectBuy.sol, 0
 BLKDROP 8
 
-.globl	_buildDirectBuyStateInit_internal
-.type	_buildDirectBuyStateInit_internal, @function
-CALL $_buildDirectBuyStateInit_internal_macro$
+.globl	_buildDirectBuyStateInit_e0440b3d_internal
+.type	_buildDirectBuyStateInit_e0440b3d_internal, @function
+CALL $_buildDirectBuyStateInit_e0440b3d_internal_macro$
 
-.macro _buildDirectBuyStateInit_internal_macro
+.macro _buildDirectBuyStateInit_e0440b3d_internal_macro
 .loc ../contracts/FactoryDirectBuy.sol, 120
 PUSHINT 0
 NEWC
@@ -494,7 +493,7 @@ LDU 128
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
-	CALL $expectedAddressDirectBuy_internal_macro$
+	CALL $expectedAddressDirectBuy_0276a8a4_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -527,11 +526,9 @@ PUSHCONT {
 	ROLL 3
 	SECOND
 	NEWC
-	PUSHINT 2
-	STZEROES
+	STSLICECONST x2_
 	STI 1
-	PUSHINT 3
-	STZEROES
+	STSLICECONST x1_
 	STSLICE
 	SWAP
 	STGRAMS
@@ -556,11 +553,19 @@ IFREF {
 }
 THROW 0
 
-.macro expectedAddressDirectBuy_internal_macro
+.macro expectedAddressDirectBuy_0276a8a4_internal_macro
 .loc ../contracts/FactoryDirectBuy.sol, 140
 DROP
+GETGLOB 4
+PUSHINT 0
+SETINDEXQ 2
+FALSE
+SETINDEXQ 1
+PUSHINT 64
+SETINDEXQ 4
+SETGLOB 4
 CALLREF {
-	CALL $_buildDirectBuyStateInit_internal_macro$
+	CALL $_buildDirectBuyStateInit_e0440b3d_internal_macro$
 }
 HASHCU
 NEWC
@@ -570,11 +575,11 @@ ENDC
 CTOS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 
-.globl	getTokenWallet_internal
-.type	getTokenWallet_internal, @function
-CALL $getTokenWallet_internal_macro$
+.globl	getTokenWallet_111a8b45_internal
+.type	getTokenWallet_111a8b45_internal, @function
+CALL $getTokenWallet_111a8b45_internal_macro$
 
-.macro getTokenWallet_internal_macro
+.macro getTokenWallet_111a8b45_internal_macro
 .loc ../contracts/FactoryDirectBuy.sol, 144
 PUSHINT 0
 NEWC
@@ -624,7 +629,7 @@ IFREF {
 ENDS
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
 CALLREF {
-	CALL $owner_internal_macro$
+	CALL $owner_8da5cb5b_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -657,11 +662,11 @@ IFREF {
 }
 THROW 0
 
-.globl	owner_internal
-.type	owner_internal, @function
-CALL $owner_internal_macro$
+.globl	owner_8da5cb5b_internal
+.type	owner_8da5cb5b_internal, @function
+CALL $owner_8da5cb5b_internal_macro$
 
-.macro owner_internal_macro
+.macro owner_8da5cb5b_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 16
 GETGLOB 10
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
@@ -687,7 +692,7 @@ LDMSGADDR
 ENDS
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
 CALLREF {
-	CALL $transferOwnership_internal_macro$
+	CALL $transferOwnership_f2fde38b_internal_macro$
 }
 DROP
 CALLREF {
@@ -695,11 +700,11 @@ CALLREF {
 }
 THROW 0
 
-.globl	transferOwnership_internal
-.type	transferOwnership_internal, @function
-CALL $transferOwnership_internal_macro$
+.globl	transferOwnership_f2fde38b_internal
+.type	transferOwnership_f2fde38b_internal, @function
+CALL $transferOwnership_f2fde38b_internal_macro$
 
-.macro transferOwnership_internal_macro
+.macro transferOwnership_f2fde38b_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 31
 GETGLOB 9
 PARSEMSGADDR
@@ -710,7 +715,7 @@ DUP
 PUSHCONT {
 	DROP
 	CALLREF {
-		CALL $owner_internal_macro$
+		CALL $owner_8da5cb5b_internal_macro$
 	}
 	GETGLOB 9
 	SDEQ
@@ -730,15 +735,15 @@ PLDU 256
 THROWIFNOT 100
 .loc ../contracts/modules/access/OwnableInternal.sol, 21
 CALLREF {
-	CALL $_transferOwnership_internal_macro$
+	CALL $_transferOwnership_d29d44ee_internal_macro$
 }
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
 
-.globl	_transferOwnership_internal
-.type	_transferOwnership_internal, @function
-CALL $_transferOwnership_internal_macro$
+.globl	_transferOwnership_d29d44ee_internal
+.type	_transferOwnership_d29d44ee_internal, @function
+CALL $_transferOwnership_d29d44ee_internal_macro$
 
-.macro _transferOwnership_internal_macro
+.macro _transferOwnership_d29d44ee_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 25
 GETGLOB 10
 .loc ../contracts/modules/access/OwnableInternal.sol, 26
@@ -798,13 +803,11 @@ PUSHCONT {
 	PUSH S2
 	PUSHINT 64
 	DICTUGET
+	ZEROSWAPIFNOT
 	PUSHCONT {
 		PLDU 64
 	}
-	PUSHCONT {
-		PUSHINT 0
-	}
-	IFELSE
+	IF
 	PUSHREF {
 	}
 	DUP
@@ -920,12 +923,12 @@ CALLREF {
 LDU 1 ; haveSign msgSlice
 SWAP
 PUSHCONT {
-	PUSHINT 512
+	PUSHPOW2 9
 	LDSLICEX ; signatureSlice msgSlice
 	DUP
 	HASHSU ; signatureSlice msgSlice hashMsgSlice
 	SWAP
-	LDU 1 ; signatureSlice hashMsgSlice havePubkey msgSlice
+	LDU 1 ; signatureSlice hashMsgSlice hasPubkey msgSlice
 	SWAP
 	PUSHCONT {
 		LDU 256 ; signatureSlice hashMsgSlice pubkey msgSlice
@@ -941,7 +944,7 @@ PUSHCONT {
 	THROWIFNOT 40
 }
 PUSHCONT {
-	LDU 1 ; havePubkey msgSlice
+	LDU 1 ; hasPubkey msgSlice
 	SWAP
 	THROWIF 58
 }

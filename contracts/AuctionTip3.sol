@@ -57,8 +57,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     }
     AuctionStatus state;
 
+    event AuctionCreated(AuctionDetails);
+    event AuctionActive(AuctionDetails);
     event BidPlaced(address buyerAddress, uint128 value);
     event BidDeclined(address buyerAddress, uint128 value);
+    event AuctionComplete(address buyerAddress, uint128 value); 
+    event AuctionCancelled();
 
     constructor(
         address _markerRootAddr,
@@ -90,6 +94,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         bidDelta = _bidDelta;
         nextBidValue = price;
         paymentTokenRoot = _paymentTokenRoot;
+        
+        emit AuctionCreated{dest: nft}(buildInfo());
         state = AuctionStatus.Created;
 
         ITokenRoot(paymentTokenRoot).deployWallet {
@@ -108,7 +114,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         require(msg.sender.value != 0 && msg.sender == paymentTokenRoot, BaseErrors.operation_not_permited);
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         tokenWallet = value;
+
+        emit AuctionActive{dest: nft}(buildInfo());
         state = AuctionStatus.Active;
+
         tokenWallet.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
@@ -200,14 +209,18 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
                 false,
                 empty
             );
+
+            emit AuctionComplete{dest: nft}(currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
         } else {
-            state = AuctionStatus.Cancelled;
             ITIP4_1NFT(nft).transfer{ value: 0, flag: 64, bounce: false }(
                 nftOwner,
                 sendGasTo,
                 callbacks
             );
+
+            emit AuctionCancelled{dest: nft}();
+            state = AuctionStatus.Cancelled;
         }
     }
 
@@ -237,6 +250,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     }
 
     function getInfo() external view returns (AuctionDetails) {
+        return buildInfo();
+    }
+
+    function buildInfo() private view returns(AuctionDetails) {
         return AuctionDetails(nft, nftOwner, paymentTokenRoot, tokenWallet, auctionStartTime, auctionDuration, auctionEndTime);
     }
 }

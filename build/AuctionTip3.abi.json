@@ -173,6 +173,22 @@
 	],
 	"events": [
 		{
+			"name": "AuctionCreated",
+			"inputs": [
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionActive",
+			"inputs": [
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "BidPlaced",
 			"inputs": [
 				{"name":"buyerAddress","type":"address"},
@@ -186,6 +202,22 @@
 			"inputs": [
 				{"name":"buyerAddress","type":"address"},
 				{"name":"value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionComplete",
+			"inputs": [
+				{"name":"buyerAddress","type":"address"},
+				{"name":"value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionCancelled",
+			"inputs": [
 			],
 			"outputs": [
 			]

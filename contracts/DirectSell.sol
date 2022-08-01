@@ -109,7 +109,13 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         require(msg.value >= Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW);
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
         TvmCell emptyPayload;
-        if (currentStatus == DirectSellStatus.Active && msg.sender.value != 0 && msg.sender == tokenWallet && amount >= price){
+        if (currentStatus == DirectSellStatus.Active && 
+            msg.sender.value != 0 && 
+            msg.sender == tokenWallet && 
+            amount >= price
+            && (auctionEnd > 0 && now < auctionEnd || auctionEnd == 0) 
+            )
+        {
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
             ITIP4_1NFT(nftAddress).transfer{ 
                 value: Gas.TRANSFER_OWNERSHIP_VALUE,
@@ -136,7 +142,13 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
 
             IDirectSellCallback(owner).directSellSuccess(owner, sender);
             changeState(DirectSellStatus.Filled);
+            
         } else {
+            if (now >= auctionEnd) {
+                IDirectSellCallback(owner).directSellCancelledOnTime();
+                changeState(DirectSellStatus.Cancelled);
+            }
+
             ITokenWallet(msg.sender).transfer{
                 value: 0,
                 flag: 128,
@@ -191,6 +203,22 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
                 currentStatus,
                 msg.sender
             );
+    }
+
+    function finishAuction(
+        address sendGasTo
+    ) public {
+        require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
+        require(now < auctionEnd, DirectBuySellErrors.DIRECT_SELL_IN_STILL_PROGRESS);
+        
+        mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+        ITIP4_1NFT(nftAddress).changeManager { value: 0, flag: 128 }(
+            owner,
+            sendGasTo,
+            callbacks
+        );
+     
+        changeState(DirectSellStatus.Cancelled);
     }
 
     function closedDirectSell() external onlyOwner {

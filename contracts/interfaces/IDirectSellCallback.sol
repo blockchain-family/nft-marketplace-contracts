@@ -17,4 +17,6 @@ interface IDirectSellCallback {
         address newOwner
     ) external;
 
+    function directSellCancelledOnTime() external; 
+
 }

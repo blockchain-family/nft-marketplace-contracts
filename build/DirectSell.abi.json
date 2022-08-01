@@ -57,6 +57,14 @@
 			]
 		},
 		{
+			"name": "finishAuction",
+			"inputs": [
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "closedDirectSell",
 			"inputs": [
 			],

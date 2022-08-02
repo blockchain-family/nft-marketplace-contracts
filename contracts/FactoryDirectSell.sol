@@ -46,14 +46,13 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         address _paymentToken,
         uint128 _price
         ) external pure returns(TvmCell) {
-            
-        return abi.encode(
-            _nftAddress,
-            _startAuction, 
-            _endAuction.hasValue() ? _endAuction : 0, 
-            _paymentToken, 
-            _price
-        );
+            return abi.encode(
+                _nftAddress,
+                _startAuction, 
+                _endAuction.hasValue() ? _endAuction : 0, 
+                _paymentToken, 
+                _price
+            );
     }
 
     function onNftChangeManager(

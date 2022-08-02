@@ -9,6 +9,7 @@ import "./interfaces/IDirectBuyCallback.sol";
 import "./libraries/DirectBuyStatus.sol";
 
 import "./errors/DirectBuySellErrors.sol";
+import "./errors/BaseErrors.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
@@ -197,7 +198,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
         address sendGasTo
     ) public {
         require(currentStatus == DirectBuyStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
-        require(now < endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
+        require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
+        require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
 
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         ITIP4_1NFT(nftAddress).changeManager { value: 0, flag: 128 } (

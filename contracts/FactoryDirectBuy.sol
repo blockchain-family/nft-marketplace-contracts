@@ -47,7 +47,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         return abi.encode(
             nft, 
             startTime.hasValue() ? startTime : 0, 
-            durationTime.has.hasValue() ? durationTime : 0
+            durationTime.hasValue() ? durationTime : 0
         );
     }
 

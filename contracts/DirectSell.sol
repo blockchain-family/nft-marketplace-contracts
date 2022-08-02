@@ -17,6 +17,7 @@ import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
 import "./errors/DirectBuySellErrors.sol";
+import "./errors/BaseErrors.sol";
 
 contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     address static factoryDirectSell;
@@ -209,8 +210,9 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         address sendGasTo
     ) public {
         require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
-        require(now < auctionEnd, DirectBuySellErrors.DIRECT_SELL_IN_STILL_PROGRESS);
-        
+        require(now >= auctionEnd, DirectBuySellErrors.DIRECT_SELL_IN_STILL_PROGRESS);
+        require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
+
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         ITIP4_1NFT(nftAddress).changeManager { value: 0, flag: 128 }(
             owner,

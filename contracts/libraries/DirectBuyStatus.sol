@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.0;
+pragma ton-solidity >= 0.62.0;
 
 library DirectBuyStatus {
     uint8 constant Create      = 0;

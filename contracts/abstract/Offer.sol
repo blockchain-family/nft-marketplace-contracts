@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -8,8 +8,6 @@ import '../errors/BaseErrors.sol';
 import '../errors/OffersBaseErrors.sol';
 
 import '../interfaces/IOffersRoot.sol';
-// import '../../true-nft/contracts/interfaces/IData.sol';
-
 
 abstract contract Offer {
 

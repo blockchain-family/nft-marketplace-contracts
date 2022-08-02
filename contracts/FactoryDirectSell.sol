@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -71,7 +71,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         TvmSlice payloadSlice = payload.toSlice();
         address nftForSell = payloadSlice.decode(address);
 
-        require(msg.sender.value != 0 && msg.sender == nftForSell, DirectBuySellErrors.NO_NFT);
+        require(msg.sender.value != 0 && msg.sender == nftForSell, DirectBuySellErrors.NOT_NFT_SENDER);
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;

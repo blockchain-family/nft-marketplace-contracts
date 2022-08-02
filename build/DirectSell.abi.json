@@ -57,7 +57,7 @@
 			]
 		},
 		{
-			"name": "finishAuction",
+			"name": "finishSell",
 			"inputs": [
 				{"name":"sendGasTo","type":"address"}
 			],

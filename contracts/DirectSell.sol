@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -146,7 +146,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         } else {
             if (now >= auctionEnd) {
                 IDirectSellCallback(owner).directSellCancelledOnTime();
-                changeState(DirectSellStatus.Cancelled);
+                changeState(DirectSellStatus.Filled);
             }
 
             ITokenWallet(msg.sender).transfer{
@@ -205,7 +205,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
             );
     }
 
-    function finishAuction(
+    function finishSell(
         address sendGasTo
     ) public {
         require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
@@ -218,7 +218,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
             callbacks
         );
      
-        changeState(DirectSellStatus.Cancelled);
+        changeState(DirectSellStatus.Filled);
     }
 
     function closedDirectSell() external onlyOwner {

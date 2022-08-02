@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 interface IAcceptNftBurnCallback {
     function onAcceptNftBurn(

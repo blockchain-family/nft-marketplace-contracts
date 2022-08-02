@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 library AuctionErrors {
     uint8 constant auction_still_in_progress = 250;

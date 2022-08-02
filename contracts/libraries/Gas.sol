@@ -1,4 +1,4 @@
-pragma ton-solidity =0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 library Gas {
     uint128 constant DEPLOY_AUCTION_VALUE            = 3 ton;
@@ -21,7 +21,7 @@ library Gas {
     // direct buy
     uint128 constant DIRECT_BUY_INITIAL_BALANCE      = 1 ton;
     uint128 constant DEPLOY_DIRECT_BUY_MIN_VALUE     = 2 ton;
-    uint128 constant GET_BALANCE_WALLET              = 0.1 ton;
+    uint128 constant GET_BALANCE_WALLET              = 0.1 ton; //?
     
     // direct sell
     uint128 constant DIRECT_SELL_INITIAL_BALANCE      = 1 ton;

@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -39,8 +39,16 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     } 
 
-    function buildPayload(address nft) external pure returns (TvmCell) {
-        return abi.encode(nft);
+    function buildPayload (
+        address nft, 
+        optional(uint64) startTime,
+        optional(uint64) durationTime
+    ) external pure returns (TvmCell) {
+        return abi.encode(
+            nft, 
+            startTime.hasValue() ? startTime : 0, 
+            durationTime.has.hasValue() ? durationTime : 0
+        );
     }
 
     function onAcceptTokensTransfer(
@@ -62,7 +70,11 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
             msg.sender.value != 0 &&
             msg.sender == getTokenWallet(tokenRoot, sender)) 
         {
-            (uint128 price) = payloadSlice.decode(uint128);
+            (
+                uint128 price,
+                uint64 startTime,
+                uint64 durationTime
+            ) = payloadSlice.decode(uint128, uint64, uint64);
             uint64 nonce = tx.timestamp;
             address directBuyAddress = new DirectBuy {
             stateInit: _buildDirectBuyStateInit(
@@ -72,7 +84,9 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
                 nonce),
             value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE
                 }(
-                amount
+                amount,
+                startTime,
+                durationTime
             );
 
             emit DirectBuyDeployed{dest: nftForBuy}(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
@@ -85,7 +99,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
             }(
                 amount,
                 directBuyAddress,
-                uint128(0),
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
                 originalGasTo,
                 true,
                 payload

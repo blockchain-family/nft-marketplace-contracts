@@ -1,4 +1,4 @@
-pragma ton-solidity >=0.62.0;
+pragma ton-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -29,6 +29,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
 
     uint128 price;
 
+    uint64 startTime;
+    uint64 durationTime;
+    uint64 endTime;
+
     address spentTokenWallet;
     uint8 currentStatus;
     
@@ -42,17 +46,25 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
         address spentWallet;
         uint8 status;
         address sender;
+        uint64 startTimeBuy;
+        uint64 durationTimeBuy;
+        uint64 endTimeBuy;
     }
 
     event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyDetails);
 
-    constructor(uint128 _amount) public {
+    constructor(uint128 _amount, uint64 _startTime, uint64 _durationTime) public {
         if(msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
             changeState(DirectBuyStatus.Create);
             tvm.rawReserve(address(this).balance - msg.value, 0);
 
             price = _amount;
-
+            startTime = _startTime;
+            durationTime = _durationTime;
+            if (_startTime > 0 && _durationTime > 0) {
+                endTime = _startTime + _durationTime;
+            }
+            
             ITokenRoot(spentTokenRoot).deployWallet{
                 value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
                 flag: 1,
@@ -119,13 +131,13 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
         address sendGasTo,
         TvmCell /*payload*/
     ) external override {
-        require(msg.sender.value != 0 && msg.sender == nftAddress, DirectBuySellErrors.NOT_NFT);
+        require(msg.sender.value != 0 && msg.sender == nftAddress, DirectBuySellErrors.NOT_NFT_SENDER);
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
         require(msg.value >= Gas.DIRECT_BUY_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW);
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-        if (currentStatus == DirectBuyStatus.Active) {
+        if (currentStatus == DirectBuyStatus.Active && (endTime > 0 && now < endTime || endTime == 0)) {
             ITIP4_1NFT(nftAddress).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
                 owner,
                 sendGasTo,
@@ -144,6 +156,11 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
             IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
             changeState(DirectBuyStatus.Filled);
         } else {
+                if (now >= endTime) {
+                    IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
+                    changeState(DirectBuyStatus.Filled);        
+                }
+
                 ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                 nftOwner,
                 sendGasTo,
@@ -169,8 +186,27 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
                 price,
                 spentTokenWallet,
                 currentStatus,
-                msg.sender
+                msg.sender,
+                startTime,
+                durationTime,
+                endTime
             );
+    }
+
+    function finishBuy(
+        address sendGasTo
+    ) public {
+        require(currentStatus == DirectBuyStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
+        require(now < endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
+
+        mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+        ITIP4_1NFT(nftAddress).changeManager { value: 0, flag: 128 } (
+            owner,
+            sendGasTo,
+            callbacks
+        );
+
+        changeState(DirectBuyStatus.Filled);
     }
 
     function closedDirectBuy() external onlyOwner {

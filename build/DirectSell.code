@@ -422,7 +422,7 @@ PUSHCONT {
 		PUSHINT 0
 		SENDRAWMSG
 		.loc ../contracts/DirectSell.sol, 149
-		PUSHINT 4
+		PUSHINT 3
 		CALLREF {
 			CALL $changeState_268f1153_internal_macro$
 		}
@@ -631,7 +631,7 @@ GETGLOB 9
 TUPLE 11
 .loc ../contracts/DirectSell.sol, 0
 
-.macro finishAuction
+.macro finishSell
 DROP
 GETGLOB 6
 THROWIFNOT 76
@@ -652,7 +652,7 @@ LDMSGADDR
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
-	CALL $finishAuction_9c18782b_internal_macro$
+	CALL $finishSell_80c7c454_internal_macro$
 }
 DROP
 CALLREF {
@@ -660,11 +660,11 @@ CALLREF {
 }
 THROW 0
 
-.globl	finishAuction_9c18782b_internal
-.type	finishAuction_9c18782b_internal, @function
-CALL $finishAuction_9c18782b_internal_macro$
+.globl	finishSell_80c7c454_internal
+.type	finishSell_80c7c454_internal, @function
+CALL $finishSell_80c7c454_internal_macro$
 
-.macro finishAuction_9c18782b_internal_macro
+.macro finishSell_80c7c454_internal_macro
 .loc ../contracts/DirectSell.sol, 211
 GETGLOB 19
 EQINT 2
@@ -699,7 +699,7 @@ ENDC
 PUSHPOW2 7
 SENDRAWMSG
 .loc ../contracts/DirectSell.sol, 221
-PUSHINT 4
+PUSHINT 3
 CALLREF {
 	CALL $changeState_268f1153_internal_macro$
 }
@@ -1070,15 +1070,9 @@ THROW 60
 
 .macro public_function_selector
 DUP
-PUSHINT 1236465367
+PUSHINT 1339321079
 LEQ
 IFJMPREF {
-	DUP
-	PUSHINT 377962650
-	EQUAL
-	IFJMPREF {
-		CALL $finishAuction$
-	}
 	DUP
 	PUSHINT 601546343
 	EQUAL
@@ -1097,16 +1091,22 @@ IFJMPREF {
 	IFJMPREF {
 		CALL $onTokenWallet$
 	}
+	DUP
+	PUSHINT 1339321079
+	EQUAL
+	IFJMPREF {
+		CALL $constructor$
+	}
 }
 DUP
 PUSHINT 1893244873
 LEQ
 IFJMPREF {
 	DUP
-	PUSHINT 1339321079
+	PUSHINT 1361771221
 	EQUAL
 	IFJMPREF {
-		CALL $constructor$
+		CALL $finishSell$
 	}
 	DUP
 	PUSHINT 1864928151

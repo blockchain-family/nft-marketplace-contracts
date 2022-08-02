@@ -65,16 +65,18 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         address sendGasTo,
         TvmCell payload
     ) external override {
-        require(msg.sender.value != 0 && msg.sender == nftOwner, DirectBuySellErrors.NOT_NFT_OWNER);
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
         require(msg.value >= Gas.DIRECT_BUY_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW);
+        
+        TvmSlice payloadSlice = payload.toSlice();
+        address nftForSell = payloadSlice.decode(address);
+
+        require(msg.sender.value != 0 && msg.sender == nftForSell, DirectBuySellErrors.NO_NFT);
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         bool needCancel = false;
 
-        TvmSlice payloadSlice = payload.toSlice();
-        address nftForSell = payloadSlice.decode(address);
         if (payloadSlice.bits() == 523) {
             (
                 uint64 _startAuction,

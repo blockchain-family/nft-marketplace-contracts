@@ -11,4 +11,5 @@ library DirectBuySellErrors {
     uint16 constant NOT_FACTORY_MSG_SENDER_NFT    = 307;
     uint16 constant VALUE_TOO_LOW                 = 308;
     uint16 constant DIRECT_SELL_IN_STILL_PROGRESS = 309;
+    uint16 constant NO_NFT                        = 310;
 }

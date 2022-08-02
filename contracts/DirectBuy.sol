@@ -119,7 +119,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
         address sendGasTo,
         TvmCell /*payload*/
     ) external override {
-        require(msg.sender.value != 0 && msg.sender == nftOwner, DirectBuySellErrors.NOT_NFT_OWNER);
+        require(msg.sender.value != 0 && msg.sender == nftAddress, DirectBuySellErrors.NOT_NFT);
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
         require(msg.value >= Gas.DIRECT_BUY_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW);
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);

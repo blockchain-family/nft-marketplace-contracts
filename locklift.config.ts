@@ -1,6 +1,6 @@
 import { LockliftConfig } from "locklift";
 import { FactorySource } from "./build/factorySource";
-import { SimpleGiver, GiverWallet } from "./giverSettings";
+import { SimpleGiver, GiverWallet, TestnetGiver } from "./giverSettings";
 
 declare global {
   const locklift: import("locklift").Locklift<FactorySource>;
@@ -20,6 +20,9 @@ const config: LockliftConfig = {
     // externalContracts: {
     //   "node_modules/broxus-ton-tokens-contracts/build": ['TokenRoot', 'TokenWallet']
     // }
+    externalContracts: {
+      "precompiled": ['TokenWalletPlatform']
+    }
   },
   linker: {
     // Specify path to your stdlib
@@ -57,8 +60,23 @@ const config: LockliftConfig = {
         // !!! Never commit it in your repos !!!
         // phrase: "action inject penalty envelope rabbit element slim tornado dinner pizza off blood",
         amount: 20,
+        phrase: "action inject penalty envelope rabbit element slim tornado dinner pizza off blood",
       },
     },
+    dev: {
+      connection: "testnet",
+
+      giver: {
+        giverFactory: (ever, keyPair, address) => new TestnetGiver(ever, keyPair, address),
+        address: "0:a4053fd2e9798d0457c9e8f012cef203e49da863d76f36d52d5e2e62c326b217",
+        key: "2d572a3f1b2ce83f4bcf83ae55da7d61b670ecc58530f5467f57d909db6cd6c3",
+      },
+      keys: {
+        phrase:"fringe scene sound floor number umbrella undo tomato seed best tourist hard",
+        amount: 5 
+      }
+    },
+    
     mainnet: {
       // Specify connection settings for https://github.com/broxus/everscale-standalone-client/
       connection: "mainnet",
@@ -78,7 +96,7 @@ const config: LockliftConfig = {
     },
   },
   mocha: {
-    timeout: 2000000,
+    timeout: 2000000
   },
 };
 

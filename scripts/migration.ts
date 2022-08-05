@@ -33,21 +33,22 @@ export class Migration {
         return this.migration_log[alias] !== undefined;
     }
 
-    load(contract, alias) {
+    load(contractName, alias) {
+        let contract = locklift.factory.getDeployedContract(contractName);
         if (this.migration_log[alias] !== undefined) {
-            contract.setAddress(this.migration_log[alias].address);
+            contract = locklift.factory.getDeployedContract(contractName, this.migration_log[alias].address);
         } else {
             throw new Error(`Contract ${alias} not found in the migration`);
         }
         return contract;
     }
 
-    store(contract, alias) {
+    store(contractAddress, contractName, alias) {
         this.migration_log = {
             ...this.migration_log,
             [alias]: {
-                address: contract.address,
-                name: contract.name
+                address: contractAddress,
+                name: contractName
             }
         }
         this._saveMigrationLog();

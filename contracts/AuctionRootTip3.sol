@@ -139,7 +139,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             IAuctionRootCallback(msg.sender).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false}(nftOwner, msg.sender);
 
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-            ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
+            ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                 nftOwner,
                 sendGasTo,
                 callbacks
@@ -189,11 +189,13 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint256 hashState = tvm.hash(state);
         nft = address.makeAddrStd(address(this).wid, hashState);
     }
+
    function _buildNftCode(address collection) internal virtual view returns (TvmCell) {
         TvmBuilder salt;
         salt.store(collection);
         return tvm.setCodeSalt(codeNft, salt.toCell());
     }
+
     function _buildNftState(
         TvmCell code,
         uint256 id
@@ -204,4 +206,5 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             code: code
         });
     }
+    
 }

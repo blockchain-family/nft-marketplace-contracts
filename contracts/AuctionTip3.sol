@@ -236,14 +236,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     ) private pure {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
-                IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{value: 1, flag: 1, bounce: false}(callbackId);
+                IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{ value: 1, flag: 1, bounce: false }(callbackId);
             } else {
-                IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{value: 2, flag: 1, bounce: false}(callbackId);
+                IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{ value: 2, flag: 1, bounce: false }(callbackId);
             }
         }
     }
 
-    function buildPlaceBidPayload(uint32 callbackId, address buyer) external pure responsible returns (TvmCell) {
+    function buildPlaceBidPayload(
+        uint32 callbackId, 
+        address buyer
+    ) external pure responsible returns (TvmCell) {
         TvmBuilder builder;
         builder.store(callbackId);
         builder.store(buyer);
@@ -255,6 +258,15 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     }
 
     function buildInfo() private view returns(AuctionDetails) {
-        return AuctionDetails(nft, nftOwner, paymentTokenRoot, tokenWallet, auctionStartTime, auctionDuration, auctionEndTime);
+        return AuctionDetails(
+            nft, 
+            nftOwner, 
+            paymentTokenRoot, 
+            tokenWallet, 
+            auctionStartTime, 
+            auctionDuration, 
+            auctionEndTime
+        );
     }
+
 }

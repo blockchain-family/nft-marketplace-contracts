@@ -6,7 +6,7 @@ pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
 import "./libraries/DirectSellStatus.sol";
-import "./interfaces/IDirectSellCallback.sol";
+import "./interfaces/IDirectSell.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
@@ -35,35 +35,16 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     uint8 currentStatus;
     bool receivedNFT;
 
-    struct DirectSellDetails {
-        address factory;
-        address creator;
-        address token;
-        address nft;
-        uint64 _timeTx;
-        uint64 start;
-        uint64 end;
-        uint128 _price;
-        address wallet;
-        uint8 status;
-        address sender;
-    }
-
-     enum AuctionStatus {
-        Created,
-        AwaitNFT,
-        Active,
-        Filled,
-        Cancelled
-    }
-    AuctionStatus state;
-
-    event DirectSellStateChanged(uint8 from, uint8 to, DirectSellDetails);
-
-    constructor(uint64 _auctionStart, uint64 _auctionEnd, uint128 _price) public {
+    constructor(
+        uint64 _auctionStart, 
+        uint64 _auctionEnd, 
+        uint128 _price
+    ) public {
        if(msg.sender.value != 0 && msg.sender == factoryDirectSell) {
+            
             changeState(DirectSellStatus.Create);
             tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+            
             auctionStart = _auctionStart;
             auctionEnd = _auctionEnd;
             price = _price;
@@ -95,7 +76,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         }
     }
 
-    function getDetails() external view returns(DirectSellDetails){
+    function getDetails() external view returns(IDirectSell.DirectSellDetails){
         return builderDetails();
     }
 
@@ -109,6 +90,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     ) override external {
         require(msg.value >= Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE, DirectBuySellErrors.VALUE_TOO_LOW);
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+        
         TvmCell emptyPayload;
         if (currentStatus == DirectSellStatus.Active && 
             msg.sender.value != 0 && 
@@ -141,12 +123,12 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
                 emptyPayload
             );
 
-            IDirectSellCallback(owner).directSellSuccess(owner, sender);
+            IDirectSell(owner).directSellSuccessCallback(owner, sender);
             changeState(DirectSellStatus.Filled);
             
         } else {
             if (now >= auctionEnd) {
-                IDirectSellCallback(owner).directSellCancelledOnTime();
+                IDirectSell(owner).directSellCancelledOnTimeCallback();
                 changeState(DirectSellStatus.Filled);
             }
 
@@ -189,7 +171,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
 		emit DirectSellStateChanged(prevStateN, newState, builderDetails());
 	}
 
-    function builderDetails() private view returns (DirectSellDetails) {
+    function builderDetails() private view returns (IDirectSell.DirectSellDetails) {
 		return
 			DirectSellDetails(
                 factoryDirectSell,
@@ -223,7 +205,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         changeState(DirectSellStatus.Filled);
     }
 
-    function closedDirectSell() external onlyOwner {
+    function closeSell() external onlyOwner {
         require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
         
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;

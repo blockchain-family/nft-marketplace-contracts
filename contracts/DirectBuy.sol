@@ -5,7 +5,7 @@ pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
-import "./interfaces/IDirectBuyCallback.sol";
+import "./interfaces/IDirectBuy.sol";
 import "./libraries/DirectBuyStatus.sol";
 
 import "./errors/DirectBuySellErrors.sol";
@@ -21,7 +21,6 @@ import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
 
 contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
-    
     address static factoryDirectBuy;
     address static owner;
     address static spentTokenRoot;
@@ -37,25 +36,13 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
     address spentTokenWallet;
     uint8 currentStatus;
     
-    struct DirectBuyDetails {
-        address factory;
-        address creator;
-        address spentToken;
-        address nft;
-        uint64 _timeTx;
-        uint128 _price;
-        address spentWallet;
-        uint8 status;
-        address sender;
-        uint64 startTimeBuy;
-        uint64 durationTimeBuy;
-        uint64 endTimeBuy;
-    }
-
-    event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyDetails);
-
-    constructor(uint128 _amount, uint64 _startTime, uint64 _durationTime) public {
+    constructor(
+        uint128 _amount, 
+        uint64 _startTime, 
+        uint64 _durationTime
+    ) public {
         if(msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
+            
             changeState(DirectBuyStatus.Create);
             tvm.rawReserve(address(this).balance - msg.value, 0);
 
@@ -87,7 +74,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
     function onTokenWallet(address _spentTokenWallet) external {
         require(msg.sender.value != 0 && msg.sender == spentTokenWallet, DirectBuySellErrors.NOT_FROM_SPENT_TOKEN_ROOT);
         spentTokenWallet = _spentTokenWallet;
+        
         changeState(DirectBuyStatus.Active);
+
     }
 
     function getDetails() external view returns(DirectBuyDetails){
@@ -105,7 +94,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
         if (tokenRoot == spentTokenRoot && 
             amount >= price) {
+            
             changeState(DirectBuyStatus.Active);
+
         } else {
             TvmCell emptyPayload;
             ITokenWallet(msg.sender).transfer {
@@ -154,11 +145,13 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
                 false,
                 empty
             );     
-            IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
+            
+            IDirectBuy(nftOwner).directBuySuccessCallback(nftOwner, owner);
             changeState(DirectBuyStatus.Filled);
+
         } else {
                 if (now >= endTime) {
-                    IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
+                    IDirectBuy(nftOwner).directBuySuccessCallback(nftOwner, owner);
                     changeState(DirectBuyStatus.Filled);        
                 }
 
@@ -211,7 +204,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
         changeState(DirectBuyStatus.Filled);
     }
 
-    function closedDirectBuy() external onlyOwner {
+    function closeBuy() external onlyOwner {
         require(currentStatus == DirectBuyStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
         
         TvmCell emptyPayload;
@@ -227,6 +220,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
             true,
             emptyPayload
         );
+
         changeState(DirectBuyStatus.Cancelled);
     }
 }

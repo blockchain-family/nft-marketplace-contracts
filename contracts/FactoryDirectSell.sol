@@ -6,7 +6,7 @@ pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
 
-import "./interfaces/IDirectSellCallback.sol";
+import "./interfaces/IDirectSell.sol";
 import "./modules/access/OwnableInternal.sol";
 
 import "./errors/DirectBuySellErrors.sol";
@@ -22,9 +22,6 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     uint64 static nonce_;
 
     TvmCell directSellCode;
-    
-    event DirectSellDeployed(address _directSellAddress, address sender, address paymentToken, address nft, uint64 _nonce, uint128 price);
-    event DirectSellDeclined(address sender);
 
     constructor(
         address _owner,
@@ -97,8 +94,23 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
                 _price
             );
             
-            emit DirectSellDeployed{dest: nftForSell}(directSellAddress, msg.sender, _paymentToken, nftForSell, _nonce, _price); 
-            IDirectSellCallback(msg.sender).directSellDeployed(directSellAddress, msg.sender, _paymentToken, nftForSell, _nonce, _price);
+            // emit DirectSellDeployed{ dest: nftForSell }
+            // (
+            //     directSellAddress, 
+            //     msg.sender, 
+            //     _paymentToken, 
+            //     nftForSell, 
+            //     _nonce, 
+            //     _price
+            // ); 
+            IDirectSell(msg.sender).directSellDeployedCallback(
+                directSellAddress, 
+                msg.sender, 
+                _paymentToken, 
+                nftForSell, 
+                _nonce, 
+                _price
+            );
 
             ITIP4_1NFT(msg.sender).changeManager { value: 0, flag: 128 }(
                 directSellAddress,
@@ -111,8 +123,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         }
 
         if (needCancel) {
-            emit DirectSellDeclined{dest: nftForSell}(msg.sender);
-            IDirectSellCallback(msg.sender).directSellDeclined(msg.sender);
+            // emit DirectSellDeclined{ dest: nftForSell }(msg.sender);
+            IDirectSell(msg.sender).directSellDeclinedCallback(msg.sender);
 
             ITIP4_1NFT(msg.sender).changeManager { value: 0, flag: 128 }(
                 nftOwner,

@@ -830,13 +830,13 @@ IFREF {
 THROW 0
 
 .macro buildPlaceBidPayload_5ca856c3_internal_macro
-.loc ../contracts/AuctionTip3.sol, 248
+.loc ../contracts/AuctionTip3.sol, 251
 SWAP
 NEWC
 STU 32
-.loc ../contracts/AuctionTip3.sol, 249
+.loc ../contracts/AuctionTip3.sol, 252
 STSLICE
-.loc ../contracts/AuctionTip3.sol, 250
+.loc ../contracts/AuctionTip3.sol, 253
 GETGLOB 4
 PUSHINT 0
 SETINDEXQ 2
@@ -857,7 +857,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionTip3.sol, 253
+.loc ../contracts/AuctionTip3.sol, 256
 ENDS
 .loc ../contracts/AuctionTip3.sol, 0
 CALLREF {
@@ -913,7 +913,7 @@ IFREF {
 THROW 0
 
 .macro getInfo_5a9b0b89_internal_macro
-.loc ../contracts/AuctionTip3.sol, 254
+.loc ../contracts/AuctionTip3.sol, 257
 CALL $buildInfo_38a4648d_internal_macro$
 .loc ../contracts/AuctionTip3.sol, 0
 
@@ -922,7 +922,7 @@ CALL $buildInfo_38a4648d_internal_macro$
 CALL $buildInfo_38a4648d_internal_macro$
 
 .macro buildInfo_38a4648d_internal_macro
-.loc ../contracts/AuctionTip3.sol, 258
+.loc ../contracts/AuctionTip3.sol, 261
 GETGLOB 12
 GETGLOB 15
 GETGLOB 19

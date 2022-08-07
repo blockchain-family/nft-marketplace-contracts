@@ -722,10 +722,10 @@ CTOS
 CALL $_buildNftCode_c58e679e_internal_macro$
 
 .macro _buildNftCode_c58e679e_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 194
+.loc ../contracts/AuctionRootTip3.sol, 195
 NEWC
 STSLICE
-.loc ../contracts/AuctionRootTip3.sol, 195
+.loc ../contracts/AuctionRootTip3.sol, 196
 GETGLOB 15
 CTOS
 SWAP
@@ -842,7 +842,7 @@ CALLREF {
 CALL $_buildNftState_c971fdf8_internal_macro$
 
 .macro _buildNftState_c971fdf8_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 201
+.loc ../contracts/AuctionRootTip3.sol, 203
 PUSHINT 0
 NEWC
 STU 256

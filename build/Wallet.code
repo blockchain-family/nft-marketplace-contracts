@@ -142,6 +142,13 @@ IFREF {
 	CALL $c4_to_c7$
 }
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 33
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
 LDU 256
 ENDS
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 0
@@ -306,14 +313,30 @@ PUSHCONT {
 	LDSLICEX ; signatureSlice msgSlice
 	DUP
 	HASHSU ; signatureSlice msgSlice hashMsgSlice
-	ROT
-	GETGLOB 2
+	SWAP
+	LDU 1 ; signatureSlice hashMsgSlice hasPubkey msgSlice
+	SWAP
+	PUSHCONT {
+		LDU 256 ; signatureSlice hashMsgSlice pubkey msgSlice
+		XCHG S3
+		SWAP
+	}
+	PUSHCONT {
+		XCHG S2
+		GETGLOB 2
+	}
+	IFELSE
 	DUP
 	SETGLOB 5
 	CHKSIGNU ; msgSlice isSigned
 	THROWIFNOT 40
 }
-IF
+PUSHCONT {
+	LDU 1 ; hasPubkey msgSlice
+	SWAP
+	THROWIF 58
+}
+IFELSE
 LDU 64 ; timestamp msgSlice
 SWAP
 CALL $replay_protection_macro$

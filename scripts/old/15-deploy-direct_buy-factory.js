@@ -7,7 +7,6 @@ const {
 } = require(process.cwd() + '/test/utils')
 
 async function main() {
-
     const response = await prompts([
         {
             type: 'text',
@@ -39,7 +38,6 @@ async function main() {
     }, locklift.utils.convertCrystal(10, 'nano'));
 
     console.log(`FactoryDirectBuy: ${factoryDirectBuy.address}`);
-
     migration.store(factoryDirectBuy, 'FactoryDirectBuy');
 
     if (response.owner) {

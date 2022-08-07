@@ -6,7 +6,6 @@ const migration = new Migration();
 
 async function main() {
     const signer = (await locklift.keystore.getSigner("0"));
-
     program
         .allowUnknownOption()
         .option('-n, --key_number <key_number>', 'count of accounts')
@@ -18,9 +17,10 @@ async function main() {
     const key_number = +(options.key_number || '0');
     const balance = +(options.balance || '10');
 
-    const { contract: wallet, tx } = await locklift.factory.deployContract({
-        contract: "Wallet",
-        publicKey: signer.publicKey,
+    const contractName = "Wallet";
+    let accountFactory = locklift.factory.getAccountsFactory(contractName);
+    const { account: wallet, tx } = await accountFactory.deployNewAccount({
+        publicKey: (signer?.publicKey) as string,
         initParams: {
             _randomNonce: locklift.utils.getRandomNonce(),
         },
@@ -29,10 +29,8 @@ async function main() {
     });
 
     const name = `Account${key_number + 1}`;
-    
-    migration.store(wallet, name);
+    migration.store(wallet.address.toString(), contractName, name);
     console.log(`${name}: ${wallet.address.toString()}`);
-
 }
 
 main()

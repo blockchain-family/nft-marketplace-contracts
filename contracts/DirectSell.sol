@@ -6,7 +6,7 @@ pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
 import "./libraries/DirectSellStatus.sol";
-import "./interfaces/IDirectSell.sol";
+import "./interfaces/IDirectSellCallback.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
@@ -34,6 +34,26 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     address tokenWallet;
     uint8 currentStatus;
     bool receivedNFT;
+
+    struct DirectSellDetails {
+        address factory;
+        address creator;
+        address token;
+        address nft;
+        uint64 _timeTx;
+        uint64 start;
+        uint64 end;
+        uint128 _price;
+        address wallet;
+        uint8 status;
+        address sender;
+    }
+
+    event DirectSellStateChanged(
+        uint8 from, 
+        uint8 to, 
+        DirectSellDetails
+    );
 
     constructor(
         uint64 _auctionStart, 
@@ -76,7 +96,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         }
     }
 
-    function getDetails() external view returns(IDirectSell.DirectSellDetails){
+    function getDetails() external view returns(DirectSellDetails){
         return builderDetails();
     }
 
@@ -123,12 +143,12 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
                 emptyPayload
             );
 
-            IDirectSell(owner).directSellSuccessCallback(owner, sender);
+            IDirectSellCallback(owner).directSellSuccess(owner, sender);
             changeState(DirectSellStatus.Filled);
             
         } else {
             if (now >= auctionEnd) {
-                IDirectSell(owner).directSellCancelledOnTimeCallback();
+                IDirectSellCallback(owner).directSellCancelledOnTime();
                 changeState(DirectSellStatus.Filled);
             }
 
@@ -171,7 +191,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
 		emit DirectSellStateChanged(prevStateN, newState, builderDetails());
 	}
 
-    function builderDetails() private view returns (IDirectSell.DirectSellDetails) {
+    function builderDetails() private view returns (DirectSellDetails) {
 		return
 			DirectSellDetails(
                 factoryDirectSell,

@@ -65,7 +65,7 @@
 			]
 		},
 		{
-			"name": "closedDirectBuy",
+			"name": "closeBuy",
 			"inputs": [
 			],
 			"outputs": [

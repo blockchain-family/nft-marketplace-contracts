@@ -11,7 +11,7 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
 
-import "./interfaces/IDirectBuy.sol";
+import "./interfaces/IDirectBuyCallback.sol";
 import "./modules/access/OwnableInternal.sol";
 
 import "./DirectBuy.sol";
@@ -23,6 +23,21 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     TvmCell tokenPlatformCode;
     TvmCell directBuyCode;
     
+     event DirectBuyDeployed(
+        address directBuyAddress, 
+        address sender, 
+        address tokenRoot, 
+        address nft, 
+        uint64 nonce, 
+        uint128 amount
+    );
+
+    event DirectBuyDeclined(
+        address sender, 
+        address tokenRoot, 
+        uint128 amount
+    );
+
     constructor(
         address _owner,
         address sendGasTo
@@ -95,7 +110,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
                 nonce, 
                 amount
             );
-            IDirectBuy(sender).directBuyDeployedCallback(
+            IDirectBuyCallback(sender).directBuyDeployed(
                 directBuyAddress, 
                 sender, 
                 tokenRoot, 
@@ -123,7 +138,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
                 tokenRoot, 
                 amount
             );
-            IDirectBuy(sender).directBuyDeployedDeclinedCallback(
+            IDirectBuyCallback(sender).directBuyDeployedDeclined(
                 sender, 
                 tokenRoot, 
                 amount

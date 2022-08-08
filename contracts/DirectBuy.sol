@@ -5,7 +5,7 @@ pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
-import "./interfaces/IDirectBuy.sol";
+import "./interfaces/IDirectBuyCallback.sol";
 import "./libraries/DirectBuyStatus.sol";
 
 import "./errors/DirectBuySellErrors.sol";
@@ -36,6 +36,27 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
     address spentTokenWallet;
     uint8 currentStatus;
     
+    struct DirectBuyDetails {
+        address factory;
+        address creator;
+        address spentToken;
+        address nft;
+        uint64 _timeTx;
+        uint128 _price;
+        address spentWallet;
+        uint8 status;
+        address sender;
+        uint64 startTimeBuy;
+        uint64 durationTimeBuy;
+        uint64 endTimeBuy;
+    }
+
+    event DirectBuyStateChanged(
+        uint8 from, 
+        uint8 to, 
+        DirectBuyDetails
+    );
+
     constructor(
         uint128 _amount, 
         uint64 _startTime, 
@@ -146,12 +167,12 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
                 empty
             );     
             
-            IDirectBuy(nftOwner).directBuySuccessCallback(nftOwner, owner);
+            IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
             changeState(DirectBuyStatus.Filled);
 
         } else {
                 if (now >= endTime) {
-                    IDirectBuy(nftOwner).directBuySuccessCallback(nftOwner, owner);
+                    IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
                     changeState(DirectBuyStatus.Filled);        
                 }
 

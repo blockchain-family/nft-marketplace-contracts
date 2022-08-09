@@ -21,7 +21,8 @@ const config: LockliftConfig = {
     //   "node_modules/broxus-ton-tokens-contracts/build": ['TokenRoot', 'TokenWallet']
     // }
     externalContracts: {
-      "precompiled": ['TokenWalletPlatform', 'Index', 'IndexBasis']
+      "precompiled": ['TokenWalletPlatform', 'Index', 'IndexBasis'],
+      "node_modules/ton-eth-bridge-token-contracts/build": ['TokenRoot', 'TokenWallet']
     }
   },
   linker: {

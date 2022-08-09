@@ -112,6 +112,15 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
                 _nonce, 
                 _price
             ); 
+            emit DirectSellDeployed{ dest: msg.sender }
+            (
+                directSellAddress, 
+                msg.sender, 
+                _paymentToken, 
+                nftForSell, 
+                _nonce, 
+                _price
+            ); 
             IDirectSellCallback(msg.sender).directSellDeployed(
                 directSellAddress, 
                 msg.sender, 
@@ -133,6 +142,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
 
         if (needCancel) {
             emit DirectSellDeclined{ dest: nftForSell }(msg.sender);
+            emit DirectSellDeclined{ dest: msg.sender }(msg.sender);
             IDirectSellCallback(msg.sender).directSellDeclined(msg.sender);
 
             ITIP4_1NFT(msg.sender).changeManager { value: 0, flag: 128 }(

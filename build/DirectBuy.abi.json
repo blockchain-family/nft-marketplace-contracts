@@ -8,14 +8,7 @@
 			"inputs": [
 				{"name":"_amount","type":"uint128"},
 				{"name":"_startTime","type":"uint64"},
-				{"name":"_durationTime","type":"uint64"}
-			],
-			"outputs": [
-			]
-		},
-		{
-			"name": "onTokenWallet",
-			"inputs": [
+				{"name":"_durationTime","type":"uint64"},
 				{"name":"_spentTokenWallet","type":"address"}
 			],
 			"outputs": [

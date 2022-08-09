@@ -60,7 +60,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
     constructor(
         uint128 _amount, 
         uint64 _startTime, 
-        uint64 _durationTime
+        uint64 _durationTime,
+        address _spentTokenWallet
     ) public {
         if(msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
             
@@ -73,15 +74,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
             if (_startTime > 0 && _durationTime > 0) {
                 endTime = _startTime + _durationTime;
             }
-            
-            ITokenRoot(spentTokenRoot).deployWallet{
-                value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
-                flag: 1,
-                callback: DirectBuy.onTokenWallet
-            }(
-                address(this),
-                Gas.DEPLOY_EMPTY_WALLET_GRAMS
-            );
+            spentTokenWallet = _spentTokenWallet;
         } else {
             msg.sender.transfer(0, false, 128 + 32);
         }
@@ -90,14 +83,6 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
     modifier onlyOwner() {
        require(msg.sender.value != 0 && msg.sender == owner, DirectBuySellErrors.NOT_OWNER_DIRECT_BUY);
         _;
-    }
-
-    function onTokenWallet(address _spentTokenWallet) external {
-        require(msg.sender.value != 0 && msg.sender == spentTokenWallet, DirectBuySellErrors.NOT_FROM_SPENT_TOKEN_ROOT);
-        spentTokenWallet = _spentTokenWallet;
-        
-        changeState(DirectBuyStatus.Active);
-
     }
 
     function getDetails() external view returns(DirectBuyDetails){
@@ -114,6 +99,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager  {
     ) external override {
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
         if (tokenRoot == spentTokenRoot && 
+            msg.sender == spentTokenWallet &&
             amount >= price) {
             
             changeState(DirectBuyStatus.Active);

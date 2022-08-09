@@ -7,7 +7,6 @@ pragma AbiHeader time;
 import "./libraries/Gas.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
-
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
 
@@ -88,20 +87,35 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
                 uint64 durationTime
             ) = payloadSlice.decode(uint128, uint64, uint64);
             uint64 nonce = tx.timestamp;
-            address directBuyAddress = new DirectBuy {
-            stateInit: _buildDirectBuyStateInit(
+            
+            TvmCell stateInit = _buildDirectBuyStateInit(
                 sender, 
                 tokenRoot,
                 nftForBuy,
-                nonce),
+                nonce);
+
+            address directBuyAddress = address(tvm.hash(stateInit));
+     
+            new DirectBuy {
+            stateInit: stateInit,
             value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE
                 }(
                 amount,
                 startTime,
-                durationTime
+                durationTime,
+                getTokenWallet(tokenRoot, directBuyAddress)
             );
 
             emit DirectBuyDeployed{ dest: nftForBuy }
+            (
+                directBuyAddress, 
+                sender, 
+                tokenRoot, 
+                nftForBuy, 
+                nonce, 
+                amount
+            );
+            emit DirectBuyDeployed{ dest: sender }
             (
                 directBuyAddress, 
                 sender, 
@@ -133,6 +147,12 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
             ); 
         } else {
             emit DirectBuyDeclined{ dest: nftForBuy }
+            (
+                sender, 
+                tokenRoot, 
+                amount
+            );
+            emit DirectBuyDeclined{ dest: sender }
             (
                 sender, 
                 tokenRoot, 

@@ -21,7 +21,7 @@ library Gas {
     // direct buy
     uint128 constant DIRECT_BUY_INITIAL_BALANCE      = 1 ton;
     uint128 constant DEPLOY_DIRECT_BUY_MIN_VALUE     = 2 ton;
-        
+
     // direct sell
     uint128 constant DIRECT_SELL_INITIAL_BALANCE      = 1 ton;
     uint128 constant DEPLOY_DIRECT_SELL_MIN_VALUE     = 2 ton;

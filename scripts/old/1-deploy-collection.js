@@ -9,15 +9,9 @@ const migration = new Migration();
 
 const {
     deployCollection,
-    deployAccount,
-    deployTokenRoot,
-    getAccount,
-    Contract,
     LockLift,
-    getRandomNonce,
     isValidTonAddress,
-    logContract,
-    getTotalSupply
+    logContract
 } = require(process.cwd() + '/test/utils')
 
 const INCREMENT = 20;
@@ -99,7 +93,7 @@ async function main() {
     const balanceStart = await locklift.ton.getBalance(tempAdmin.address);
 
     if (requiredGas.gt(balanceStart)) {
-        throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
+        throw Error('NOT ENOUGH BALANCE ON ' + tempAdmin.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
     }
 
     const spinner = ora('Deploying Collection').start();

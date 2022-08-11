@@ -1,8 +1,6 @@
 import BigNumber from "bignumber.js";
 const logger = require('mocha-logger');
 
-declare var locklift: LockLift;
-
 export type Address = `0:${string}`
 export const isValidTonAddress = (address: string): address is Address => /^(?:-1|0):[0-9a-fA-F]{64}$/.test(address);
 
@@ -70,8 +68,8 @@ export interface Tx {
 export const getRandomNonce = () => Math.random() * 64000 | 0;
 
 export async function logContract(contract: Contract) {
-  const balance = await locklift.ton.getBalance(contract.address);
-  logger.log(`${contract.name} (${contract.address}) - ${locklift.utils.convertCrystal(balance.toNumber(), 'ton')}`);
+  const balance = await locklift.provider.getBalance(contract.address);
+  logger.log(`${contract.name} (${contract.address}) - ${locklift.utils.fromNano(balance)}`);
 };
 
 export async function getAccount(keyPair: KeyPair, address: Address) {
@@ -91,7 +89,7 @@ export async function deployAccount(keyPair: KeyPair, balance: number): Promise<
       _randomNonce: Math.random() * 6400 | 0,
     },
     keyPair,
-  }, locklift.utils.convertCrystal(balance, 'nano'));
+  }, locklift.utils.toNano(balance));
 
   account.setKeyPair(keyPair);
 
@@ -102,11 +100,10 @@ export async function deployTokenRoot(account: Account, config: { name: string, 
   let { name, symbol, decimals, initialSupply, deployWalletValue } = config;
   decimals = decimals || '4'
   initialSupply = initialSupply || new BigNumber(10000000).shiftedBy(2).toFixed()
-  // deployWalletValue = deployWalletValue || locklift.utils.convertCrystal('1', 'nano')
-  deployWalletValue = locklift.utils.convertCrystal('0.1', 'nano')
+  deployWalletValue = locklift.utils.toNano(0.1);
 
-  const TokenRoot = await locklift.factory.getContract("TokenRoot");
-  const TokenWallet = await locklift.factory.getContract("TokenWallet");
+  const TokenRoot = await locklift.factory.getContractArtifacts("TokenRoot");
+  const TokenWallet = await locklift.factory.getContractArtifacts("TokenWallet");
 
   return await locklift.giver.deployContract({
     contract: TokenRoot,
@@ -129,15 +126,15 @@ export async function deployTokenRoot(account: Account, config: { name: string, 
       walletCode_: TokenWallet.code,
     },
     keyPair: account.keyPair,
-  }, locklift.utils.convertCrystal('3', 'nano'));
+  }, locklift.utils.toNano('3'));
 
 }
 
-export async function deployCollection(account: Account, config = {remainOnNft: 1}): Promise<Contract> {
-  const Collection = await locklift.factory.getContract("Collection");
-  const Nft = await locklift.factory.getContract("Nft");
-  const Index = await locklift.factory.getContract("Index", 'precompiled');
-  const IndexBasis = await locklift.factory.getContract("IndexBasis");
+export async function deployCollection(account: Account, config = { remainOnNft: 1 }): Promise<Contract> {
+  const Collection = await locklift.factory.getContractArtifacts("Collection");
+  const Nft = await locklift.factory.getContractArtifacts("Nft");
+  const Index = await locklift.factory.getContractArtifacts("Index");
+  const IndexBasis = await locklift.factory.getContractArtifacts("IndexBasis");
 
   let { remainOnNft } = config;
   remainOnNft = remainOnNft || 0;
@@ -149,13 +146,13 @@ export async function deployCollection(account: Account, config = {remainOnNft: 
       codeIndex: Index.code,
       codeIndexBasis: IndexBasis.code,
       owner: account.address,
-      remainOnNft: locklift.utils.convertCrystal(remainOnNft, 'nano'),
+      remainOnNft: locklift.utils.toNano(remainOnNft),
     },
     initParams: {
       nonce_: getRandomNonce()
     },
     keyPair: account.keyPair,
-  }, locklift.utils.convertCrystal(4, 'nano'));
+  }, locklift.utils.toNano(4));
 }
 
 export async function deployTokenWallet(account: Account, tokenRoot: Contract): Promise<Contract> {
@@ -173,11 +170,11 @@ export async function deployTokenWallet(account: Account, tokenRoot: Contract): 
     method: 'deployWallet',
     params: {
       walletOwner: account.address,
-      deployWalletValue: locklift.utils.convertCrystal(0.1, 'nano'),
+      deployWalletValue: locklift.utils.toNano(0.1),
       answerId: 0
     },
     keyPair: account.keyPair,
-    value: locklift.utils.convertCrystal(0.5, 'nano'),
+    value: locklift.utils.toNano(0.5),
   });
 
   const TokenWallet = await locklift.factory.getContract("TokenWallet");
@@ -205,7 +202,6 @@ export function getPurchaseCount(market: Contract): Promise<BigNumber> {
 }
 
 export async function getTokenWallet(market: Contract): Promise<Contract> {
-  const tokenWallet = await locklift.factory.getContract("TokenWallet");
   let walletAddr = await market.call({
     method: 'tokenWallet',
     params: {
@@ -213,20 +209,15 @@ export async function getTokenWallet(market: Contract): Promise<Contract> {
     }
   });
 
-  tokenWallet.setAddress(walletAddr);
-
-  return tokenWallet;
+  return (await locklift.factory.getDeployedContract("TokenWallet", walletAddr));
 }
 
 export async function getNftById(market: Contract, id: number): Promise<Contract> {
-  let nft = await locklift.factory.getContract("Nft");
   let nftAddr = await market.call({
     method: 'nftAddress',
     params: { id, answerId: 0 }
   });
 
-  nft.setAddress(nftAddr);
-
-  return nft;
+  return await locklift.factory.getDeployedContract("Nft", nftAddr);
 }
 

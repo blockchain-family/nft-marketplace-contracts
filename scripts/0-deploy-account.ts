@@ -29,7 +29,7 @@ async function main() {
     });
 
     const name = `Account${key_number + 1}`;
-    migration.store(wallet.address.toString(), contractName, name);
+    migration.store(wallet.address, contractName, name);
     console.log(`${name}: ${wallet.address.toString()}`);
 }
 

@@ -47,7 +47,7 @@ export class Migration {
         this.migration_log = {
             ...this.migration_log,
             [alias]: {
-                address: contractAddress,
+                address: contractAddress.toString(),
                 name: contractName
             }
         }

@@ -10,7 +10,7 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'FactoryDirectSell owner',
-            validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'    
+            validate: (value:any) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'    
         }
     ]);
 

@@ -16,7 +16,7 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'Get Collection Owner Address (default ' + tempAdmin.address + ')',
-            validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value:string) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
             type: 'number',
@@ -36,7 +36,7 @@ async function main() {
                 type: 'text',
                 name: 'nftOwner',
                 message: 'Get NFTs Owner Address (default ' + tempAdmin.address + ')',
-                validate: value => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+                validate: (value:string) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
             },
             {
                 type: 'text',

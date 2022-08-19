@@ -16,8 +16,8 @@ async function main() {
 
     const account = migration.load("Wallet", "Account1");
     const signer = (await locklift.keystore.getSigner('0'));
-    const DirectSell = (await locklift.factory.getContractArtifacts("DirectSell"));
-    
+    const accountFactory = locklift.factory.getAccountsFactory("Wallet");
+    const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
     const {contract: factoryDirectSell, tx } = await locklift.factory.deployContract({
         contract: "FactoryDirectSell",
         publicKey: (signer?.publicKey) as string,
@@ -26,18 +26,27 @@ async function main() {
             sendGasTo: account.address
         },
         initParams: {
-            nonce_: Math.random() * 6400 | 0,
-            directSellCode: DirectSell.code
+            nonce_: Math.random() * 6400 | 0
         },
         value: locklift.utils.toNano(10)
     });
 
     console.log(`FactoryDirectSell: ${factoryDirectSell.address}`);
     migration.store(factoryDirectSell.address, "FactoryDirectSell", "FactoryDirectSell");
+    const DirectSell = (await locklift.factory.getContractArtifacts('DirectSell'));
+
+    console.log(`Set code DirectSell`);
+    await acc.runTarget(
+        {
+            contract:factoryDirectSell,
+            value: locklift.utils.toNano(1),
+        },
+        (dS) => dS.methods.setCodeDirectSell({
+            _directSellCode: DirectSell.code,
+        }),
+    );
 
     if (response.owner) {
-        const accountFactory = locklift.factory.getAccountsFactory("Wallet");
-        const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
         await acc.runTarget(
             {
                 contract: factoryDirectSell,

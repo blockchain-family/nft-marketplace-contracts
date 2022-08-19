@@ -79,6 +79,10 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     _;
   }
 
+  function getTypeContract() external pure returns (string) {
+    return "DirectSell";
+  }
+
   function onTokenWallet(address _wallet) external {
     require(msg.sender.value != 0 && msg.sender == paymentToken, DirectBuySellErrors.NOT_FROM_SPENT_TOKEN_ROOT);
     tokenWallet = _wallet;

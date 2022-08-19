@@ -10,7 +10,7 @@ const INCREMENT = 20;
 async function main() {
     const tempAdmin = migration.load("Wallet", "Account1");
     const signer = (await locklift.keystore.getSigner('0'));
-
+    
     const response = await prompts([
         {
             type: 'text',
@@ -67,6 +67,7 @@ async function main() {
         config.nftOwner = response2.nftOwner;
     }
 
+    
     const tx_results = []
     const amount = config.nftAmount;
 
@@ -78,7 +79,7 @@ async function main() {
     }
 
     const spinner = ora('Deploying Collection').start();
-
+    
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
     const Index = (await locklift.factory.getContractArtifacts("Index"));
     const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));

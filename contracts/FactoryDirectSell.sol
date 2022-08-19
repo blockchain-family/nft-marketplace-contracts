@@ -39,14 +39,29 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
 
+  function getTypeContract() external pure returns (string) {
+    return "FactoryDirectSell";
+  }
+
+  function setCodeDirectSell(TvmCell _directSellCode) public onlyOwner {
+    tvm.rawReserve(Gas.SET_CODE, 0);  
+    directSellCode = _directSellCode;
+
+    msg.sender.transfer(
+      0,
+		  false,
+		  128 + 2
+    );
+  }
+
   function buildPayload(
     address _nftAddress,
     uint64 _startAuction,
-    optional(uint64) _endAuction,
+    uint64 _endAuction,
     address _paymentToken,
     uint128 _price
   ) external pure returns (TvmCell) {
-    return abi.encode(_nftAddress, _startAuction, _endAuction.hasValue() ? _endAuction : 0, _paymentToken, _price);
+    return abi.encode(_nftAddress, _startAuction, _endAuction, _paymentToken, _price);
   }
 
   function onNftChangeManager(
@@ -82,7 +97,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         value: Gas.DEPLOY_DIRECT_SELL_MIN_VALUE
       }(_startAuction, _endAuction, _price);
 
-      emit DirectSellDeployed{ dest: nftForSell }(
+      emit DirectSellDeployed{dest: address.makeAddrExtern(nftForSell.value, 256)}(
         directSellAddress,
         msg.sender,
         _paymentToken,
@@ -90,7 +105,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _nonce,
         _price
       );
-      emit DirectSellDeployed{ dest: msg.sender }(
+      emit DirectSellDeployed{dest: address.makeAddrExtern(msg.sender.value, 256)}(
         directSellAddress,
         msg.sender,
         _paymentToken,
@@ -109,8 +124,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
 
       ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(directSellAddress, sendGasTo, callbacks);
     } else {
-      emit DirectSellDeclined{ dest: nftForSell }(msg.sender);
-      emit DirectSellDeclined{ dest: msg.sender }(msg.sender);
+      emit DirectSellDeclined{dest: address.makeAddrExtern(nftForSell.value, 256)}(msg.sender);
+      emit DirectSellDeclined{dest: address.makeAddrExtern(msg.sender.value, 256)}(msg.sender);
       IDirectSellCallback(msg.sender).directSellDeclined(msg.sender);
 
       ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(nftOwner, sendGasTo, callbacks);

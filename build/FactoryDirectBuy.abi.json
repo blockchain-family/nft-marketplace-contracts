@@ -13,14 +13,38 @@
 			]
 		},
 		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
 			"name": "buildPayload",
 			"inputs": [
 				{"name":"nft","type":"address"},
-				{"name":"startTime","type":"optional(uint64)"},
-				{"name":"durationTime","type":"optional(uint64)"}
+				{"name":"startTime","type":"uint64"},
+				{"name":"durationTime","type":"uint64"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "setCodeTokenPlatform",
+			"inputs": [
+				{"name":"_tokenPlatformCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setCodeDirectBuy",
+			"inputs": [
+				{"name":"_directBuyCode","type":"cell"}
+			],
+			"outputs": [
 			]
 		},
 		{

@@ -68,6 +68,10 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         _sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
+    function getTypeContract() external pure returns (string) {
+        return "AuctionRoot";
+    }
+
     function onNftChangeManager(
         uint256 /*id*/,
         address nftOwner,

@@ -20,6 +20,14 @@
 			]
 		},
 		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
 			"name": "onNftChangeManager",
 			"inputs": [
 				{"name":"value0","type":"uint256"},

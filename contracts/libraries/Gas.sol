@@ -27,4 +27,6 @@ library Gas {
     uint128 constant DEPLOY_DIRECT_SELL_MIN_VALUE     = 2 ton;
 
     uint128 constant FINISH_ORDER_VALUE               = 1 ton;
+
+    uint128 constant SET_CODE                         = 1 ton;
 }

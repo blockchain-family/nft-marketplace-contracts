@@ -79,6 +79,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
     _;
   }
 
+  function getTypeContract() external pure returns (string) {
+    return "DirectBuy";
+  }
+
   function getDetails() external view returns (DirectBuyDetails) {
     return builderDetails();
   }

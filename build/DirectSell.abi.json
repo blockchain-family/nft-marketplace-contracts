@@ -14,6 +14,14 @@
 			]
 		},
 		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
 			"name": "onTokenWallet",
 			"inputs": [
 				{"name":"_wallet","type":"address"}

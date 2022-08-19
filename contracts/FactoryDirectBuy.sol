@@ -32,7 +32,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
   event DirectBuyDeclined(address sender, address tokenRoot, uint128 amount);
 
-  constructor(address _owner, address sendGasTo) public OwnableInternal(_owner) {
+  constructor(address _owner, address sendGasTo) OwnableInternal(_owner) public {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
@@ -40,12 +40,38 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
 
+  function getTypeContract() external pure returns (string) {
+    return "FactoryDirectBuy";
+  }
+
   function buildPayload(
     address nft,
-    optional(uint64) startTime,
-    optional(uint64) durationTime
+    uint64 startTime,
+    uint64 durationTime
   ) external pure returns (TvmCell) {
-    return abi.encode(nft, startTime.hasValue() ? startTime : 0, durationTime.hasValue() ? durationTime : 0);
+    return abi.encode(nft, startTime, durationTime);
+  }
+
+  function setCodeTokenPlatform(TvmCell _tokenPlatformCode) public onlyOwner {
+    tvm.rawReserve(Gas.SET_CODE, 0);
+    tokenPlatformCode = _tokenPlatformCode;
+
+    msg.sender.transfer(
+      0,
+		  false,
+		  128 + 2
+    );
+  } 
+
+  function setCodeDirectBuy(TvmCell _directBuyCode) public onlyOwner {
+    tvm.rawReserve(Gas.SET_CODE, 0);  
+    directBuyCode = _directBuyCode;
+
+    msg.sender.transfer(
+      0,
+		  false,
+		  128 + 2
+    );
   }
 
   function onAcceptTokensTransfer(
@@ -55,7 +81,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     address, /*senderWallet*/
     address originalGasTo,
     TvmCell payload
-  ) external override {
+  ) override external {
     tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);
 
     TvmSlice payloadSlice = payload.toSlice();
@@ -63,14 +89,13 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     if (
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&
-      msg.sender == getTokenWallet(tokenRoot, sender) &&
+      msg.sender == getTokenWallet(tokenRoot, address(this)) &&
       msg.value >= (Gas.DEPLOY_DIRECT_BUY_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE)
     ) {
       (uint64 startTime, uint64 durationTime) = payloadSlice.decode(uint64, uint64);
       uint64 nonce = tx.timestamp;
 
       TvmCell stateInit = _buildDirectBuyStateInit(sender, tokenRoot, nftForBuy, nonce);
-
       address directBuyAddress = address(tvm.hash(stateInit));
 
       new DirectBuy{ stateInit: stateInit, value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE }(
@@ -80,8 +105,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         getTokenWallet(tokenRoot, directBuyAddress)
       );
 
-      emit DirectBuyDeployed{ dest: nftForBuy }(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
-      emit DirectBuyDeployed{ dest: sender }(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
+      emit DirectBuyDeployed{dest: address.makeAddrExtern(nftForBuy.value, 256)}(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
+      emit DirectBuyDeployed{dest: address.makeAddrExtern(sender.value, 256)}(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
       IDirectBuyCallback(sender).directBuyDeployed(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
 
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
@@ -93,8 +118,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         payload
       );
     } else {
-      emit DirectBuyDeclined{ dest: nftForBuy }(sender, tokenRoot, amount);
-      emit DirectBuyDeclined{ dest: sender }(sender, tokenRoot, amount);
+      emit DirectBuyDeclined{dest: address.makeAddrExtern(nftForBuy.value, 256)}(sender, tokenRoot, amount);
+      emit DirectBuyDeclined{dest: address.makeAddrExtern(sender.value, 256)}(sender, tokenRoot, amount);
       IDirectBuyCallback(sender).directBuyDeployedDeclined(sender, tokenRoot, amount);
 
       TvmCell emptyPayload;

@@ -1,4 +1,4 @@
-import { isValidTonAddress} from "../test/utils";
+import { isValidTonAddress} from "../test/utils_old";
 import { Migration } from "./migration";
 
 const migration = new Migration();

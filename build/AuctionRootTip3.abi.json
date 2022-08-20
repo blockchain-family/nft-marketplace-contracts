@@ -66,6 +66,16 @@
 			]
 		},
 		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "changeDeploymentFee",
 			"inputs": [
 				{"name":"_value","type":"uint128"}
@@ -162,6 +172,13 @@
 			]
 		},
 		{
+			"name": "AuctionRootUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "OwnershipTransferred",
 			"inputs": [
 				{"name":"oldOwner","type":"address"},
@@ -184,6 +201,7 @@
 		{"name":"offerCode","type":"cell"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"auctionBidDelta","type":"uint8"},
-		{"name":"auctionBidDeltaDecimals","type":"uint8"}
+		{"name":"auctionBidDeltaDecimals","type":"uint8"},
+		{"name":"currentVersion","type":"uint32"}
 	]
 }

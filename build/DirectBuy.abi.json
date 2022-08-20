@@ -38,7 +38,7 @@
 				{"name":"sender","type":"address"},
 				{"name":"value3","type":"address"},
 				{"name":"originalGasTo","type":"address"},
-				{"name":"value5","type":"cell"}
+				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
 			]
@@ -71,6 +71,16 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"data": [
@@ -90,6 +100,13 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "DirectBuyUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
@@ -106,6 +123,7 @@
 		{"name":"durationTime","type":"uint64"},
 		{"name":"endTime","type":"uint64"},
 		{"name":"spentTokenWallet","type":"address"},
-		{"name":"currentStatus","type":"uint8"}
+		{"name":"currentStatus","type":"uint8"},
+		{"name":"currentVersion","type":"uint32"}
 	]
 }

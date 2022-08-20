@@ -32,9 +32,11 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
 
     uint8 public auctionBidDelta;
     uint8 public auctionBidDeltaDecimals;
+    uint32 currentVersion;
 
     event AuctionDeployed(address offerAddress, MarketOffer offerInfo);
     event AuctionDeclined(address nftOwner, address dataAddress);
+    event AuctionRootUpgrade();
 
     constructor(
         TvmCell _codeNft,
@@ -65,6 +67,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
 
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
+        currentVersion++;
+
         _sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
@@ -211,4 +215,41 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         });
     }
     
+    function upgrade(
+        TvmCell newCode,
+        uint32 newVersion,
+        address sendGasTo
+    ) external onlyOwner {
+        if (currentVersion == newVersion) {
+			tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+			sendGasTo.transfer({
+				value: 0,
+				flag: 128 + 2,
+				bounce: false
+			});
+		} else {
+            emit AuctionRootUpgrade();
+
+            TvmCell cellParams = abi.encode(
+                nonce_,
+                owner(),
+                currentVersion,
+                auctionBidDelta,
+                auctionBidDeltaDecimals,
+                codeNft,
+                offerCode,
+                deploymentFee,
+                marketFee,
+                marketFeeDecimals,
+                deploymentFeePart
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade (cellParams);
+        }
+    }
+
+    function onCodeUpgrade(TvmCell data) private {}
 }

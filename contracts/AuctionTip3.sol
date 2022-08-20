@@ -38,6 +38,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         uint64 startTime;
         uint64 duration;
         uint64 finishTime;
+        uint64 nowTime;
     }
 
     struct Bid {
@@ -58,12 +59,15 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     }
     AuctionStatus state;
 
+    uint32 currentVersion;
+
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
     event BidPlaced(address buyerAddress, uint128 value);
     event BidDeclined(address buyerAddress, uint128 value);
     event AuctionComplete(address buyerAddress, uint128 value); 
     event AuctionCancelled();
+    event AuctionUpgrade();
 
     constructor(
         address _markerRootAddr,
@@ -98,7 +102,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         
         emit AuctionCreated{dest: address.makeAddrExtern(nft.value, 256)}(buildInfo());
         state = AuctionStatus.Created;
-
+        currentVersion++;
+        
         ITokenRoot(paymentTokenRoot).deployWallet {
             value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
             flag: 1,
@@ -269,8 +274,54 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             tokenWallet, 
             auctionStartTime, 
             auctionDuration, 
-            auctionEndTime
+            auctionEndTime,
+            now
         );
     }
+
+    function upgrade(
+        TvmCell newCode,
+        uint32 newVersion,
+        address sendGasTo
+    ) external onlyMarketRoot {
+        if (currentVersion == newVersion) {
+			tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
+			sendGasTo.transfer({
+				value: 0,
+				flag: 128 + 2,
+				bounce: false
+			});
+		} else {
+            emit AuctionUpgrade();
+
+            TvmCell cellParams = abi.encode(
+              nonce_,
+              currentVersion,
+              price,
+              nft,
+              markerRootAddr,
+              tokenRootAddr,
+              nftOwner,
+              deploymentFee,
+              marketFee,
+              marketFeeDecimals,
+              auctionDuration,
+              auctionStartTime,
+              auctionEndTime,
+              maxBidValue,
+              bidDelta,
+              nextBidValue,
+              paymentTokenRoot,
+              state
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade(cellParams);
+        }
+    }
+
+    function onCodeUpgrade(TvmCell data) private {}
 
 }

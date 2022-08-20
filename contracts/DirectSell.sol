@@ -6,6 +6,8 @@ pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
 import "./libraries/DirectSellStatus.sol";
+import "./libraries/ExchangePayload.sol";
+
 import "./interfaces/IDirectSellCallback.sol";
 
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
@@ -34,6 +36,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
   address tokenWallet;
   uint8 currentStatus;
   bool receivedNFT;
+  uint32 currentVersion;
 
   struct DirectSellDetails {
     address factory;
@@ -50,6 +53,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
   }
 
   event DirectSellStateChanged(uint8 from, uint8 to, DirectSellDetails);
+  event DirectSellUpgrade();
 
   constructor(
     uint64 _auctionStart,
@@ -102,11 +106,13 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     address sender,
     address, /*sender_wallet*/
     address original_gas_to,
-    TvmCell /*payload*/
+    TvmCell payload
   ) external override {
     tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
 
+    (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload);
     TvmCell emptyPayload;
+
     if (
       msg.sender.value != 0 &&
       msg.sender == tokenWallet &&
@@ -117,7 +123,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     ) {
       mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
       ITIP4_1NFT(nftAddress).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
-        sender,
+        buyer,
         original_gas_to,
         callbacks
       );
@@ -131,17 +137,17 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         emptyPayload
       );
 
-      IDirectSellCallback(owner).directSellSuccess(owner, sender);
+      IDirectSellCallback(owner).directSellSuccess(callbackId, owner, buyer);
       changeState(DirectSellStatus.Filled);
     } else {
       if (now >= auctionEnd) {
-        IDirectSellCallback(owner).directSellCancelledOnTime();
+        IDirectSellCallback(owner).directSellCancelledOnTime(callbackId);
         changeState(DirectSellStatus.Filled);
       }
 
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
         amount,
-        sender,
+        buyer,
         uint128(0),
         original_gas_to,
         true,
@@ -217,4 +223,45 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
 
     changeState(DirectSellStatus.Cancelled);
   }
+
+  function upgrade(
+    TvmCell newCode,
+    uint32 newVersion,
+    address sendGasTo
+  ) external {
+    require(msg.sender.value !=0 && msg.sender == factoryDirectSell, DirectBuySellErrors.NOT_FACTORY_DIRECT_SELL);
+    if (currentVersion == newVersion) {
+			tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+			sendGasTo.transfer({
+				value: 0,
+				flag: 128 + 2,
+				bounce: false
+			});
+		} else {
+            emit DirectSellUpgrade();
+
+            TvmCell cellParams = abi.encode(
+              factoryDirectSell,
+              owner,
+              paymentToken,
+              nftAddress,
+              timeTx,
+              auctionStart,
+              auctionEnd,
+              price,
+              tokenWallet,
+              currentStatus,
+              receivedNFT,
+              currentVersion
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade(cellParams);
+        }
+  }
+
+  function onCodeUpgrade(TvmCell data) private {} 
+
 }

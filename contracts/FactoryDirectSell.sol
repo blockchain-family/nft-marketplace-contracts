@@ -19,7 +19,10 @@ import "./DirectSell.sol";
 
 contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   uint64 static nonce_;
+  
   TvmCell directSellCode;
+
+  uint32 currentVersion;
 
   event DirectSellDeployed(
     address _directSellAddress,
@@ -30,6 +33,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     uint128 price
   );
   event DirectSellDeclined(address sender);
+  event FactoryDirectSellUpgrade();
 
   constructor(address _owner, address sendGasTo) public OwnableInternal(_owner) {
     tvm.accept();
@@ -151,4 +155,36 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         code: directSellCode
       });
   }
+
+  function upgrade(
+    TvmCell newCode,
+    uint32 newVersion,
+    address sendGasTo
+  ) external onlyOwner {
+    if (currentVersion == newVersion) {
+			tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+			sendGasTo.transfer({
+				value: 0,
+				flag: 128 + 2,
+				bounce: false
+			});
+		} else {
+            emit FactoryDirectSellUpgrade();
+
+            TvmCell cellParams = abi.encode(
+              nonce_,
+              owner(),
+              currentVersion,
+              directSellCode
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade(cellParams);
+    }  
+  }
+
+  function onCodeUpgrade(TvmCell data) private {}
+
 }

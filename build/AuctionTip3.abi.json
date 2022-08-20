@@ -74,7 +74,17 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"nowTime","type":"uint64"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -183,7 +193,7 @@
 		{
 			"name": "AuctionCreated",
 			"inputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"nowTime","type":"uint64"}],"name":"value0","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -191,7 +201,7 @@
 		{
 			"name": "AuctionActive",
 			"inputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"nowTime","type":"uint64"}],"name":"value0","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -229,6 +239,13 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "AuctionUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
@@ -253,6 +270,7 @@
 		{"components":[{"name":"addr","type":"address"},{"name":"value","type":"uint128"}],"name":"currentBid","type":"tuple"},
 		{"name":"maxBidValue","type":"uint128"},
 		{"name":"nextBidValue","type":"uint128"},
-		{"name":"state","type":"uint8"}
+		{"name":"state","type":"uint8"},
+		{"name":"currentVersion","type":"uint32"}
 	]
 }

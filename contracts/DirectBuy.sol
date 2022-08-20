@@ -5,8 +5,10 @@ pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
 import "./libraries/Gas.sol";
-import "./interfaces/IDirectBuyCallback.sol";
 import "./libraries/DirectBuyStatus.sol";
+import "./libraries/ExchangePayload.sol";
+
+import "./interfaces/IDirectBuyCallback.sol";
 
 import "./errors/DirectBuySellErrors.sol";
 import "./errors/BaseErrors.sol";
@@ -34,6 +36,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
 
   address spentTokenWallet;
   uint8 currentStatus;
+  uint32 currentVersion;
 
   struct DirectBuyDetails {
     address factory;
@@ -51,6 +54,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
   }
 
   event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyDetails);
+  event DirectBuyUpgrade();
 
   constructor(
     uint128 _amount,
@@ -69,6 +73,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
         endTime = _startTime + _durationTime;
       }
       spentTokenWallet = _spentTokenWallet;
+
+      currentVersion++;
     } else {
       msg.sender.transfer(0, false, 128 + 32);
     }
@@ -93,9 +99,12 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
     address sender,
     address, /*senderWallet*/
     address originalGasTo,
-    TvmCell /*payload*/
+    TvmCell payload
   ) external override {
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+    
+    (address buyer, ) = ExchangePayload.getSenderAndCallId(sender, payload);
+
     if (
         tokenRoot == spentTokenRoot && 
         msg.sender.value != 0 &&
@@ -107,7 +116,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
       TvmCell emptyPayload;
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
         amount,
-        sender,
+        buyer,
         uint128(0),
         originalGasTo,
         true,
@@ -214,4 +223,45 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
 
     changeState(DirectBuyStatus.Cancelled);
   }
+
+  function upgrade(
+    TvmCell newCode,
+    uint32 newVersion,
+    address sendGasTo
+  ) external {
+    require(msg.sender.value !=0 && msg.sender == factoryDirectBuy, DirectBuySellErrors.NOT_FACTORY_DIRECT_BUY);
+    if (currentVersion == newVersion) {
+			tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+			sendGasTo.transfer({
+				value: 0,
+				flag: 128 + 2,
+				bounce: false
+			});
+		} else {
+            emit DirectBuyUpgrade();
+
+            TvmCell cellParams = abi.encode(
+              factoryDirectBuy,
+              owner,
+              spentTokenRoot,
+              nftAddress,
+              timeTx,
+              price,
+              startTime,
+              durationTime,
+              endTime,
+              spentTokenWallet,
+              currentStatus,
+              currentVersion
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade(cellParams);
+        }
+  }
+
+  function onCodeUpgrade(TvmCell data) private {} 
+
 }

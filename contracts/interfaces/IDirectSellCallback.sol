@@ -13,9 +13,10 @@ interface IDirectSellCallback {
     function directSellDeclined(address sender) external;    
 
     function directSellSuccess(
+        uint32 callbackId,
         address oldOwner,
         address newOwner
     ) external;
 
-    function directSellCancelledOnTime() external; 
+    function directSellCancelledOnTime(uint32 callbackId) external; 
 }

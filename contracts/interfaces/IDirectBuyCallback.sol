@@ -3,6 +3,7 @@ pragma ton-solidity >= 0.62.0;
 interface IDirectBuyCallback {
 
     function directBuyDeployed(
+        uint32 callbackId,
         address directBuyAddress, 
         address sender, 
         address tokenRoot,
@@ -12,6 +13,7 @@ interface IDirectBuyCallback {
     ) external;
     
     function directBuyDeployedDeclined(
+        uint32 callbackId,
         address sender, 
         address tokenRoot, 
         uint128 amount

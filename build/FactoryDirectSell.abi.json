@@ -56,6 +56,16 @@
 			]
 		},
 		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "owner",
 			"inputs": [
 			],
@@ -98,6 +108,13 @@
 			]
 		},
 		{
+			"name": "FactoryDirectSellUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "OwnershipTransferred",
 			"inputs": [
 				{"name":"oldOwner","type":"address"},
@@ -113,6 +130,7 @@
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"owner_","type":"address"},
 		{"name":"nonce_","type":"uint64"},
-		{"name":"directSellCode","type":"cell"}
+		{"name":"directSellCode","type":"cell"},
+		{"name":"currentVersion","type":"uint32"}
 	]
 }

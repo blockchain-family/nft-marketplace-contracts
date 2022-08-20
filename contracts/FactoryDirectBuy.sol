@@ -21,6 +21,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   TvmCell tokenPlatformCode;
   TvmCell directBuyCode;
 
+  uint32 currentVersion;
+
   event DirectBuyDeployed(
     address directBuyAddress,
     address sender,
@@ -31,11 +33,12 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   );
 
   event DirectBuyDeclined(address sender, address tokenRoot, uint128 amount);
+  event FactoryDirectBuyUpgrade();
 
   constructor(address _owner, address sendGasTo) OwnableInternal(_owner) public {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-
+    currentVersion++;
     _transferOwnership(_owner);
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
@@ -84,6 +87,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   ) override external {
     tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);
 
+    (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload); 
     TvmSlice payloadSlice = payload.toSlice();
     address nftForBuy = payloadSlice.decode(address);
     if (
@@ -95,7 +99,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
       (uint64 startTime, uint64 durationTime) = payloadSlice.decode(uint64, uint64);
       uint64 nonce = tx.timestamp;
 
-      TvmCell stateInit = _buildDirectBuyStateInit(sender, tokenRoot, nftForBuy, nonce);
+      TvmCell stateInit = _buildDirectBuyStateInit(buyer, tokenRoot, nftForBuy, nonce);
       address directBuyAddress = address(tvm.hash(stateInit));
 
       new DirectBuy{ stateInit: stateInit, value: Gas.DEPLOY_DIRECT_BUY_MIN_VALUE }(
@@ -105,9 +109,9 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         getTokenWallet(tokenRoot, directBuyAddress)
       );
 
-      emit DirectBuyDeployed{dest: address.makeAddrExtern(nftForBuy.value, 256)}(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
-      emit DirectBuyDeployed{dest: address.makeAddrExtern(sender.value, 256)}(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
-      IDirectBuyCallback(sender).directBuyDeployed(directBuyAddress, sender, tokenRoot, nftForBuy, nonce, amount);
+      emit DirectBuyDeployed{dest: address.makeAddrExtern(nftForBuy.value, 256)}(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
+      emit DirectBuyDeployed{dest: address.makeAddrExtern(buyer.value, 256)}(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
+      IDirectBuyCallback(buyer).directBuyDeployed(callbackId, directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
 
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
         amount,
@@ -118,14 +122,14 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         payload
       );
     } else {
-      emit DirectBuyDeclined{dest: address.makeAddrExtern(nftForBuy.value, 256)}(sender, tokenRoot, amount);
-      emit DirectBuyDeclined{dest: address.makeAddrExtern(sender.value, 256)}(sender, tokenRoot, amount);
-      IDirectBuyCallback(sender).directBuyDeployedDeclined(sender, tokenRoot, amount);
+      emit DirectBuyDeclined{dest: address.makeAddrExtern(nftForBuy.value, 256)}(buyer, tokenRoot, amount);
+      emit DirectBuyDeclined{dest: address.makeAddrExtern(buyer.value, 256)}(buyer, tokenRoot, amount);
+      IDirectBuyCallback(buyer).directBuyDeployedDeclined(callbackId, buyer, tokenRoot, amount);
 
       TvmCell emptyPayload;
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
         amount,
-        sender,
+        buyer,
         uint128(0),
         originalGasTo,
         true,
@@ -178,4 +182,37 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         )
       );
   }
+
+  function upgrade (
+    TvmCell newCode,
+    uint32 newVersion,
+    address sendGasTo
+  ) external onlyOwner {
+     if (currentVersion == newVersion) {
+			tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+			sendGasTo.transfer({
+				value: 0,
+				flag: 128 + 2,
+				bounce: false
+			});
+		} else {
+            emit FactoryDirectBuyUpgrade();
+
+            TvmCell cellParams = abi.encode(
+              nonce_,
+              owner(),
+              currentVersion,
+              tokenPlatformCode,
+              directBuyCode
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade(cellParams);
+    }
+  }
+
+  function onCodeUpgrade(TvmCell data) private {}
 }
+

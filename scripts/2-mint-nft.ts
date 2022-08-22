@@ -70,7 +70,6 @@ async function main() {
 
     const accountFactory = locklift.factory.getAccountsFactory("Wallet");
     const signer = (await locklift.keystore.getSigner('0'));  
-    const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
     await locklift.tracing.trace(acc.runTarget(
         {
             contract: collection,

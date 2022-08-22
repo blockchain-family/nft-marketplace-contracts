@@ -202,8 +202,15 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
     require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
     require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
 
-    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-    ITIP4_1NFT(nftAddress).changeManager{ value: 0, flag: 128 }(owner, sendGasTo, callbacks);
+    TvmCell emptyPayload;
+    ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+      price,
+      owner,
+      0,
+      sendGasTo,
+      true,
+      emptyPayload
+    );
 
     changeState(DirectBuyStatus.Filled);
   }

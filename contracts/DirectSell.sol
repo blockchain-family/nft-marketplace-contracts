@@ -67,7 +67,8 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
       auctionStart = _auctionStart;
       auctionEnd = _auctionEnd;
       price = _price;
-
+      currentVersion++;
+      
       ITokenRoot(paymentToken).deployWallet{
         value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
         flag: 1,

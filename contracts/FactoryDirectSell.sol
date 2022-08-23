@@ -97,7 +97,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
       );
       uint64 _nonce = tx.timestamp;
       address directSellAddress = new DirectSell{
-        stateInit: _buildDirectSellStateInit(msg.sender, _paymentToken, nftForSell, _nonce),
+        stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, nftForSell, _nonce),
         value: Gas.DEPLOY_DIRECT_SELL_MIN_VALUE
       }(_startAuction, _endAuction, _price);
 
@@ -109,7 +109,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _nonce,
         _price
       );
-      emit DirectSellDeployed{dest: address.makeAddrExtern(msg.sender.value, 256)}(
+      emit DirectSellDeployed{dest: address.makeAddrExtern(nftOwner.value, 256)}(
         directSellAddress,
         msg.sender,
         _paymentToken,

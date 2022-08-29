@@ -88,7 +88,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         require(newManager == address(this));
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
         bool isDeclined = false;
-        if (nftOwner == owner() && payload.toSlice().bits() == 523) {
+        
+        if (payload.toSlice().bits() == 523) {
             (
                 address _paymentTokenRoot,
                 uint128 _price,

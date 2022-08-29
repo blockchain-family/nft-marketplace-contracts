@@ -1,4 +1,4 @@
-import { isValidTonAddress, logContract } from "../test/utils_old";
+import { isValidTonAddress, logContract } from "../test/utils";
 import { Migration } from "./migration";
 
 const migration = new Migration();

@@ -23,13 +23,9 @@ async function main() {
 
     const Nft = await locklift.factory.getContract("Nft");
 
-    // const callbacks = [
-    //     [AuctionRootTip3.address, { value: new BigNumber(5).shiftedBy(9).toFixed(), payload: payload1}]
-    // ];
-
     const callbacks = {};
     callbacks[AuctionRootTip3.address] = { value: new BigNumber(5).shiftedBy(9).toFixed(), payload: payload1};
-
+    
     const message = await this.locklift.ton.client.abi.encode_message_body({
         abi: {
             type: "Contract",

@@ -2,7 +2,7 @@ import { Migration } from "./migration";
 
 const prompts = require('prompts');
 const migration = new Migration();
-const {isValidTonAddress} = require(process.cwd() + '/test/utils_old');
+const {isValidTonAddress} = require(process.cwd() + '/test/utils');
 
 async function main() {
     const response = await prompts([

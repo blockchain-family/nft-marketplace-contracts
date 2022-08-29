@@ -161,11 +161,11 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
         empty
       );
 
-      IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
+      IDirectBuyCallback(nftOwner).directBuySuccess{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, owner);
       changeState(DirectBuyStatus.Filled);
     } else {
       if (now >= endTime) {
-        IDirectBuyCallback(nftOwner).directBuySuccess(nftOwner, owner);
+        IDirectBuyCallback(nftOwner).directBuySuccess{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, owner);
         changeState(DirectBuyStatus.Filled);
       }
 

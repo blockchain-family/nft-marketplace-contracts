@@ -127,7 +127,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 MarketOffer offerInfo = MarketOffer(collection, nftOwner, msg.sender, offerAddress, _price, _auctionDuration, tx.timestamp);
                 
                 emit AuctionDeployed(offerAddress, offerInfo);
-                IAuctionRootCallback(msg.sender).auctionTip3DeployedCallback{ value: 0.1 ton, flag: 1, bounce: false}(offerAddress, offerInfo);
+                IAuctionRootCallback(msg.sender).auctionTip3DeployedCallback{ value: 0.1 ton, flag: 1, bounce: false }(offerAddress, offerInfo);
 
                 mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
                 ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
@@ -144,7 +144,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
-            IAuctionRootCallback(msg.sender).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false}(nftOwner, msg.sender);
+            IAuctionRootCallback(msg.sender).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, msg.sender);
 
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
             ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(

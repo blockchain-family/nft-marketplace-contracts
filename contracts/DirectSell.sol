@@ -15,13 +15,12 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 import "./Nft.sol";
-import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
 import "./errors/DirectBuySellErrors.sol";
 import "./errors/BaseErrors.sol";
 
-contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
+contract DirectSell is IAcceptTokensTransferCallback {
   address static factoryDirectSell;
   address static owner;
   address static paymentToken;
@@ -35,7 +34,6 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
 
   address tokenWallet;
   uint8 currentStatus;
-  bool receivedNFT;
   uint32 currentVersion;
 
   struct DirectSellDetails {
@@ -91,10 +89,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
   function onTokenWallet(address _wallet) external {
     require(msg.sender.value != 0 && msg.sender == paymentToken, DirectBuySellErrors.NOT_FROM_SPENT_TOKEN_ROOT);
     tokenWallet = _wallet;
-
-    if (receivedNFT) {
-      changeState(DirectSellStatus.Active);
-    }
+    changeState(DirectSellStatus.Active);
   }
 
   function getDetails() external view returns (DirectSellDetails) {
@@ -122,6 +117,9 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
       amount >= price &&
       ((auctionEnd > 0 && now < auctionEnd) || auctionEnd == 0)
     ) {
+      IDirectSellCallback(owner).directSellSuccess{ value: 0.1 ton, flag: 1, bounce: false }(callbackId, owner, buyer);
+      changeState(DirectSellStatus.Filled);
+
       mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
       ITIP4_1NFT(nftAddress).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
         buyer,
@@ -129,7 +127,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         callbacks
       );
 
-      ITokenWallet(tokenWallet).transfer{ value: 0, flag: 64, bounce: false }(
+      ITokenWallet(tokenWallet).transfer{ value: 0, flag: 128, bounce: false }(
         price,
         owner,
         Gas.DEPLOY_EMPTY_WALLET_GRAMS,
@@ -137,12 +135,9 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         false,
         emptyPayload
       );
-
-      IDirectSellCallback(owner).directSellSuccess(callbackId, owner, buyer);
-      changeState(DirectSellStatus.Filled);
     } else {
       if (now >= auctionEnd) {
-        IDirectSellCallback(owner).directSellCancelledOnTime(callbackId);
+        IDirectSellCallback(owner).directSellCancelledOnTime{ value: 0.1 ton, flag: 1, bounce: false }(callbackId);
         changeState(DirectSellStatus.Filled);
       }
 
@@ -154,31 +149,6 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
         true,
         emptyPayload
       );
-    }
-  }
-
-  function onNftChangeManager(
-    uint256, /*id*/
-    address nftOwner,
-    address, /*oldManager*/
-    address newManager,
-    address, /*collection*/
-    address sendGasTo,
-    TvmCell /*payload*/
-  ) external override {
-    require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
-    tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
-
-    if (
-        msg.sender.value != 0 && 
-        msg.sender == factoryDirectSell && 
-        tokenWallet.value != 0
-    ) {
-      receivedNFT = true;
-      changeState(DirectSellStatus.Active);
-    } else {
-      mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-      ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(nftOwner, sendGasTo, callbacks);
     }
   }
 
@@ -220,7 +190,7 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
     require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-    ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(owner, owner, callbacks);
+    ITIP4_1NFT(nftAddress).changeManager{ value: 0, flag: 128 }(owner, owner, callbacks);
 
     changeState(DirectSellStatus.Cancelled);
   }
@@ -252,7 +222,6 @@ contract DirectSell is IAcceptTokensTransferCallback, INftChangeManager {
               price,
               tokenWallet,
               currentStatus,
-              receivedNFT,
               currentVersion
             );
             

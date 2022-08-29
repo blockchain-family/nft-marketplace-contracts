@@ -100,7 +100,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         nextBidValue = price;
         paymentTokenRoot = _paymentTokenRoot;
         
-        emit AuctionCreated{dest: address.makeAddrExtern(nft.value, 256)}(buildInfo());
+        emit AuctionCreated(buildInfo());
         state = AuctionStatus.Created;
         currentVersion++;
         
@@ -121,7 +121,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         tokenWallet = value;
 
-        emit AuctionActive{dest: address.makeAddrExtern(nft.value, 256)}(buildInfo());
+        emit AuctionActive(buildInfo());
         state = AuctionStatus.Active;
 
         tokenWallet.transfer({ value: 0, flag: 128 + 2, bounce: false });
@@ -140,6 +140,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         TvmCell payload					
     ) override external {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
+        
         (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload);
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
@@ -153,7 +154,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         ) {
             processBid(callbackId, buyer, amount, original_gas_to);
         } else {
-            emit BidDeclined{dest: address.makeAddrExtern(nft.value, 256)}(buyer, amount);
+            emit BidDeclined(buyer, amount);
             sendBidResultCallback(callbackId, buyer, false);
             TvmCell empty;
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
@@ -179,7 +180,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         maxBidValue = _bid;
         currentBid = newBid;
         calculateAndSetNextBid();
-        emit BidPlaced{dest: address.makeAddrExtern(nft.value, 256)}(_newBidSender, _bid);
+
+        emit BidPlaced(_newBidSender, _bid);
         sendBidResultCallback(_callbackId, _newBidSender, true);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
@@ -220,7 +222,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
                 empty
             );
 
-            emit AuctionComplete{dest: address.makeAddrExtern(nft.value, 256)}(currentBid.addr, maxBidValue);
+            emit AuctionComplete(currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
         } else {
             ITIP4_1NFT(nft).transfer{ value: 0, flag: 64, bounce: false }(
@@ -229,7 +231,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
                 callbacks
             );
 
-            emit AuctionCancelled{dest: address.makeAddrExtern(nft.value, 256)}();
+            emit AuctionCancelled();
             state = AuctionStatus.Cancelled;
         }
     }

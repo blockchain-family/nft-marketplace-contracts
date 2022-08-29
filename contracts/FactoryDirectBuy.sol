@@ -109,9 +109,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         getTokenWallet(tokenRoot, directBuyAddress)
       );
 
-      emit DirectBuyDeployed{dest: address.makeAddrExtern(nftForBuy.value, 256)}(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
-      emit DirectBuyDeployed{dest: address.makeAddrExtern(buyer.value, 256)}(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
-      IDirectBuyCallback(buyer).directBuyDeployed(callbackId, directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
+      emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
+      IDirectBuyCallback(buyer).directBuyDeployed{ value: 0.1 ton, flag: 1, bounce: false }(callbackId, directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
 
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
         amount,
@@ -122,9 +121,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         payload
       );
     } else {
-      emit DirectBuyDeclined{dest: address.makeAddrExtern(nftForBuy.value, 256)}(buyer, tokenRoot, amount);
-      emit DirectBuyDeclined{dest: address.makeAddrExtern(buyer.value, 256)}(buyer, tokenRoot, amount);
-      IDirectBuyCallback(buyer).directBuyDeployedDeclined(callbackId, buyer, tokenRoot, amount);
+      emit DirectBuyDeclined(buyer, tokenRoot, amount);
+      IDirectBuyCallback(buyer).directBuyDeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false }(callbackId, buyer, tokenRoot, amount);
 
       TvmCell emptyPayload;
       ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(

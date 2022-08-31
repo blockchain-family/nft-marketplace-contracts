@@ -180,19 +180,19 @@ contract DirectSell is IAcceptTokensTransferCallback {
     require(now >= auctionEnd, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
     require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
 
+    changeState(DirectSellStatus.Filled);
+    
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
     ITIP4_1NFT(nftAddress).changeManager{ value: 0, flag: 128 }(owner, sendGasTo, callbacks);
-
-    changeState(DirectSellStatus.Filled);
   }
 
   function closeSell() external onlyOwner {
     require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
 
+    changeState(DirectSellStatus.Cancelled);
+
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
     ITIP4_1NFT(nftAddress).changeManager{ value: 0, flag: 128 }(owner, owner, callbacks);
-
-    changeState(DirectSellStatus.Cancelled);
   }
 
   function upgrade(

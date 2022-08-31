@@ -112,6 +112,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                         nft: msg.sender
                     }
                 }(
+                    _price,
                     address(this),
                     collection,
                     nftOwner,
@@ -168,9 +169,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             contr: AuctionTip3,
             code: offerCode,
             varInit: {
-                price: _price,
-                nft: _nft,
-                nonce_: _nonce
+                nonce_: _nonce,
+                nft: _nft
             }
         });
 

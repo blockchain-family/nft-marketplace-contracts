@@ -70,6 +70,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     event AuctionUpgrade();
 
     constructor(
+        uint128 _price,
         address _markerRootAddr,
         address _tokenRootAddr,
         address _nftOwner,
@@ -84,6 +85,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     ) public {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         setDefaultProperties(
+            _price,
             _markerRootAddr, 
             _tokenRootAddr, 
             _nftOwner,

@@ -25,6 +25,7 @@ abstract contract Offer {
     uint8 public marketFeeDecimals;
 
     function setDefaultProperties(
+        uint128 _price,
         address _markerRootAddr,
         address _tokenRootAddr,
         address _nftOwner,
@@ -33,7 +34,8 @@ abstract contract Offer {
         uint8 _marketFeeDecimals
     ) 
         internal 
-    {
+    {   
+        price = _price;
         markerRootAddr = _markerRootAddr;
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;

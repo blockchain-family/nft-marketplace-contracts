@@ -12,8 +12,8 @@
 				{"name":"_deploymentFee","type":"uint128"},
 				{"name":"_marketFee","type":"uint8"},
 				{"name":"_marketFeeDecimals","type":"uint8"},
-				{"name":"_auctionBidDelta","type":"uint8"},
-				{"name":"_auctionBidDeltaDecimals","type":"uint8"},
+				{"name":"_auctionBidDelta","type":"uint16"},
+				{"name":"_auctionBidDeltaDecimals","type":"uint16"},
 				{"name":"_sendGasTo","type":"address"}
 			],
 			"outputs": [
@@ -137,7 +137,7 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"name":"auctionBidDelta","type":"uint8"}
+				{"name":"auctionBidDelta","type":"uint16"}
 			]
 		},
 		{
@@ -145,7 +145,7 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"name":"auctionBidDeltaDecimals","type":"uint8"}
+				{"name":"auctionBidDeltaDecimals","type":"uint16"}
 			]
 		}
 	],
@@ -200,8 +200,8 @@
 		{"name":"codeNft","type":"cell"},
 		{"name":"offerCode","type":"cell"},
 		{"name":"nonce_","type":"uint64"},
-		{"name":"auctionBidDelta","type":"uint8"},
-		{"name":"auctionBidDeltaDecimals","type":"uint8"},
+		{"name":"auctionBidDelta","type":"uint16"},
+		{"name":"auctionBidDeltaDecimals","type":"uint16"},
 		{"name":"currentVersion","type":"uint32"}
 	]
 }

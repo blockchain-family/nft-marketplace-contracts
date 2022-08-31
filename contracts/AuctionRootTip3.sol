@@ -30,8 +30,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint64 deployNonce;
     }
 
-    uint8 public auctionBidDelta;
-    uint8 public auctionBidDeltaDecimals;
+    uint16 public auctionBidDelta;
+    uint16 public auctionBidDeltaDecimals;
     uint32 currentVersion;
 
     event AuctionDeployed(address offerAddress, MarketOffer offerInfo);
@@ -45,8 +45,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint128 _deploymentFee,
         uint8 _marketFee, 
         uint8 _marketFeeDecimals,
-        uint8 _auctionBidDelta,
-        uint8 _auctionBidDeltaDecimals,
+        uint16 _auctionBidDelta,
+        uint16 _auctionBidDeltaDecimals,
         address _sendGasTo
     ) OwnableInternal(
         _owner
@@ -108,9 +108,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     flag: 1,
                     code: offerCode,
                     varInit: {
-                        price: _price,
-                        nft: msg.sender,
-                        nonce_: tx.timestamp
+                        nonce_: tx.timestamp,
+                        nft: msg.sender
                     }
                 }(
                     address(this),
@@ -128,7 +127,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 MarketOffer offerInfo = MarketOffer(collection, nftOwner, msg.sender, offerAddress, _price, _auctionDuration, tx.timestamp);
                 
                 emit AuctionDeployed(offerAddress, offerInfo);
-                IAuctionRootCallback(msg.sender).auctionTip3DeployedCallback{ value: 0.1 ton, flag: 1, bounce: false }(offerAddress, offerInfo);
+                IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{ value: 0.1 ton, flag: 1, bounce: false }(offerAddress, offerInfo);
 
                 mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
                 ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
@@ -145,7 +144,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
-            IAuctionRootCallback(msg.sender).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, msg.sender);
+            IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, msg.sender);
 
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
             ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(

@@ -46,7 +46,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         uint128 value;
     }
 
-    uint8 public bidDelta;
+    uint16 public bidDelta;
     Bid public currentBid;
     uint128 public maxBidValue;
     uint128 public nextBidValue;
@@ -78,7 +78,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         uint8 _marketFeeDecimals,
         uint64 _auctionStartTime,
         uint64 _auctionDuration, 
-        uint8 _bidDelta,
+        uint16 _bidDelta,
         address _paymentTokenRoot,
         address sendGasTo
     ) public {
@@ -206,6 +206,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         require(msg.value >= Gas.FINISH_AUCTION_VALUE, BaseErrors.not_enough_value);
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
+            
+            emit AuctionComplete(currentBid.addr, maxBidValue);
+            state = AuctionStatus.Complete;
+
             ITIP4_1NFT(nft).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
                 currentBid.addr,
                 sendGasTo,
@@ -213,7 +217,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             );
             
             TvmCell empty;
-            ITokenWallet(tokenWallet).transfer{ value: 0, flag: 64, bounce: false }(
+            ITokenWallet(tokenWallet).transfer{ value: 0, flag: 128, bounce: false }(
                 maxBidValue,
                 nftOwner,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
@@ -221,18 +225,15 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
                 false,
                 empty
             );
-
-            emit AuctionComplete(currentBid.addr, maxBidValue);
-            state = AuctionStatus.Complete;
         } else {
-            ITIP4_1NFT(nft).transfer{ value: 0, flag: 64, bounce: false }(
-                nftOwner,
-                sendGasTo,
-                callbacks
-            );
-
             emit AuctionCancelled();
             state = AuctionStatus.Cancelled;
+            
+            ITIP4_1NFT(nft).changeManager{value: 0, flag: 128}(
+                    nftOwner,
+                    sendGasTo,
+                    callbacks
+            );
         }
     }
 

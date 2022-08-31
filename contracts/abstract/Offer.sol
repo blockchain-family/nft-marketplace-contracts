@@ -12,10 +12,9 @@ import '../interfaces/IOffersRoot.sol';
 abstract contract Offer {
 
     uint64 static nonce_;
-
-    uint128 public static price;
     address public static nft;
 
+    uint128 public price;
     address public markerRootAddr;
     address public tokenRootAddr;
     address public nftOwner;

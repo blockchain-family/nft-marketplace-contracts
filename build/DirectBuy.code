@@ -726,9 +726,14 @@ PUSHINT 1000000000
 GEQ
 THROWIFNOT 104
 .loc ../contracts/DirectBuy.sol, 205
+PUSHINT 3
+CALLREF {
+	CALL $changeState_268f1153_internal_macro$
+}
+.loc ../contracts/DirectBuy.sol, 207
 PUSHREF {
 }
-.loc ../contracts/DirectBuy.sol, 206
+.loc ../contracts/DirectBuy.sol, 208
 TRUE
 ROT
 PUSHINT 0
@@ -759,11 +764,6 @@ STBREFR
 ENDC
 PUSHPOW2 7
 SENDRAWMSG
-.loc ../contracts/DirectBuy.sol, 215
-PUSHINT 3
-CALLREF {
-	CALL $changeState_268f1153_internal_macro$
-}
 .loc ../contracts/DirectBuy.sol, 0
 
 .macro closeBuy
@@ -804,9 +804,14 @@ GETGLOB 20
 EQINT 2
 THROWIFNOT 303
 .loc ../contracts/DirectBuy.sol, 221
+PUSHINT 4
+CALLREF {
+	CALL $changeState_268f1153_internal_macro$
+}
+.loc ../contracts/DirectBuy.sol, 223
 PUSHREF {
 }
-.loc ../contracts/DirectBuy.sol, 222
+.loc ../contracts/DirectBuy.sol, 224
 TRUE
 GETGLOB 11
 PUSHINT 0
@@ -837,11 +842,6 @@ STBREFR
 ENDC
 PUSHPOW2 7
 SENDRAWMSG
-.loc ../contracts/DirectBuy.sol, 231
-PUSHINT 4
-CALLREF {
-	CALL $changeState_268f1153_internal_macro$
-}
 .loc ../contracts/DirectBuy.sol, 0
 
 .macro upgrade

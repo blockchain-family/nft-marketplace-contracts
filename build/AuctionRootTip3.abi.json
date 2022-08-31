@@ -179,15 +179,6 @@
 			]
 		},
 		{
-			"name": "AuctionDebug",
-			"inputs": [
-				{"name":"_owner_deb","type":"address"},
-				{"name":"_bits_payload","type":"uint16"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "OwnershipTransferred",
 			"inputs": [
 				{"name":"oldOwner","type":"address"},

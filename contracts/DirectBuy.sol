@@ -202,6 +202,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
     require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
     require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
 
+    changeState(DirectBuyStatus.Filled);
+
     TvmCell emptyPayload;
     ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
       price,
@@ -211,13 +213,13 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
       true,
       emptyPayload
     );
-
-    changeState(DirectBuyStatus.Filled);
   }
 
   function closeBuy() external onlyOwner {
     require(currentStatus == DirectBuyStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
 
+    changeState(DirectBuyStatus.Cancelled);
+    
     TvmCell emptyPayload;
     ITokenWallet(spentTokenWallet).transfer{ value: 0, flag: 128, bounce: false }(
       price,
@@ -227,8 +229,6 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
       true,
       emptyPayload
     );
-
-    changeState(DirectBuyStatus.Cancelled);
   }
 
   function upgrade(

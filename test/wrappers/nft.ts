@@ -22,9 +22,7 @@ export class NftC {
     }
 
     async changeManager(initiator: AccountType, newManager: Address, sendGasTo: Address, callbacks: CallbackType[]) {
-        return await 
-        // locklift.tracing.trace(
-            initiator.runTarget(
+        return await initiator.runTarget(
             {
                 contract: this.contract,
                 value: locklift.utils.toNano(6),
@@ -35,7 +33,6 @@ export class NftC {
                 sendGasTo: sendGasTo.toString() == zeroAddress ? this.owner.address: sendGasTo,
                 callbacks       
             })
-        // )
         );
     }
 

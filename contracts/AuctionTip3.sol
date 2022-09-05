@@ -231,7 +231,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             emit AuctionCancelled();
             state = AuctionStatus.Cancelled;
             
-            ITIP4_1NFT(nft).changeManager{value: 0, flag: 128}(
+            ITIP4_1NFT(nft).changeManager{ value: 0, flag: 128 }(
                     nftOwner,
                     sendGasTo,
                     callbacks
@@ -250,9 +250,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
     ) private pure {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
-                IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{ value: 1, flag: 1, bounce: false }(callbackId);
+                IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{ value: 0.1 ever, flag: 1, bounce: false }(callbackId);
             } else {
-                IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{ value: 2, flag: 1, bounce: false }(callbackId);
+                IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{ value: 0.1 ever, flag: 1, bounce: false }(callbackId);
             }
         }
     }
@@ -264,7 +264,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         TvmBuilder builder;
         builder.store(callbackId);
         builder.store(buyer);
-        return { value: 0, bounce: false, flag: 64} builder.toCell();
+        return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
     function getInfo() external view returns (AuctionDetails) {

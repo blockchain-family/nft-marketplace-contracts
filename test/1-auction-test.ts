@@ -54,7 +54,7 @@ describe("Test Auction contract", async function () {
     });
 
     describe("Auction completed", async function () {
-        it('Deploy Auction', async function () {
+        it('Deploy Auction and success', async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(tokenRoot, 5000000000, Math.round(Date.now() / 1000), 30)).toString();
 
@@ -77,10 +77,10 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await tokenWallet2.transfer(5000000000, auction.address, true, '', locklift.utils.toNano(2));
+            await tokenWallet2.transfer(5000000000, auction.address, 0, true, '', locklift.utils.toNano(2));
 
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
-            expect(bidPlacedEvent.buyerAddress.toString()).to.be.eq(await account3.address.toString());
+            expect(bidPlacedEvent.buyerAddress.toString()).to.be.eq(account3.address.toString());
 
             await sleep(30000);
             await auction.finishAuction(account2);
@@ -97,7 +97,7 @@ describe("Test Auction contract", async function () {
     });
 
     describe("Auction cancel from creater", async function () {
-        it('Deploy Auction', async function () {
+        it('Deploy Auction and cancel', async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(tokenRoot, 1000000000, Math.round(Date.now() / 1000), 30)).toString();
 
@@ -120,7 +120,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(event.offerAddress, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await tokenWallet2.transfer(5000000000, auction.address, true, '', locklift.utils.toNano(2));
+            await tokenWallet2.transfer(5000000000, auction.address, 0,  true, '', locklift.utils.toNano(2));
             
             await sleep(30000);
             await auction.finishAuction(account2);

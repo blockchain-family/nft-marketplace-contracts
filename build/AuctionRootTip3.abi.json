@@ -49,7 +49,7 @@
 				{"name":"_nonce","type":"uint64"}
 			],
 			"outputs": [
-				{"name":"offerAddress","type":"address"}
+				{"name":"value0","type":"address"}
 			]
 		},
 		{

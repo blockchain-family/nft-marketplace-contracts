@@ -117,7 +117,7 @@ contract DirectSell is IAcceptTokensTransferCallback {
       amount >= price &&
       ((auctionEnd > 0 && now < auctionEnd) || auctionEnd == 0)
     ) {
-      IDirectSellCallback(owner).directSellSuccess{ value: 0.1 ton, flag: 1, bounce: false }(callbackId, owner, buyer);
+      IDirectSellCallback(owner).directSellSuccess{ value: 0.1 ever, flag: 1, bounce: false }(callbackId, owner, buyer);
       changeState(DirectSellStatus.Filled);
 
       mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
@@ -137,7 +137,7 @@ contract DirectSell is IAcceptTokensTransferCallback {
       );
     } else {
       if (now >= auctionEnd) {
-        IDirectSellCallback(owner).directSellCancelledOnTime{ value: 0.1 ton, flag: 1, bounce: false }(callbackId);
+        IDirectSellCallback(owner).directSellCancelledOnTime{ value: 0.1 ever, flag: 1, bounce: false }(callbackId);
         changeState(DirectSellStatus.Filled);
       }
 
@@ -209,27 +209,27 @@ contract DirectSell is IAcceptTokensTransferCallback {
 				bounce: false
 			});
 		} else {
-            emit DirectSellUpgrade();
+      emit DirectSellUpgrade();
 
-            TvmCell cellParams = abi.encode(
-              factoryDirectSell,
-              owner,
-              paymentToken,
-              nftAddress,
-              timeTx,
-              auctionStart,
-              auctionEnd,
-              price,
-              tokenWallet,
-              currentStatus,
-              currentVersion
-            );
-            
-            tvm.setcode(newCode);
-            tvm.setCurrentCode(newCode);
+      TvmCell cellParams = abi.encode(
+        factoryDirectSell,
+        owner,
+        paymentToken,
+        nftAddress,
+        timeTx,
+        auctionStart,
+        auctionEnd,
+        price,
+        tokenWallet,
+        currentStatus,
+        currentVersion
+      );
+      
+      tvm.setcode(newCode);
+      tvm.setCurrentCode(newCode);
 
-            onCodeUpgrade(cellParams);
-        }
+      onCodeUpgrade(cellParams);
+    }
   }
 
   function onCodeUpgrade(TvmCell data) private {} 

@@ -135,6 +135,18 @@
 			]
 		},
 		{
+			"name": "DebugEventSSSS",
+			"inputs": [
+				{"name":"payloadBits","type":"uint16"},
+				{"name":"msgSenderValue","type":"uint256"},
+				{"name":"msgSenderAddress","type":"address"},
+				{"name":"msgValue","type":"uint128"},
+				{"name":"calculateAddr","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "OwnershipTransferred",
 			"inputs": [
 				{"name":"oldOwner","type":"address"},

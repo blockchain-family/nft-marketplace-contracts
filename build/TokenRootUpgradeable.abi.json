@@ -28,6 +28,50 @@
 			]
 		},
 		{
+			"name": "walletVersion",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"value0","type":"uint32"}
+			]
+		},
+		{
+			"name": "platformCode",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "requestUpgradeWallet",
+			"inputs": [
+				{"name":"currentVersion","type":"uint32"},
+				{"name":"walletOwner","type":"address"},
+				{"name":"remainingGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setWalletCode",
+			"inputs": [
+				{"name":"code","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"code","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "disableMint",
 			"inputs": [
 				{"name":"answerId","type":"uint32"}
@@ -221,7 +265,8 @@
 		{"key":4,"name":"rootOwner_","type":"address"},
 		{"key":5,"name":"walletCode_","type":"cell"},
 		{"key":6,"name":"randomNonce_","type":"uint256"},
-		{"key":7,"name":"deployer_","type":"address"}
+		{"key":7,"name":"deployer_","type":"address"},
+		{"key":8,"name":"platformCode_","type":"cell"}
 	],
 	"events": [
 	],
@@ -239,6 +284,8 @@
 		{"name":"burnByRootDisabled_","type":"bool"},
 		{"name":"mintDisabled_","type":"bool"},
 		{"name":"randomNonce_","type":"uint256"},
-		{"name":"deployer_","type":"address"}
+		{"name":"deployer_","type":"address"},
+		{"name":"platformCode_","type":"cell"},
+		{"name":"walletVersion_","type":"uint32"}
 	]
 }

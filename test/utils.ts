@@ -4,6 +4,8 @@ import { Address, Contract, zeroAddress } from "locklift";
 import { Token } from "./wrappers/token";
 import { AuctionRoot } from "./wrappers/auctionRoot";
 import { NftC } from "./wrappers/nft";
+import { FactoryDirectBuy } from "./wrappers/factoryDirectBuy";
+import { FactoryDirectSell } from "./wrappers/factoryDirectSell";
 
 const logger = require("mocha-logger");
 const { expect } = require("chai");
@@ -71,7 +73,6 @@ export const deployCollection = async function (account: AccountType, config = {
 
     return collection;
 }
-
 export const deployNFT = async function (account: AccountType, collection: CollectionType, nft_name: string, nft_description: string, nft_url: string, externalUrl: string, ownerNFT = account) {
     let item = {
         "type": "Basic NFT",
@@ -113,9 +114,10 @@ export const deployNFT = async function (account: AccountType, collection: Colle
 export const deployTokenRoot = async function (token_name: string, token_symbol: string, owner: AccountType) {
     const signer = await locklift.keystore.getSigner('0');
 
-    const TokenWallet = await locklift.factory.getContractArtifacts('TokenWallet');
+    const TokenWallet = await locklift.factory.getContractArtifacts('TokenWalletUpgradeable');
+    const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
     const { contract: _root, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
-        contract: 'TokenRoot',
+        contract: 'TokenRootUpgradeable',
         initParams: {
             name_: token_name,
             symbol_: token_symbol,
@@ -123,7 +125,8 @@ export const deployTokenRoot = async function (token_name: string, token_symbol:
             rootOwner_: owner.address,
             walletCode_: TokenWallet.code,
             randomNonce_: locklift.utils.getRandomNonce(),
-            deployer_: new Address(zeroAddress)
+            deployer_: new Address(zeroAddress),
+            platformCode_: TokenWalletPlatform.code
         },
         publicKey: signer?.publicKey as string,
         constructorParams: {
@@ -174,4 +177,44 @@ export const deployAuctionRoot = async function (owner: AccountType) {
     logger.log(`Auction Root address ${auctionRootTip3.address.toString()}`);
 
     return new AuctionRoot(auctionRootTip3, owner);
+}
+
+export const deployFactoryDirectBuy = async function (owner: AccountType) {
+    const signer = await locklift.keystore.getSigner('0');
+    const {contract: factoryDirectBuy} = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: "FactoryDirectBuy",
+        publicKey: (signer?.publicKey) as string,
+        constructorParams: {
+            _owner: owner.address,
+            sendGasTo: owner.address
+        },
+        initParams: {
+            nonce_: locklift.utils.getRandomNonce()    
+        },
+        value: locklift.utils.toNano(10)
+    }));
+
+    logger.log(`FactoryDirectBuy address ${factoryDirectBuy.address.toString()}`);
+
+    return new FactoryDirectBuy(factoryDirectBuy, owner);
+};    
+
+export const deployFactoryDirectSell = async function(owner: AccountType) {
+    const signer = await locklift.keystore.getSigner('0');
+    const {contract: factoryDirectSell} = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: "FactoryDirectSell",
+        publicKey: (signer?.publicKey) as string,
+        constructorParams: {
+            _owner: owner.address,
+            sendGasTo: owner.address
+        },
+        initParams: {
+            nonce_: locklift.utils.getRandomNonce()    
+        },
+        value: locklift.utils.toNano(10)
+    }));
+
+    logger.log(`FactoryDirectSell address ${factoryDirectSell.address.toString()}`);
+
+    return new FactoryDirectSell(factoryDirectSell, owner);  
 }

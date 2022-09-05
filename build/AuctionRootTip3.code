@@ -614,8 +614,8 @@ STSLICECONST x801_
 STU 256
 ENDC
 CTOS
-.loc ../contracts/AuctionRootTip3.sol, 0
 NIP
+.loc ../contracts/AuctionRootTip3.sol, 0
 
 .macro buildAuctionCreationPayload
 DROP

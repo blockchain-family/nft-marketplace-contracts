@@ -128,7 +128,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 MarketOffer offerInfo = MarketOffer(collection, nftOwner, msg.sender, offerAddress, _price, _auctionDuration, tx.timestamp);
                 
                 emit AuctionDeployed(offerAddress, offerInfo);
-                IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{ value: 0.1 ton, flag: 1, bounce: false }(offerAddress, offerInfo);
+                IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{ value: 0.1 ever, flag: 1, bounce: false }(offerAddress, offerInfo);
 
                 mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
                 ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
@@ -145,7 +145,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
-            IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, msg.sender);
+            IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{ value: 0.1 ever, flag: 1, bounce: false }(nftOwner, msg.sender);
 
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
             ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
@@ -163,7 +163,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     ) 
         public 
         view 
-        returns (address offerAddress)
+        returns (address)
     {
         TvmCell data = tvm.buildStateInit({
             contr: AuctionTip3,
@@ -174,7 +174,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             }
         });
 
-        offerAddress = address(tvm.hash(data));
+        return address(tvm.hash(data));
     }
 
     function buildAuctionCreationPayload (
@@ -221,12 +221,12 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         address sendGasTo
     ) external onlyOwner {
         if (currentVersion == newVersion) {
-			tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
-			sendGasTo.transfer({
-				value: 0,
-				flag: 128 + 2,
-				bounce: false
-			});
+            tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+            sendGasTo.transfer({
+                value: 0,
+                flag: 128 + 2,
+                bounce: false
+            });
 		} else {
             emit AuctionRootUpgrade();
 

@@ -161,11 +161,11 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
         empty
       );
 
-      IDirectBuyCallback(nftOwner).directBuySuccess{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, owner);
+      IDirectBuyCallback(nftOwner).directBuySuccess{ value: 0.1 ever, flag: 1, bounce: false }(nftOwner, owner);
       changeState(DirectBuyStatus.Filled);
     } else {
       if (now >= endTime) {
-        IDirectBuyCallback(nftOwner).directBuySuccess{ value: 0.1 ton, flag: 1, bounce: false }(nftOwner, owner);
+        IDirectBuyCallback(nftOwner).directBuySuccess{ value: 0.1 ever, flag: 1, bounce: false }(nftOwner, owner);
         changeState(DirectBuyStatus.Filled);
       }
 
@@ -245,30 +245,29 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
 				bounce: false
 			});
 		} else {
-            emit DirectBuyUpgrade();
+      emit DirectBuyUpgrade();
 
-            TvmCell cellParams = abi.encode(
-              factoryDirectBuy,
-              owner,
-              spentTokenRoot,
-              nftAddress,
-              timeTx,
-              price,
-              startTime,
-              durationTime,
-              endTime,
-              spentTokenWallet,
-              currentStatus,
-              currentVersion
-            );
-            
-            tvm.setcode(newCode);
-            tvm.setCurrentCode(newCode);
+      TvmCell cellParams = abi.encode(
+        factoryDirectBuy,
+        owner,
+        spentTokenRoot,
+        nftAddress,
+        timeTx,
+        price,
+        startTime,
+        durationTime,
+        endTime,
+        spentTokenWallet,
+        currentStatus,
+        currentVersion
+      );
+      
+      tvm.setcode(newCode);
+      tvm.setCurrentCode(newCode);
 
-            onCodeUpgrade(cellParams);
-        }
+      onCodeUpgrade(cellParams);
+    }
   }
 
   function onCodeUpgrade(TvmCell data) private {} 
-
 }

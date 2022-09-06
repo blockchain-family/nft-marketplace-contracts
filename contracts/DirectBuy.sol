@@ -9,6 +9,7 @@ import "./libraries/DirectBuyStatus.sol";
 import "./libraries/ExchangePayload.sol";
 
 import "./interfaces/IDirectBuyCallback.sol";
+import "./interfaces/IUpgradableByRequest.sol";
 
 import "./errors/DirectBuySellErrors.sol";
 import "./errors/BaseErrors.sol";
@@ -21,7 +22,7 @@ import "./Nft.sol";
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
-contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
+contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest {
   address static factoryDirectBuy;
   address static owner;
   address static spentTokenRoot;
@@ -202,7 +203,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
     require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
     require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
 
-    changeState(DirectBuyStatus.Filled);
+    changeState(DirectBuyStatus.Expired);
 
     TvmCell emptyPayload;
     ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
@@ -235,7 +236,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager {
     TvmCell newCode,
     uint32 newVersion,
     address sendGasTo
-  ) external {
+  ) override external {
     require(msg.sender.value !=0 && msg.sender == factoryDirectBuy, DirectBuySellErrors.NOT_FACTORY_DIRECT_BUY);
     if (currentVersion == newVersion) {
 			tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);

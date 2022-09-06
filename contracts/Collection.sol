@@ -4,13 +4,14 @@ pragma AbiHeader expire;
 pragma AbiHeader time;
 pragma AbiHeader pubkey;
 
+import "./modules/TIP4_2/TIP4_2Collection.sol";
 import "./modules/TIP4_3/TIP4_3Collection.sol";
 import "./modules/access/OwnableInternal.sol";
 import "./Nft.sol";
 import "./interfaces/IAcceptNftBurnCallback.sol";
 import "./interfaces/IBurnableCollection.sol";
 
-contract Collection is TIP4_3Collection, IBurnableCollection, OwnableInternal {
+contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, OwnableInternal {
 
 	uint64 static nonce_;
 
@@ -26,11 +27,13 @@ contract Collection is TIP4_3Collection, IBurnableCollection, OwnableInternal {
 		TvmCell codeIndex,
 		TvmCell codeIndexBasis,
 		address owner,
-		uint128 remainOnNft
+		uint128 remainOnNft,
+		string json
 	)
 		public
 		OwnableInternal(owner)
 		TIP4_1Collection(codeNft)
+		TIP4_2Collection(json)
 		TIP4_3Collection(codeIndex, codeIndexBasis)
 	{
 		tvm.accept();
@@ -93,7 +96,7 @@ contract Collection is TIP4_3Collection, IBurnableCollection, OwnableInternal {
 		internal
 		pure
 		virtual
-		override
+		override (TIP4_2Collection, TIP4_3Collection)
 		returns (TvmCell)
 	{
 		return tvm.buildStateInit({contr: Nft, varInit: {_id: id}, code: code});

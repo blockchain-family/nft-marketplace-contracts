@@ -7,8 +7,9 @@ pragma AbiHeader time;
 import "./libraries/Gas.sol";
 
 import "./interfaces/IDirectSellCallback.sol";
-import "./modules/access/OwnableInternal.sol";
+import "./interfaces/IUpgradableByRequest.sol";
 
+import "./modules/access/OwnableInternal.sol";
 import "./errors/DirectBuySellErrors.sol";
 
 import "./Nft.sol";
@@ -23,6 +24,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   TvmCell directSellCode;
 
   uint32 currentVersion;
+  uint32 currectVersionDirectSell;
 
   event DirectSellDeployed(
     address _directSellAddress,
@@ -38,6 +40,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   constructor(address _owner, address sendGasTo) public OwnableInternal(_owner) {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+    currentVersion++;
 
     _transferOwnership(_owner);
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
@@ -50,6 +53,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   function setCodeDirectSell(TvmCell _directSellCode) public onlyOwner {
     tvm.rawReserve(Gas.SET_CODE, 0);  
     directSellCode = _directSellCode;
+    currectVersionDirectSell++;
 
     msg.sender.transfer(
       0,
@@ -60,15 +64,15 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
 
   function buildPayload(
     address _nftAddress,
-    uint64 _startAuction,
-    uint64 _endAuction,
+    uint64 _startTime,
+    uint64 _endTime,
     address _paymentToken,
     uint128 _price
   ) external pure returns (TvmCell) {
     TvmBuilder builder;
     builder.store(_nftAddress);
-    builder.store(_startAuction);
-    builder.store(_endAuction);
+    builder.store(_startTime);
+    builder.store(_endTime);
     builder.store(_paymentToken);
     builder.store(_price);
 
@@ -152,6 +156,26 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         },
         code: directSellCode
       });
+  }
+
+  function expectedAddressDirectSell(
+    address _owner,
+    address _paymentToken,
+    address _nft,
+    uint64 _timeTx
+  ) internal view returns (address) {
+    return address(
+        tvm.hash((_buildDirectSellStateInit(_owner, _paymentToken, _nft, _timeTx)))
+      );
+  }
+
+  function RequestUpgradeDirectSell (address _owner, address _paymentToken, address _nft, uint64 _timeTx, address sendGasTo) external view onlyOwner {
+    require(msg.value >= Gas.UPGRADE_DIRECT_SELL_MIN_VALUE, BaseErrors.value_too_low);  
+    tvm.rawReserve(math.max(Gas.DIRECT_SELL_INITIAL_BALANCE, address(this).balance - msg.value), 2); //?
+    IUpgradableByRequest(expectedAddressDirectSell(_owner, _paymentToken, _nft, _timeTx)).upgrade{
+        value: 0,
+        flag: 128
+    }(directSellCode, currectVersionDirectSell, sendGasTo);      
   }
 
   function upgrade(

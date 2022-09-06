@@ -22,7 +22,7 @@ const config: LockliftConfig = {
     // }
     externalContracts: {
       "precompiled": ['TokenWalletPlatform', 'Index', 'IndexBasis'],
-      "node_modules/ton-eth-bridge-token-contracts/build": ['TokenRoot', 'TokenWallet']
+      "node_modules/ton-eth-bridge-token-contracts/build": ['TokenRootUpgradeable', 'TokenWalletUpgradeable']
     }
   },
   linker: {
@@ -74,7 +74,7 @@ const config: LockliftConfig = {
       },
       keys: {
         phrase:"fringe scene sound floor number umbrella undo tomato seed best tourist hard",
-        amount: 5 
+        amount: 20 
       }
     },
     
@@ -85,13 +85,15 @@ const config: LockliftConfig = {
       giver: {
         // Check if you need provide custom giver
         giverFactory: (ever, keyPair, address) => new GiverWallet(ever, keyPair, address),
-        address: "0:ece57bcc6c530283becbbd8a3b24d3c5987cdddc3c8b7b33be6e4a6312490415",
-        key: "172af540e43a524763dd53b26a066d472a97c4de37d5498170564510608250c3",
+        address: "0:9be58a09cc9f33c2f2f78f5cb91e7cda53673b4dd179acfeda06505a88e21a00",
+        phrase: "",
+        accountId: 0
       },
       keys: {
         // Use everdev to generate your phrase
         // !!! Never commit it in your repos !!!
-        // phrase: "action inject penalty envelope rabbit element slim tornado dinner pizza off blood",
+        phrase: "action inject penalty envelope rabbit element slim tornado dinner pizza off blood",
+        // phrase: "",
         amount: 20,
       },
     },

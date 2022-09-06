@@ -1,4 +1,4 @@
-import { isValidTonAddress, logContract} from "../test/utils";
+import { isValidTonAddress} from "../test/utils";
 import { Migration } from "./migration";
 
 const migration = new Migration();
@@ -101,9 +101,6 @@ async function main() {
     });
 
     migration.store(collection.address, "Collection", "Collection");
-
-    await logContract(collection);
-
     let accountFactory = locklift.factory.getAccountsFactory('Wallet');
     const acc = accountFactory.getAccount(tempAdmin.address,  (signer?.publicKey) as string);
 

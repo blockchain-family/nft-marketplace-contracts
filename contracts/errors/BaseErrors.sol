@@ -10,4 +10,5 @@ library BaseErrors {
     uint8 constant sender_is_not_manager = 106;
     uint8 constant zero_owner_for_ownership_transfer = 107;
     uint8 constant operation_not_permited = 108;
+    uint8 constant value_too_low = 109;
 }

@@ -1,4 +1,4 @@
-import { AccountType, CollectionType, deployAccount, deployNFT, deployTokenRoot, deployCollection, deployAuctionRoot, CallbackType, sleep, deployFactoryDirectBuy} from "./utils";
+import { AccountType, CollectionType, deployAccount, deployTokenRoot, deployCollectionAndMintNft, CallbackType, sleep, deployFactoryDirectBuy} from "./utils";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
@@ -32,14 +32,12 @@ describe("Test DirectBuy contract", async function() {
         account3 = await deployAccount(2, 15);
     });
 
-    it('Deploy NFT-Collection', async function () {
-        collection = await deployCollection(account1,);
-        logger.log(`Nft Collection address: ${collection.address.toString()}`);
-    });
+    it('Deploy NFT-Collection and Mint Nft', async function () {
+        let accForNft:AccountType[] = [];
+        accForNft.push(account2);
 
-    it('Deploy NFT-s', async function () {
-        nft = await deployNFT(account1, collection, "Test name", "Test name NFT", "https://", "https://", account2);
-        logger.log(`Nft address: ${nft.address.toString()}`);
+        const [collection, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
+        nft = nftS[0];
     });
 
     it('Deploy TIP-3 token', async function () {

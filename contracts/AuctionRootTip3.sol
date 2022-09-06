@@ -6,10 +6,12 @@ pragma AbiHeader time;
 
 import './libraries/Gas.sol';
 import './errors/AuctionErrors.sol';
+import './errors/BaseErrors.sol';
 
 import './abstract/OffersRoot.sol';
 
 import "./interfaces/IAuctionRootCallback.sol";
+import "./interfaces/IUpgradableByRequest.sol";
 
 import './Nft.sol';
 import './modules/TIP4_1/interfaces/INftChangeManager.sol';
@@ -33,6 +35,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     uint16 public auctionBidDelta;
     uint16 public auctionBidDeltaDecimals;
     uint32 currentVersion;
+    uint32 currentVersionOffer;
 
     event AuctionDeployed(address offerAddress, MarketOffer offerInfo);
     event AuctionDeclined(address nftOwner, address dataAddress);
@@ -68,6 +71,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
         currentVersion++;
+        currentVersionOffer++;
 
         _sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
@@ -161,7 +165,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint128 _price,
         uint64 _nonce
     ) 
-        public 
+        internal 
         view 
         returns (address)
     {
@@ -215,6 +219,27 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         });
     }
     
+    function RequestUpgradeAuction (address _nft, uint128 _price, uint64 _nonce, address sendGasTo) external view onlyOwner {
+        require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.value_too_low);  
+        tvm.rawReserve(math.max(Gas.AUCTION_ROOT_INITIAL_BALANCE, address(this).balance - msg.value), 2); //?
+        IUpgradableByRequest(getOfferAddress(_nft, _price, _nonce)).upgrade{
+            value: 0,
+            flag: 128
+        }(offerCode, currentVersionOffer, sendGasTo);      
+    }
+
+    function upgradeOfferCode(TvmCell newCode) public onlyOwner {
+        tvm.rawReserve(Gas.SET_CODE, 0);
+        offerCode = newCode;
+        currentVersionOffer++;
+
+        msg.sender.transfer(
+            0,
+            false,
+            128 + 2
+        );
+    }
+
     function upgrade(
         TvmCell newCode,
         uint32 newVersion,

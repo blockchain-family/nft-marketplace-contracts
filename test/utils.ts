@@ -7,6 +7,7 @@ import { NftC } from "./wrappers/nft";
 import { FactoryDirectBuy } from "./wrappers/factoryDirectBuy";
 import { FactoryDirectSell } from "./wrappers/factoryDirectSell";
 
+const fs = require('fs')
 const logger = require("mocha-logger");
 const { expect } = require("chai");
 
@@ -46,14 +47,18 @@ export const deployAccount = async function (key_number = 0, initial_balance = 1
     return wallet;
 }
 
-export const deployCollection = async function (account: AccountType, config = { remainOnNft: 1 }) {
+export const deployCollectionAndMintNft = async function (account: AccountType, remainOnNft: 1, pathJsonFile: "nft_to_address.json", accForNft: AccountType[]) {
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
     const Index = (await locklift.factory.getContractArtifacts("Index"));
     const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));
     const signer = await locklift.keystore.getSigner('0');
 
-    let { remainOnNft } = config;
     remainOnNft = remainOnNft || 0;
+    accForNft = accForNft || "";
+
+    let array_json: any;
+    const data = fs.readFileSync(pathJsonFile, 'utf8');
+    if (data) array_json = JSON.parse(data);
 
     const { contract: collection } = await locklift.factory.deployContract({
         contract: "Collection",
@@ -63,15 +68,60 @@ export const deployCollection = async function (account: AccountType, config = {
             codeIndex: Index.code,
             codeIndexBasis: IndexBasis.code,
             owner: account.address,
-            remainOnNft: locklift.utils.toNano(remainOnNft)
+            remainOnNft: locklift.utils.toNano(remainOnNft),
+            json: JSON.stringify(array_json.collection)
         },
         initParams: {
             nonce_: locklift.utils.getRandomNonce()
         },
-        value: locklift.utils.toNano(4)
+        value: locklift.utils.toNano(5)
     });
 
-    return collection;
+    logger.log(`Collection address: ${collection.address.toString()}`);
+
+    let nftMinted : NftC[] = [];
+
+    if (array_json.nfts) {
+        let ch = 0;
+        for (const element of array_json.nfts) {
+            let item = {
+                "type": "Basic NFT",
+                "name": element.name,
+                "description": element.description,
+                "preview": {
+                    "source": element.preview_url,
+                    "mimetype": "image/png"
+                },
+                "files": [
+                    {
+
+                        "source": element.url,
+                        "mimetype": "image/png"
+                    }
+                ],
+                "external_url": "https://flatqube.io/"
+            }
+            let payload = JSON.stringify(item)
+            let accountFactory = await locklift.factory.getAccountsFactory('Wallet');
+            const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
+            await acc.runTarget({
+                contract: collection,
+                value: locklift.utils.toNano(6),
+            },
+            (collNFT) => collNFT.methods.mintNft({
+                _owner: accForNft[ch].address,
+                _json: payload,
+            }));
+            let totalMinted = await collection.methods.totalMinted({ answerId: 0 }).call();
+            let nftAddress = await collection.methods.nftAddress({ answerId: 0, id: (Number(totalMinted.count) - 1).toFixed() }).call();
+            let nftCN = await NftC.from_addr(nftAddress.nft, accForNft[ch]);
+            nftMinted.push(nftCN);
+            logger.log(`Nft address: ${nftAddress.nft.toString()}, owner: ${accForNft[ch].address.toString()}`);
+            ch++;
+        }
+    }
+
+    return [collection, nftMinted] as const;
 }
 export const deployNFT = async function (account: AccountType, collection: CollectionType, nft_name: string, nft_description: string, nft_url: string, externalUrl: string, ownerNFT = account) {
     let item = {

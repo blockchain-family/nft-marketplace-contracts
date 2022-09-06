@@ -61,16 +61,15 @@
 			]
 		},
 		{
-			"name": "expectedAddressDirectBuy",
+			"name": "RequestUpgradeDirectSell",
 			"inputs": [
-				{"name":"answerId","type":"uint32"},
 				{"name":"_owner","type":"address"},
 				{"name":"_spentTokenRoot","type":"address"},
 				{"name":"_nft","type":"address"},
-				{"name":"_timeTx","type":"uint64"}
+				{"name":"_timeTx","type":"uint64"},
+				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
-				{"name":"value0","type":"address"}
 			]
 		},
 		{
@@ -135,18 +134,6 @@
 			]
 		},
 		{
-			"name": "DebugEventSSSS",
-			"inputs": [
-				{"name":"payloadBits","type":"uint16"},
-				{"name":"msgSenderValue","type":"uint256"},
-				{"name":"msgSenderAddress","type":"address"},
-				{"name":"msgValue","type":"uint128"},
-				{"name":"calculateAddr","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "OwnershipTransferred",
 			"inputs": [
 				{"name":"oldOwner","type":"address"},
@@ -164,6 +151,7 @@
 		{"name":"nonce_","type":"uint64"},
 		{"name":"tokenPlatformCode","type":"cell"},
 		{"name":"directBuyCode","type":"cell"},
-		{"name":"currentVersion","type":"uint32"}
+		{"name":"currentVersion","type":"uint32"},
+		{"name":"currectVersionDirectBuy","type":"uint32"}
 	]
 }

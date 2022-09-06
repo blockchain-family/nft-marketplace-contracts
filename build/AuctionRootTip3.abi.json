@@ -42,17 +42,6 @@
 			]
 		},
 		{
-			"name": "getOfferAddress",
-			"inputs": [
-				{"name":"_nft","type":"address"},
-				{"name":"_price","type":"uint128"},
-				{"name":"_nonce","type":"uint64"}
-			],
-			"outputs": [
-				{"name":"value0","type":"address"}
-			]
-		},
-		{
 			"name": "buildAuctionCreationPayload",
 			"inputs": [
 				{"name":"answerId","type":"uint32"},
@@ -63,6 +52,25 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "RequestUpgradeAuction",
+			"inputs": [
+				{"name":"_nft","type":"address"},
+				{"name":"_price","type":"uint128"},
+				{"name":"_nonce","type":"uint64"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgradeOfferCode",
+			"inputs": [
+				{"name":"newCode","type":"cell"}
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -202,6 +210,7 @@
 		{"name":"nonce_","type":"uint64"},
 		{"name":"auctionBidDelta","type":"uint16"},
 		{"name":"auctionBidDeltaDecimals","type":"uint16"},
-		{"name":"currentVersion","type":"uint32"}
+		{"name":"currentVersion","type":"uint32"},
+		{"name":"currentVersionOffer","type":"uint32"}
 	]
 }

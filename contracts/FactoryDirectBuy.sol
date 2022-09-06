@@ -11,6 +11,8 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransfe
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
 
 import "./interfaces/IDirectBuyCallback.sol";
+import "./interfaces/IUpgradableByRequest.sol";
+
 import "./modules/access/OwnableInternal.sol";
 
 import "./DirectBuy.sol";
@@ -22,6 +24,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   TvmCell directBuyCode;
 
   uint32 currentVersion;
+  uint32 currectVersionDirectBuy;
 
   event DirectBuyDeployed(
     address directBuyAddress,
@@ -34,12 +37,12 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
   event DirectBuyDeclined(address sender, address tokenRoot, uint128 amount);
   event FactoryDirectBuyUpgrade();
-  event DebugEventSSSS(uint16 payloadBits, uint msgSenderValue, address msgSenderAddress, uint128 msgValue, address calculateAddr);
 
   constructor(address _owner, address sendGasTo) OwnableInternal(_owner) public {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
     currentVersion++;
+
     _transferOwnership(_owner);
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
@@ -75,6 +78,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   function setCodeDirectBuy(TvmCell _directBuyCode) public onlyOwner {
     tvm.rawReserve(Gas.SET_CODE, 0);  
     directBuyCode = _directBuyCode;
+    currectVersionDirectBuy++;
 
     msg.sender.transfer(
       0,
@@ -95,7 +99,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload); 
     TvmSlice payloadSlice = payload.toSlice();
     address nftForBuy = payloadSlice.decode(address);
-    emit DebugEventSSSS(payloadSlice.bits(), msg.sender.value, msg.sender, msg.value, getTokenWallet(tokenRoot, address(this)));
     if (
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&
@@ -127,7 +130,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         payload
       );
     } else {
-      // emit DirectBuyDeclined(buyer, tokenRoot, amount);
+      emit DirectBuyDeclined(buyer, tokenRoot, amount);
       IDirectBuyCallback(buyer).directBuyDeployedDeclined{ value: 0.1 ever, flag: 1, bounce: false }(callbackId, buyer, tokenRoot, amount);
 
       TvmCell emptyPayload;
@@ -162,18 +165,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
       });
   }
 
-  function expectedAddressDirectBuy(
-    address _owner,
-    address _spentTokenRoot,
-    address _nft,
-    uint64 _timeTx
-  ) external view responsible returns (address) {
-    return
-      { value: 0, bounce: false, flag: 64 } address(
-        tvm.hash((_buildDirectBuyStateInit(_owner, _spentTokenRoot, _nft, _timeTx)))
-      );
-  }
-
   function getTokenWallet(address _tokenRoot, address _sender) internal view returns (address) {
     return
       address(
@@ -185,6 +176,26 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
           })
         )
       );
+  }
+
+  function expectedAddressDirectBuy(
+    address _owner,
+    address _spentTokenRoot,
+    address _nft,
+    uint64 _timeTx
+  ) internal view returns (address) {
+    return address(
+        tvm.hash((_buildDirectBuyStateInit(_owner, _spentTokenRoot, _nft, _timeTx)))
+      );
+  }
+
+  function RequestUpgradeDirectSell (address _owner, address _spentTokenRoot, address _nft, uint64 _timeTx, address sendGasTo) external view onlyOwner {
+    require(msg.value >= Gas.UPGRADE_DIRECT_BUY_MIN_VALUE, BaseErrors.value_too_low);  
+    tvm.rawReserve(math.max(Gas.DIRECT_BUY_INITIAL_BALANCE, address(this).balance - msg.value), 2); //?
+        IUpgradableByRequest(expectedAddressDirectBuy(_owner, _spentTokenRoot, _nft, _timeTx)).upgrade{
+            value: 0,
+            flag: 128
+        }(directBuyCode, currectVersionDirectBuy, sendGasTo);      
   }
 
   function upgrade (

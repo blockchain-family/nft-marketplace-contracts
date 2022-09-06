@@ -32,8 +32,8 @@
 			"name": "buildPayload",
 			"inputs": [
 				{"name":"_nftAddress","type":"address"},
-				{"name":"_startAuction","type":"uint64"},
-				{"name":"_endAuction","type":"uint64"},
+				{"name":"_startTime","type":"uint64"},
+				{"name":"_endTime","type":"uint64"},
 				{"name":"_paymentToken","type":"address"},
 				{"name":"_price","type":"uint128"}
 			],
@@ -51,6 +51,18 @@
 				{"name":"value4","type":"address"},
 				{"name":"sendGasTo","type":"address"},
 				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "RequestUpgradeDirectSell",
+			"inputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"_paymentToken","type":"address"},
+				{"name":"_nft","type":"address"},
+				{"name":"_timeTx","type":"uint64"},
+				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
 			]
@@ -132,6 +144,7 @@
 		{"name":"owner_","type":"address"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"directSellCode","type":"cell"},
-		{"name":"currentVersion","type":"uint32"}
+		{"name":"currentVersion","type":"uint32"},
+		{"name":"currectVersionDirectSell","type":"uint32"}
 	]
 }

@@ -16,12 +16,13 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransfe
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
+import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IAuctionBidPlacedCallback.sol";
 
 import "./errors/AuctionErrors.sol";
 import "./errors/BaseErrors.sol";
 
-contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
+contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest {
     
     address paymentTokenRoot;
     address tokenWallet;
@@ -38,7 +39,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         uint64 startTime;
         uint64 duration;
         uint64 finishTime;
-        uint64 nowTime;
+        uint128 _price;
+        uint64 _nonce;
     }
 
     struct Bid {
@@ -187,14 +189,19 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         sendBidResultCallback(_callbackId, _newBidSender, true);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
-            TvmCell empty;  
+            IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{ value: 0.1 ever, flag: 1, bounce: false }(_callbackId, currentBid.addr, currentBid.value);
+            TvmBuilder builder;
+            builder.store(_callbackId);
+            builder.store(currentBid.addr);
+            builder.store(currentBid.value);
+            
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
                 _currentBid.value,
                 _currentBid.addr,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
                 original_gas_to,
                 false,
-                empty
+                builder.toCell()
             );
         } else {
             original_gas_to.transfer({ value: 0, flag: 128, bounce: false });
@@ -257,6 +264,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         }
     }
 
+
+
     function buildPlaceBidPayload(
         uint32 callbackId, 
         address buyer
@@ -280,7 +289,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
             auctionStartTime, 
             auctionDuration, 
             auctionEndTime,
-            now
+            price,
+            nonce_
         );
     }
 
@@ -288,7 +298,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback {
         TvmCell newCode,
         uint32 newVersion,
         address sendGasTo
-    ) external onlyMarketRoot {
+    ) override external onlyMarketRoot {
         if (currentVersion == newVersion) {
 			tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
 			sendGasTo.transfer({

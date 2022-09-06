@@ -4,20 +4,20 @@ import {Account} from "locklift/build/factory";
 
 declare type AccountType = Account<FactorySource["Wallet"]>
 
-export class DirectBuy {
-    public contract: Contract<FactorySource["DirectBuy"]>;
+export class DirectSell {
+    public contract: Contract<FactorySource["DirectSell"]>;
     public owner: AccountType;
     public address: Address;
 
-    constructor(auction_contract: Contract<FactorySource["DirectBuy"]>, auction_owner: AccountType) {
+    constructor(auction_contract: Contract<FactorySource["DirectSell"]>, auction_owner: AccountType) {
         this.contract = auction_contract;
         this.owner = auction_owner;
         this.address = this.contract.address;
     }
 
     static async from_addr(addr: Address, owner: AccountType) {
-        const contract = await locklift.factory.getDeployedContract('DirectBuy', addr);
-        return new DirectBuy(contract, owner);
+        const contract = await locklift.factory.getDeployedContract('DirectSell', addr);
+        return new DirectSell(contract, owner);
     }
 
     async getEvents(event_name: string) {
@@ -32,26 +32,13 @@ export class DirectBuy {
         return null;
     }
 
-    async finishBuy(initiator: AccountType) {
-        return await initiator.runTarget(
-            {
-                contract: this.contract,
-                value: locklift.utils.toNano(2),
-                flags: 1
-            },
-            (dd) => dd.methods.finishBuy({
-                sendGasTo: initiator.address
-            })
-        );
-    }
-
-    async closeBuy() {
+    async closeSell() {
         return await this.owner.runTarget(
             {
                 contract: this.contract,
                 value: locklift.utils.toNano(1)
             },
-            (cc) => cc.methods.closeBuy({})
+            (cc) => cc.methods.closeSell({})
         );
     }
 }

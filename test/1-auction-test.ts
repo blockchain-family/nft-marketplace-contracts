@@ -4,6 +4,7 @@ import { Auction } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
+import { LargeNumberLike } from "crypto";
 
 const logger = require('mocha-logger');
 const { expect } = require('chai');
@@ -22,7 +23,11 @@ let tokenWallet2: TokenWallet;
 let auctionRoot: AuctionRoot;
 let auction: Auction;
 
+let startBalanceTW1: number = 10000000000;
+let startBalanceTW2: number = 50000000000;
+
 describe("Test Auction contract", async function () {
+
     it('Deploy account', async function () {
         account1 = await deployAccount(0, 20);
         account2 = await deployAccount(1, 10);
@@ -44,8 +49,8 @@ describe("Test Auction contract", async function () {
     });
 
     it('Mint TIP-3 token to account', async function () {
-        tokenWallet1 = await tokenRoot.mint(10000000000, account2);
-        tokenWallet2 = await tokenRoot.mint(50000000000, account3);
+        tokenWallet1 = await tokenRoot.mint(startBalanceTW1, account2);
+        tokenWallet2 = await tokenRoot.mint(startBalanceTW2, account3);
     });
 
     it('Deploy AuctionRootTip3', async function () {
@@ -55,8 +60,9 @@ describe("Test Auction contract", async function () {
 
     describe("Auction completed", async function () {
         it('Deploy Auction and success', async function () {
+            const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(tokenRoot, 5000000000, Math.round(Date.now() / 1000), 30)).toString();
+            payload = (await auctionRoot.buildPayload(tokenRoot, spentToken, Math.round(Date.now() / 1000), 30)).toString();
 
             let callback: CallbackType;
             callback = [
@@ -77,7 +83,9 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await tokenWallet2.transfer(5000000000, auction.address, 0, true, '', locklift.utils.toNano(2));
+            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyerAddress.toString()).to.be.eq(account3.address.toString());
@@ -92,14 +100,22 @@ describe("Test Auction contract", async function () {
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
             
             await auction.getEvent('AuctionComplete');
+
+            const spentTokenWallet1Balance = await tokenWallet1.balance() as any;
+            expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1 + spentToken).toString());
+
+            startBalanceTW1 += spentToken;
+            startBalanceTW2 -= spentToken;
+
             logger.log("");
         });
     });
 
     describe("Auction cancel from creater", async function () {
         it('Deploy Auction and cancel', async function () {
+            const spentToken: number = 5000000000;            
             let payload: string;
-            payload = (await auctionRoot.buildPayload(tokenRoot, 1000000000, Math.round(Date.now() / 1000), 30)).toString();
+            payload = (await auctionRoot.buildPayload(tokenRoot, spentToken, Math.round(Date.now() / 1000), 30)).toString();
 
             let callback: CallbackType;
             callback = [
@@ -120,15 +136,18 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(event.offerAddress, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await tokenWallet2.transfer(5000000000, auction.address, 0,  true, '', locklift.utils.toNano(2));
-            
+            await tokenWallet2.transfer(spentToken, auction.address, 0,  true, '', locklift.utils.toNano(2));
+            let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
+
             await sleep(30000);
             await auction.finishAuction(account2);
             
             event = await nft.getEvent('ManagerChanged');
             expect(event.newManager.toString()).to.be.eq(account3.address.toString());
             await auction.getEvent('AuctionCancelled');
-    
+            spentTokenWallet2Balance = await tokenWallet2.balance();
+            expect(spentTokenWallet2Balance.toString()).to.be.eq(startBalanceTW2.toString());
         });
     });
 });

@@ -36,7 +36,6 @@ export class Token {
 
     async deployWallet(user: AccountType) {
         const token = this.contract;
-        const tokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
         await user.runTarget(
             {
                 contract: token,

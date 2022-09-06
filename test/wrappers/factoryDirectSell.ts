@@ -6,26 +6,26 @@ import { NftC } from "./nft";
 
 declare type AccountType = Account<FactorySource["Wallet"]>
 
-export class FactoryDirectBuy {
-    public contract: Contract<FactorySource["FactoryDirectBuy"]>;
+export class FactoryDirectSell {
+    public contract: Contract<FactorySource["FactoryDirectSell"]>;
     public owner: AccountType;
     public address: Address;
 
-    constructor(auction_contract: Contract<FactorySource["FactoryDirectBuy"]>, auction_owner: AccountType) {
+    constructor(auction_contract: Contract<FactorySource["FactoryDirectSell"]>, auction_owner: AccountType) {
         this.contract = auction_contract;
         this.owner = auction_owner;
         this.address = this.contract.address;
     }
 
     static async from_addr(addr: Address, owner: AccountType) {
-        const contract = await locklift.factory.getDeployedContract('FactoryDirectBuy', addr);
-        return new FactoryDirectBuy(contract, owner);
+        const contract = await locklift.factory.getDeployedContract('FactoryDirectSell', addr);
+        return new FactoryDirectSell(contract, owner);
     }
 
-    async buildPayload(nft: NftC, startTime: any, durationTime: any) {
-        return (await this.contract.methods.buildPayload({nft: nft.address, startTime: startTime, durationTime: durationTime}).call()).value0;
+    async buildPayload(nft:NftC, startTime: any, endTime:any, paymentToken: Token, price: any) {
+        return (await this.contract.methods.buildPayload({_nftAddress: nft.address, _startTime: startTime, _endTime: endTime, _paymentToken: paymentToken.address, _price:price}).call()).value0;
     }
-    
+
     async getEvents(event_name: string) {
         return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }

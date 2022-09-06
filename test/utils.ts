@@ -195,6 +195,32 @@ export const deployFactoryDirectBuy = async function (owner: AccountType) {
     }));
 
     logger.log(`FactoryDirectBuy address ${factoryDirectBuy.address.toString()}`);
+    
+    const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
+    const DirectBuy = await locklift.factory.getContractArtifacts('DirectBuy');
+    await owner.runTarget(
+        {
+            contract: factoryDirectBuy,
+            value: locklift.utils.toNano(1),
+        },
+        (twP) => twP.methods.setCodeTokenPlatform({
+            _tokenPlatformCode: TokenWalletPlatform.code
+        }),
+    );
+
+    logger.log(`TokenWalletPlatform is set`);
+
+    await owner.runTarget(
+        {
+          contract: factoryDirectBuy,
+          value: locklift.utils.toNano(1),  
+        },
+        (dB) => dB.methods.setCodeDirectBuy({
+            _directBuyCode: DirectBuy.code
+        }),
+    );
+
+    logger.log(`DirectBuy is set`);
 
     return new FactoryDirectBuy(factoryDirectBuy, owner);
 };    
@@ -215,6 +241,19 @@ export const deployFactoryDirectSell = async function(owner: AccountType) {
     }));
 
     logger.log(`FactoryDirectSell address ${factoryDirectSell.address.toString()}`);
+
+    const DirectSell = locklift.factory.getContractArtifacts("DirectSell");
+    await owner.runTarget(
+        {
+            contract:factoryDirectSell,
+            value: locklift.utils.toNano(1),
+        },
+        (dS) => dS.methods.setCodeDirectSell({
+            _directSellCode: DirectSell.code,
+        }),
+    );
+
+    logger.log(`DirectSell is set`);
 
     return new FactoryDirectSell(factoryDirectSell, owner);  
 }

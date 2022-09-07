@@ -1,4 +1,4 @@
-import { isValidTonAddress } from "../test/utils";
+import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
 
 const migration = new Migration();
@@ -18,7 +18,7 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'Get Collection Owner Address (default ' + account.address + ')',
-            validate: (value: any) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
 

@@ -1,6 +1,7 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 library Gas {
+    
     uint128 constant DEPLOY_AUCTION_VALUE                   = 3 ever;
     uint128 constant AUCTION_INITIAL_BALANCE                = 1 ever;
     uint128 constant AUCTION_ROOT_INITIAL_BALANCE           = 5 ever;
@@ -32,4 +33,5 @@ library Gas {
 
     uint128 constant FINISH_ORDER_VALUE                     = 1 ever;
     uint128 constant SET_CODE                               = 1 ever;
+
 }

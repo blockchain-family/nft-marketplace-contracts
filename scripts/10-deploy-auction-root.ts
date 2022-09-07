@@ -1,7 +1,8 @@
 import { Migration } from "./migration";
+import { isValidEverAddress} from "../test/utils";
+
 const prompts = require('prompts')
 const migration = new Migration();
-const {isValidTonAddress} = require(process.cwd() + '/test/utils');
 
 async function main() {
     const response = await prompts([
@@ -9,7 +10,7 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'AuctionRootTip3 owner',
-            validate: (value:any) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
 

@@ -1,8 +1,11 @@
-pragma ton-solidity >=0.62.0;
+pragma ever-solidity >=0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
+
+import "./errors/BaseErrors.sol";
+import "./errors/DirectBuySellErrors.sol";
 
 import "./libraries/Gas.sol";
 
@@ -10,12 +13,10 @@ import "./interfaces/IDirectSellCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
 
 import "./modules/access/OwnableInternal.sol";
-import "./errors/DirectBuySellErrors.sol";
-
-import "./Nft.sol";
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
+import "./Nft.sol";
 import "./DirectSell.sol";
 
 contract FactoryDirectSell is OwnableInternal, INftChangeManager {
@@ -62,7 +63,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     );
   }
 
-  function buildPayload(
+  function buildDirectSellCreationPayload(
     address _nftAddress,
     uint64 _startTime,
     uint64 _endTime,
@@ -95,12 +96,18 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     address nftForSell = payloadSlice.decode(address);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+    
     if (
       msg.sender.value != 0 && msg.sender == nftForSell &&
       msg.value >= (Gas.DEPLOY_DIRECT_SELL_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
       payloadSlice.bits() == 523
     ) {
-      (uint64 _startAuction, uint64 _endAuction, address _paymentToken, uint128 _price) = payloadSlice.decode(
+      (
+        uint64 _startAuction, 
+        uint64 _endAuction, 
+        address _paymentToken, 
+        uint128 _price
+      ) = payloadSlice.decode(
         uint64,
         uint64,
         address,
@@ -120,7 +127,11 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _nonce,
         _price
       );
-      IDirectSellCallback(nftOwner).directSellDeployed{ value: 0.1 ever, flag: 1, bounce: false }(
+      IDirectSellCallback(nftOwner).directSellDeployed{ 
+        value: 0.1 ever, 
+        flag: 1, 
+        bounce: false 
+      }(
         directSellAddress,
         msg.sender,
         _paymentToken,
@@ -129,12 +140,34 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _price
       );
 
-      ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(directSellAddress, sendGasTo, callbacks);
+      ITIP4_1NFT(msg.sender).changeManager{
+        value: 0, 
+        flag: 128 
+      }(
+        directSellAddress, 
+        sendGasTo, 
+        callbacks
+      );
+
     } else {
       emit DirectSellDeclined(msg.sender, nftForSell);
-      IDirectSellCallback(nftOwner).directSellDeclined{ value: 0.1 ever, flag: 1, bounce: false }(msg.sender);
+      IDirectSellCallback(nftOwner).directSellDeclined{
+        value: 0.1 ever, 
+        flag: 1,
+        bounce: false
+      }(
+        msg.sender
+      );
 
-      ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(nftOwner, sendGasTo, callbacks);
+      ITIP4_1NFT(msg.sender).changeManager{
+        value: 0, 
+        flag: 128 
+      }(
+        nftOwner, 
+        sendGasTo, 
+        callbacks
+      );
+
     }
   }
 
@@ -169,13 +202,27 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
       );
   }
 
-  function RequestUpgradeDirectSell (address _owner, address _paymentToken, address _nft, uint64 _timeTx, address sendGasTo) external view onlyOwner {
+  function RequestUpgradeDirectSell(
+    address _owner, 
+    address _paymentToken, 
+    address _nft, 
+    uint64 _timeTx, 
+    address sendGasTo
+  ) external view onlyOwner {
     require(msg.value >= Gas.UPGRADE_DIRECT_SELL_MIN_VALUE, BaseErrors.value_too_low);  
-    tvm.rawReserve(math.max(Gas.DIRECT_SELL_INITIAL_BALANCE, address(this).balance - msg.value), 2); //?
+    tvm.rawReserve(math.max(
+      Gas.DIRECT_SELL_INITIAL_BALANCE, 
+      address(this).balance - msg.value), 2
+    ); 
+
     IUpgradableByRequest(expectedAddressDirectSell(_owner, _paymentToken, _nft, _timeTx)).upgrade{
-        value: 0,
-        flag: 128
-    }(directSellCode, currectVersionDirectSell, sendGasTo);      
+      value: 0,
+      flag: 128
+    }(
+      directSellCode, 
+      currectVersionDirectSell, 
+      sendGasTo
+    );      
   }
 
   function upgrade(

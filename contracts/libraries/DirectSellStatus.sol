@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 library DirectSellStatus {
     uint8 constant Create    = 0;

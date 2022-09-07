@@ -29,7 +29,7 @@
 			]
 		},
 		{
-			"name": "buildPayload",
+			"name": "buildDirectSellCreationPayload",
 			"inputs": [
 				{"name":"_nftAddress","type":"address"},
 				{"name":"_startTime","type":"uint64"},

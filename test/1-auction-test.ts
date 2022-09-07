@@ -1,6 +1,5 @@
-import { AccountType, CollectionType, deployAccount, deployNFT, deployTokenRoot, deployAuctionRoot, CallbackType, sleep, deployCollectionAndMintNft} from "./utils";
-import { AuctionRoot } from "./wrappers/auctionRoot";
-import { Auction } from "./wrappers/auction";
+import { AccountType, CollectionType, deployAccount, deployTokenRoot, deployAuctionRoot, CallbackType, sleep, deployCollectionAndMintNft} from "./utils";
+import { AuctionRoot, Auction } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";

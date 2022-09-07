@@ -1,21 +1,24 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
-import './libraries/Gas.sol';
-import './errors/AuctionErrors.sol';
-import './errors/BaseErrors.sol';
-
 import './abstract/OffersRoot.sol';
+
+import './errors/BaseErrors.sol';
+import './errors/AuctionErrors.sol';
+
+
+import './libraries/Gas.sol';
 
 import "./interfaces/IAuctionRootCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
 
-import './Nft.sol';
 import './modules/TIP4_1/interfaces/INftChangeManager.sol';
 import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
+
+import './Nft.sol';
 import './AuctionTip3.sol';
 
 contract AuctionRootTip3 is OffersRoot, INftChangeManager {
@@ -129,13 +132,29 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     _paymentTokenRoot,
                     nftOwner
                 );
-                MarketOffer offerInfo = MarketOffer(collection, nftOwner, msg.sender, offerAddress, _price, _auctionDuration, tx.timestamp);
+
+                MarketOffer offerInfo = MarketOffer(
+                    collection, 
+                    nftOwner, 
+                    msg.sender, 
+                    offerAddress,
+                    _price,
+                    _auctionDuration,
+                    tx.timestamp
+                );
                 
                 emit AuctionDeployed(offerAddress, offerInfo);
-                IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{ value: 0.1 ever, flag: 1, bounce: false }(offerAddress, offerInfo);
+                IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{
+                     value: 0.1 ever, 
+                     flag: 1, 
+                     bounce: false 
+                }(
+                    offerAddress,
+                    offerInfo
+                );
 
                 mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-                ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
+                ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                     offerAddress,
                     sendGasTo,
                     callbacks
@@ -149,7 +168,14 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
-            IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{ value: 0.1 ever, flag: 1, bounce: false }(nftOwner, msg.sender);
+            IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{
+                value: 0.1 ever, 
+                flag: 1, 
+                bounce: false 
+            }(
+                nftOwner,
+                msg.sender
+            );
 
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
             ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
@@ -219,9 +245,18 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         });
     }
     
-    function RequestUpgradeAuction (address _nft, uint128 _price, uint64 _nonce, address sendGasTo) external view onlyOwner {
+    function RequestUpgradeAuction(
+        address _nft,
+        uint128 _price,
+        uint64 _nonce,
+        address sendGasTo
+    ) external view onlyOwner {
         require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.value_too_low);  
-        tvm.rawReserve(math.max(Gas.AUCTION_ROOT_INITIAL_BALANCE, address(this).balance - msg.value), 2); //?
+        tvm.rawReserve(math.max(
+            Gas.AUCTION_ROOT_INITIAL_BALANCE, 
+            address(this).balance - msg.value), 2
+        );
+
         IUpgradableByRequest(getOfferAddress(_nft, _price, _nonce)).upgrade{
             value: 0,
             flag: 128

@@ -1049,7 +1049,7 @@ IFREF {
 THROW 0
 
 .macro supportsInterface_01ffc9a7_internal_macro
-.loc ../contracts/modules/TIP6/TIP6.sol, 14
+.loc ../contracts/modules/TIP6/TIP6.sol, 16
 GETGLOB 4
 PUSHINT 0
 SETINDEXQ 2

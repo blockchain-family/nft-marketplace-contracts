@@ -1,9 +1,8 @@
 import { AccountType, CollectionType, deployAccount, deployTokenRoot, deployCollectionAndMintNft, CallbackType, sleep, deployFactoryDirectBuy} from "./utils";
+import { FactoryDirectBuy, DirectBuy } from "./wrappers/directbuy";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
-import { FactoryDirectBuy } from "./wrappers/factoryDirectBuy";
-import { DirectBuy } from "./wrappers/DirectBuy";
 
 const logger = require('mocha-logger');
 const { expect } = require('chai');

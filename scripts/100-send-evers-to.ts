@@ -1,6 +1,6 @@
 import { Address } from "locklift/.";
-import { isValidTonAddress} from "../test/utils";
 import { Migration } from "./migration";
+import { isValidEverAddress } from "../test/utils";
 
 const migration = new Migration();
 const ora = require('ora');
@@ -16,13 +16,13 @@ async function main() {
             type: 'from',
             name: 'from',
             message: 'From',
-            validate: (value: string) => isValidTonAddress(value) ? true : 'Invalid Everscale address' || value === '' ? account.address.toString() : value 
+            validate: (value: string) => isValidEverAddress(value) ? true : 'Invalid Everscale address' || value === '' ? account.address.toString() : value 
         },
         {
             type: 'text',
             name: 'to',
             message: 'To',
-            validate: (value: string) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: string) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
             type: 'number',

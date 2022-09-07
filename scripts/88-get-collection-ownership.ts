@@ -1,12 +1,7 @@
-import { isValidTonAddress, logContract } from "../test/utils";
 import { Migration } from "./migration";
+import { isValidEverAddress} from "../test/utils";
 
 const migration = new Migration();
-
-// @ts-check
-const BigNumber = require('bignumber.js');
-
-const ora = require('ora')
 const prompts = require('prompts')
 
 async function main() {
@@ -15,7 +10,7 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'Collection new owner address',
-            validate: (value:string) => isValidTonAddress(value) ? true : 'Invalid Everscale address'
+            validate: (value:string) => isValidEverAddress(value) ? true : 'Invalid Everscale address'
         }
     ])
 
@@ -37,9 +32,6 @@ async function main() {
 
         console.log('Transfer ownership to: ' + response.owner)
     }
-
-    // @ts-ignore
-    await logContract(collection)
 }
 
 main()

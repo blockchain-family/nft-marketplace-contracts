@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 library DirectBuySellErrors {
     uint16 constant NOT_FROM_SPENT_TOKEN_ROOT         = 300;

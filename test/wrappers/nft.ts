@@ -1,7 +1,7 @@
+import { Account } from "locklift/build/factory";
+import { CallbackType } from "../utils";
 import { Address, Contract, zeroAddress } from "locklift";
 import { FactorySource } from "../../build/factorySource";
-import {Account} from "locklift/build/factory";
-import {CallbackType} from "../utils";
 
 declare type AccountType = Account<FactorySource["Wallet"]>
 

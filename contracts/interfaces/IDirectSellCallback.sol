@@ -1,6 +1,7 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 interface IDirectSellCallback {
+    
     function directSellDeployed(
         address directSellAddress,
         address sender, 
@@ -19,4 +20,5 @@ interface IDirectSellCallback {
     ) external;
 
     function directSellCancelledOnTime(uint32 callbackId) external; 
+    
 }

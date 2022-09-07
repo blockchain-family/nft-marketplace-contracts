@@ -1,33 +1,35 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
-import "./libraries/Gas.sol";
-import "./libraries/ExchangePayload.sol";
-
 import './abstract/Offer.sol';
 
-import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
-import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
-import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
+import "./errors/BaseErrors.sol";
+import "./errors/AuctionErrors.sol";
 
-import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
-import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
+import "./libraries/Gas.sol";
+import "./libraries/ExchangePayload.sol";
 
 import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IAuctionBidPlacedCallback.sol";
 
-import "./errors/AuctionErrors.sol";
-import "./errors/BaseErrors.sol";
+import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
+import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
+
+import "./Nft.sol";
+
+import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
+import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
+import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest {
     
     address paymentTokenRoot;
     address tokenWallet;
 
-    uint64 auctionStartTime; // it can be suited to 32, but who cares?
+    uint64 auctionStartTime; 
     uint64 auctionDuration;
     uint64 auctionEndTime;
 
@@ -121,7 +123,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     }
 
     function onTokenWallet(address value) external {
-        require(msg.sender.value != 0 && msg.sender == paymentTokenRoot, BaseErrors.operation_not_permited);
+        require(
+            msg.sender.value != 0 && 
+            msg.sender == paymentTokenRoot, 
+            BaseErrors.operation_not_permited
+        );
+
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         tokenWallet = value;
 
@@ -189,7 +196,16 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         sendBidResultCallback(_callbackId, _newBidSender, true);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
-            IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{ value: 0.1 ever, flag: 1, bounce: false }(_callbackId, currentBid.addr, currentBid.value);
+            IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
+                value: 0.1 ever, 
+                flag: 1, 
+                bounce: false 
+            }(
+                _callbackId,
+                currentBid.addr,
+                currentBid.value
+            );
+
             TvmBuilder builder;
             builder.store(_callbackId);
             builder.store(currentBid.addr);
@@ -219,7 +235,11 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             emit AuctionComplete(currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
 
-            ITIP4_1NFT(nft).transfer{ value: Gas.TRANSFER_OWNERSHIP_VALUE, flag: 1, bounce: false }(
+            ITIP4_1NFT(nft).transfer{
+                value: Gas.TRANSFER_OWNERSHIP_VALUE, 
+                flag: 1, 
+                bounce: false
+            }(
                 currentBid.addr,
                 sendGasTo,
                 callbacks
@@ -257,9 +277,21 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     ) private pure {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
-                IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{ value: 0.1 ever, flag: 1, bounce: false }(callbackId);
+                IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{
+                    value: 0.1 ever, 
+                    flag: 1, 
+                    bounce: false 
+                }(
+                    callbackId
+                );
             } else {
-                IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{ value: 0.1 ever, flag: 1, bounce: false }(callbackId);
+                IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{
+                    value: 0.1 ever,
+                    flag: 1, 
+                    bounce: false 
+                }(
+                    callbackId
+                );
             }
         }
     }

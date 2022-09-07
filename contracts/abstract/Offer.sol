@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -47,12 +47,22 @@ abstract contract Offer {
     }
 
     modifier onlyOwner() {
-        require(msg.sender.value != 0 && msg.sender == nftOwner, BaseErrors.message_sender_is_not_my_owner);
+        require(
+            msg.sender.value != 0 &&
+            msg.sender == nftOwner, 
+            BaseErrors.message_sender_is_not_my_owner
+        );
+
         _;
     }
 
     modifier onlyMarketRoot() {
-        require(msg.sender.value != 0 && msg.sender == markerRootAddr, OffersBaseErrors.message_sender_is_not_my_root);
+        require(
+            msg.sender.value != 0 && 
+            msg.sender == markerRootAddr, 
+            OffersBaseErrors.message_sender_is_not_my_root
+        );
+
         _;
     }
 }

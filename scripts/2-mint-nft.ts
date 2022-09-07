@@ -1,4 +1,4 @@
-import { isValidTonAddress} from "../test/utils";
+import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
 
 const migration = new Migration();
@@ -13,7 +13,7 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'Owner (default ' + account.address + ')',
-            validate: (value:string) => isValidTonAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value:string) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
             type: 'text',

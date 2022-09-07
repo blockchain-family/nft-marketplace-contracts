@@ -1,4 +1,5 @@
 import { Migration } from "./migration";
+
 const ora = require('ora');
 const migration = new Migration();
 

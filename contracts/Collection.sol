@@ -1,15 +1,17 @@
-pragma ton-solidity >= 0.62.0;
+pragma ever-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
 pragma AbiHeader pubkey;
 
+import "./interfaces/IAcceptNftBurnCallback.sol";
+import "./interfaces/IBurnableCollection.sol";
+
 import "./modules/TIP4_2/TIP4_2Collection.sol";
 import "./modules/TIP4_3/TIP4_3Collection.sol";
 import "./modules/access/OwnableInternal.sol";
+
 import "./Nft.sol";
-import "./interfaces/IAcceptNftBurnCallback.sol";
-import "./interfaces/IBurnableCollection.sol";
 
 contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, OwnableInternal {
 
@@ -37,16 +39,16 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, 
 		TIP4_3Collection(codeIndex, codeIndexBasis)
 	{
 		tvm.accept();
-		tvm.rawReserve(1 ton, 0);
+		tvm.rawReserve(1 ever, 0);
 		_remainOnNft = remainOnNft;
 	}
 
 	function mintNft(address _owner, string _json) public virtual onlyOwner {
 		require(
-			msg.value > _remainOnNft + 4 ton,
+			msg.value > _remainOnNft + 4 ever,
 			value_is_less_than_required
 		);
-		tvm.rawReserve(1 ton, 0);
+		tvm.rawReserve(1 ever, 0);
 		_mintNft(_owner, _json, 0, 128);
 	}
 
@@ -56,13 +58,13 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, 
 
 	function batchMintNft(address _owner, string[] _jsons) public virtual onlyOwner {
 		require(
-			msg.value > (_remainOnNft + 3 ton) * _jsons.length + 1 ton,
+			msg.value > (_remainOnNft + 3 ever) * _jsons.length + 1 ever,
 			value_is_less_than_required
 		);
-		tvm.rawReserve(1 ton, 0);
+		tvm.rawReserve(1 ever, 0);
 
 		for ((string _json) : _jsons) {
-			_mintNft(_owner, _json, 3 ton, 0);
+			_mintNft(_owner, _json, 3 ever, 0);
 		}
 	}
 

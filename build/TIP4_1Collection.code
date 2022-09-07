@@ -395,7 +395,7 @@ IFREF {
 THROW 0
 
 .macro nftAddress_f88fba8c_internal_macro
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 65
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 67
 GETGLOB 4
 PUSHINT 0
 SETINDEXQ 2
@@ -414,19 +414,19 @@ CALLREF {
 CALL $_resolveNft_2d542587_internal_macro$
 
 .macro _resolveNft_2d542587_internal_macro
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 73
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 75
 MYADDR
 CALLREF {
 	CALL $_buildNftCode_c58e679e_internal_macro$
 }
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 74
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 76
 SWAP
 CALLREF {
 	CALL $_buildNftState_c971fdf8_internal_macro$
 }
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 75
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 77
 HASHCU
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 76
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 78
 MYADDR
 PARSEMSGADDR
 THIRD
@@ -443,10 +443,10 @@ CTOS
 CALL $_buildNftCode_c58e679e_internal_macro$
 
 .macro _buildNftCode_c58e679e_internal_macro
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 86
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 88
 NEWC
 STSLICE
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 87
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 89
 GETGLOB 11
 CTOS
 SWAP
@@ -563,7 +563,7 @@ CALLREF {
 CALL $_buildNftState_c971fdf8_internal_macro$
 
 .macro _buildNftState_c971fdf8_internal_macro
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 99
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 101
 PUSHINT 0
 NEWC
 STU 256
@@ -595,7 +595,7 @@ ENDC
 CALL $_isOwner_52494a14_internal_macro$
 
 .macro _isOwner_52494a14_internal_macro
-.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 107
+.loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 109
 TRUE
 .loc ../contracts/modules/TIP4_1/TIP4_1Collection.sol, 0
 
@@ -672,7 +672,7 @@ IFREF {
 THROW 0
 
 .macro supportsInterface_01ffc9a7_internal_macro
-.loc ../contracts/modules/TIP6/TIP6.sol, 14
+.loc ../contracts/modules/TIP6/TIP6.sol, 16
 GETGLOB 4
 PUSHINT 0
 SETINDEXQ 2

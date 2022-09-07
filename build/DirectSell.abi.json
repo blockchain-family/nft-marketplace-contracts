@@ -30,7 +30,7 @@
 			]
 		},
 		{
-			"name": "getDetails",
+			"name": "getInfo",
 			"inputs": [
 			],
 			"outputs": [

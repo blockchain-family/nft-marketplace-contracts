@@ -2,17 +2,19 @@ import { Account } from "locklift/build/factory";
 import { FactorySource } from "../build/factorySource";
 import { Address, Contract, zeroAddress } from "locklift";
 import { Token } from "./wrappers/token";
-import { AuctionRoot } from "./wrappers/auctionRoot";
+import { AuctionRoot } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
-import { FactoryDirectBuy } from "./wrappers/factoryDirectBuy";
-import { FactoryDirectSell } from "./wrappers/factoryDirectSell";
+//@ts-ignore
+import { FactoryDirectBuy } from "./wrappers/directbuy";
+//@ts-ignore
+import { FactoryDirectSell } from "./wrappers/directsell";
 
 const fs = require('fs')
 const logger = require("mocha-logger");
 const { expect } = require("chai");
 
 export type AddressN = `0:${string}`
-export const isValidTonAddress = (address: string): address is AddressN => /^(?:-1|0):[0-9a-fA-F]{64}$/.test(address);
+export const isValidEverAddress = (address: string): address is AddressN => /^(?:-1|0):[0-9a-fA-F]{64}$/.test(address);
 export declare type AccountType = Account<FactorySource["Wallet"]>;
 export declare type CollectionType = Contract<FactorySource["Collection"]>;
 

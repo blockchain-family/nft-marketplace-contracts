@@ -21,7 +21,7 @@
 			]
 		},
 		{
-			"name": "buildPayload",
+			"name": "buildDirectBuyCreationPayload",
 			"inputs": [
 				{"name":"nft","type":"address"},
 				{"name":"startTime","type":"uint64"},

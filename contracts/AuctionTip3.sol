@@ -67,9 +67,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
-    event BidPlaced(address buyerAddress, uint128 value);
-    event BidDeclined(address buyerAddress, uint128 value);
-    event AuctionComplete(address buyerAddress, uint128 value); 
+    event BidPlaced(address buyer, uint128 value);
+    event BidDeclined(address buyer, uint128 value);
+    event AuctionComplete(address seller, address buyer, uint128 value); 
     event AuctionCancelled();
     event AuctionUpgrade();
 
@@ -232,7 +232,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
             
-            emit AuctionComplete(currentBid.addr, maxBidValue);
+            emit AuctionComplete(nftOwner, currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
 
             ITIP4_1NFT(nft).transfer{

@@ -209,7 +209,7 @@
 		{
 			"name": "BidPlaced",
 			"inputs": [
-				{"name":"buyerAddress","type":"address"},
+				{"name":"buyer","type":"address"},
 				{"name":"value","type":"uint128"}
 			],
 			"outputs": [
@@ -218,7 +218,7 @@
 		{
 			"name": "BidDeclined",
 			"inputs": [
-				{"name":"buyerAddress","type":"address"},
+				{"name":"buyer","type":"address"},
 				{"name":"value","type":"uint128"}
 			],
 			"outputs": [
@@ -227,7 +227,8 @@
 		{
 			"name": "AuctionComplete",
 			"inputs": [
-				{"name":"buyerAddress","type":"address"},
+				{"name":"seller","type":"address"},
+				{"name":"buyer","type":"address"},
 				{"name":"value","type":"uint128"}
 			],
 			"outputs": [

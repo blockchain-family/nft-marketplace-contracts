@@ -13,7 +13,7 @@ async function main() {
     
     const response = await prompts([
         {
-            type: 'from',
+            type: 'text',
             name: 'from',
             message: 'From',
             validate: (value: string) => isValidEverAddress(value) ? true : 'Invalid Everscale address' || value === '' ? account.address.toString() : value 

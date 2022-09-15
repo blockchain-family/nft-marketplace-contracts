@@ -33,7 +33,7 @@
 			"inputs": [
 				{"name":"_nftAddress","type":"address"},
 				{"name":"_startTime","type":"uint64"},
-				{"name":"_endTime","type":"uint64"},
+				{"name":"durationTime","type":"uint64"},
 				{"name":"_paymentToken","type":"address"},
 				{"name":"_price","type":"uint128"}
 			],
@@ -101,11 +101,11 @@
 		{
 			"name": "DirectSellDeployed",
 			"inputs": [
-				{"name":"_directSellAddress","type":"address"},
+				{"name":"directSellAddress","type":"address"},
 				{"name":"sender","type":"address"},
 				{"name":"paymentToken","type":"address"},
 				{"name":"nft","type":"address"},
-				{"name":"_nonce","type":"uint64"},
+				{"name":"nonce","type":"uint64"},
 				{"name":"price","type":"uint128"}
 			],
 			"outputs": [

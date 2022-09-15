@@ -28,11 +28,11 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   uint32 currectVersionDirectSell;
 
   event DirectSellDeployed(
-    address _directSellAddress,
+    address directSellAddress,
     address sender,
     address paymentToken,
     address nft,
-    uint64 _nonce,
+    uint64  nonce,
     uint128 price
   );
   event DirectSellDeclined(address sender, address _nftAddress);
@@ -66,14 +66,14 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   function buildDirectSellCreationPayload(
     address _nftAddress,
     uint64 _startTime,
-    uint64 _endTime,
+    uint64 durationTime,
     address _paymentToken,
     uint128 _price
   ) external pure returns (TvmCell) {
     TvmBuilder builder;
     builder.store(_nftAddress);
     builder.store(_startTime);
-    builder.store(_endTime);
+    builder.store(durationTime);
     builder.store(_paymentToken);
     builder.store(_price);
 
@@ -104,7 +104,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     ) {
       (
         uint64 _startAuction, 
-        uint64 _endAuction, 
+        uint64 durationTime, 
         address _paymentToken, 
         uint128 _price
       ) = payloadSlice.decode(
@@ -114,13 +114,13 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         uint128
       );
       uint64 _nonce = tx.timestamp;
-      address directSellAddress = new DirectSell{
+      address directSell = new DirectSell{
         stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, nftForSell, _nonce),
         value: Gas.DEPLOY_DIRECT_SELL_MIN_VALUE
-      }(_startAuction, _endAuction, _price);
+      }(_startAuction, durationTime, _price);
 
       emit DirectSellDeployed(
-        directSellAddress,
+        directSell,
         msg.sender,
         _paymentToken,
         nftForSell,
@@ -132,7 +132,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         flag: 1, 
         bounce: false 
       }(
-        directSellAddress,
+        directSell,
         msg.sender,
         _paymentToken,
         nftForSell,
@@ -144,7 +144,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         value: 0, 
         flag: 128 
       }(
-        directSellAddress, 
+        directSell, 
         sendGasTo, 
         callbacks
       );

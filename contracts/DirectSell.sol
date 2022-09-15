@@ -29,8 +29,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
   address static nftAddress;
   uint64 static timeTx;
 
-  uint64 auctionStart;
-  uint64 auctionEnd;
+  uint64 startTime;
+  uint64 durationTime;
+  uint64 endTime;
 
   uint128 price;
 
@@ -56,16 +57,20 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
   event DirectSellUpgrade();
 
   constructor(
-    uint64 _auctionStart,
-    uint64 _auctionEnd,
+    uint64 _startTime,
+    uint64 _durationTime,
     uint128 _price
   ) public {
     if (msg.sender.value != 0 && msg.sender == factoryDirectSell) {
       changeState(DirectSellStatus.Create);
       tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
 
-      auctionStart = _auctionStart;
-      auctionEnd = _auctionEnd;
+      startTime = _startTime;
+      durationTime = _durationTime;
+      if(startTime > 0 && durationTime > 0) {
+        endTime = startTime + durationTime;
+      }
+      
       price = _price;
       currentVersion++;
       
@@ -112,7 +117,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     uint128 amount,
     address sender,
     address, /*sender_wallet*/
-    address original_gas_to,
+    address originalGasTo,
     TvmCell payload
   ) external override {
     tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
@@ -130,7 +135,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       msg.value >= (Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
       currentStatus == DirectSellStatus.Active &&
       amount >= price &&
-      ((auctionEnd > 0 && now < auctionEnd) || auctionEnd == 0)
+      ((endTime > 0 && now < endTime) || endTime == 0)
     ) {
       IDirectSellCallback(owner).directSellSuccess{ 
         value: 0.1 ever, 
@@ -151,7 +156,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         bounce: false 
       }(
         buyer,
-        original_gas_to,
+        originalGasTo,
         callbacks
       );
 
@@ -163,13 +168,13 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         price,
         owner,
         Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-        original_gas_to,
+        originalGasTo,
         false,
         emptyPayload
       );
 
     } else {
-      if (now >= auctionEnd) {
+      if (now >= endTime) {
         IDirectSellCallback(owner).directSellCancelledOnTime{
           value: 0.1 ever, 
           flag: 1, 
@@ -189,7 +194,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         amount,
         buyer,
         uint128(0),
-        original_gas_to,
+        originalGasTo,
         true,
         emptyPayload
       );
@@ -211,8 +216,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         paymentToken,
         nftAddress,
         timeTx,
-        auctionStart,
-        auctionEnd,
+        startTime,
+        endTime,
         price,
         tokenWallet,
         currentStatus,
@@ -227,7 +232,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     );
     
     require(
-      now >= auctionEnd, 
+      now >= endTime, 
       DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS
     );
     
@@ -296,8 +301,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         paymentToken,
         nftAddress,
         timeTx,
-        auctionStart,
-        auctionEnd,
+        startTime,
+        endTime,
         price,
         tokenWallet,
         currentStatus,

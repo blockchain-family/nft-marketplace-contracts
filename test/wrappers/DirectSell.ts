@@ -23,7 +23,7 @@ export class FactoryDirectSell {
     }
 
     async buildPayload(nft:NftC, startTime: any, endTime:any, paymentToken: Token, price: any) {
-        return (await this.contract.methods.buildDirectSellCreationPayload({_nftAddress: nft.address, _startTime: startTime, _endTime: endTime, _paymentToken: paymentToken.address, _price:price}).call()).value0;
+        return (await this.contract.methods.buildDirectSellCreationPayload({_nftAddress: nft.address, _startTime: startTime, durationTime: endTime, _paymentToken: paymentToken.address, _price:price}).call()).value0;
     }
 
     async getEvents(event_name: string) {

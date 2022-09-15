@@ -59,7 +59,7 @@ describe("Test DirectSell contract", async function () {
         it('Deploy DirectSell and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectSell.buildPayload(nft, Math.round(Date.now() / 1000), 0, tokenRoot, spentToken));
+            payload = (await factoryDirectSell.buildPayload(nft, Math.round(Date.now() / 1000), 30, tokenRoot, spentToken));
             await sleep(10000);
 
             let callback: CallbackType;
@@ -75,9 +75,9 @@ describe("Test DirectSell contract", async function () {
 
             await nft.changeManager(account2, factoryDirectSell.address, account2.address, callbacks);
             const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
-            logger.log(`Address DirectSell ${dSCreate._directSellAddress.toString()}`);
+            logger.log(`Address DirectSell ${dSCreate.directSellAddress.toString()}`);
 
-            directSell = await DirectSell.from_addr(dSCreate._directSellAddress, account2);
+            directSell = await DirectSell.from_addr(dSCreate.directSellAddress, account2);
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
@@ -122,9 +122,9 @@ describe("Test DirectSell contract", async function () {
 
                 await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
                 const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
-                logger.log(`Address DirectSell ${dSCreate._directSellAddress.toString()}`);
+                logger.log(`Address DirectSell ${dSCreate.directSellAddress.toString()}`);
 
-                directSell = await DirectSell.from_addr(dSCreate._directSellAddress, account3);
+                directSell = await DirectSell.from_addr(dSCreate.directSellAddress, account3);
                 const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
                 expect(dSActive.to.toString()).to.be.eq('2');
 

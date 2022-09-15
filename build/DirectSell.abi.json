@@ -6,8 +6,8 @@
 		{
 			"name": "constructor",
 			"inputs": [
-				{"name":"_auctionStart","type":"uint64"},
-				{"name":"_auctionEnd","type":"uint64"},
+				{"name":"_startTime","type":"uint64"},
+				{"name":"_durationTime","type":"uint64"},
 				{"name":"_price","type":"uint128"}
 			],
 			"outputs": [
@@ -44,7 +44,7 @@
 				{"name":"amount","type":"uint128"},
 				{"name":"sender","type":"address"},
 				{"name":"value3","type":"address"},
-				{"name":"original_gas_to","type":"address"},
+				{"name":"originalGasTo","type":"address"},
 				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
@@ -111,8 +111,9 @@
 		{"name":"paymentToken","type":"address"},
 		{"name":"nftAddress","type":"address"},
 		{"name":"timeTx","type":"uint64"},
-		{"name":"auctionStart","type":"uint64"},
-		{"name":"auctionEnd","type":"uint64"},
+		{"name":"startTime","type":"uint64"},
+		{"name":"durationTime","type":"uint64"},
+		{"name":"endTime","type":"uint64"},
 		{"name":"price","type":"uint128"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"currentStatus","type":"uint8"},

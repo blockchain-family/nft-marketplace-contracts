@@ -84,7 +84,7 @@ describe("Test Auction contract", async function () {
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
-            expect(bidPlacedEvent.buyerAddress.toString()).to.be.eq(account3.address.toString());
+            expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
             await sleep(30000);
             await auction.finishAuction(account2);
@@ -102,7 +102,7 @@ describe("Test Auction contract", async function () {
 
             startBalanceTW1 += spentToken;
             startBalanceTW2 -= spentToken;
-
+            
             logger.log("");
         });
     });

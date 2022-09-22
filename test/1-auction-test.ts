@@ -20,6 +20,7 @@ let tokenRoot: Token;
 let tokenWallet1: TokenWallet;
 let tokenWallet2: TokenWallet;
 let tokenWallet3: TokenWallet;
+let tokenWallet4: TokenWallet;
 
 let auctionRoot: AuctionRoot;
 let auction: Auction;
@@ -27,6 +28,7 @@ let auction: Auction;
 let startBalanceTW1: number = 90000000000;
 let startBalanceTW2: number = 90000000000;
 let startBalanceTW3: number = 90000000000;
+let startBalanceTW4: number = 90000000000;
 
 describe("Test Auction contract", async function () {
 
@@ -50,9 +52,10 @@ describe("Test Auction contract", async function () {
     });
 
     it('Mint TIP-3 token to account', async function () {
-        tokenWallet1 = await tokenRoot.mint(startBalanceTW1, account2);
-        tokenWallet2 = await tokenRoot.mint(startBalanceTW2, account3);
-        tokenWallet3 = await tokenRoot.mint(startBalanceTW3, account4);
+        tokenWallet1 = await tokenRoot.mint(startBalanceTW1, account1);
+        tokenWallet2 = await tokenRoot.mint(startBalanceTW2, account2);
+        tokenWallet3 = await tokenRoot.mint(startBalanceTW3, account3);
+        tokenWallet4 = await tokenRoot.mint(startBalanceTW4, account4);
     });
 
     it('Deploy AuctionRootTip3', async function () {
@@ -85,9 +88,9 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
-            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
-            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
+            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
 
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
@@ -103,11 +106,11 @@ describe("Test Auction contract", async function () {
             
             await auction.getEvent('AuctionComplete');
 
-            const spentTokenWallet1Balance = await tokenWallet1.balance() as any;
-            expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1 + spentToken).toString());
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 + spentToken).toString());
 
-            startBalanceTW1 += spentToken;
-            startBalanceTW2 -= spentToken;
+            startBalanceTW2 += spentToken;
+            startBalanceTW3 -= spentToken;
             
             logger.log("");
         });
@@ -138,9 +141,9 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(event.offerAddress, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await tokenWallet2.transfer(spentToken, auction.address, 0,  true, '', locklift.utils.toNano(2));
-            let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
-            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
+            await tokenWallet3.transfer(spentToken, auction.address, 0,  true, '', locklift.utils.toNano(2));
+            let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
 
             await sleep(30000);
             await auction.finishAuction(account2);
@@ -148,8 +151,8 @@ describe("Test Auction contract", async function () {
             event = await nft.getEvent('ManagerChanged');
             expect(event.newManager.toString()).to.be.eq(account3.address.toString());
             await auction.getEvent('AuctionCancelled');
-            spentTokenWallet2Balance = await tokenWallet2.balance();
-            expect(spentTokenWallet2Balance.toString()).to.be.eq(startBalanceTW2.toString());
+            spentTokenWallet3Balance = await tokenWallet3.balance();
+            expect(spentTokenWallet3Balance.toString()).to.be.eq(startBalanceTW3.toString());
         });
     });
 
@@ -179,18 +182,18 @@ describe("Auction bidding variants", async function () {
         logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
         
         //First bid placed
-        await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
-        let spentTokenWallet1Balance = await tokenWallet1.balance() as any;
+        await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
+        let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
         const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
         expect(bidPlacedEvent.buyer.toString()).to.be.eq(account2.address.toString());
-        expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1 - spentToken).toString());
+        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
         //Second bid placed
-        await tokenWallet3.transfer(spentToken + 10000000000, auction.address, 0, true, '', locklift.utils.toNano(2));
-        let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+        await tokenWallet4.transfer(spentToken + 10000000000, auction.address, 0, true, '', locklift.utils.toNano(2));
+        let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
         const rebidPlacedEvent = await auction.getEvent('BidPlaced') as any;
         expect(rebidPlacedEvent.buyer.toString()).to.be.eq(account4.address.toString());
-        expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken - 10000000000).toString());
+        expect(spentTokenWallet4Balance.toString()).to.be.eq((startBalanceTW4 - spentToken - 10000000000).toString());
         
         //Finish auction
         await sleep(30000);
@@ -204,14 +207,14 @@ describe("Auction bidding variants", async function () {
         
         await auction.getEvent('AuctionComplete');
 
-        spentTokenWallet1Balance = await tokenWallet1.balance() as any;
-        let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
-        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 + spentToken + 10000000000).toString());
-        expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1).toString());
-        expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken - 10000000000 ).toString());
+        spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+        let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+        expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 + spentToken + 10000000000).toString());
+        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+        expect(spentTokenWallet4Balance.toString()).to.be.eq((startBalanceTW4 - spentToken - 10000000000 ).toString());
         
-        startBalanceTW2 = startBalanceTW2 + spentToken + 10000000000;
-        startBalanceTW3 = startBalanceTW3 - spentToken - 10000000000;
+        startBalanceTW3 = startBalanceTW3 + spentToken + 10000000000;
+        startBalanceTW4 = startBalanceTW4 - spentToken - 10000000000;
 
         logger.log("");
 
@@ -245,19 +248,19 @@ describe("Auction bidding variants", async function () {
         
 
         //First user bid
-        await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
-        let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+        await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
+        let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
         const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
         expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
         
         //Second user bid
-        await tokenWallet1.transfer(spentToken + 1000000000, auction.address, 0, true, '', locklift.utils.toNano(2));
-        let spentTokenWallet1Balance = await tokenWallet1.balance() as any;
+        await tokenWallet2.transfer(spentToken + 1000000000, auction.address, 0, true, '', locklift.utils.toNano(2));
+        let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
         const rebidPlacedEvent = await auction.getEvent('BidPlaced') as any;
         expect(rebidPlacedEvent.buyer.toString()).to.be.eq(account2.address.toString());
 
         //First user rebid
-        await tokenWallet2.transfer(spentToken + 2000000000 , auction.address, 0, true, '', locklift.utils.toNano(2));
+        await tokenWallet3.transfer(spentToken + 2000000000 , auction.address, 0, true, '', locklift.utils.toNano(2));
         const newbidPlacedEvent = await auction.getEvent('BidPlaced') as any;
         expect(newbidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
         
@@ -273,13 +276,13 @@ describe("Auction bidding variants", async function () {
             
         await auction.getEvent('AuctionComplete');
 
-        let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
-        spentTokenWallet1Balance = await tokenWallet1.balance() as any;
+        let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
         spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+        spentTokenWallet3Balance = await tokenWallet3.balance() as any;
         
-        expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 + spentToken + 2000000000 ).toString());
-        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken - 2000000000).toString());
-        expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1).toString());
+        expect(spentTokenWallet4Balance.toString()).to.be.eq((startBalanceTW4 + spentToken + 2000000000 ).toString());
+        expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken - 2000000000).toString());
+        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
    
         logger.log("");
         });

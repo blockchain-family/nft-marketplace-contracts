@@ -23,6 +23,7 @@
 		{
 			"name": "buildDirectBuyCreationPayload",
 			"inputs": [
+				{"name":"callbackId","type":"uint32"},
 				{"name":"nft","type":"address"},
 				{"name":"startTime","type":"uint64"},
 				{"name":"durationTime","type":"uint64"}
@@ -64,7 +65,7 @@
 			"name": "RequestUpgradeDirectSell",
 			"inputs": [
 				{"name":"_owner","type":"address"},
-				{"name":"_spentTokenRoot","type":"address"},
+				{"name":"spentToken","type":"address"},
 				{"name":"_nft","type":"address"},
 				{"name":"_timeTx","type":"uint64"},
 				{"name":"sendGasTo","type":"address"}
@@ -108,7 +109,7 @@
 			"inputs": [
 				{"name":"directBuyAddress","type":"address"},
 				{"name":"sender","type":"address"},
-				{"name":"tokenRoot","type":"address"},
+				{"name":"token","type":"address"},
 				{"name":"nft","type":"address"},
 				{"name":"nonce","type":"uint64"},
 				{"name":"amount","type":"uint128"}
@@ -120,7 +121,7 @@
 			"name": "DirectBuyDeclined",
 			"inputs": [
 				{"name":"sender","type":"address"},
-				{"name":"tokenRoot","type":"address"},
+				{"name":"token","type":"address"},
 				{"name":"amount","type":"uint128"}
 			],
 			"outputs": [

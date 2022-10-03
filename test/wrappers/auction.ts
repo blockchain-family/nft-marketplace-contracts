@@ -21,8 +21,8 @@ export class AuctionRoot {
         return new AuctionRoot(contract, owner);
     }
 
-    async buildPayload(paymentToken: Token, price: any, auctionStartTime: any, auctionDuration: any) {
-        return (await this.contract.methods.buildAuctionCreationPayload({_paymentTokenRoot: paymentToken.address, _price: price, _auctionStartTime: auctionStartTime, _auctionDuration: auctionDuration, answerId: 0}).call()).value0;
+    async buildPayload(callbackId: number, paymentToken: Token, price: any, auctionStartTime: any, auctionDuration: any) {
+        return (await this.contract.methods.buildAuctionCreationPayload({callbackId: callbackId, paymentToken: paymentToken.address, price: price, auctionStartTime: auctionStartTime, auctionDuration: auctionDuration, answerId: 0}).call()).value0;
     }
 
     async getEvents(event_name: string) {

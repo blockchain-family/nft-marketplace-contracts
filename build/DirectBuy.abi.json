@@ -52,7 +52,7 @@
 				{"name":"newManager","type":"address"},
 				{"name":"value4","type":"address"},
 				{"name":"sendGasTo","type":"address"},
-				{"name":"value6","type":"cell"}
+				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
 			]
@@ -86,7 +86,7 @@
 	"data": [
 		{"key":1,"name":"factoryDirectBuy","type":"address"},
 		{"key":2,"name":"owner","type":"address"},
-		{"key":3,"name":"spentTokenRoot","type":"address"},
+		{"key":3,"name":"spentToken","type":"address"},
 		{"key":4,"name":"nftAddress","type":"address"},
 		{"key":5,"name":"timeTx","type":"uint64"}
 	],
@@ -115,7 +115,7 @@
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"factoryDirectBuy","type":"address"},
 		{"name":"owner","type":"address"},
-		{"name":"spentTokenRoot","type":"address"},
+		{"name":"spentToken","type":"address"},
 		{"name":"nftAddress","type":"address"},
 		{"name":"timeTx","type":"uint64"},
 		{"name":"price","type":"uint128"},

@@ -26,7 +26,7 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransfe
 contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest {
   address static factoryDirectBuy;
   address static owner;
-  address static spentTokenRoot;
+  address static spentToken;
   address static nftAddress;
   uint64 static timeTx;
 
@@ -108,11 +108,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     TvmCell payload
   ) external override {
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-    
-    (address buyer, ) = ExchangePayload.getSenderAndCallId(sender, payload);
-
+    (address buyer,) = ExchangePayload.getSenderAndCallId(sender, payload);
     if (
-        tokenRoot == spentTokenRoot && 
+        tokenRoot == spentToken && 
         msg.sender.value != 0 &&
         msg.sender == spentTokenWallet && 
         amount >= price
@@ -142,10 +140,12 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     address newManager,
     address, /*collection*/
     address sendGasTo,
-    TvmCell /*payload*/
+    TvmCell payload
   ) external override {
     require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+
+    (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
     if (
@@ -184,6 +184,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         flag: 1, 
         bounce: false 
       }(
+        callbackId,
         nftOwner, 
         owner
       );
@@ -196,6 +197,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
           flag: 1, 
           bounce: false 
         }(
+          callbackId,
           nftOwner,
           owner
         );
@@ -210,8 +212,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         nftOwner, 
         sendGasTo, 
         callbacks
-      );
-      
+      ); 
     }
   }
 
@@ -226,7 +227,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       DirectBuyInfo(
         factoryDirectBuy,
         owner,
-        spentTokenRoot,
+        spentToken,
         nftAddress,
         timeTx,
         price,
@@ -311,7 +312,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       TvmCell cellParams = abi.encode(
         factoryDirectBuy,
         owner,
-        spentTokenRoot,
+        spentToken,
         nftAddress,
         timeTx,
         price,

@@ -59,7 +59,7 @@ describe("Test DirectSell contract", async function () {
         it('Deploy DirectSell and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectSell.buildPayload(nft, Math.round(Date.now() / 1000), 30, tokenRoot, spentToken));
+            payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000), 30, tokenRoot, spentToken));
             await sleep(10000);
 
             let callback: CallbackType;
@@ -106,7 +106,7 @@ describe("Test DirectSell contract", async function () {
             it('Deploy DirectSell and cancel', async function () {
                 const spentToken: number = 5000000000;
                 let payload: string;
-                payload = (await factoryDirectSell.buildPayload(nft, Math.round(Date.now() / 1000), 0, tokenRoot, spentToken));
+                payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000), 0, tokenRoot, spentToken));
                 await sleep(10000);
 
                 let callback: CallbackType;

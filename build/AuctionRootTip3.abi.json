@@ -45,10 +45,11 @@
 			"name": "buildAuctionCreationPayload",
 			"inputs": [
 				{"name":"answerId","type":"uint32"},
-				{"name":"_paymentTokenRoot","type":"address"},
-				{"name":"_price","type":"uint128"},
-				{"name":"_auctionStartTime","type":"uint64"},
-				{"name":"_auctionDuration","type":"uint64"}
+				{"name":"callbackId","type":"uint32"},
+				{"name":"paymentToken","type":"address"},
+				{"name":"price","type":"uint128"},
+				{"name":"auctionStartTime","type":"uint64"},
+				{"name":"auctionDuration","type":"uint64"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}

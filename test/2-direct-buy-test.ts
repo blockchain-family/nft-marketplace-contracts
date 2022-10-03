@@ -57,7 +57,7 @@ describe("Test DirectBuy contract", async function() {
         it('Deploy DirectBuy and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(nft, Math.round(Date.now() / 1000), 30));
+            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 30));
             
             await sleep(10000);
             await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
@@ -106,7 +106,7 @@ describe("Test DirectBuy contract", async function() {
         it('Deploy DirectBuy and cancel', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(nft, Math.round(Date.now() / 1000), 30));
+            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 30));
             
             await sleep(10000);
             await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));

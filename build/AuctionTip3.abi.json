@@ -16,7 +16,7 @@
 				{"name":"_auctionStartTime","type":"uint64"},
 				{"name":"_auctionDuration","type":"uint64"},
 				{"name":"_bidDelta","type":"uint16"},
-				{"name":"_paymentTokenRoot","type":"address"},
+				{"name":"_paymentToken","type":"address"},
 				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
@@ -75,7 +75,7 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"_paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{
@@ -193,7 +193,7 @@
 		{
 			"name": "AuctionCreated",
 			"inputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"_paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"}],"name":"value0","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -201,7 +201,7 @@
 		{
 			"name": "AuctionActive",
 			"inputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"_paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"}],"name":"value0","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -262,7 +262,7 @@
 		{"name":"deploymentFee","type":"uint128"},
 		{"name":"marketFee","type":"uint128"},
 		{"name":"marketFeeDecimals","type":"uint8"},
-		{"name":"paymentTokenRoot","type":"address"},
+		{"name":"paymentToken","type":"address"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"auctionStartTime","type":"uint64"},
 		{"name":"auctionDuration","type":"uint64"},

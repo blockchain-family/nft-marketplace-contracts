@@ -26,7 +26,7 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransfe
 
 contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest {
     
-    address paymentTokenRoot;
+    address paymentToken;
     address tokenWallet;
 
     uint64 auctionStartTime; 
@@ -36,7 +36,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     struct AuctionDetails {
         address auctionSubject;
         address subjectOwner;
-        address paymentTokenRoot;
+        address _paymentToken;
         address walletForBids;
         uint64 startTime;
         uint64 duration;
@@ -84,7 +84,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint64 _auctionStartTime,
         uint64 _auctionDuration, 
         uint16 _bidDelta,
-        address _paymentTokenRoot,
+        address _paymentToken,
         address sendGasTo
     ) public {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
@@ -104,13 +104,13 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         maxBidValue = 0;
         bidDelta = _bidDelta;
         nextBidValue = price;
-        paymentTokenRoot = _paymentTokenRoot;
+        paymentToken = _paymentToken;
         
         emit AuctionCreated(buildInfo());
         state = AuctionStatus.Created;
         currentVersion++;
         
-        ITokenRoot(paymentTokenRoot).deployWallet {
+        ITokenRoot(paymentToken).deployWallet {
             value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
             flag: 1,
             callback: AuctionTip3.onTokenWallet
@@ -125,7 +125,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     function onTokenWallet(address value) external {
         require(
             msg.sender.value != 0 && 
-            msg.sender == paymentTokenRoot, 
+            msg.sender == paymentToken, 
             BaseErrors.operation_not_permited
         );
 
@@ -158,7 +158,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             amount >= nextBidValue &&
             msg.sender == tokenWallet &&
             tokenWallet.value != 0 &&
-            paymentTokenRoot == token_root && 
+            paymentToken == token_root && 
             now < auctionEndTime &&
             now >= auctionStartTime &&
             state == AuctionStatus.Active
@@ -296,8 +296,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         }
     }
 
-
-
     function buildPlaceBidPayload(
         uint32 callbackId, 
         address buyer
@@ -316,7 +314,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         return AuctionDetails(
             nft, 
             nftOwner, 
-            paymentTokenRoot, 
+            paymentToken, 
             tokenWallet, 
             auctionStartTime, 
             auctionDuration, 
@@ -358,7 +356,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               maxBidValue,
               bidDelta,
               nextBidValue,
-              paymentTokenRoot,
+              paymentToken,
               state
             );
             

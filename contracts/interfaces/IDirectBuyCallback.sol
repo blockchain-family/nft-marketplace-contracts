@@ -6,7 +6,7 @@ interface IDirectBuyCallback {
         uint32 callbackId,
         address directBuyAddress, 
         address sender, 
-        address tokenRoot,
+        address token,
         address nft, 
         uint64 nonce, 
         uint128 amount
@@ -15,11 +15,12 @@ interface IDirectBuyCallback {
     function directBuyDeployedDeclined(
         uint32 callbackId,
         address sender, 
-        address tokenRoot, 
+        address token, 
         uint128 amount
     ) external;
 
     function directBuySuccess(
+        uint32 callbackId,
         address oldOwner,
         address newOwner
     ) external;

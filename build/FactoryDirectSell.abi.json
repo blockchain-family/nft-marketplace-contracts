@@ -31,6 +31,7 @@
 		{
 			"name": "buildDirectSellCreationPayload",
 			"inputs": [
+				{"name":"callbackId","type":"uint32"},
 				{"name":"_nftAddress","type":"address"},
 				{"name":"_startTime","type":"uint64"},
 				{"name":"durationTime","type":"uint64"},

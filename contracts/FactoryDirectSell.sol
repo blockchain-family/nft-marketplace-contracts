@@ -64,6 +64,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   }
 
   function buildDirectSellCreationPayload(
+    uint32 callbackId,
     address _nftAddress,
     uint64 _startTime,
     uint64 durationTime,
@@ -71,6 +72,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     uint128 _price
   ) external pure returns (TvmCell) {
     TvmBuilder builder;
+    builder.store(callbackId);
     builder.store(_nftAddress);
     builder.store(_startTime);
     builder.store(durationTime);
@@ -92,8 +94,9 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
+    (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
     TvmSlice payloadSlice = payload.toSlice();
-    address nftForSell = payloadSlice.decode(address);
+    (,address nftForSell) = payloadSlice.decode(uint32, address);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
     
@@ -132,6 +135,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         flag: 1, 
         bounce: false 
       }(
+        callbackId,
         directSell,
         msg.sender,
         _paymentToken,
@@ -156,6 +160,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         flag: 1,
         bounce: false
       }(
+        callbackId,
         msg.sender
       );
 

@@ -95,19 +95,21 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         require(newManager == address(this));
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
         bool isDeclined = false;
-        
-        if (payload.toSlice().bits() == 523) {
-            (
-                address _paymentTokenRoot,
-                uint128 _price,
-                uint64 _auctionStartTime,
-                uint64 _auctionDuration
-            ) = payload.toSlice().decode(address, uint128, uint64, uint64);
+
+        TvmSlice payloadSlice = payload.toSlice();
+        (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
+        if (payloadSlice.bits() == 555) {
+            (   
+                ,address paymentToken,
+                uint128 price,
+                uint64 auctionStartTime,
+                uint64 auctionDuration
+            ) = payloadSlice.decode(uint32, address, uint128, uint64, uint64);
             if (
-                _paymentTokenRoot.value > 0 &&
-                _price >= 0 &&
-                _auctionStartTime > 0 &&
-                _auctionDuration > 0 
+                paymentToken.value > 0 &&
+                price >= 0 &&
+                auctionStartTime > 0 &&
+                auctionDuration > 0 
             ) {
                 address offerAddress = new AuctionTip3 {
                     wid: address(this).wid,
@@ -119,17 +121,17 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                         nft: msg.sender
                     }
                 }(
-                    _price,
+                    price,
                     address(this),
                     collection,
                     nftOwner,
                     deploymentFeePart * 2, 
                     marketFee, 
                     marketFeeDecimals,
-                    _auctionStartTime, 
-                    _auctionDuration,
+                    auctionStartTime, 
+                    auctionDuration,
                     auctionBidDelta,
-                    _paymentTokenRoot,
+                    paymentToken,
                     nftOwner
                 );
 
@@ -138,8 +140,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     nftOwner, 
                     msg.sender, 
                     offerAddress,
-                    _price,
-                    _auctionDuration,
+                    price,
+                    auctionDuration,
                     tx.timestamp
                 );
                 
@@ -149,6 +151,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                      flag: 1, 
                      bounce: false 
                 }(
+                    callbackId,
                     offerAddress,
                     offerInfo
                 );
@@ -173,6 +176,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 flag: 1, 
                 bounce: false 
             }(
+                callbackId,
                 nftOwner,
                 msg.sender
             );
@@ -207,14 +211,19 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         return address(tvm.hash(data));
     }
 
-    function buildAuctionCreationPayload (
-        address _paymentTokenRoot,
-        uint128 _price,
-        uint64 _auctionStartTime,
-        uint64 _auctionDuration
+    function buildAuctionCreationPayload(
+        uint32 callbackId,
+        address paymentToken,
+        uint128 price,
+        uint64 auctionStartTime,
+        uint64 auctionDuration
     ) external pure responsible returns(TvmCell) {
         TvmBuilder builder;
-        builder.store(_paymentTokenRoot, _price, _auctionStartTime, _auctionDuration);
+        builder.store(callbackId);
+        builder.store(paymentToken);
+        builder.store(price);
+        builder.store(auctionStartTime);
+        builder.store(auctionDuration);
         return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 

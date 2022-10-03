@@ -3,6 +3,7 @@ pragma ever-solidity >= 0.62.0;
 interface IDirectSellCallback {
     
     function directSellDeployed(
+        uint32 callbackId,
         address directSellAddress,
         address sender, 
         address paymentToken, 
@@ -11,7 +12,7 @@ interface IDirectSellCallback {
         uint128 price
     ) external;
     
-    function directSellDeclined(address sender) external;    
+    function directSellDeclined(uint32 callbackId, address sender) external;    
 
     function directSellSuccess(
         uint32 callbackId,

@@ -293,8 +293,9 @@ describe("Test Auction contract", async function () {
 
             logger.log("");
         });
-        describe("Auction negative testing", async function () {
-            it('Trying to stake before auction starts', async function () {
+    });
+    describe("Auction negative testing", async function () {
+        it('Trying to stake before auction starts', async function () {
                 const spentToken: number = 1000000000;
                 let payload: string;
                 payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000) + 150), 30)).toString();
@@ -327,9 +328,9 @@ describe("Test Auction contract", async function () {
                 await auction.getEvent('AuctionComplete');
                 logger.log("");
 
-            });
-            describe("Auction negative testing", async function () {
-                it('Trying to stake less then auction bid', async function () {
+        });
+            
+        it('Trying to stake less then auction bid', async function () {
                     const spentToken: number = 1000000000;
                     let payload: string;
                     payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 30)).toString();
@@ -363,10 +364,9 @@ describe("Test Auction contract", async function () {
                     await auction.getEvent('AuctionComplete');
                     logger.log("");
 
-                });
-            });
-            describe("Auction negative testing", async function () {
-                it('Trying to stake after auction closed', async function () {
+        });
+            
+        it('Trying to stake after auction closed', async function () {
                     const spentToken: number = 1000000000;
                     let payload: string;
                     payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 30)).toString();
@@ -399,9 +399,6 @@ describe("Test Auction contract", async function () {
 
                     expect(bidPlacedEvent.buyer.toString()).to.be.eq(account1.address.toString());
                     expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1).toString());
-                });
-            });
         });
     });
 });
-

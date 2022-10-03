@@ -293,6 +293,7 @@ describe("Auction bidding variants", async function () {
    
         logger.log("");
         });
+    });
   describe("Auction negative testing", async function () {
     it('Trying to stake before auction starts', async function () {
         const spentToken: number = 1000000000;
@@ -325,10 +326,10 @@ describe("Auction bidding variants", async function () {
         
         await auction.finishAuction(account3);
         await auction.getEvent('AuctionComplete');
-        logger.log("");      
+        logger.log("");    
         
      });
-     describe("Auction negative testing", async function () {
+     
      it('Trying to stake less then auction bid', async function () {
         const spentToken: number = 1000000000;
         let payload: string;
@@ -364,8 +365,8 @@ describe("Auction bidding variants", async function () {
         logger.log("");      
         
      });
-    });
-    describe("Auction negative testing", async function () {
+    
+    
      it('Trying to stake after auction closed', async function () {
         const spentToken: number = 1000000000;
         let payload: string;
@@ -409,6 +410,6 @@ describe("Auction bidding variants", async function () {
 
 
     
-});
-});
+
+
 

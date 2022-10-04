@@ -66,6 +66,10 @@ export class DirectBuy {
         return null;
     }
 
+    async getInfo() {
+        return (await this.contract.methods.getInfo({}).call()).value0;
+    }
+
     async finishBuy(initiator: AccountType) {
         return await initiator.runTarget(
             {

@@ -43,6 +43,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint64 finishTime;
         uint128 _price;
         uint64 _nonce;
+        AuctionStatus status;
     }
 
     struct Bid {
@@ -320,7 +321,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             auctionDuration, 
             auctionEndTime,
             price,
-            nonce_
+            nonce_,
+            state
         );
     }
 

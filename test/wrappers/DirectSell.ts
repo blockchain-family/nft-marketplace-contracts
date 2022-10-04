@@ -67,6 +67,10 @@ export class DirectSell {
         return null;
     }
 
+    async getInfo() {
+        return (await this.contract.methods.getInfo({}).call()).value0;
+    }
+
     async closeSell() {
         return await this.owner.runTarget(
             {

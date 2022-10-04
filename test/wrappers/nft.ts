@@ -21,6 +21,10 @@ export class NftC {
         return new NftC(contract, owner);
     }
 
+    async getInfo() {
+        return (await this.contract.methods.getInfo({answerId: 0}).call());
+    }
+
     async changeManager(initiator: AccountType, newManager: Address, sendGasTo: Address, callbacks: CallbackType[]) {
         return await initiator.runTarget(
             {

@@ -80,6 +80,6 @@ export class Auction {
     }
 
     async getInfo() {
-        return await this.contract.methods.getInfo({}).call();
+        return (await this.contract.methods.getInfo({}).call()).value0;
     }
 }

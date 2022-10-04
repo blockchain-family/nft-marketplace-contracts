@@ -39,7 +39,7 @@ describe("Test Auction contract", async function () {
     it('Deploy account', async function () {
         account1 = await deployAccount(0, 20);
         account2 = await deployAccount(1, 10);
-        account3 = await deployAccount(2, 10);
+        account3 = await deployAccount(2, 30);
         account4 = await deployAccount(3, 20);
         account5 = await deployAccount(4, 20);
     });
@@ -228,6 +228,7 @@ describe("Test Auction contract", async function () {
 
         });
     });
+    
     describe("Auction single rebid", async function () {
         it('Two stake with first user rebid', async function () {
             const spentToken: number = 1000000000;
@@ -294,39 +295,39 @@ describe("Test Auction contract", async function () {
             logger.log("");
         });
     });
+    
     describe("Auction negative testing", async function () {
         it('Trying to stake before auction starts', async function () {
-                const spentToken: number = 1000000000;
-                let payload: string;
-                payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000) + 150), 30)).toString();
+            const spentToken: number = 1000000000;
+            let payload: string;
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)) + 1000, 50)).toString();
 
-                let callback: CallbackType;
-                callback = [
-                    auctionRoot.address,
-                    {
-                        value: locklift.utils.toNano(5),
-                        payload: payload,
-                    },
-                ];
+            let callback: CallbackType;
+            callback = [
+                auctionRoot.address,
+                {
+                    value: locklift.utils.toNano(5),
+                    payload: payload,
+                },
+            ];
 
-                const callbacks: CallbackType[] = [];
-                callbacks.push(callback);
+            const callbacks: CallbackType[] = [];
+            callbacks.push(callback);
 
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
-                await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
-                const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
+            logger.log(auctionDeployedEvent.offerAddress);
+            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-                logger.log(auctionDeployedEvent.offerAddress);
-                auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
-                logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
+            await tokenWallet4.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
+            const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
+            expect(bidPlacedEvent.buyer.toString()).to.be.eq(account4.address.toString());
 
-                await tokenWallet4.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
-                const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
-                expect(bidPlacedEvent.buyer.toString()).to.be.eq(account4.address.toString());
-
-                await auction.finishAuction(account3);
-                await auction.getEvent('AuctionComplete');
-                logger.log("");
+            await auction.finishAuction(account3);
+            await auction.getEvent('AuctionComplete');
+            logger.log("");
 
         });
             

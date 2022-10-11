@@ -66,7 +66,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
   ) public {
     if (msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
       changeState(DirectBuyStatus.Create);
-      tvm.rawReserve(address(this).balance - msg.value, 0);
+      tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
       price = _amount;
       startTime = _startTime;
@@ -153,7 +153,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         msg.sender == nftAddress &&
         msg.value >= (Gas.DIRECT_BUY_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
         currentStatus == DirectBuyStatus.Active &&
-        ((endTime > 0 && now < endTime) || endTime == 0)
+        ((endTime > 0 && now < endTime) || endTime == 0) &&
+        now >= startTime
     ) {
       ITIP4_1NFT(nftAddress).transfer{
         value: Gas.TRANSFER_OWNERSHIP_VALUE, 

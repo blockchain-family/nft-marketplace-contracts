@@ -135,7 +135,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       msg.value >= (Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
       currentStatus == DirectSellStatus.Active &&
       amount >= price &&
-      ((endTime > 0 && now < endTime) || endTime == 0)
+      ((endTime > 0 && now < endTime) || endTime == 0) &&
+      now >= startTime
     ) {
       IDirectSellCallback(owner).directSellSuccess{ 
         value: 0.1 ever, 

@@ -34,7 +34,10 @@ export class NftAuctionCallbacks {
             },
             {
                 name: 'bidPlacedCallback',
-                inputs: [{ name: 'callbackId', type: 'uint32' }],
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nextBidValue', type: 'uint128' }
+                ],
                 outputs: [],
             },
             {

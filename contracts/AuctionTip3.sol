@@ -68,7 +68,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
-    event BidPlaced(address buyer, uint128 value);
+    event BidPlaced(address buyer, uint128 value, uint128 nextBidValue);
     event BidDeclined(address buyer, uint128 value);
     event AuctionComplete(address seller, address buyer, uint128 value); 
     event AuctionCancelled();
@@ -164,10 +164,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             now >= auctionStartTime &&
             state == AuctionStatus.Active
         ) {
-            processBid(callbackId, buyer, amount, original_gas_to);
+            processBid(callbackId, buyer, amount, original_gas_to, nextBidValue);
         } else {
             emit BidDeclined(buyer, amount);
-            sendBidResultCallback(callbackId, buyer, false);
+            sendBidResultCallback(callbackId, buyer, false, 0);
             TvmCell empty;
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
                 amount,
@@ -184,7 +184,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint32 _callbackId,
         address _newBidSender,
         uint128 _bid,
-        address original_gas_to
+        address original_gas_to,
+        uint128 _nextBidValue
     ) private {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         Bid _currentBid = currentBid;
@@ -193,8 +194,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         currentBid = newBid;
         calculateAndSetNextBid();
 
-        emit BidPlaced(_newBidSender, _bid);
-        sendBidResultCallback(_callbackId, _newBidSender, true);
+        emit BidPlaced(_newBidSender, _bid, _nextBidValue);
+        sendBidResultCallback(_callbackId, _newBidSender, true, _nextBidValue);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
@@ -274,7 +275,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     function sendBidResultCallback(
         uint32 callbackId,
         address _callbackTarget,
-        bool _isBidPlaced
+        bool _isBidPlaced,
+        uint128 _nextBidValue
     ) private pure {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
@@ -283,7 +285,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                     flag: 1, 
                     bounce: false 
                 }(
-                    callbackId
+                    callbackId,
+                    _nextBidValue
                 );
             } else {
                 IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{

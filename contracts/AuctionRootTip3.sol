@@ -192,7 +192,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
 
     function getOfferAddress(
         address _nft,
-        uint128 _price,
         uint64 _nonce
     ) 
         internal 
@@ -256,7 +255,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     
     function RequestUpgradeAuction(
         address _nft,
-        uint128 _price,
         uint64 _nonce,
         address sendGasTo
     ) external view onlyOwner {
@@ -266,7 +264,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             address(this).balance - msg.value), 2
         );
 
-        IUpgradableByRequest(getOfferAddress(_nft, _price, _nonce)).upgrade{
+        IUpgradableByRequest(getOfferAddress(_nft, _nonce)).upgrade{
             value: 0,
             flag: 128
         }(offerCode, currentVersionOffer, sendGasTo);      

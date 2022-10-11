@@ -59,7 +59,6 @@
 			"name": "RequestUpgradeAuction",
 			"inputs": [
 				{"name":"_nft","type":"address"},
-				{"name":"_price","type":"uint128"},
 				{"name":"_nonce","type":"uint64"},
 				{"name":"sendGasTo","type":"address"}
 			],

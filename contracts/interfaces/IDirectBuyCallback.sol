@@ -24,5 +24,6 @@ interface IDirectBuyCallback {
         address oldOwner,
         address newOwner
     ) external;
-     
+
+    function directBuyCancelledOnTime(uint32 callbackId) external;
 }

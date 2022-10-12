@@ -192,18 +192,16 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
       changeState(DirectBuyStatus.Filled);
     } else {
-      if (now >= endTime) {
-        IDirectBuyCallback(nftOwner).directBuySuccess{
+      if (endTime > 0 && now >= endTime) {
+        IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
           value: 0.1 ever, 
           flag: 1, 
           bounce: false 
         }(
-          callbackId,
-          nftOwner,
-          owner
+          callbackId
         );
 
-        changeState(DirectBuyStatus.Filled);
+        changeState(DirectBuyStatus.Expired);
       }
 
       ITIP4_1NFT(msg.sender).changeManager{

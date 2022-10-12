@@ -21,5 +21,4 @@ interface IDirectSellCallback {
     ) external;
 
     function directSellCancelledOnTime(uint32 callbackId) external; 
-    
 }

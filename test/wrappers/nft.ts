@@ -29,7 +29,7 @@ export class NftC {
         return await initiator.runTarget(
             {
                 contract: this.contract,
-                value: locklift.utils.toNano(6),
+                value: locklift.utils.toNano(5),
                 flags: 1
             },
             (dd) => dd.methods.changeManager({

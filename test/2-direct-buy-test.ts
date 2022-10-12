@@ -31,7 +31,7 @@ async function Callback(payload:string) {
     callback = [
         directBuy.address,
         {
-            value: locklift.utils.toNano(2),
+            value: locklift.utils.toNano(1),
             payload: '',
         },
     ];
@@ -156,8 +156,11 @@ describe("Test DirectBuy contract", async function() {
             //Хочу проверить, что раньбше времени нельзя совершить прямую покупку, а потом можно
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000)+ 10, 8));
-            await sleep(1000);
+            let startTime = Math.round(Date.now() / 1000) + 5
+            let duration = 8
+            console.log(startTime)
+            console.log(startTime + duration)
+            payload = (await factoryDirectBuy.buildPayload(0, nft, startTime, duration));
             await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -173,12 +176,11 @@ describe("Test DirectBuy contract", async function() {
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks);
             expect(dbActive.to.toString()).to.be.eq('2');
 
-            await sleep(10000);
+            await sleep(15000);
+            console.log(Math.round(Date.now() / 1000))
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks);
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('3');
-            const ownerChanged = await nft.getEvent('OwnerChanged') as any;
-            expect(ownerChanged.newOwner.toString()).to.be.eq(account2.address.toString());
 
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account2.address.toString());

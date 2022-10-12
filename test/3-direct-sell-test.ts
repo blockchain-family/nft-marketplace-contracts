@@ -5,7 +5,6 @@ import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
 
-
 const logger = require('mocha-logger');
 const { expect } = require('chai');
 
@@ -48,7 +47,6 @@ describe("Test DirectSell contract", async function () {
         account2 = await deployAccount(1, 30);
         account3 = await deployAccount(2, 30);
     });
-
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: AccountType[] = [];
         accForNft.push(account1);
@@ -56,17 +54,14 @@ describe("Test DirectSell contract", async function () {
         const [collection, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
     });
-
     it('Deploy TIP-3 token', async function () {
         tokenRoot = await deployTokenRoot('Test', 'Test', account1);
     });
-
     it('Mint TIP-3 token to account', async function () {
         tokenWallet1 = await tokenRoot.mint(startBalanceTW1, account1);
         tokenWallet2 = await tokenRoot.mint(startBalanceTW2, account2);
         tokenWallet3 = await tokenRoot.mint(startBalanceTW2, account3);
     });
-
     it('Deploy FactoryDirectSell', async function () {
         factoryDirectSell = await deployFactoryDirectSell(account1);
         logger.log("");
@@ -115,7 +110,7 @@ describe("Test DirectSell contract", async function () {
 
             logger.log("");
 
-        });
+        }); 
         it('Deploy limited DirectSell and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
@@ -156,7 +151,7 @@ describe("Test DirectSell contract", async function () {
             startBalanceTW3 -= spentToken;
 
             logger.log("");
-        });
+        });  
         it('Deploy limited DirectSell and try to buy before start', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
@@ -200,12 +195,12 @@ describe("Test DirectSell contract", async function () {
             startBalanceTW3 += spentToken;
 
             logger.log("");
-        });
+        });  
         it('Deploy unlimited DirectSell and try to buy before start', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000) + 100, 0, tokenRoot, spentToken));
-            await sleep(1000);
+            let startTime = Math.round(Date.now() / 1000) + 10
+            payload = (await factoryDirectSell.buildPayload(0, nft, startTime, 0, tokenRoot, spentToken));
             let callbacks = await Callback(payload);
 
             await nft.changeManager(account2, factoryDirectSell.address, account2.address, callbacks);
@@ -222,7 +217,7 @@ describe("Test DirectSell contract", async function () {
             let owner = (await nft.getInfo()).owner
             expect(owner.toString()).to.be.eq(account2.address.toString());
 
-            await sleep(10000);
+            await sleep(15000);
             await tokenWallet3.transfer(spentToken, directSell.address, 0, true, '', locklift.utils.toNano(2));
             directSell = await DirectSell.from_addr(dSCreate.directSellAddress, account3);
             const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
@@ -240,7 +235,6 @@ describe("Test DirectSell contract", async function () {
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 + spentToken).toString());
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
-
 
             startBalanceTW2 += spentToken;
             startBalanceTW3 -= spentToken;

@@ -100,6 +100,13 @@ export class NftAuctionCallbacks {
                 outputs: [],
             },
             {
+                name: 'directBuyCancelledOnTime',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                ],
+                outputs: [],
+            },
+            {
                 name: 'directSellDeployed',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },

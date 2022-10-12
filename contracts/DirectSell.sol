@@ -55,7 +55,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo);
   event DirectSellUpgrade();
-
   constructor(
     uint64 _startTime,
     uint64 _durationTime,
@@ -128,7 +127,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     ) = ExchangePayload.getSenderAndCallId(sender, payload);
     
     TvmCell emptyPayload;
-
+        
     if (
       msg.sender.value != 0 &&
       msg.sender == tokenWallet &&
@@ -175,7 +174,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       );
 
     } else {
-      if (now >= endTime) {
+      if (endTime > 0 && now >= endTime) {
         IDirectSellCallback(owner).directSellCancelledOnTime{
           value: 0.1 ever, 
           flag: 1, 
@@ -184,7 +183,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
           callbackId
         );
 
-        changeState(DirectSellStatus.Filled);
+        changeState(DirectSellStatus.Expired);
       }
 
       ITokenWallet(msg.sender).transfer{ 

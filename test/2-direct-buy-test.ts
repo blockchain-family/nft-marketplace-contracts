@@ -110,7 +110,7 @@ describe("Test DirectBuy contract", async function() {
         it('Deploy future DirectBuy and success', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000)+ 50, 30));
+            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000)+ 5, 30));
             await sleep(10000);
             await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
             const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
@@ -134,7 +134,7 @@ describe("Test DirectBuy contract", async function() {
             const callbacks: CallbackType[] = [];
             callbacks.push(callback);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks);
-            const dBFilled = await await directBuy.getEvent('DirectBuyStateChanged') as any;
+            const dBFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dBFilled.to.toString()).to.be.eq('3');
 
             await sleep(51000);

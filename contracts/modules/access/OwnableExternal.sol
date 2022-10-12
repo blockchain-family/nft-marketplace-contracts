@@ -1,4 +1,4 @@
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity = 0.62.0;
 
 /// @title This extension is used to add the owner role to the contract. It is used to manage contracts through external messages.
 abstract contract OwnableExternal {
@@ -13,7 +13,7 @@ abstract contract OwnableExternal {
     }
 
     function owner() public view virtual responsible returns (uint256) {
-        return {value: 0, flag: 64} owner_;
+        return {value: 0, bounce: false, flag: 64} owner_;
     }
 
     function transferOwnership(uint256 newOwner) public virtual onlyOwner {

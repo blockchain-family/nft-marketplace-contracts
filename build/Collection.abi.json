@@ -10,7 +10,8 @@
 				{"name":"codeIndex","type":"cell"},
 				{"name":"codeIndexBasis","type":"cell"},
 				{"name":"owner","type":"address"},
-				{"name":"remainOnNft","type":"uint128"}
+				{"name":"remainOnNft","type":"uint128"},
+				{"name":"json","type":"string"}
 			],
 			"outputs": [
 			]
@@ -135,6 +136,15 @@
 			]
 		},
 		{
+			"name": "getJson",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"json","type":"string"}
+			]
+		},
+		{
 			"name": "totalSupply",
 			"inputs": [
 				{"name":"answerId","type":"uint32"}
@@ -226,6 +236,7 @@
 		{"name":"_supportedInterfaces","type":"optional(cell)"},
 		{"name":"_codeNft","type":"cell"},
 		{"name":"_totalSupply","type":"uint128"},
+		{"name":"_json","type":"string"},
 		{"name":"_codeIndex","type":"cell"},
 		{"name":"_codeIndexBasis","type":"cell"},
 		{"name":"_indexDeployValue","type":"uint128"},

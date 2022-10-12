@@ -1,6 +1,6 @@
-/// We recommend using the compiler version 0.57.1. 
+/// We recommend using the compiler version 0.62.0. 
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity = 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
@@ -99,7 +99,10 @@ abstract contract TIP4_3Nft is TIP4_1Nft, ITIP4_3NFT {
         return {value: 0, flag: 64, bounce: false} tvm.hash(_codeIndex);
     }
 
-    function resolveIndex(address collection, address owner) public view override responsible returns (address index) {
+    function resolveIndex(
+        address collection, 
+        address owner
+    ) public view override responsible returns (address index) {
         TvmCell code = _buildIndexCode(collection, owner);
         TvmCell state = _buildIndexState(code, address(this));
         uint256 hashState = tvm.hash(state);

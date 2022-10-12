@@ -1,6 +1,7 @@
-pragma ton-solidity >=0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 interface IAcceptNftBurnCallback {
+    
     function onAcceptNftBurn(
         address _collection,
         uint256 _id,
@@ -10,4 +11,5 @@ interface IAcceptNftBurnCallback {
         address _remainingGasTo,
         TvmCell _payload
     ) external;
+    
 }

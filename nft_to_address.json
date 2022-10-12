@@ -1,0 +1,28 @@
+  {
+    "collection": {
+            "type": "Basic NFT",
+            "name": "Sample Name",
+            "description": "Description abount NFT collection!",
+            "preview": {
+                "source": "https://",
+                "mimetype": "image/png"
+            },
+            "files": [
+                {
+                    "source": "https://",
+                    "mimetype": "image/png"
+                }
+            ],
+            "external_url": "https://"
+    },
+    "nfts":   
+        [
+            {
+                "address": "",
+                "preview_url":	"https://",
+                "url": "https://",
+                "name": "Test1",
+                "description": "Test 1 nft"
+            }
+        ]
+}

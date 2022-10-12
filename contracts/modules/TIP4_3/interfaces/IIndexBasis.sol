@@ -1,6 +1,9 @@
-pragma ton-solidity >= 0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 interface IIndexBasis {
+   
     function getInfo() external view responsible returns (address collection);
+    
     function destruct(address gasReceiver) external;
+
 }

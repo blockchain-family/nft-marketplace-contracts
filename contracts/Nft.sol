@@ -1,15 +1,14 @@
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
 pragma AbiHeader pubkey;
 
+import './interfaces/IBurnableCollection.sol';
 
 import './modules/TIP4_1/TIP4_1Nft.sol';
 import './modules/TIP4_3/TIP4_3Nft.sol';
 import './modules/TIP4_2/TIP4_2Nft.sol';
-
-import './interfaces/IBurnableCollection.sol';
 
 contract Nft is TIP4_1Nft, TIP4_2Nft, TIP4_3Nft {
 
@@ -69,9 +68,17 @@ contract Nft is TIP4_1Nft, TIP4_2Nft, TIP4_3Nft {
         TIP4_3Nft._deployIndex();
     }
 
-    function burn(address sendGasTo,  address callbackTo, TvmCell callbackPayload) external virtual onlyManager {
+    function burn(
+        address sendGasTo,  
+        address callbackTo, 
+        TvmCell callbackPayload
+    ) external virtual onlyManager {
         tvm.accept();
-        IBurnableCollection(_collection).acceptNftBurn{value: 0 , flag: 128 + 32, bounce: false}(
+        IBurnableCollection(_collection).acceptNftBurn{ 
+            value: 0, 
+            flag: 128 + 32, 
+            bounce: false
+        }(
             _id,
             _owner,
             _manager,

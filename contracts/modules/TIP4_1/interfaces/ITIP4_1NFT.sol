@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 interface ITIP4_1NFT {
 
@@ -36,7 +36,12 @@ interface ITIP4_1NFT {
     /// @return owner Address of NFT owner
     /// @return manager Address of NFT manager
     /// @return collection Address of collection smart contract
-    function getInfo() external view responsible returns(uint256 id, address owner, address manager,  address collection);
+    function getInfo() external view responsible returns(
+        uint256 id, 
+        address owner, 
+        address manager,  
+        address collection
+        );
 
     /// @notice Change NFT owner
     /// @dev Invoked from manager address only
@@ -46,7 +51,11 @@ interface ITIP4_1NFT {
     /// @param newOwner - New owner of NFT
     /// @param sendGasTo - Address to send remaining gas
     /// @param callbacks - Callbacks array to send by addresses. It can be empty.
-    function changeOwner(address newOwner, address sendGasTo, mapping(address => CallbackParams) callbacks) external;
+    function changeOwner(
+        address newOwner, 
+        address sendGasTo, 
+        mapping(address => CallbackParams) callbacks
+    ) external;
 
     /// @notice Change NFT manager
     /// @dev Invoked from manager address only
@@ -54,7 +63,11 @@ interface ITIP4_1NFT {
     /// @param newManager - New manager of NFT
     /// @param sendGasTo - Address to send remaining gas
     /// @param callbacks - Callbacks array to send by addresses. It can be empty.
-    function changeManager(address newManager, address sendGasTo, mapping(address => CallbackParams)  callbacks) external;
+    function changeManager(
+        address newManager, 
+        address sendGasTo, 
+        mapping(address => CallbackParams)  callbacks
+    ) external;
 
     /// @notice Change NFT owner and manager
     /// @dev Invoked from manager address only
@@ -63,5 +76,10 @@ interface ITIP4_1NFT {
     /// @param to - New NFT owner and manager
     /// @param sendGasTo Address to send remaining gas
     /// @param callbacks Callbacks array to send by addresses. It can be empty
-    function transfer(address to, address sendGasTo, mapping(address => CallbackParams) callbacks) external;
+    function transfer(
+        address to, 
+        address sendGasTo, 
+        mapping(address => CallbackParams) callbacks
+    ) external;
+    
 }

@@ -1,0 +1,158 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "buildDirectBuyCreationPayload",
+			"inputs": [
+				{"name":"callbackId","type":"uint32"},
+				{"name":"nft","type":"address"},
+				{"name":"startTime","type":"uint64"},
+				{"name":"durationTime","type":"uint64"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "setCodeTokenPlatform",
+			"inputs": [
+				{"name":"_tokenPlatformCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setCodeDirectBuy",
+			"inputs": [
+				{"name":"_directBuyCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"tokenRoot","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"originalGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "RequestUpgradeDirectSell",
+			"inputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"spentToken","type":"address"},
+				{"name":"_nft","type":"address"},
+				{"name":"_timeTx","type":"uint64"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "transferOwnership",
+			"inputs": [
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"}
+	],
+	"events": [
+		{
+			"name": "DirectBuyDeployed",
+			"inputs": [
+				{"name":"directBuyAddress","type":"address"},
+				{"name":"sender","type":"address"},
+				{"name":"token","type":"address"},
+				{"name":"nft","type":"address"},
+				{"name":"nonce","type":"uint64"},
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "DirectBuyDeclined",
+			"inputs": [
+				{"name":"sender","type":"address"},
+				{"name":"token","type":"address"},
+				{"name":"amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "FactoryDirectBuyUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "OwnershipTransferred",
+			"inputs": [
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"owner_","type":"address"},
+		{"name":"nonce_","type":"uint64"},
+		{"name":"tokenPlatformCode","type":"cell"},
+		{"name":"directBuyCode","type":"cell"},
+		{"name":"currentVersion","type":"uint32"},
+		{"name":"currectVersionDirectBuy","type":"uint32"}
+	]
+}

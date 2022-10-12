@@ -1,0 +1,1671 @@
+.version sol 0.62.0
+
+.macro constructor
+DROP
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7_with_init_storage$
+}
+GETGLOB 6
+THROWIF 51
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDU 128
+LDU 64
+LDU 64
+LDMSGADDR
+ENDS
+.loc ../contracts/DirectBuy.sol, 67
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+GETGLOB 9
+GETGLOB 10
+SDEQ
+AND
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 68
+	PUSHINT 0
+	CALLREF {
+		CALL $changeState_268f1153_internal_macro$
+	}
+	.loc ../contracts/DirectBuy.sol, 69
+	PUSHINT 1000000000
+	PUSHINT 0
+	RAWRESERVE
+	.loc ../contracts/DirectBuy.sol, 71
+	PUSH S3
+	SETGLOB 15
+	.loc ../contracts/DirectBuy.sol, 72
+	PUSH S2
+	SETGLOB 16
+	.loc ../contracts/DirectBuy.sol, 73
+	OVER
+	SETGLOB 17
+	.loc ../contracts/DirectBuy.sol, 74
+	PUSH S2
+	GTINT 0
+	PUSH S2
+	GTINT 0
+	AND
+	PUSHCONT {
+		.loc ../contracts/DirectBuy.sol, 75
+		BLKPUSH 2, 2
+		ADD
+		UFITS 64
+		SETGLOB 18
+		.loc ../contracts/DirectBuy.sol, 0
+	}
+	IF
+	.loc ../contracts/DirectBuy.sol, 77
+	DUP
+	SETGLOB 19
+	.loc ../contracts/DirectBuy.sol, 79
+	GETGLOB 21
+	INC
+	UFITS 32
+	SETGLOB 21
+}
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 81
+	GETGLOB 9
+	NEWC
+	STSLICECONST x42_
+	STSLICE
+	PUSHINT 111
+	STZEROES
+	ENDC
+	PUSHINT 160
+	SENDRAWMSG
+}
+IFELSE
+.loc ../contracts/DirectBuy.sol, 0
+BLKDROP 4
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro getTypeContract
+DROP
+GETGLOB 6
+THROWIFNOT 76
+.loc ../contracts/DirectBuy.sol, 94
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $getTypeContract_6c9a92ae_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 2568476738
+	STUR 130
+	STREF
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.macro getTypeContract_6c9a92ae_internal_macro
+.loc ../contracts/DirectBuy.sol, 95
+PUSHREF {
+	.blob x446972656374427579
+}
+.loc ../contracts/DirectBuy.sol, 0
+
+.macro getInfo
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectBuy.sol, 98
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $getInfo_5a9b0b89_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 1
+	STUR 98
+	SWAP
+	NEWC
+	STSLICECONST x99f66c2d
+	SWAP
+	UNTUPLE 12
+	REVERSE 13, 0
+	STSLICE
+	ROLLREV 11
+	NEWC
+	STSLICE
+	ROLLREV 10
+	NEWC
+	STSLICE
+	ROLLREV 9
+	NEWC
+	STSLICE
+	STU 64
+	STU 128
+	ROLLREV 6
+	NEWC
+	STSLICE
+	STU 8
+	ROLLREV 4
+	NEWC
+	STSLICE
+	STU 64
+	STU 64
+	STU 64
+	STBREFR
+	STBREFR
+	STBREFR
+	STBREFR
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.macro getInfo_5a9b0b89_internal_macro
+.loc ../contracts/DirectBuy.sol, 99
+CALL $buildInfo_38a4648d_internal_macro$
+.loc ../contracts/DirectBuy.sol, 0
+
+.macro onAcceptTokensTransfer
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectBuy.sol, 102
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+LDU 128
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $onAcceptTokensTransfer_e63f2284_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro onAcceptTokensTransfer_e63f2284_internal_macro
+.loc ../contracts/DirectBuy.sol, 110
+PUSHINT 1000000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/DirectBuy.sol, 111
+ROLL 3
+SWAP
+CALLREF {
+	CALL $ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro$
+}
+DROP
+.loc ../contracts/DirectBuy.sol, 112
+ROLL 4
+GETGLOB 12
+SDEQ
+DUP
+PUSHCONT {
+	DROP
+	GETGLOB 9
+	PARSEMSGADDR
+	INDEX 3
+	PLDU 256
+	NEQINT 0
+	GETGLOB 9
+	GETGLOB 19
+	SDEQ
+	PUSH S5
+	GETGLOB 15
+	GEQ
+	AND
+	AND
+}
+IF
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 118
+	PUSHINT 2
+	CALLREF {
+		CALL $changeState_268f1153_internal_macro$
+	}
+}
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 120
+	PUSHREF {
+	}
+	.loc ../contracts/DirectBuy.sol, 121
+	TRUE
+	PUSH S3
+	PUSHINT 0
+	PUSH2 S4, S7
+	GETGLOB 9
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	PUSHINT 1
+	STUR 111
+	ROLLREV 6
+	NEWC
+	STSLICECONST x73e22143
+	STU 128
+	STSLICE
+	STU 128
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STI 1
+	STREF
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHPOW2 7
+	SENDRAWMSG
+}
+IFELSE
+.loc ../contracts/DirectBuy.sol, 0
+BLKDROP 4
+
+.macro onNftChangeManager
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectBuy.sol, 136
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDU 256
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $onNftChangeManager_3b8ea82d_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro onNftChangeManager_3b8ea82d_internal_macro
+.loc ../contracts/DirectBuy.sol, 145
+ROLL 3
+MYADDR
+SDEQ
+THROWIFNOT 301
+.loc ../contracts/DirectBuy.sol, 146
+PUSHINT 1000000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/DirectBuy.sol, 148
+PUSHREFSLICE {
+	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+}
+SWAP
+CALLREF {
+	CALL $ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro$
+}
+NIP
+.loc ../contracts/DirectBuy.sol, 150
+NEWDICT
+.loc ../contracts/DirectBuy.sol, 151
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+GETGLOB 9
+GETGLOB 13
+SDEQ
+AND
+DUP
+PUSHCONT {
+	DROP
+	DEPTH
+	ADDCONST -2
+	PICK
+	PUSHINT 1000000000
+	PUSHINT 500000000
+	ADD
+	UFITS 128
+	GEQ
+	GETGLOB 20
+	EQINT 2
+	GETGLOB 18
+	GTINT 0
+	NOW
+	GETGLOB 18
+	LESS
+	AND
+	GETGLOB 18
+	EQINT 0
+	OR
+	NOW
+	GETGLOB 16
+	GEQ
+	AND
+	AND
+	AND
+}
+IF
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 159
+	PUSH2 S0, S2
+	GETGLOB 11
+	GETGLOB 13
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	PUSHINT 2966078354328462592422700595397985988247553
+	STUR 143
+	ROLLREV 3
+	NEWC
+	STSLICECONST x11dd9e92
+	STSLICE
+	ROTREV
+	NEWC
+	STSLICE
+	STDICT
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+	.loc ../contracts/DirectBuy.sol, 169
+	PUSHREF {
+	}
+	.loc ../contracts/DirectBuy.sol, 170
+	FALSE
+	PUSH S4
+	PUSHINT 100000000
+	PUSH S9
+	GETGLOB 15
+	GETGLOB 19
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	PUSHINT 1
+	STUR 111
+	ROLLREV 6
+	NEWC
+	STSLICECONST x73e22143
+	STU 128
+	STSLICE
+	STU 128
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STI 1
+	STREF
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 64
+	SENDRAWMSG
+	.loc ../contracts/DirectBuy.sol, 183
+	GETGLOB 11
+	PUSH3 S6, S2, S6
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	PUSHINT 2803819077499249229031122585109857988247553
+	STUR 143
+	ROLLREV 3
+	NEWC
+	STSLICECONST x3e9a6c48
+	STU 32
+	STSLICE
+	SWAP
+	NEWC
+	STSLICE
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+	.loc ../contracts/DirectBuy.sol, 193
+	PUSHINT 3
+	CALLREF {
+		CALL $changeState_268f1153_internal_macro$
+	}
+}
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 195
+	NOW
+	GETGLOB 18
+	GEQ
+	PUSHCONT {
+		.loc ../contracts/DirectBuy.sol, 196
+		GETGLOB 11
+		PUSH3 S6, S2, S6
+		FALSE
+		NEWC
+		STSLICECONST x6_
+		STI 1
+		STSLICECONST x1_
+		STSLICE
+		PUSHINT 2803819077499249229031122585109857988247553
+		STUR 143
+		ROLLREV 3
+		NEWC
+		STSLICECONST x3e9a6c48
+		STU 32
+		STSLICE
+		SWAP
+		NEWC
+		STSLICE
+		STBREFR
+		STBREFR
+		ENDC
+		PUSHINT 1
+		SENDRAWMSG
+		.loc ../contracts/DirectBuy.sol, 206
+		PUSHINT 3
+		CALLREF {
+			CALL $changeState_268f1153_internal_macro$
+		}
+		.loc ../contracts/DirectBuy.sol, 0
+	}
+	IF
+	.loc ../contracts/DirectBuy.sol, 209
+	PUSH3 S0, S2, S5
+	GETGLOB 9
+	NEWC
+	STSLICECONST x62_
+	STSLICE
+	PUSHINT 1
+	STUR 111
+	ROLLREV 3
+	NEWC
+	STSLICECONST x09158dea
+	STSLICE
+	ROTREV
+	NEWC
+	STSLICE
+	STDICT
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHPOW2 7
+	SENDRAWMSG
+}
+IFELSE
+.loc ../contracts/DirectBuy.sol, 0
+BLKDROP 7
+
+.globl	changeState_268f1153_internal
+.type	changeState_268f1153_internal, @function
+CALL $changeState_268f1153_internal_macro$
+
+.macro changeState_268f1153_internal_macro
+.loc ../contracts/DirectBuy.sol, 221
+GETGLOB 20
+.loc ../contracts/DirectBuy.sol, 222
+OVER
+SETGLOB 20
+.loc ../contracts/DirectBuy.sol, 223
+CALLREF {
+	CALL $buildInfo_38a4648d_internal_macro$
+}
+ROTREV
+PUSHSLICE xc0000000000000000000000001
+NEWC
+STSLICE
+ROLLREV 3
+NEWC
+STSLICECONST x4de584ce
+STU 8
+STU 8
+SWAP
+UNTUPLE 12
+REVERSE 13, 0
+STSLICE
+ROLLREV 11
+NEWC
+STSLICE
+ROLLREV 10
+NEWC
+STSLICE
+ROLLREV 9
+NEWC
+STSLICE
+STU 64
+STU 128
+ROLLREV 6
+NEWC
+STSLICE
+STU 8
+ROLLREV 4
+NEWC
+STSLICE
+STU 64
+STU 64
+STU 64
+STBREFR
+STBREFR
+STBREFR
+STBREFR
+STBREFR
+STBREFR
+ENDC
+PUSHINT 0
+SENDRAWMSG
+.loc ../contracts/DirectBuy.sol, 0
+
+.globl	buildInfo_38a4648d_internal
+.type	buildInfo_38a4648d_internal, @function
+CALL $buildInfo_38a4648d_internal_macro$
+
+.macro buildInfo_38a4648d_internal_macro
+.loc ../contracts/DirectBuy.sol, 228
+GETGLOB 10
+GETGLOB 11
+GETGLOB 12
+GETGLOB 13
+GETGLOB 14
+GETGLOB 15
+GETGLOB 19
+GETGLOB 20
+GETGLOB 9
+GETGLOB 16
+GETGLOB 17
+GETGLOB 18
+TUPLE 12
+.loc ../contracts/DirectBuy.sol, 0
+
+.macro finishBuy
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectBuy.sol, 244
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $finishBuy_dbf76a5f_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.globl	finishBuy_dbf76a5f_internal
+.type	finishBuy_dbf76a5f_internal, @function
+CALL $finishBuy_dbf76a5f_internal_macro$
+
+.macro finishBuy_dbf76a5f_internal_macro
+.loc ../contracts/DirectBuy.sol, 245
+GETGLOB 20
+EQINT 2
+THROWIFNOT 303
+.loc ../contracts/DirectBuy.sol, 249
+NOW
+GETGLOB 18
+GEQ
+THROWIFNOT 304
+.loc ../contracts/DirectBuy.sol, 250
+DEPTH
+ADDCONST -2
+PICK
+PUSHINT 1000000000
+GEQ
+THROWIFNOT 104
+.loc ../contracts/DirectBuy.sol, 252
+PUSHINT 5
+CALLREF {
+	CALL $changeState_268f1153_internal_macro$
+}
+.loc ../contracts/DirectBuy.sol, 254
+PUSHREF {
+}
+.loc ../contracts/DirectBuy.sol, 255
+TRUE
+ROT
+PUSHINT 0
+GETGLOB 11
+GETGLOB 15
+GETGLOB 9
+FALSE
+NEWC
+STSLICECONST x6_
+STI 1
+STSLICECONST x1_
+STSLICE
+PUSHINT 1
+STUR 111
+ROLLREV 6
+NEWC
+STSLICECONST x73e22143
+STU 128
+STSLICE
+STU 128
+ROLLREV 3
+NEWC
+STSLICE
+STI 1
+STREF
+STBREFR
+STBREFR
+ENDC
+PUSHPOW2 7
+SENDRAWMSG
+.loc ../contracts/DirectBuy.sol, 0
+
+.macro closeBuy
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectBuy.sol, 269
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $closeBuy_c6ab5cdc_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro closeBuy_c6ab5cdc_internal_macro
+.loc ../contracts/DirectBuy.sol, 86
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+GETGLOB 9
+GETGLOB 11
+SDEQ
+AND
+THROWIFNOT 302
+.loc ../contracts/DirectBuy.sol, 270
+GETGLOB 20
+EQINT 2
+THROWIFNOT 303
+.loc ../contracts/DirectBuy.sol, 275
+PUSHINT 4
+CALLREF {
+	CALL $changeState_268f1153_internal_macro$
+}
+.loc ../contracts/DirectBuy.sol, 277
+PUSHREF {
+}
+.loc ../contracts/DirectBuy.sol, 278
+TRUE
+GETGLOB 11
+PUSHINT 0
+GETGLOB 11
+GETGLOB 15
+GETGLOB 19
+FALSE
+NEWC
+STSLICECONST x6_
+STI 1
+STSLICECONST x1_
+STSLICE
+PUSHINT 1
+STUR 111
+ROLLREV 6
+NEWC
+STSLICECONST x73e22143
+STU 128
+STSLICE
+STU 128
+ROLLREV 3
+NEWC
+STSLICE
+STI 1
+STREF
+STBREFR
+STBREFR
+ENDC
+PUSHPOW2 7
+SENDRAWMSG
+.loc ../contracts/DirectBuy.sol, 0
+
+.macro upgrade
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectBuy.sol, 292
+OVER
+PUSHCONT {
+	LDREF
+	LDU 32
+	LDREF
+	ENDS
+	CTOS
+}
+PUSHCONT {
+	LDREF
+	LDU 32
+}
+IFELSE
+LDMSGADDR
+ENDS
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $upgrade_fb9d1513_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro upgrade_fb9d1513_internal_macro
+.loc ../contracts/DirectBuy.sol, 297
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+GETGLOB 9
+GETGLOB 10
+SDEQ
+AND
+THROWIFNOT 305
+.loc ../contracts/DirectBuy.sol, 303
+GETGLOB 21
+ROT
+EQUAL
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 304
+	PUSHINT 1000000000
+	PUSHINT 0
+	RAWRESERVE
+	.loc ../contracts/DirectBuy.sol, 305
+	DUP
+	NEWC
+	STSLICECONST x42_
+	STSLICE
+	PUSHINT 111
+	STZEROES
+	ENDC
+	PUSHINT 130
+	SENDRAWMSG
+}
+PUSHCONT {
+	.loc ../contracts/DirectBuy.sol, 311
+	PUSHREF {
+		.blob xc0000000000000000000000000549a335b
+	}
+	PUSHINT 0
+	SENDRAWMSG
+	.loc ../contracts/DirectBuy.sol, 313
+	GETGLOB 21
+	GETGLOB 20
+	GETGLOB 19
+	GETGLOB 18
+	GETGLOB 17
+	GETGLOB 16
+	GETGLOB 15
+	GETGLOB 14
+	GETGLOB 13
+	GETGLOB 12
+	GETGLOB 11
+	GETGLOB 10
+	NEWC
+	STSLICE
+	ROLLREV 11
+	NEWC
+	STSLICE
+	ROLLREV 10
+	NEWC
+	STSLICE
+	ROLLREV 9
+	NEWC
+	STSLICE
+	STU 64
+	STU 128
+	STU 64
+	STU 64
+	STU 64
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STU 8
+	STU 32
+	STBREFR
+	STBREFR
+	STBREFR
+	STBREFR
+	ENDC
+	.loc ../contracts/DirectBuy.sol, 328
+	PUSH S2
+	SETCODE
+	.loc ../contracts/DirectBuy.sol, 329
+	PUSH S2
+	CTOS
+	DUP
+	PUSHSLICE x8adb35
+	SDEQ
+	PUSHCONT {
+		PLDREFIDX 1
+		CTOS
+	}
+	IF
+	PLDREF
+	CTOS
+	BLESS
+	POP C3
+	.loc ../contracts/DirectBuy.sol, 331
+	CALLREF {
+		CALL $:onCodeUpgrade$
+	}
+}
+IFELSE
+.loc ../contracts/DirectBuy.sol, 0
+DROP2
+
+.internal-alias :onCodeUpgrade, 2
+.internal :onCodeUpgrade
+DROP
+.loc ../contracts/DirectBuy.sol, 0
+CALLREF {
+	CALL $c7_to_c4$
+}
+COMMIT
+THROW 0
+
+.macro c4_to_c7
+PUSHROOT
+CTOS
+LDU 256 ; pubkey c4
+LDU 64 ; pubkey timestamp c4
+LDU 1 ; ctor flag
+NIP
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDU 64
+LDU 128
+LDU 64
+LDU 64
+LDU 64
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDU 8
+LDU 32
+ENDS
+SETGLOB 21
+SETGLOB 20
+SETGLOB 19
+SETGLOB 18
+SETGLOB 17
+SETGLOB 16
+SETGLOB 15
+SETGLOB 14
+SETGLOB 13
+SETGLOB 12
+SETGLOB 11
+SETGLOB 10
+SETGLOB 3
+SETGLOB 2
+
+.macro c4_to_c7_with_init_storage
+PUSHROOT
+CTOS
+SBITS
+GTINT 1
+PUSHCONT {
+	PUSHINT 0
+	PUSHROOT
+	CTOS
+	PLDDICT ; D
+	PUSHINT 1
+	OVER
+	PUSHINT 64
+	DICTUGET
+	PUSHCONT {
+		PUSHREFSLICE {
+			.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+		}
+	}
+	IFNOT
+	PUSHINT 2
+	PUSH S2
+	PUSHINT 64
+	DICTUGET
+	PUSHCONT {
+		PUSHREFSLICE {
+			.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+		}
+	}
+	IFNOT
+	PUSHINT 3
+	PUSH S3
+	PUSHINT 64
+	DICTUGET
+	PUSHCONT {
+		PUSHREFSLICE {
+			.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+		}
+	}
+	IFNOT
+	PUSHINT 4
+	PUSH S4
+	PUSHINT 64
+	DICTUGET
+	PUSHCONT {
+		PUSHREFSLICE {
+			.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+		}
+	}
+	IFNOT
+	PUSHINT 5
+	PUSH S5
+	PUSHINT 64
+	DICTUGET
+	ZEROSWAPIFNOT
+	PUSHCONT {
+		PLDU 64
+	}
+	IF
+	PUSHINT 0
+	BLKPUSH 3, 0
+	PUSHREFSLICE {
+		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+	}
+	PUSHINT 0
+	DUP
+	SETGLOB 21
+	SETGLOB 20
+	SETGLOB 19
+	SETGLOB 18
+	SETGLOB 17
+	SETGLOB 16
+	SETGLOB 15
+	SETGLOB 14
+	SETGLOB 13
+	SETGLOB 12
+	SETGLOB 11
+	SETGLOB 10
+	PUSHINT 64
+	DICTUGET
+	THROWIFNOT 61
+	PLDU 256
+	SETGLOB 2
+	PUSHINT 0 ; timestamp
+	SETGLOB 3
+}
+IFREFELSE {
+	CALL $c4_to_c7$
+}
+
+.macro c7_to_c4
+GETGLOB 21
+GETGLOB 20
+GETGLOB 19
+GETGLOB 18
+GETGLOB 17
+GETGLOB 16
+GETGLOB 15
+GETGLOB 14
+GETGLOB 13
+GETGLOB 12
+GETGLOB 11
+GETGLOB 10
+GETGLOB 3
+GETGLOB 2
+NEWC
+STU 256
+STU 64
+STONE
+STSLICE
+ROLLREV 11
+NEWC
+STSLICE
+ROLLREV 10
+NEWC
+STSLICE
+ROLLREV 9
+NEWC
+STSLICE
+STU 64
+STU 128
+STU 64
+STU 64
+STU 64
+ROLLREV 3
+NEWC
+STSLICE
+STU 8
+STU 32
+STBREFR
+STBREFR
+STBREFR
+STBREFR
+ENDC
+POPROOT
+
+.macro upd_only_time_in_c4
+PUSHROOT
+CTOS
+LDU 256
+LDU 64
+NIP
+GETGLOB 3
+ROT
+NEWC
+STU 256
+STU 64
+STSLICE
+ENDC
+POPROOT
+
+.internal-alias :main_internal, 0
+.internal :main_internal
+PUSHROOT
+CTOS
+SBITS
+NEQINT 1
+SETGLOB 6
+PUSH S2
+CTOS
+LDU 4 ; bounced tail
+LDMSGADDR ; bounced src tail
+DROP
+SETGLOB 9
+MODPOW2 1
+IFRET
+OVER
+SEMPTY ; isEmpty
+IFJMPREF {
+	GETGLOB 6
+	THROWIFNOT 76
+}
+OVER
+LDUQ 32  ; [funcId] body' ok
+THROWIFNOT 60
+OVER
+IFNOTJMPREF {
+	GETGLOB 6
+	THROWIFNOT 76
+}
+SWAP
+CALLREF {
+	CALL $public_function_selector$
+}
+THROW 60
+
+.internal-alias :main_external, -1
+.internal :main_external
+PUSHROOT
+CTOS
+SBITS
+NEQINT 1
+SETGLOB 6
+PUSHREFSLICE {
+	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+}
+SETGLOB 9
+OVER
+CALLREF {
+	CALL $c4_to_c7_with_init_storage$
+}
+LDU 1 ; haveSign msgSlice
+SWAP
+PUSHCONT {
+	PUSHPOW2 9
+	LDSLICEX ; signatureSlice msgSlice
+	DUP
+	HASHSU ; signatureSlice msgSlice hashMsgSlice
+	SWAP
+	LDU 1 ; signatureSlice hashMsgSlice hasPubkey msgSlice
+	SWAP
+	PUSHCONT {
+		LDU 256 ; signatureSlice hashMsgSlice pubkey msgSlice
+		XCHG S3
+		SWAP
+	}
+	PUSHCONT {
+		XCHG S2
+		GETGLOB 2
+	}
+	IFELSE
+	CHKSIGNU ; msgSlice isSigned
+	THROWIFNOT 40
+}
+PUSHCONT {
+	LDU 1 ; hasPubkey msgSlice
+	SWAP
+	THROWIF 58
+}
+IFELSE
+LDU 64 ; timestamp msgSlice
+SWAP
+CALL $replay_protection_macro$
+LDU 32 ; expireAt msgSlice
+SWAP
+NOW ; msgSlice expireAt now
+GREATER ; msgSlice expireAt>now
+THROWIFNOT 57
+LDU 32 ; funcId body
+SWAP
+CALLREF {
+	CALL $public_function_selector$
+}
+THROW 60
+
+.globl	ExchangePayload_with_obj_getSenderAndCallId_b6ff786b
+.type	ExchangePayload_with_obj_getSenderAndCallId_b6ff786b, @function
+CALL $ExchangePayload_with_obj_getSenderAndCallId_b6ff786b_macro$
+
+.macro ExchangePayload_with_obj_getSenderAndCallId_b6ff786b_macro
+.loc ../contracts/libraries/ExchangePayload.sol, 13
+PUSHINT 0
+.loc ../contracts/libraries/ExchangePayload.sol, 14
+BLKPUSH 2, 2
+.loc ../contracts/libraries/ExchangePayload.sol, 17
+CALLREF {
+	CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 19
+	PUSH S2
+	CALLREF {
+		CALL $EventDataDecoder_no_obj_decode_54438b56_macro$
+	}
+	.loc ../contracts/libraries/ExchangePayload.sol, 20
+	DUP
+	INDEX 8
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 23
+	SWAP
+	SECOND
+	POP S2
+	.loc ../contracts/libraries/ExchangePayload.sol, 26
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 27
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 30
+	PUSH S2
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 33
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 34
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+IFELSE
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+DROP
+.loc ../contracts/libraries/ExchangePayload.sol, 38
+SWAP
+BLKDROP2 1, 2
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+
+.globl	ExchangePayload_no_obj_getSenderAndCallId_b6ff786b
+.type	ExchangePayload_no_obj_getSenderAndCallId_b6ff786b, @function
+CALL $ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro$
+
+.macro ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro
+.loc ../contracts/libraries/ExchangePayload.sol, 13
+PUSHINT 0
+.loc ../contracts/libraries/ExchangePayload.sol, 14
+ROT
+.loc ../contracts/libraries/ExchangePayload.sol, 17
+PUSH S2
+CALLREF {
+	CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 19
+	PUSH S2
+	CALLREF {
+		CALL $EventDataDecoder_no_obj_decode_54438b56_macro$
+	}
+	.loc ../contracts/libraries/ExchangePayload.sol, 20
+	DUP
+	INDEX 8
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 23
+	SWAP
+	SECOND
+	POP S2
+	.loc ../contracts/libraries/ExchangePayload.sol, 26
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 27
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 30
+	PUSH S2
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 33
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 34
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+IFELSE
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+DROP
+.loc ../contracts/libraries/ExchangePayload.sol, 38
+SWAP
+BLKDROP2 1, 2
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+
+.globl	EventDataDecoder_with_obj_isValid_47a0ea0d
+.type	EventDataDecoder_with_obj_isValid_47a0ea0d, @function
+CALL $EventDataDecoder_with_obj_isValid_47a0ea0d_macro$
+
+.macro EventDataDecoder_with_obj_isValid_47a0ea0d_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
+DUP
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
+DUP
+PUSHINT 904
+PUSHINT 1
+SCHKBITREFSQ
+DUP
+PUSHCONT {
+	DROP
+	LDREFRTOS
+	PUSHINT 520
+	PUSHINT 1
+	SCHKBITREFSQ
+}
+IF
+NIP
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_no_obj_isValid_47a0ea0d
+.type	EventDataDecoder_no_obj_isValid_47a0ea0d, @function
+CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+
+.macro EventDataDecoder_no_obj_isValid_47a0ea0d_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
+DUP
+PUSHINT 904
+PUSHINT 1
+SCHKBITREFSQ
+DUP
+PUSHCONT {
+	DROP
+	LDREFRTOS
+	PUSHINT 520
+	PUSHINT 1
+	SCHKBITREFSQ
+}
+IF
+NIP
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_with_obj_decode_54438b56
+.type	EventDataDecoder_with_obj_decode_54438b56, @function
+CALL $EventDataDecoder_with_obj_decode_54438b56_macro$
+
+.macro EventDataDecoder_with_obj_decode_54438b56_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 34
+DUP
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 35
+LDREFRTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 37
+OVER
+LDU 128
+LDI 8
+POP S4
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 39
+XCPU S1, S3
+LDU 256
+POP S5
+PUSH S2
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 256
+POP S6
+PUSH S3
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+ROLL 5
+PLDU 256
+ROLL 4
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 128
+POP S6
+PUSH S5
+LDU 128
+POP S7
+PUSH S6
+LDU 8
+POP S8
+PUSH S7
+LDU 128
+POP S9
+PUSH S8
+LDU 128
+POP S10
+PAIR
+ROLL 8
+PLDREF
+TUPLE 9
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_no_obj_decode_54438b56
+.type	EventDataDecoder_no_obj_decode_54438b56, @function
+CALL $EventDataDecoder_no_obj_decode_54438b56_macro$
+
+.macro EventDataDecoder_no_obj_decode_54438b56_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 34
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 35
+LDREFRTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 37
+OVER
+LDU 128
+LDI 8
+POP S4
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 39
+XCPU S1, S3
+LDU 256
+POP S5
+PUSH S2
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 256
+POP S6
+PUSH S3
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+ROLL 5
+PLDU 256
+ROLL 4
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 128
+POP S6
+PUSH S5
+LDU 128
+POP S7
+PUSH S6
+LDU 8
+POP S8
+PUSH S7
+LDU 128
+POP S9
+PUSH S8
+LDU 128
+POP S10
+PAIR
+ROLL 8
+PLDREF
+TUPLE 9
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.macro public_function_selector
+DUP
+PUSHINT 1688565960
+LEQ
+IFJMPREF {
+	DUP
+	PUSHINT 420993090
+	EQUAL
+	IFJMPREF {
+		CALL $getTypeContract$
+	}
+	DUP
+	PUSHINT 435579949
+	EQUAL
+	IFJMPREF {
+		CALL $getInfo$
+	}
+	DUP
+	PUSHINT 601546343
+	EQUAL
+	IFJMPREF {
+		CALL $onNftChangeManager$
+	}
+	DUP
+	PUSHINT 1688565960
+	EQUAL
+	IFJMPREF {
+		CALL $upgrade$
+	}
+}
+DUP
+PUSHINT 2056408247
+LEQ
+IFJMPREF {
+	DUP
+	PUSHINT 1755262835
+	EQUAL
+	IFJMPREF {
+		CALL $finishBuy$
+	}
+	DUP
+	PUSHINT 1893244873
+	EQUAL
+	IFJMPREF {
+		CALL $onAcceptTokensTransfer$
+	}
+	DUP
+	PUSHINT 2051490787
+	EQUAL
+	IFJMPREF {
+		CALL $closeBuy$
+	}
+	DUP
+	PUSHINT 2056408247
+	EQUAL
+	IFJMPREF {
+		CALL $constructor$
+	}
+}
+

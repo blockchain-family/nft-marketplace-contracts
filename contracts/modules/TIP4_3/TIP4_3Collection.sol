@@ -1,6 +1,6 @@
-/// We recommend using the compiler version 0.57.1. 
+/// We recommend using the compiler version 0.62.0. 
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity = 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
@@ -29,9 +29,9 @@ abstract contract TIP4_3Collection is TIP4_1Collection, ITIP4_3Collection {
     TvmCell _codeIndexBasis;
 
     /// Values for deploy/destroy
-    uint128 _indexDeployValue = 0.4 ton;
-    uint128 _indexDestroyValue = 0.1 ton;
-    uint128 _deployIndexBasisValue = 0.4 ton;
+    uint128 _indexDeployValue = 0.4 ever;
+    uint128 _indexDestroyValue = 0.1 ever;
+    uint128 _deployIndexBasisValue = 0.4 ever;
 
     constructor(
         TvmCell codeIndex,

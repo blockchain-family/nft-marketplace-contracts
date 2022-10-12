@@ -1,4 +1,4 @@
-.version sol 0.57.1
+.version sol 0.62.0
 
 .macro constructor
 DROP
@@ -25,8 +25,8 @@ LDREF
 LDU 128
 LDU 8
 LDU 8
-LDU 8
-LDU 8
+LDU 16
+LDU 16
 LDREF
 ENDS
 CTOS
@@ -35,39 +35,95 @@ ENDS
 PUSH S7
 .loc ../contracts/modules/access/OwnableInternal.sol, 12
 CALLREF {
-	CALL $_transferOwnership_internal_macro$
+	CALL $_transferOwnership_d29d44ee_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 51
+.loc ../contracts/AuctionRootTip3.sol, 62
 ACCEPT
-.loc ../contracts/AuctionRootTip3.sol, 52
+.loc ../contracts/AuctionRootTip3.sol, 63
 PUSHINT 5000000000
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/AuctionRootTip3.sol, 54
-BLKSWAP 6, 3
+.loc ../contracts/AuctionRootTip3.sol, 65
+SWAP
+REVERSE 7, 2
+REVERSE 8, 0
 CALLREF {
-	CALL $setDefaultProperties_internal_macro$
+	CALL $setDefaultProperties_1b8d2212_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 63
+.loc ../contracts/AuctionRootTip3.sol, 74
 ROT
 SETGLOB 18
-.loc ../contracts/AuctionRootTip3.sol, 64
+.loc ../contracts/AuctionRootTip3.sol, 75
 SWAP
 SETGLOB 19
-.loc ../contracts/AuctionRootTip3.sol, 65
+.loc ../contracts/AuctionRootTip3.sol, 76
+GETGLOB 20
+INC
+UFITS 32
+SETGLOB 20
+.loc ../contracts/AuctionRootTip3.sol, 77
+GETGLOB 21
+INC
+UFITS 32
+SETGLOB 21
+.loc ../contracts/AuctionRootTip3.sol, 79
 NEWC
 STSLICECONST x42_
 STSLICE
 PUSHINT 111
 STZEROES
 ENDC
-PUSHINT 128
+PUSHPOW2 7
 SENDRAWMSG
 .loc ../contracts/AuctionRootTip3.sol, 0
 CALLREF {
 	CALL $c7_to_c4$
 }
 THROW 0
+
+.macro getTypeContract
+DROP
+GETGLOB 6
+THROWIFNOT 76
+.loc ../contracts/AuctionRootTip3.sol, 82
+ENDS
+.loc ../contracts/AuctionRootTip3.sol, 0
+CALLREF {
+	CALL $getTypeContract_6c9a92ae_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 2568476738
+	STUR 130
+	STREF
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.macro getTypeContract_6c9a92ae_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 83
+PUSHREF {
+	.blob x41756374696f6e526f6f74
+}
+.loc ../contracts/AuctionRootTip3.sol, 0
 
 .macro onNftChangeManager
 DROP
@@ -78,7 +134,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 68
+.loc ../contracts/AuctionRootTip3.sol, 86
 OVER
 PUSHCONT {
 	LDREF
@@ -108,7 +164,7 @@ LDREF
 ENDS
 .loc ../contracts/AuctionRootTip3.sol, 0
 CALLREF {
-	CALL $onNftChangeManager_internal_macro$
+	CALL $onNftChangeManager_3b8ea82d_internal_macro$
 }
 DROP
 CALLREF {
@@ -116,58 +172,46 @@ CALLREF {
 }
 THROW 0
 
-.macro onNftChangeManager_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 77
+.macro onNftChangeManager_3b8ea82d_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 95
 ROLL 3
 MYADDR
 SDEQ
 THROWIFNOT 100
-.loc ../contracts/AuctionRootTip3.sol, 78
+.loc ../contracts/AuctionRootTip3.sol, 96
 PUSHINT 5000000000
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/AuctionRootTip3.sol, 79
-PUSH S2
-ROLL 6
-CALLREF {
-	CALL $_resolveNft_internal_macro$
-}
-.loc ../contracts/AuctionRootTip3.sol, 80
+.loc ../contracts/AuctionRootTip3.sol, 97
 FALSE
-.loc ../contracts/AuctionRootTip3.sol, 81
-SWAP
-GETGLOB 9
-SDEQ
-DUP
-PUSHCONT {
-	DROP
-	PUSH S5
-	CALLREF {
-		CALL $owner_internal_macro$
-	}
-	SDEQ
-	DUP
-	PUSHCONT {
-		DROP
-		OVER
-		CTOS
-		SBITS
-		PUSHINT 523
-		EQUAL
-	}
-	IF
+.loc ../contracts/AuctionRootTip3.sol, 99
+OVER
+CTOS
+.loc ../contracts/AuctionRootTip3.sol, 100
+PUSHREFSLICE {
+	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
 }
-IF
+ROLL 3
+CALLREF {
+	CALL $ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro$
+}
+NIP
+.loc ../contracts/AuctionRootTip3.sol, 101
+OVER
+SBITS
+PUSHINT 555
+EQUAL
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 82
+	.loc ../contracts/AuctionRootTip3.sol, 102
 	OVER
-	CTOS
+	LDU 32
 	LDMSGADDR
 	LDU 128
 	LDU 64
 	LDU 64
-	DROP
-	.loc ../contracts/AuctionRootTip3.sol, 88
+	POP S7
+	BLKDROP2 1, 4
+	.loc ../contracts/AuctionRootTip3.sol, 108
 	PUSH S3
 	PARSEMSGADDR
 	INDEX 3
@@ -183,8 +227,8 @@ PUSHCONT {
 	AND
 	AND
 	PUSHCONT {
-		.loc ../contracts/AuctionRootTip3.sol, 94
-		PUSH2 S9, S3
+		.loc ../contracts/AuctionRootTip3.sol, 114
+		PUSH2 S10, S3
 		GETGLOB 18
 		PUSH2 S3, S4
 		GETGLOB 12
@@ -192,9 +236,10 @@ PUSHCONT {
 		GETGLOB 14
 		MULCONST 2
 		UFITS 128
+		PUSH S18
 		PUSH S17
-		PUSH S16
 		MYADDR
+		PUSH S13
 		PUSHINT 0
 		NEWC
 		STU 256
@@ -202,18 +247,6 @@ PUSHCONT {
 		NEWDICT
 		PUSHINT 64
 		DICTUSETB
-		PUSH S14
-		NEWC
-		STU 128
-		PUSHINT 2
-		ROT
-		PUSHINT 64
-		DICTUSETB
-		GETGLOB 9
-		PUSHINT 3
-		ROT
-		PUSHINT 64
-		DICTUSET
 		LTIME
 		NEWC
 		STU 64
@@ -221,6 +254,11 @@ PUSHCONT {
 		ROT
 		PUSHINT 64
 		DICTUSETB
+		GETGLOB 9
+		PUSHINT 2
+		ROT
+		PUSHINT 64
+		DICTUSET
 		NEWC
 		STDICT
 		ENDC
@@ -242,13 +280,13 @@ PUSHCONT {
 		STU 256
 		ENDC
 		CTOS
-		ROLLREV 12
-		PUSH S12
+		ROLLREV 13
+		PUSH S13
 		NEWC
 		STSLICECONST x62_
 		STSLICE
-		PUSHSLICE x4b2d05e00000000000000000000000000007_
-		STSLICER
+		PUSHINT 3274370980303967982866698814945429188247555
+		STUR 143
 		OVER
 		CALLREF {
 			CTOS
@@ -274,9 +312,10 @@ PUSHCONT {
 		}
 		STREF
 		STSLICECONST 1
-		ROLLREV 11
+		ROLLREV 12
 		NEWC
-		STSLICECONST x7c746db0
+		STSLICECONST x1f5863df
+		STU 128
 		STSLICE
 		ROLLREV 10
 		NEWC
@@ -289,7 +328,7 @@ PUSHCONT {
 		STU 8
 		STU 64
 		STU 64
-		STU 8
+		STU 16
 		ROTREV
 		NEWC
 		STSLICE
@@ -304,14 +343,14 @@ PUSHCONT {
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/AuctionRootTip3.sol, 117
-		PUSH2 S8, S10
+		.loc ../contracts/AuctionRootTip3.sol, 138
+		PUSH2 S9, S11
 		GETGLOB 9
 		PUSH3 S3, S6, S4
 		LTIME
 		TUPLE 7
-		.loc ../contracts/AuctionRootTip3.sol, 118
-		OVER
+		.loc ../contracts/AuctionRootTip3.sol, 148
+		PUSH2 S0, S1
 		PUSHSLICE xc0000000000000000000000001
 		NEWC
 		STSLICE
@@ -344,10 +383,50 @@ PUSHCONT {
 		ENDC
 		PUSHINT 0
 		SENDRAWMSG
-		.loc ../contracts/AuctionRootTip3.sol, 119
+		.loc ../contracts/AuctionRootTip3.sol, 149
+		PUSH3 S1, S6, S12
+		FALSE
+		NEWC
+		STSLICECONST x6_
+		STI 1
+		STSLICECONST x1_
+		STSLICE
+		PUSHINT 2803819077499249229031122585109857988247553
+		STUR 143
+		ROLLREV 3
+		NEWC
+		STSLICECONST x1d207ac4
+		STU 32
+		STSLICE
+		SWAP
+		UNTUPLE 7
+		REVERSE 7, 0
+		NEWC
+		STSLICE
+		ROLLREV 6
+		NEWC
+		STSLICE
+		ROLLREV 5
+		NEWC
+		STSLICE
+		ROLLREV 4
+		NEWC
+		STSLICE
+		STU 128
+		STU 128
+		STU 64
+		STBREFR
+		STBREFR
+		STBREFR
+		STBREFR
+		STBREFR
+		ENDC
+		PUSHINT 1
+		SENDRAWMSG
+		.loc ../contracts/AuctionRootTip3.sol, 159
 		NEWDICT
-		.loc ../contracts/AuctionRootTip3.sol, 120
-		PUSH S8
+		.loc ../contracts/AuctionRootTip3.sol, 160
+		PUSH S9
 		ROT
 		GETGLOB 9
 		NEWC
@@ -366,29 +445,30 @@ PUSHCONT {
 		STBREFR
 		STBREFR
 		ENDC
-		PUSHINT 128
+		PUSHPOW2 7
 		SENDRAWMSG
 	}
 	PUSHCONT {
-		.loc ../contracts/AuctionRootTip3.sol, 126
+		.loc ../contracts/AuctionRootTip3.sol, 166
 		TRUE
-		POP S5
+		POP S7
 	}
 	IFELSE
 	.loc ../contracts/AuctionRootTip3.sol, 0
 	BLKDROP 4
 }
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 129
-	DROP
+	.loc ../contracts/AuctionRootTip3.sol, 169
 	TRUE
+	POP S3
 }
 IFELSE
-.loc ../contracts/AuctionRootTip3.sol, 132
+.loc ../contracts/AuctionRootTip3.sol, 172
+ROT
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 133
+	.loc ../contracts/AuctionRootTip3.sol, 173
 	GETGLOB 9
-	PUSH S5
+	PUSH S6
 	PUSHSLICE xc0000000000000000000000001
 	NEWC
 	STSLICE
@@ -404,10 +484,34 @@ PUSHCONT {
 	ENDC
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/AuctionRootTip3.sol, 135
+	.loc ../contracts/AuctionRootTip3.sol, 174
+	GETGLOB 9
+	PUSH3 S6, S1, S6
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	PUSHINT 2803819077499249229031122585109857988247553
+	STUR 143
+	ROLLREV 3
+	NEWC
+	STSLICECONST x27a650da
+	STU 32
+	STSLICE
+	SWAP
+	NEWC
+	STSLICE
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+	.loc ../contracts/AuctionRootTip3.sol, 184
 	NEWDICT
-	.loc ../contracts/AuctionRootTip3.sol, 136
-	PUSH2 S2, S5
+	.loc ../contracts/AuctionRootTip3.sol, 185
+	PUSH2 S3, S6
 	GETGLOB 9
 	NEWC
 	STSLICECONST x62_
@@ -425,76 +529,20 @@ PUSHCONT {
 	STBREFR
 	STBREFR
 	ENDC
-	PUSHINT 128
+	PUSHPOW2 7
 	SENDRAWMSG
 	.loc ../contracts/AuctionRootTip3.sol, 0
 }
 IF
 .loc ../contracts/AuctionRootTip3.sol, 0
-BLKDROP 5
+BLKDROP 7
 
-.macro getOfferAddress
-DROP
-GETGLOB 6
-THROWIFNOT 76
-GETGLOB 2
-ISNULL
-IFREF {
-	CALL $c4_to_c7$
-}
-.loc ../contracts/AuctionRootTip3.sol, 144
-OVER
-PUSHCONT {
-	LDREF
-	ENDS
-	CTOS
-}
-IF
-LDMSGADDR
-LDU 128
-LDU 64
-ENDS
-.loc ../contracts/AuctionRootTip3.sol, 0
-CALLREF {
-	CALL $getOfferAddress_internal_macro$
-}
-OVER
-PUSHCONT {
-	PUSH S3
-	CTOS
-	LDU 2
-	LDMSGADDR
-	DROP
-	NIP
-	NEWC
-	STSLICECONST xc
-	STSLICE
-	PUSHINT 1
-	STUR 98
-	SWAP
-	NEWC
-	STSLICECONST xf97c8f7d
-	STSLICE
-	STBREFR
-	ENDC
-	PUSHINT 0
-	SENDRAWMSG
-}
-PUSHCONT {
-	DROP
-}
-IFELSE
-IFREF {
-	CALL $upd_only_time_in_c4$
-}
-THROW 0
+.globl	getOfferAddress_b584a551_internal
+.type	getOfferAddress_b584a551_internal, @function
+CALL $getOfferAddress_b584a551_internal_macro$
 
-.globl	getOfferAddress_internal
-.type	getOfferAddress_internal, @function
-CALL $getOfferAddress_internal_macro$
-
-.macro getOfferAddress_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 153
+.macro getOfferAddress_b584a551_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 201
 PUSHINT 0
 NEWC
 STU 256
@@ -502,18 +550,6 @@ PUSHINT 0
 NEWDICT
 PUSHINT 64
 DICTUSETB
-ROT
-NEWC
-STU 128
-PUSHINT 2
-ROT
-PUSHINT 64
-DICTUSETB
-ROT
-PUSHINT 3
-ROT
-PUSHINT 64
-DICTUSET
 SWAP
 NEWC
 STU 64
@@ -521,6 +557,11 @@ PUSHINT 1
 ROT
 PUSHINT 64
 DICTUSETB
+SWAP
+PUSHINT 2
+ROT
+PUSHINT 64
+DICTUSET
 NEWC
 STDICT
 ENDC
@@ -531,7 +572,7 @@ STOPTREF
 STOPTREF
 STZERO
 ENDC
-.loc ../contracts/AuctionRootTip3.sol, 163
+.loc ../contracts/AuctionRootTip3.sol, 210
 HASHCU
 NEWC
 STSLICECONST x801_
@@ -544,7 +585,7 @@ CTOS
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/AuctionRootTip3.sol, 166
+.loc ../contracts/AuctionRootTip3.sol, 213
 LDU 32
 GETGLOB 4
 ROT
@@ -552,11 +593,15 @@ SETINDEXQ 5
 SETGLOB 4
 OVER
 PUSHCONT {
+	LDU 32
 	LDREF
 	ENDS
 	CTOS
 }
-IF
+PUSHCONT {
+	LDU 32
+}
+IFELSE
 LDMSGADDR
 LDU 128
 LDU 64
@@ -564,7 +609,7 @@ LDU 64
 ENDS
 .loc ../contracts/AuctionRootTip3.sol, 0
 CALLREF {
-	CALL $buildAuctionCreationPayload_internal_macro$
+	CALL $buildAuctionCreationPayload_4585399e_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -577,8 +622,8 @@ PUSHCONT {
 	NEWC
 	STSLICECONST xc
 	STSLICE
-	PUSHSLICE x000000000000000000000000320aeef5e_
-	STSLICER
+	PUSHINT 3457574088
+	STUR 130
 	STREF
 	ENDC
 	PUSHINT 0
@@ -593,11 +638,9 @@ PUSHCONT {
 	ROLL 3
 	SECOND
 	NEWC
-	PUSHINT 2
-	STZEROES
+	STSLICECONST x2_
 	STI 1
-	PUSHINT 3
-	STZEROES
+	STSLICECONST x1_
 	STSLICE
 	SWAP
 	STGRAMS
@@ -619,36 +662,52 @@ IFREF {
 }
 THROW 0
 
-.macro buildAuctionCreationPayload_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 173
-REVERSE 4, 0
+.macro buildAuctionCreationPayload_4585399e_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 221
+ROLL 4
 NEWC
-STSLICE
-STU 128
+STU 32
+.loc ../contracts/AuctionRootTip3.sol, 222
+ROLL 4
+STSLICER
+.loc ../contracts/AuctionRootTip3.sol, 223
+ROLL 3
+STUR 128
+.loc ../contracts/AuctionRootTip3.sol, 224
+XCHG S1, S2
 STU 64
+.loc ../contracts/AuctionRootTip3.sol, 225
 STU 64
-.loc ../contracts/AuctionRootTip3.sol, 174
+.loc ../contracts/AuctionRootTip3.sol, 226
+GETGLOB 4
+PUSHINT 0
+SETINDEXQ 2
+FALSE
+SETINDEXQ 1
+PUSHINT 64
+SETINDEXQ 4
+SETGLOB 4
 ENDC
 .loc ../contracts/AuctionRootTip3.sol, 0
 
-.globl	_resolveNft_internal
-.type	_resolveNft_internal, @function
-CALL $_resolveNft_internal_macro$
+.globl	_resolveNft_42e98847_internal
+.type	_resolveNft_42e98847_internal, @function
+CALL $_resolveNft_42e98847_internal_macro$
 
-.macro _resolveNft_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 181
+.macro _resolveNft_42e98847_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 233
 SWAP
 CALLREF {
-	CALL $_buildNftCode_internal_macro$
+	CALL $_buildNftCode_c58e679e_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 182
+.loc ../contracts/AuctionRootTip3.sol, 234
 SWAP
 CALLREF {
-	CALL $_buildNftState_internal_macro$
+	CALL $_buildNftState_c971fdf8_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 183
+.loc ../contracts/AuctionRootTip3.sol, 235
 HASHCU
-.loc ../contracts/AuctionRootTip3.sol, 184
+.loc ../contracts/AuctionRootTip3.sol, 236
 MYADDR
 PARSEMSGADDR
 THIRD
@@ -660,15 +719,15 @@ ENDC
 CTOS
 .loc ../contracts/AuctionRootTip3.sol, 0
 
-.globl	_buildNftCode_internal
-.type	_buildNftCode_internal, @function
-CALL $_buildNftCode_internal_macro$
+.globl	_buildNftCode_c58e679e_internal
+.type	_buildNftCode_c58e679e_internal, @function
+CALL $_buildNftCode_c58e679e_internal_macro$
 
-.macro _buildNftCode_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 188
+.macro _buildNftCode_c58e679e_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 241
 NEWC
 STSLICE
-.loc ../contracts/AuctionRootTip3.sol, 189
+.loc ../contracts/AuctionRootTip3.sol, 242
 GETGLOB 15
 CTOS
 SWAP
@@ -780,12 +839,12 @@ CALLREF {
 }
 .loc ../contracts/AuctionRootTip3.sol, 0
 
-.globl	_buildNftState_internal
-.type	_buildNftState_internal, @function
-CALL $_buildNftState_internal_macro$
+.globl	_buildNftState_c971fdf8_internal
+.type	_buildNftState_c971fdf8_internal, @function
+CALL $_buildNftState_c971fdf8_internal_macro$
 
-.macro _buildNftState_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 195
+.macro _buildNftState_c971fdf8_internal_macro
+.loc ../contracts/AuctionRootTip3.sol, 249
 PUSHINT 0
 NEWC
 STU 256
@@ -812,31 +871,351 @@ STZERO
 ENDC
 .loc ../contracts/AuctionRootTip3.sol, 0
 
-.globl	setDefaultProperties_internal
-.type	setDefaultProperties_internal, @function
-CALL $setDefaultProperties_internal_macro$
+.macro RequestUpgradeAuction
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/AuctionRootTip3.sol, 256
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+LDU 64
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+ENDS
+.loc ../contracts/AuctionRootTip3.sol, 0
+CALLREF {
+	CALL $RequestUpgradeAuction_54d53eed_internal_macro$
+}
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
 
-.macro setDefaultProperties_internal_macro
-.loc ../contracts/abstract/OffersRoot.sol, 32
+.macro RequestUpgradeAuction_54d53eed_internal_macro
+.loc ../contracts/modules/access/OwnableInternal.sol, 31
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+DUP
+PUSHCONT {
+	DROP
+	CALLREF {
+		CALL $owner_8da5cb5b_internal_macro$
+	}
+	GETGLOB 9
+	SDEQ
+}
+IF
+THROWIFNOT 100
+.loc ../contracts/modules/access/OwnableInternal.sol, 32
+DEPTH
+ADDCONST -2
+PICK
+THROWIFNOT 101
+.loc ../contracts/AuctionRootTip3.sol, 261
+DEPTH
+ADDCONST -2
+PICK
+PUSHINT 5000000000
+GEQ
+THROWIFNOT 109
+.loc ../contracts/AuctionRootTip3.sol, 262
+PUSHINT 5000000000
+GETPARAM 7
+FIRST
+DEPTH
+ADDCONST -2
+PICK
+SUB
+UFITS 128
+MAX
+PUSHINT 2
+RAWRESERVE
+.loc ../contracts/AuctionRootTip3.sol, 267
+GETGLOB 21
+GETGLOB 16
+BLKSWAP 2, 3
+CALLREF {
+	CALL $getOfferAddress_b584a551_internal_macro$
+}
+NEWC
+STSLICECONST x62_
+STSLICE
+PUSHINT 1
+STUR 111
+ROLLREV 3
+NEWC
+STSLICECONST x64a578c8
+STREF
+STU 32
+STSLICE
+STBREFR
+ENDC
+PUSHPOW2 7
+SENDRAWMSG
+.loc ../contracts/AuctionRootTip3.sol, 0
+
+.macro upgradeOfferCode
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/AuctionRootTip3.sol, 273
+LDREF
+ENDS
+.loc ../contracts/AuctionRootTip3.sol, 0
+CALLREF {
+	CALL $upgradeOfferCode_3163a60b_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.globl	upgradeOfferCode_3163a60b_internal
+.type	upgradeOfferCode_3163a60b_internal, @function
+CALL $upgradeOfferCode_3163a60b_internal_macro$
+
+.macro upgradeOfferCode_3163a60b_internal_macro
+.loc ../contracts/modules/access/OwnableInternal.sol, 31
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+DUP
+PUSHCONT {
+	DROP
+	CALLREF {
+		CALL $owner_8da5cb5b_internal_macro$
+	}
+	GETGLOB 9
+	SDEQ
+}
+IF
+THROWIFNOT 100
+.loc ../contracts/modules/access/OwnableInternal.sol, 32
+DEPTH
+ADDCONST -2
+PICK
+THROWIFNOT 101
+.loc ../contracts/AuctionRootTip3.sol, 274
+PUSHINT 1000000000
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/AuctionRootTip3.sol, 275
+SETGLOB 16
+.loc ../contracts/AuctionRootTip3.sol, 276
+GETGLOB 21
+INC
+UFITS 32
+SETGLOB 21
+.loc ../contracts/AuctionRootTip3.sol, 278
+GETGLOB 9
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 111
+STZEROES
+ENDC
+PUSHINT 130
+SENDRAWMSG
+.loc ../contracts/AuctionRootTip3.sol, 0
+
+.macro upgrade
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/AuctionRootTip3.sol, 285
+OVER
+PUSHCONT {
+	LDREF
+	LDU 32
+	LDREF
+	ENDS
+	CTOS
+}
+PUSHCONT {
+	LDREF
+	LDU 32
+}
+IFELSE
+LDMSGADDR
+ENDS
+.loc ../contracts/AuctionRootTip3.sol, 0
+CALLREF {
+	CALL $upgrade_fb9d1513_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro upgrade_fb9d1513_internal_macro
+.loc ../contracts/modules/access/OwnableInternal.sol, 31
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+DUP
+PUSHCONT {
+	DROP
+	CALLREF {
+		CALL $owner_8da5cb5b_internal_macro$
+	}
+	GETGLOB 9
+	SDEQ
+}
+IF
+THROWIFNOT 100
+.loc ../contracts/modules/access/OwnableInternal.sol, 32
+DEPTH
+ADDCONST -2
+PICK
+THROWIFNOT 101
+.loc ../contracts/AuctionRootTip3.sol, 290
+GETGLOB 20
+ROT
+EQUAL
+PUSHCONT {
+	.loc ../contracts/AuctionRootTip3.sol, 291
+	PUSHINT 5000000000
+	PUSHINT 0
+	RAWRESERVE
+	.loc ../contracts/AuctionRootTip3.sol, 292
+	DUP
+	NEWC
+	STSLICECONST x42_
+	STSLICE
+	PUSHINT 111
+	STZEROES
+	ENDC
+	PUSHINT 130
+	SENDRAWMSG
+}
+PUSHCONT {
+	.loc ../contracts/AuctionRootTip3.sol, 298
+	PUSHREF {
+		.blob xc000000000000000000000000021ddfa5f
+	}
+	PUSHINT 0
+	SENDRAWMSG
+	.loc ../contracts/AuctionRootTip3.sol, 300
+	GETGLOB 14
+	GETGLOB 12
+	GETGLOB 11
+	GETGLOB 13
+	GETGLOB 16
+	GETGLOB 15
+	GETGLOB 19
+	GETGLOB 18
+	GETGLOB 20
+	CALLREF {
+		CALL $owner_8da5cb5b_internal_macro$
+	}
+	GETGLOB 17
+	NEWC
+	STU 64
+	STSLICE
+	STU 32
+	STU 16
+	STU 16
+	STREF
+	STREF
+	STU 128
+	STU 8
+	STU 8
+	STU 128
+	ENDC
+	.loc ../contracts/AuctionRootTip3.sol, 314
+	PUSH S2
+	SETCODE
+	.loc ../contracts/AuctionRootTip3.sol, 315
+	PUSH S2
+	CTOS
+	DUP
+	PUSHSLICE x8adb35
+	SDEQ
+	PUSHCONT {
+		PLDREFIDX 1
+		CTOS
+	}
+	IF
+	PLDREF
+	CTOS
+	BLESS
+	POP C3
+	.loc ../contracts/AuctionRootTip3.sol, 317
+	CALLREF {
+		CALL $:onCodeUpgrade$
+	}
+}
+IFELSE
+.loc ../contracts/AuctionRootTip3.sol, 0
+DROP2
+
+.internal-alias :onCodeUpgrade, 2
+.internal :onCodeUpgrade
+DROP
+.loc ../contracts/AuctionRootTip3.sol, 0
+CALLREF {
+	CALL $c7_to_c4$
+}
+COMMIT
+THROW 0
+
+.globl	setDefaultProperties_1b8d2212_internal
+.type	setDefaultProperties_1b8d2212_internal, @function
+CALL $setDefaultProperties_1b8d2212_internal_macro$
+
+.macro setDefaultProperties_1b8d2212_internal_macro
+.loc ../contracts/abstract/OffersRoot.sol, 35
 ROLL 5
 SETGLOB 15
-.loc ../contracts/abstract/OffersRoot.sol, 34
+.loc ../contracts/abstract/OffersRoot.sol, 37
 ROLL 3
 SETGLOB 16
-.loc ../contracts/abstract/OffersRoot.sol, 36
+.loc ../contracts/abstract/OffersRoot.sol, 39
 ROLL 3
 CALLREF {
-	CALL $_transferOwnership_internal_macro$
+	CALL $_transferOwnership_d29d44ee_internal_macro$
 }
-.loc ../contracts/abstract/OffersRoot.sol, 38
+.loc ../contracts/abstract/OffersRoot.sol, 41
 ROT
 SETGLOB 13
-.loc ../contracts/abstract/OffersRoot.sol, 39
+.loc ../contracts/abstract/OffersRoot.sol, 42
 SWAP
 SETGLOB 11
-.loc ../contracts/abstract/OffersRoot.sol, 40
+.loc ../contracts/abstract/OffersRoot.sol, 43
 SETGLOB 12
-.loc ../contracts/abstract/OffersRoot.sol, 42
+.loc ../contracts/abstract/OffersRoot.sol, 45
 GETGLOB 13
 PUSHINT 4
 DIVMOD
@@ -853,7 +1232,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/abstract/OffersRoot.sol, 45
+.loc ../contracts/abstract/OffersRoot.sol, 48
 OVER
 PUSHCONT {
 	LDREF
@@ -865,7 +1244,7 @@ LDU 128
 ENDS
 .loc ../contracts/abstract/OffersRoot.sol, 0
 CALLREF {
-	CALL $changeDeploymentFee_internal_macro$
+	CALL $changeDeploymentFee_3abd47a2_internal_macro$
 }
 DROP
 CALLREF {
@@ -873,7 +1252,7 @@ CALLREF {
 }
 THROW 0
 
-.macro changeDeploymentFee_internal_macro
+.macro changeDeploymentFee_3abd47a2_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 31
 GETGLOB 9
 PARSEMSGADDR
@@ -884,7 +1263,7 @@ DUP
 PUSHCONT {
 	DROP
 	CALLREF {
-		CALL $owner_internal_macro$
+		CALL $owner_8da5cb5b_internal_macro$
 	}
 	GETGLOB 9
 	SDEQ
@@ -896,12 +1275,12 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/abstract/OffersRoot.sol, 46
+.loc ../contracts/abstract/OffersRoot.sol, 49
 ACCEPT
-.loc ../contracts/abstract/OffersRoot.sol, 47
+.loc ../contracts/abstract/OffersRoot.sol, 50
 DUP
 SETGLOB 13
-.loc ../contracts/abstract/OffersRoot.sol, 48
+.loc ../contracts/abstract/OffersRoot.sol, 51
 PUSHINT 4
 DIVMOD
 DROP
@@ -917,13 +1296,13 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/abstract/OffersRoot.sol, 51
+.loc ../contracts/abstract/OffersRoot.sol, 54
 LDU 8
 LDU 8
 ENDS
 .loc ../contracts/abstract/OffersRoot.sol, 0
 CALLREF {
-	CALL $changeMarketFee_internal_macro$
+	CALL $changeMarketFee_ddc20c13_internal_macro$
 }
 DROP
 CALLREF {
@@ -931,7 +1310,7 @@ CALLREF {
 }
 THROW 0
 
-.macro changeMarketFee_internal_macro
+.macro changeMarketFee_ddc20c13_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 31
 GETGLOB 9
 PARSEMSGADDR
@@ -942,7 +1321,7 @@ DUP
 PUSHCONT {
 	DROP
 	CALLREF {
-		CALL $owner_internal_macro$
+		CALL $owner_8da5cb5b_internal_macro$
 	}
 	GETGLOB 9
 	SDEQ
@@ -954,12 +1333,12 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/abstract/OffersRoot.sol, 52
+.loc ../contracts/abstract/OffersRoot.sol, 55
 ACCEPT
-.loc ../contracts/abstract/OffersRoot.sol, 53
+.loc ../contracts/abstract/OffersRoot.sol, 56
 SWAP
 SETGLOB 11
-.loc ../contracts/abstract/OffersRoot.sol, 54
+.loc ../contracts/abstract/OffersRoot.sol, 57
 SETGLOB 12
 .loc ../contracts/abstract/OffersRoot.sol, 0
 
@@ -976,7 +1355,7 @@ IFREF {
 ENDS
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
 CALLREF {
-	CALL $owner_internal_macro$
+	CALL $owner_8da5cb5b_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -1009,11 +1388,11 @@ IFREF {
 }
 THROW 0
 
-.globl	owner_internal
-.type	owner_internal, @function
-CALL $owner_internal_macro$
+.globl	owner_8da5cb5b_internal
+.type	owner_8da5cb5b_internal, @function
+CALL $owner_8da5cb5b_internal_macro$
 
-.macro owner_internal_macro
+.macro owner_8da5cb5b_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 16
 GETGLOB 10
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
@@ -1039,7 +1418,7 @@ LDMSGADDR
 ENDS
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
 CALLREF {
-	CALL $transferOwnership_internal_macro$
+	CALL $transferOwnership_f2fde38b_internal_macro$
 }
 DROP
 CALLREF {
@@ -1047,11 +1426,11 @@ CALLREF {
 }
 THROW 0
 
-.globl	transferOwnership_internal
-.type	transferOwnership_internal, @function
-CALL $transferOwnership_internal_macro$
+.globl	transferOwnership_f2fde38b_internal
+.type	transferOwnership_f2fde38b_internal, @function
+CALL $transferOwnership_f2fde38b_internal_macro$
 
-.macro transferOwnership_internal_macro
+.macro transferOwnership_f2fde38b_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 31
 GETGLOB 9
 PARSEMSGADDR
@@ -1062,7 +1441,7 @@ DUP
 PUSHCONT {
 	DROP
 	CALLREF {
-		CALL $owner_internal_macro$
+		CALL $owner_8da5cb5b_internal_macro$
 	}
 	GETGLOB 9
 	SDEQ
@@ -1082,15 +1461,15 @@ PLDU 256
 THROWIFNOT 100
 .loc ../contracts/modules/access/OwnableInternal.sol, 21
 CALLREF {
-	CALL $_transferOwnership_internal_macro$
+	CALL $_transferOwnership_d29d44ee_internal_macro$
 }
 .loc ../contracts/modules/access/OwnableInternal.sol, 0
 
-.globl	_transferOwnership_internal
-.type	_transferOwnership_internal, @function
-CALL $_transferOwnership_internal_macro$
+.globl	_transferOwnership_d29d44ee_internal
+.type	_transferOwnership_d29d44ee_internal, @function
+CALL $_transferOwnership_d29d44ee_internal_macro$
 
-.macro _transferOwnership_internal_macro
+.macro _transferOwnership_d29d44ee_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 25
 GETGLOB 10
 .loc ../contracts/modules/access/OwnableInternal.sol, 26
@@ -1132,9 +1511,13 @@ LDU 128
 LDREF
 LDREF
 LDU 64
-LDU 8
-LDU 8
+LDU 16
+LDU 16
+LDU 32
+LDU 32
 ENDS
+SETGLOB 21
+SETGLOB 20
 SETGLOB 19
 SETGLOB 18
 SETGLOB 17
@@ -1170,15 +1553,15 @@ PUSHCONT {
 	PUSH S8
 	PUSHINT 64
 	DICTUGET
+	ZEROSWAPIFNOT
 	PUSHCONT {
 		PLDU 64
 	}
-	PUSHCONT {
-		PUSHINT 0
-	}
-	IFELSE
+	IF
 	PUSHINT 0
-	DUP
+	BLKPUSH 3, 0
+	SETGLOB 21
+	SETGLOB 20
 	SETGLOB 19
 	SETGLOB 18
 	SETGLOB 17
@@ -1202,6 +1585,8 @@ IFREFELSE {
 }
 
 .macro c7_to_c4
+GETGLOB 21
+GETGLOB 20
 GETGLOB 19
 GETGLOB 18
 GETGLOB 17
@@ -1221,15 +1606,17 @@ STONE
 STSLICE
 STU 8
 STU 8
-ROLLREV 7
+ROLLREV 9
 NEWC
 STU 128
 STU 128
 STREF
 STREF
 STU 64
-STU 8
-STU 8
+STU 16
+STU 16
+STU 32
+STU 32
 STBREFR
 ENDC
 POPROOT
@@ -1312,12 +1699,12 @@ CALLREF {
 LDU 1 ; haveSign msgSlice
 SWAP
 PUSHCONT {
-	PUSHINT 512
+	PUSHPOW2 9
 	LDSLICEX ; signatureSlice msgSlice
 	DUP
 	HASHSU ; signatureSlice msgSlice hashMsgSlice
 	SWAP
-	LDU 1 ; signatureSlice hashMsgSlice havePubkey msgSlice
+	LDU 1 ; signatureSlice hashMsgSlice hasPubkey msgSlice
 	SWAP
 	PUSHCONT {
 		LDU 256 ; signatureSlice hashMsgSlice pubkey msgSlice
@@ -1333,7 +1720,7 @@ PUSHCONT {
 	THROWIFNOT 40
 }
 PUSHCONT {
-	LDU 1 ; havePubkey msgSlice
+	LDU 1 ; hasPubkey msgSlice
 	SWAP
 	THROWIF 58
 }
@@ -1422,10 +1809,10 @@ CALLREF {
 GETGLOB 18
 OVER
 PUSHCONT {
-	PUSHSLICE xc00000000000000000000000009a432ff2
+	PUSHSLICE xc0000000000000000000000000a8a950d5
 	NEWC
 	STSLICE
-	STU 8
+	STU 16
 	ENDC
 	PUSHINT 0
 	SENDRAWMSG
@@ -1442,10 +1829,10 @@ CALLREF {
 GETGLOB 19
 OVER
 PUSHCONT {
-	PUSHSLICE xc0000000000000000000000000e605bc8e
+	PUSHSLICE xc0000000000000000000000000cea08998
 	NEWC
 	STSLICE
-	STU 8
+	STU 16
 	ENDC
 	PUSHINT 0
 	SENDRAWMSG
@@ -1453,9 +1840,324 @@ PUSHCONT {
 IF
 THROW 0
 
+.globl	ExchangePayload_with_obj_getSenderAndCallId_b6ff786b
+.type	ExchangePayload_with_obj_getSenderAndCallId_b6ff786b, @function
+CALL $ExchangePayload_with_obj_getSenderAndCallId_b6ff786b_macro$
+
+.macro ExchangePayload_with_obj_getSenderAndCallId_b6ff786b_macro
+.loc ../contracts/libraries/ExchangePayload.sol, 13
+PUSHINT 0
+.loc ../contracts/libraries/ExchangePayload.sol, 14
+BLKPUSH 2, 2
+.loc ../contracts/libraries/ExchangePayload.sol, 17
+CALLREF {
+	CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 19
+	PUSH S2
+	CALLREF {
+		CALL $EventDataDecoder_no_obj_decode_54438b56_macro$
+	}
+	.loc ../contracts/libraries/ExchangePayload.sol, 20
+	DUP
+	INDEX 8
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 23
+	SWAP
+	SECOND
+	POP S2
+	.loc ../contracts/libraries/ExchangePayload.sol, 26
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 27
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 30
+	PUSH S2
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 33
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 34
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+IFELSE
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+DROP
+.loc ../contracts/libraries/ExchangePayload.sol, 38
+SWAP
+BLKDROP2 1, 2
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+
+.globl	ExchangePayload_no_obj_getSenderAndCallId_b6ff786b
+.type	ExchangePayload_no_obj_getSenderAndCallId_b6ff786b, @function
+CALL $ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro$
+
+.macro ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro
+.loc ../contracts/libraries/ExchangePayload.sol, 13
+PUSHINT 0
+.loc ../contracts/libraries/ExchangePayload.sol, 14
+ROT
+.loc ../contracts/libraries/ExchangePayload.sol, 17
+PUSH S2
+CALLREF {
+	CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 19
+	PUSH S2
+	CALLREF {
+		CALL $EventDataDecoder_no_obj_decode_54438b56_macro$
+	}
+	.loc ../contracts/libraries/ExchangePayload.sol, 20
+	DUP
+	INDEX 8
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 23
+	SWAP
+	SECOND
+	POP S2
+	.loc ../contracts/libraries/ExchangePayload.sol, 26
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 27
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+PUSHCONT {
+	.loc ../contracts/libraries/ExchangePayload.sol, 30
+	PUSH S2
+	CTOS
+	.loc ../contracts/libraries/ExchangePayload.sol, 33
+	DUP
+	SBITS
+	GTINT 31
+	PUSHCONT {
+		.loc ../contracts/libraries/ExchangePayload.sol, 34
+		DUP
+		LDU 32
+		POP S2
+		POP S3
+		.loc ../contracts/libraries/ExchangePayload.sol, 0
+	}
+	IF
+}
+IFELSE
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+DROP
+.loc ../contracts/libraries/ExchangePayload.sol, 38
+SWAP
+BLKDROP2 1, 2
+.loc ../contracts/libraries/ExchangePayload.sol, 0
+
+.globl	EventDataDecoder_with_obj_isValid_47a0ea0d
+.type	EventDataDecoder_with_obj_isValid_47a0ea0d, @function
+CALL $EventDataDecoder_with_obj_isValid_47a0ea0d_macro$
+
+.macro EventDataDecoder_with_obj_isValid_47a0ea0d_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
+DUP
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
+DUP
+PUSHINT 904
+PUSHINT 1
+SCHKBITREFSQ
+DUP
+PUSHCONT {
+	DROP
+	LDREFRTOS
+	PUSHINT 520
+	PUSHINT 1
+	SCHKBITREFSQ
+}
+IF
+NIP
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_no_obj_isValid_47a0ea0d
+.type	EventDataDecoder_no_obj_isValid_47a0ea0d, @function
+CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+
+.macro EventDataDecoder_no_obj_isValid_47a0ea0d_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
+DUP
+PUSHINT 904
+PUSHINT 1
+SCHKBITREFSQ
+DUP
+PUSHCONT {
+	DROP
+	LDREFRTOS
+	PUSHINT 520
+	PUSHINT 1
+	SCHKBITREFSQ
+}
+IF
+NIP
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_with_obj_decode_54438b56
+.type	EventDataDecoder_with_obj_decode_54438b56, @function
+CALL $EventDataDecoder_with_obj_decode_54438b56_macro$
+
+.macro EventDataDecoder_with_obj_decode_54438b56_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 34
+DUP
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 35
+LDREFRTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 37
+OVER
+LDU 128
+LDI 8
+POP S4
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 39
+XCPU S1, S3
+LDU 256
+POP S5
+PUSH S2
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 256
+POP S6
+PUSH S3
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+ROLL 5
+PLDU 256
+ROLL 4
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 128
+POP S6
+PUSH S5
+LDU 128
+POP S7
+PUSH S6
+LDU 8
+POP S8
+PUSH S7
+LDU 128
+POP S9
+PUSH S8
+LDU 128
+POP S10
+PAIR
+ROLL 8
+PLDREF
+TUPLE 9
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_no_obj_decode_54438b56
+.type	EventDataDecoder_no_obj_decode_54438b56, @function
+CALL $EventDataDecoder_no_obj_decode_54438b56_macro$
+
+.macro EventDataDecoder_no_obj_decode_54438b56_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 34
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 35
+LDREFRTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 37
+OVER
+LDU 128
+LDI 8
+POP S4
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 39
+XCPU S1, S3
+LDU 256
+POP S5
+PUSH S2
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 256
+POP S6
+PUSH S3
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+ROLL 5
+PLDU 256
+ROLL 4
+NEWC
+STSLICECONST x9_
+STI 8
+STU 256
+ENDC
+CTOS
+PUSH S4
+LDU 128
+POP S6
+PUSH S5
+LDU 128
+POP S7
+PUSH S6
+LDU 8
+POP S8
+PUSH S7
+LDU 128
+POP S9
+PUSH S8
+LDU 128
+POP S10
+PAIR
+ROLL 8
+PLDREF
+TUPLE 9
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
 .macro public_function_selector
 DUP
-PUSHINT 1078541922
+PUSHINT 641780960
 LEQ
 IFJMPREF {
 	DUP
@@ -1465,10 +2167,10 @@ IFJMPREF {
 		CALL $transferOwnership$
 	}
 	DUP
-	PUSHINT 440610802
+	PUSHINT 420993090
 	EQUAL
 	IFJMPREF {
-		CALL $auctionBidDelta$
+		CALL $getTypeContract$
 	}
 	DUP
 	PUSHINT 601546343
@@ -1477,27 +2179,50 @@ IFJMPREF {
 		CALL $onNftChangeManager$
 	}
 	DUP
-	PUSHINT 1078541922
+	PUSHINT 641780960
 	EQUAL
 	IFJMPREF {
-		CALL $marketFeeDecimals$
+		CALL $RequestUpgradeAuction$
 	}
 }
 DUP
-PUSHINT 1381806177
+PUSHINT 1310090440
 LEQ
 IFJMPREF {
 	DUP
-	PUSHINT 1163543672
+	PUSHINT 682184917
+	EQUAL
+	IFJMPREF {
+		CALL $auctionBidDelta$
+	}
+	DUP
+	PUSHINT 752908708
 	EQUAL
 	IFJMPREF {
 		CALL $constructor$
 	}
 	DUP
-	PUSHINT 1210825687
+	PUSHINT 1078541922
+	EQUAL
+	IFJMPREF {
+		CALL $marketFeeDecimals$
+	}
+	DUP
+	PUSHINT 1310090440
 	EQUAL
 	IFJMPREF {
 		CALL $buildAuctionCreationPayload$
+	}
+}
+DUP
+PUSHINT 1471876018
+LEQ
+IFJMPREF {
+	DUP
+	PUSHINT 1319143832
+	EQUAL
+	IFJMPREF {
+		CALL $auctionBidDeltaDecimals$
 	}
 	DUP
 	PUSHINT 1325889806
@@ -1511,6 +2236,12 @@ IFJMPREF {
 	IFJMPREF {
 		CALL $deploymentFee$
 	}
+	DUP
+	PUSHINT 1471876018
+	EQUAL
+	IFJMPREF {
+		CALL $upgradeOfferCode$
+	}
 }
 DUP
 PUSHINT 2008526096
@@ -1523,10 +2254,10 @@ IFJMPREF {
 		CALL $owner$
 	}
 	DUP
-	PUSHINT 1711651982
+	PUSHINT 1688565960
 	EQUAL
 	IFJMPREF {
-		CALL $auctionBidDeltaDecimals$
+		CALL $upgrade$
 	}
 	DUP
 	PUSHINT 1915547270
@@ -1540,11 +2271,5 @@ IFJMPREF {
 	IFJMPREF {
 		CALL $changeMarketFee$
 	}
-}
-DUP
-PUSHINT 2038206333
-EQUAL
-IFJMPREF {
-	CALL $getOfferAddress$
 }
 

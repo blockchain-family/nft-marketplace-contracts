@@ -1,4 +1,5 @@
-pragma ton-solidity >=0.57.1;
+pragma ever-solidity >= 0.62.0;
+
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
@@ -6,8 +7,10 @@ pragma AbiHeader time;
 import '../errors/BaseErrors.sol';
 import '../errors/OffersBaseErrors.sol';
 
-import '../modules/access/OwnableInternal.sol';
 import '../interfaces/IOffersRoot.sol';
+
+import '../modules/access/OwnableInternal.sol';
+
 
 abstract contract OffersRoot is IOffersRoot, OwnableInternal {
     uint8 public marketFee;

@@ -1,4 +1,4 @@
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity = 0.62.0;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
@@ -10,7 +10,9 @@ abstract contract TIP6 is ITIP6 {
 
     mapping(bytes4 => bool) internal _supportedInterfaces;
 
-    function supportsInterface(bytes4 interfaceID) external override view responsible returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceID
+    ) external override view responsible returns (bool) {
         return {value: 0, flag: 64, bounce: false} _supportedInterfaces[interfaceID];
     }
 

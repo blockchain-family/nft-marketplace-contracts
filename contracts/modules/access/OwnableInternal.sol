@@ -1,4 +1,4 @@
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity = 0.62.0;
 
 /// @title This extension is used to add the owner role to the contract. It is used to manage contracts through internal messages.
 abstract contract OwnableInternal {

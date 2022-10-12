@@ -6,6 +6,7 @@
 		{
 			"name": "constructor",
 			"inputs": [
+				{"name":"_price","type":"uint128"},
 				{"name":"_markerRootAddr","type":"address"},
 				{"name":"_tokenRootAddr","type":"address"},
 				{"name":"_nftOwner","type":"address"},
@@ -14,8 +15,8 @@
 				{"name":"_marketFeeDecimals","type":"uint8"},
 				{"name":"_auctionStartTime","type":"uint64"},
 				{"name":"_auctionDuration","type":"uint64"},
-				{"name":"_bidDelta","type":"uint8"},
-				{"name":"_paymentTokenRoot","type":"address"},
+				{"name":"_bidDelta","type":"uint16"},
+				{"name":"_paymentToken","type":"address"},
 				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
@@ -30,12 +31,20 @@
 			]
 		},
 		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
 			"name": "onAcceptTokensTransfer",
 			"inputs": [
 				{"name":"token_root","type":"address"},
 				{"name":"amount","type":"uint128"},
 				{"name":"sender","type":"address"},
-				{"name":"sender_wallet","type":"address"},
+				{"name":"value3","type":"address"},
 				{"name":"original_gas_to","type":"address"},
 				{"name":"payload","type":"cell"}
 			],
@@ -64,30 +73,19 @@
 		{
 			"name": "getInfo",
 			"inputs": [
-				{"name":"answerId","type":"uint32"}
 			],
 			"outputs": [
-				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentTokenRoot","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"_paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"},{"name":"status","type":"uint8"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{
-			"name": "onAcceptTokensBurn",
+			"name": "upgrade",
 			"inputs": [
-				{"name":"value0","type":"uint128"},
-				{"name":"value1","type":"address"},
-				{"name":"value2","type":"address"},
-				{"name":"user","type":"address"},
-				{"name":"payload","type":"cell"}
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
-			]
-		},
-		{
-			"name": "price",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"price","type":"uint128"}
 			]
 		},
 		{
@@ -96,6 +94,14 @@
 			],
 			"outputs": [
 				{"name":"nft","type":"address"}
+			]
+		},
+		{
+			"name": "price",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"price","type":"uint128"}
 			]
 		},
 		{
@@ -151,7 +157,7 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"name":"bidDelta","type":"uint8"}
+				{"name":"bidDelta","type":"uint16"}
 			]
 		},
 		{
@@ -181,15 +187,31 @@
 	],
 	"data": [
 		{"key":1,"name":"nonce_","type":"uint64"},
-		{"key":2,"name":"price","type":"uint128"},
-		{"key":3,"name":"nft","type":"address"}
+		{"key":2,"name":"nft","type":"address"}
 	],
 	"events": [
 		{
+			"name": "AuctionCreated",
+			"inputs": [
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"_paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"},{"name":"status","type":"uint8"}],"name":"value0","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionActive",
+			"inputs": [
+				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"_paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"finishTime","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"_nonce","type":"uint64"},{"name":"status","type":"uint8"}],"name":"value0","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "BidPlaced",
 			"inputs": [
-				{"name":"buyerAddress","type":"address"},
-				{"name":"value","type":"uint128"}
+				{"name":"buyer","type":"address"},
+				{"name":"value","type":"uint128"},
+				{"name":"nextBidValue","type":"uint128"}
 			],
 			"outputs": [
 			]
@@ -197,8 +219,32 @@
 		{
 			"name": "BidDeclined",
 			"inputs": [
-				{"name":"buyerAddress","type":"address"},
+				{"name":"buyer","type":"address"},
 				{"name":"value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionComplete",
+			"inputs": [
+				{"name":"seller","type":"address"},
+				{"name":"buyer","type":"address"},
+				{"name":"value","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionCancelled",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AuctionUpgrade",
+			"inputs": [
 			],
 			"outputs": [
 			]
@@ -209,23 +255,24 @@
 		{"name":"_timestamp","type":"uint64"},
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"nonce_","type":"uint64"},
-		{"name":"price","type":"uint128"},
 		{"name":"nft","type":"address"},
+		{"name":"price","type":"uint128"},
 		{"name":"markerRootAddr","type":"address"},
 		{"name":"tokenRootAddr","type":"address"},
 		{"name":"nftOwner","type":"address"},
 		{"name":"deploymentFee","type":"uint128"},
 		{"name":"marketFee","type":"uint128"},
 		{"name":"marketFeeDecimals","type":"uint8"},
-		{"name":"paymentTokenRoot","type":"address"},
+		{"name":"paymentToken","type":"address"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"auctionStartTime","type":"uint64"},
 		{"name":"auctionDuration","type":"uint64"},
 		{"name":"auctionEndTime","type":"uint64"},
-		{"name":"bidDelta","type":"uint8"},
+		{"name":"bidDelta","type":"uint16"},
 		{"components":[{"name":"addr","type":"address"},{"name":"value","type":"uint128"}],"name":"currentBid","type":"tuple"},
 		{"name":"maxBidValue","type":"uint128"},
 		{"name":"nextBidValue","type":"uint128"},
-		{"name":"state","type":"uint8"}
+		{"name":"state","type":"uint8"},
+		{"name":"currentVersion","type":"uint32"}
 	]
 }

@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 interface INftChangeManager {
 
@@ -15,5 +15,13 @@ interface INftChangeManager {
     /// @param collection Address of collection smart contract that mint the NFT
     /// @param sendGasTo - Address to send remaining gas
     //  @param payload - Custom payload
-    function onNftChangeManager(uint256 id, address owner, address oldManager, address newManager, address collection, address sendGasTo, TvmCell payload) external;
+    function onNftChangeManager(
+        uint256 id, 
+        address owner, 
+        address oldManager, 
+        address newManager,
+        address collection, 
+        address sendGasTo, 
+        TvmCell payload
+    ) external;
 }

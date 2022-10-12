@@ -1,0 +1,129 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_amount","type":"uint128"},
+				{"name":"_startTime","type":"uint64"},
+				{"name":"_durationTime","type":"uint64"},
+				{"name":"_spentTokenWallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "getInfo",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"tokenRoot","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"originalGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onNftChangeManager",
+			"inputs": [
+				{"name":"value0","type":"uint256"},
+				{"name":"nftOwner","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"newManager","type":"address"},
+				{"name":"value4","type":"address"},
+				{"name":"sendGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "finishBuy",
+			"inputs": [
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "closeBuy",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"factoryDirectBuy","type":"address"},
+		{"key":2,"name":"owner","type":"address"},
+		{"key":3,"name":"spentToken","type":"address"},
+		{"key":4,"name":"nftAddress","type":"address"},
+		{"key":5,"name":"timeTx","type":"uint64"}
+	],
+	"events": [
+		{
+			"name": "DirectBuyStateChanged",
+			"inputs": [
+				{"name":"from","type":"uint8"},
+				{"name":"to","type":"uint8"},
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value2","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "DirectBuyUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"factoryDirectBuy","type":"address"},
+		{"name":"owner","type":"address"},
+		{"name":"spentToken","type":"address"},
+		{"name":"nftAddress","type":"address"},
+		{"name":"timeTx","type":"uint64"},
+		{"name":"price","type":"uint128"},
+		{"name":"startTime","type":"uint64"},
+		{"name":"durationTime","type":"uint64"},
+		{"name":"endTime","type":"uint64"},
+		{"name":"spentTokenWallet","type":"address"},
+		{"name":"currentStatus","type":"uint8"},
+		{"name":"currentVersion","type":"uint32"}
+	]
+}

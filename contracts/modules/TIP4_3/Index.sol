@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 
 import 'interfaces/IIndex.sol';
@@ -48,7 +48,7 @@ contract Index is IIndex {
         address owner,
         address nft
     ) {
-        return {value: 0, flag: 64} (
+        return {value: 0, bounce: false, flag: 64} (
             _collection,
             _owner,
             _nft

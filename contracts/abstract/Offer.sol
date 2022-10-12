@@ -1,4 +1,5 @@
-pragma ton-solidity >=0.57.1;
+pragma ever-solidity >= 0.62.0;
+
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
@@ -7,16 +8,13 @@ import '../errors/BaseErrors.sol';
 import '../errors/OffersBaseErrors.sol';
 
 import '../interfaces/IOffersRoot.sol';
-import '../../true-nft/contracts/interfaces/IData.sol';
-
 
 abstract contract Offer {
 
     uint64 static nonce_;
-
-    uint128 public static price;
     address public static nft;
 
+    uint128 public price;
     address public markerRootAddr;
     address public tokenRootAddr;
     address public nftOwner;
@@ -27,6 +25,7 @@ abstract contract Offer {
     uint8 public marketFeeDecimals;
 
     function setDefaultProperties(
+        uint128 _price,
         address _markerRootAddr,
         address _tokenRootAddr,
         address _nftOwner,
@@ -35,7 +34,8 @@ abstract contract Offer {
         uint8 _marketFeeDecimals
     ) 
         internal 
-    {
+    {   
+        price = _price;
         markerRootAddr = _markerRootAddr;
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
@@ -47,12 +47,22 @@ abstract contract Offer {
     }
 
     modifier onlyOwner() {
-        require(msg.sender.value != 0 && msg.sender == nftOwner, BaseErrors.message_sender_is_not_my_owner);
+        require(
+            msg.sender.value != 0 &&
+            msg.sender == nftOwner, 
+            BaseErrors.message_sender_is_not_my_owner
+        );
+
         _;
     }
 
     modifier onlyMarketRoot() {
-        require(msg.sender.value != 0 && msg.sender == markerRootAddr, OffersBaseErrors.message_sender_is_not_my_root);
+        require(
+            msg.sender.value != 0 && 
+            msg.sender == markerRootAddr, 
+            OffersBaseErrors.message_sender_is_not_my_root
+        );
+
         _;
     }
 }

@@ -1,0 +1,122 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_startTime","type":"uint64"},
+				{"name":"_durationTime","type":"uint64"},
+				{"name":"_price","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "onTokenWallet",
+			"inputs": [
+				{"name":"_wallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getInfo",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"token","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"start","type":"uint64"},{"name":"end","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"value0","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"originalGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "finishSell",
+			"inputs": [
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "closeSell",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"factoryDirectSell","type":"address"},
+		{"key":2,"name":"owner","type":"address"},
+		{"key":3,"name":"paymentToken","type":"address"},
+		{"key":4,"name":"nftAddress","type":"address"},
+		{"key":5,"name":"timeTx","type":"uint64"}
+	],
+	"events": [
+		{
+			"name": "DirectSellStateChanged",
+			"inputs": [
+				{"name":"from","type":"uint8"},
+				{"name":"to","type":"uint8"},
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"token","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"start","type":"uint64"},{"name":"end","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"}],"name":"value2","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "DirectSellUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"factoryDirectSell","type":"address"},
+		{"name":"owner","type":"address"},
+		{"name":"paymentToken","type":"address"},
+		{"name":"nftAddress","type":"address"},
+		{"name":"timeTx","type":"uint64"},
+		{"name":"startTime","type":"uint64"},
+		{"name":"durationTime","type":"uint64"},
+		{"name":"endTime","type":"uint64"},
+		{"name":"price","type":"uint128"},
+		{"name":"tokenWallet","type":"address"},
+		{"name":"currentStatus","type":"uint8"},
+		{"name":"currentVersion","type":"uint32"}
+	]
+}

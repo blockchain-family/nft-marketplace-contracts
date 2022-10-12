@@ -1,0 +1,151 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "setCodeDirectSell",
+			"inputs": [
+				{"name":"_directSellCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "buildDirectSellCreationPayload",
+			"inputs": [
+				{"name":"callbackId","type":"uint32"},
+				{"name":"_nftAddress","type":"address"},
+				{"name":"_startTime","type":"uint64"},
+				{"name":"durationTime","type":"uint64"},
+				{"name":"_paymentToken","type":"address"},
+				{"name":"_price","type":"uint128"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "onNftChangeManager",
+			"inputs": [
+				{"name":"value0","type":"uint256"},
+				{"name":"nftOwner","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"newManager","type":"address"},
+				{"name":"value4","type":"address"},
+				{"name":"sendGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "RequestUpgradeDirectSell",
+			"inputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"_paymentToken","type":"address"},
+				{"name":"_nft","type":"address"},
+				{"name":"_timeTx","type":"uint64"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "transferOwnership",
+			"inputs": [
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"}
+	],
+	"events": [
+		{
+			"name": "DirectSellDeployed",
+			"inputs": [
+				{"name":"directSellAddress","type":"address"},
+				{"name":"sender","type":"address"},
+				{"name":"paymentToken","type":"address"},
+				{"name":"nft","type":"address"},
+				{"name":"nonce","type":"uint64"},
+				{"name":"price","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "DirectSellDeclined",
+			"inputs": [
+				{"name":"sender","type":"address"},
+				{"name":"_nftAddress","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "FactoryDirectSellUpgrade",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "OwnershipTransferred",
+			"inputs": [
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"owner_","type":"address"},
+		{"name":"nonce_","type":"uint64"},
+		{"name":"directSellCode","type":"cell"},
+		{"name":"currentVersion","type":"uint32"},
+		{"name":"currectVersionDirectSell","type":"uint32"}
+	]
+}

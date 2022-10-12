@@ -1,16 +1,24 @@
-pragma ton-solidity >=0.57.1;
+pragma ever-solidity >= 0.62.0;
+
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
 pragma AbiHeader time;
 
-import './libraries/Gas.sol';
-import './errors/AuctionErrors.sol';
-
 import './abstract/OffersRoot.sol';
 
-import './Nft.sol';
+import './errors/BaseErrors.sol';
+import './errors/AuctionErrors.sol';
+
+
+import './libraries/Gas.sol';
+
+import "./interfaces/IAuctionRootCallback.sol";
+import "./interfaces/IUpgradableByRequest.sol";
+
 import './modules/TIP4_1/interfaces/INftChangeManager.sol';
 import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
+
+import './Nft.sol';
 import './AuctionTip3.sol';
 
 contract AuctionRootTip3 is OffersRoot, INftChangeManager {
@@ -27,11 +35,14 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint64 deployNonce;
     }
 
-    uint8 public auctionBidDelta;
-    uint8 public auctionBidDeltaDecimals;
+    uint16 public auctionBidDelta;
+    uint16 public auctionBidDeltaDecimals;
+    uint32 currentVersion;
+    uint32 currentVersionOffer;
 
     event AuctionDeployed(address offerAddress, MarketOffer offerInfo);
     event AuctionDeclined(address nftOwner, address dataAddress);
+    event AuctionRootUpgrade();
 
     constructor(
         TvmCell _codeNft,
@@ -40,8 +51,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint128 _deploymentFee,
         uint8 _marketFee, 
         uint8 _marketFeeDecimals,
-        uint8 _auctionBidDelta,
-        uint8 _auctionBidDeltaDecimals,
+        uint16 _auctionBidDelta,
+        uint16 _auctionBidDeltaDecimals,
         address _sendGasTo
     ) OwnableInternal(
         _owner
@@ -62,13 +73,20 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
 
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
+        currentVersion++;
+        currentVersionOffer++;
+
         _sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
+    function getTypeContract() external pure returns (string) {
+        return "AuctionRoot";
+    }
+
     function onNftChangeManager(
-        uint256 id,
+        uint256 /*id*/,
         address nftOwner,
-        address oldManager,
+        address /*oldManager*/,
         address newManager,
         address collection,
         address sendGasTo,
@@ -76,20 +94,22 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     ) external override {
         require(newManager == address(this));
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
-        address expectedSender = _resolveNft(collection, id);
         bool isDeclined = false;
-        if (expectedSender == msg.sender && nftOwner == owner() && payload.toSlice().bits() == 523) {
-            (
-                address _paymentTokenRoot,
-                uint128 _price,
-                uint64 _auctionStartTime,
-                uint64 _auctionDuration
-            ) = payload.toSlice().decode(address, uint128, uint64, uint64);
+
+        TvmSlice payloadSlice = payload.toSlice();
+        (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
+        if (payloadSlice.bits() == 555) {
+            (   
+                ,address paymentToken,
+                uint128 price,
+                uint64 auctionStartTime,
+                uint64 auctionDuration
+            ) = payloadSlice.decode(uint32, address, uint128, uint64, uint64);
             if (
-                _paymentTokenRoot.value > 0 &&
-                _price >= 0 &&
-                _auctionStartTime > 0 &&
-                _auctionDuration > 0 
+                paymentToken.value > 0 &&
+                price >= 0 &&
+                auctionStartTime > 0 &&
+                auctionDuration > 0 
             ) {
                 address offerAddress = new AuctionTip3 {
                     wid: address(this).wid,
@@ -97,27 +117,47 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     flag: 1,
                     code: offerCode,
                     varInit: {
-                        price: _price,
-                        nft: msg.sender,
-                        nonce_: tx.timestamp
+                        nonce_: tx.timestamp,
+                        nft: msg.sender
                     }
                 }(
+                    price,
                     address(this),
                     collection,
                     nftOwner,
                     deploymentFeePart * 2, 
                     marketFee, 
                     marketFeeDecimals,
-                    _auctionStartTime, 
-                    _auctionDuration,
+                    auctionStartTime, 
+                    auctionDuration,
                     auctionBidDelta,
-                    _paymentTokenRoot,
+                    paymentToken,
                     nftOwner
                 );
-                MarketOffer offerInfo = MarketOffer(collection, nftOwner, msg.sender, offerAddress, _price, _auctionDuration, tx.timestamp);
+
+                MarketOffer offerInfo = MarketOffer(
+                    collection, 
+                    nftOwner, 
+                    msg.sender, 
+                    offerAddress,
+                    price,
+                    auctionDuration,
+                    tx.timestamp
+                );
+                
                 emit AuctionDeployed(offerAddress, offerInfo);
+                IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{
+                     value: 0.1 ever, 
+                     flag: 1, 
+                     bounce: false 
+                }(
+                    callbackId,
+                    offerAddress,
+                    offerInfo
+                );
+
                 mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-                ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
+                ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                     offerAddress,
                     sendGasTo,
                     callbacks
@@ -131,9 +171,18 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
-            TvmCell empty;
+            IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{
+                value: 0.1 ever, 
+                flag: 1, 
+                bounce: false 
+            }(
+                callbackId,
+                nftOwner,
+                msg.sender
+            );
+
             mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-            ITIP4_1NFT(msg.sender).changeManager{value: 0, flag: 128}(
+            ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                 nftOwner,
                 sendGasTo,
                 callbacks
@@ -143,35 +192,38 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
 
     function getOfferAddress(
         address _nft,
-        uint128 _price,
         uint64 _nonce
     ) 
-        public 
+        internal 
         view 
-        returns (address offerAddress)
+        returns (address)
     {
         TvmCell data = tvm.buildStateInit({
             contr: AuctionTip3,
             code: offerCode,
             varInit: {
-                price: _price,
-                nft: _nft,
-                nonce_: _nonce
+                nonce_: _nonce,
+                nft: _nft
             }
         });
 
-        offerAddress = address(tvm.hash(data));
+        return address(tvm.hash(data));
     }
 
-    function buildAuctionCreationPayload (
-        address _paymentTokenRoot,
-        uint128 _price,
-        uint64 _auctionStartTime,
-        uint64 _auctionDuration
+    function buildAuctionCreationPayload(
+        uint32 callbackId,
+        address paymentToken,
+        uint128 price,
+        uint64 auctionStartTime,
+        uint64 auctionDuration
     ) external pure responsible returns(TvmCell) {
         TvmBuilder builder;
-        builder.store(_paymentTokenRoot, _price, _auctionStartTime, _auctionDuration);
-        return builder.toCell();
+        builder.store(callbackId);
+        builder.store(paymentToken);
+        builder.store(price);
+        builder.store(auctionStartTime);
+        builder.store(auctionDuration);
+        return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
     function _resolveNft(
@@ -183,11 +235,13 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint256 hashState = tvm.hash(state);
         nft = address.makeAddrStd(address(this).wid, hashState);
     }
+
    function _buildNftCode(address collection) internal virtual view returns (TvmCell) {
         TvmBuilder salt;
         salt.store(collection);
         return tvm.setCodeSalt(codeNft, salt.toCell());
     }
+
     function _buildNftState(
         TvmCell code,
         uint256 id
@@ -198,4 +252,71 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             code: code
         });
     }
+    
+    function RequestUpgradeAuction(
+        address _nft,
+        uint64 _nonce,
+        address sendGasTo
+    ) external view onlyOwner {
+        require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.value_too_low);  
+        tvm.rawReserve(math.max(
+            Gas.AUCTION_ROOT_INITIAL_BALANCE, 
+            address(this).balance - msg.value), 2
+        );
+
+        IUpgradableByRequest(getOfferAddress(_nft, _nonce)).upgrade{
+            value: 0,
+            flag: 128
+        }(offerCode, currentVersionOffer, sendGasTo);      
+    }
+
+    function upgradeOfferCode(TvmCell newCode) public onlyOwner {
+        tvm.rawReserve(Gas.SET_CODE, 0);
+        offerCode = newCode;
+        currentVersionOffer++;
+
+        msg.sender.transfer(
+            0,
+            false,
+            128 + 2
+        );
+    }
+
+    function upgrade(
+        TvmCell newCode,
+        uint32 newVersion,
+        address sendGasTo
+    ) external onlyOwner {
+        if (currentVersion == newVersion) {
+            tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+            sendGasTo.transfer({
+                value: 0,
+                flag: 128 + 2,
+                bounce: false
+            });
+		} else {
+            emit AuctionRootUpgrade();
+
+            TvmCell cellParams = abi.encode(
+                nonce_,
+                owner(),
+                currentVersion,
+                auctionBidDelta,
+                auctionBidDeltaDecimals,
+                codeNft,
+                offerCode,
+                deploymentFee,
+                marketFee,
+                marketFeeDecimals,
+                deploymentFeePart
+            );
+            
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade (cellParams);
+        }
+    }
+
+    function onCodeUpgrade(TvmCell data) private {}
 }

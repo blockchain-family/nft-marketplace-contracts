@@ -1,4 +1,4 @@
-pragma ton-solidity >= 0.57.1;
+pragma ever-solidity >= 0.62.0;
 
 import './interfaces/IIndexBasis.sol';
 
@@ -26,7 +26,7 @@ contract IndexBasis is IIndexBasis {
 
     /// @return collection - collection token contract address
     function getInfo() override public view responsible returns (address collection) {
-        return {value: 0, flag: 64} _collection;
+        return {value: 0, bounce: false, flag: 64} _collection;
     }
 
     /// @notice This method used for destruct token, can be called only by nft

@@ -1,6 +1,6 @@
-/// We recommend using the compiler version 0.57.1. 
+/// We recommend using the compiler version 0.62.0. 
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
-pragma ton-solidity = 0.57.1;
+pragma ever-solidity = 0.62.0;
 
 
 pragma AbiHeader expire;
@@ -61,7 +61,9 @@ contract TIP4_1Collection is ITIP4_1Collection, TIP6 {
     /// @dev Return unique address for all Ids. You find nothing by address for not a valid NFT.
     /// @param id Unique NFT id
     /// @return nft Returns address of NFT contract
-    function nftAddress(uint256 id) external view virtual override responsible returns (address nft) {
+    function nftAddress(
+        uint256 id
+    ) external view virtual override responsible returns (address nft) {
         return {value: 0, flag: 64, bounce: false} (_resolveNft(id));
     }
 

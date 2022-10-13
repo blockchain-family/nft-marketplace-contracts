@@ -39,7 +39,7 @@ async function Callback(payload:string) {
             callback = [
                 auctionRoot.address,
                 {
-                    value: locklift.utils.toNano(5),
+                    value: locklift.utils.toNano(4),
                     payload: payload,
                 },
             ];

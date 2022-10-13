@@ -228,7 +228,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
       );
   }
 
-  function RequestUpgradeDirectSell(
+  function RequestUpgradeDirectBuy(
     address _owner,
     address spentToken, 
     address _nft, 
@@ -271,6 +271,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         nonce_,
         owner(),
         currentVersion,
+        currectVersionDirectBuy,
         tokenPlatformCode,
         directBuyCode
       );

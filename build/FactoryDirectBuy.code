@@ -752,7 +752,7 @@ ENDC
 CTOS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 
-.macro RequestUpgradeDirectSell
+.macro RequestUpgradeDirectBuy
 DROP
 GETGLOB 6
 THROWIFNOT 76
@@ -786,14 +786,14 @@ LDMSGADDR
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
-	CALL $RequestUpgradeDirectSell_7002f506_internal_macro$
+	CALL $RequestUpgradeDirectBuy_72a14126_internal_macro$
 }
 IFREF {
 	CALL $upd_only_time_in_c4$
 }
 THROW 0
 
-.macro RequestUpgradeDirectSell_7002f506_internal_macro
+.macro RequestUpgradeDirectBuy_72a14126_internal_macro
 .loc ../contracts/modules/access/OwnableInternal.sol, 31
 GETGLOB 9
 PARSEMSGADDR
@@ -947,6 +947,7 @@ PUSHCONT {
 	.loc ../contracts/FactoryDirectBuy.sol, 270
 	GETGLOB 13
 	GETGLOB 12
+	GETGLOB 15
 	GETGLOB 14
 	CALLREF {
 		CALL $owner_8da5cb5b_internal_macro$
@@ -956,13 +957,14 @@ PUSHCONT {
 	STU 64
 	STSLICE
 	STU 32
+	STU 32
 	STREF
 	STREF
 	ENDC
-	.loc ../contracts/FactoryDirectBuy.sol, 278
+	.loc ../contracts/FactoryDirectBuy.sol, 279
 	PUSH S2
 	SETCODE
-	.loc ../contracts/FactoryDirectBuy.sol, 279
+	.loc ../contracts/FactoryDirectBuy.sol, 280
 	PUSH S2
 	CTOS
 	DUP
@@ -977,7 +979,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/FactoryDirectBuy.sol, 281
+	.loc ../contracts/FactoryDirectBuy.sol, 282
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}
@@ -1668,15 +1670,9 @@ TUPLE 9
 
 .macro public_function_selector
 DUP
-PUSHINT 235197086
+PUSHINT 420993090
 LEQ
 IFJMPREF {
-	DUP
-	PUSHINT 134784542
-	EQUAL
-	IFJMPREF {
-		CALL $RequestUpgradeDirectSell$
-	}
 	DUP
 	PUSHINT 142051647
 	EQUAL
@@ -1695,17 +1691,17 @@ IFJMPREF {
 	IFJMPREF {
 		CALL $transferOwnership$
 	}
-}
-DUP
-PUSHINT 1594609630
-LEQ
-IFJMPREF {
 	DUP
 	PUSHINT 420993090
 	EQUAL
 	IFJMPREF {
 		CALL $getTypeContract$
 	}
+}
+DUP
+PUSHINT 1594609630
+LEQ
+IFJMPREF {
 	DUP
 	PUSHINT 739192021
 	EQUAL
@@ -1717,6 +1713,12 @@ IFJMPREF {
 	EQUAL
 	IFJMPREF {
 		CALL $constructor$
+	}
+	DUP
+	PUSHINT 1515676228
+	EQUAL
+	IFJMPREF {
+		CALL $RequestUpgradeDirectBuy$
 	}
 	DUP
 	PUSHINT 1594609630

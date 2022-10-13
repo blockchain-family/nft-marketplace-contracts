@@ -302,6 +302,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         nftAddress,
         timeTx,
         startTime,
+        durationTime,
         endTime,
         price,
         tokenWallet,

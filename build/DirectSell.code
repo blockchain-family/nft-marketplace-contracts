@@ -828,6 +828,7 @@ PUSHCONT {
 	GETGLOB 19
 	GETGLOB 18
 	GETGLOB 17
+	GETGLOB 16
 	GETGLOB 15
 	GETGLOB 14
 	GETGLOB 13
@@ -836,15 +837,16 @@ PUSHCONT {
 	GETGLOB 10
 	NEWC
 	STSLICE
+	ROLLREV 11
+	NEWC
+	STSLICE
 	ROLLREV 10
 	NEWC
 	STSLICE
 	ROLLREV 9
 	NEWC
 	STSLICE
-	ROLLREV 8
-	NEWC
-	STSLICE
+	STU 64
 	STU 64
 	STU 64
 	STU 64
@@ -859,10 +861,10 @@ PUSHCONT {
 	STBREFR
 	STBREFR
 	ENDC
-	.loc ../contracts/DirectSell.sol, 312
+	.loc ../contracts/DirectSell.sol, 313
 	PUSH S2
 	SETCODE
-	.loc ../contracts/DirectSell.sol, 313
+	.loc ../contracts/DirectSell.sol, 314
 	PUSH S2
 	CTOS
 	DUP
@@ -877,7 +879,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/DirectSell.sol, 315
+	.loc ../contracts/DirectSell.sol, 316
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}

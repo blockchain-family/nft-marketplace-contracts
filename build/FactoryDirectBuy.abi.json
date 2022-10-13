@@ -62,7 +62,7 @@
 			]
 		},
 		{
-			"name": "RequestUpgradeDirectSell",
+			"name": "RequestUpgradeDirectBuy",
 			"inputs": [
 				{"name":"_owner","type":"address"},
 				{"name":"spentToken","type":"address"},

@@ -249,6 +249,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         nonce_,
         owner(),
         currentVersion,
+        currectVersionDirectSell,
         directSellCode
       );
       

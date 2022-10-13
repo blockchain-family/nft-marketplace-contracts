@@ -210,7 +210,7 @@ describe("Test DirectBuy contract", async function() {
             const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
             logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
             
-            directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
+            directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account2);
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
@@ -224,7 +224,7 @@ describe("Test DirectBuy contract", async function() {
             expect(spentTokenWallet2BalanceEnd.toString()).to.be.eq((startBalanceTW2).toString());
             expect(owner.toString()).to.be.eq((account3.address).toString());
         });
-        /*it('Deploy DirectBuy and timeout', async function () {
+        it('Deploy DirectBuy and timeout', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 10)); 
@@ -276,6 +276,6 @@ describe("Test DirectBuy contract", async function() {
             const owner = (await nft.getInfo()).owner;
             expect(spentTokenWallet2BalanceEnd.toString()).to.be.eq((startBalanceTW2).toString());
             expect(owner.toString()).to.be.eq((account3.address).toString())
-        });*/
+        });
     });
 });

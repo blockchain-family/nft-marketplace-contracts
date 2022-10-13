@@ -185,6 +185,8 @@ describe("Test DirectBuy contract", async function() {
             expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
 
             const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            const owner = (await nft.getInfo()).owner;
+            expect(owner.toString()).to.be.eq((account3.address).toString());
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 + spentToken).toString());
 
             startBalanceTW3 -= spentToken;
@@ -194,87 +196,86 @@ describe("Test DirectBuy contract", async function() {
         });
     });
 
-//    describe("DirectBuy cancel", async function() {
-//         it('Deploy DirectBuy and cancel', async function () {
-//             const spentToken: number = 5000000000;
-//             let payload: string;
-//             payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 5));
+   describe("DirectBuy cancel", async function() {
+        it('Deploy DirectBuy and cancel', async function () {
+            const spentToken: number = 5000000000;
+            let payload: string;
+            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 5));
             
-//             await sleep(1000);
-//             await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
-//             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
-//             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
+            await sleep(1000);
+            await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
-//             const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
-//             logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
+            const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
+            logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
             
-//             directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
-//             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
-//             expect(dbFilled.to.toString()).to.be.eq('2');
+            directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
+            const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
+            expect(dbFilled.to.toString()).to.be.eq('2');
 
-//             await directBuy.closeBuy();
-//             const dbClosed = await directBuy.getEvent('DirectBuyStateChanged') as any;
-//             expect(dbClosed.to.toString()).to.be.eq('4');
+            await directBuy.closeBuy();
+            const dbClosed = await directBuy.getEvent('DirectBuyStateChanged') as any;
+            expect(dbClosed.to.toString()).to.be.eq('4');
             
-//             await sleep(5000);
-//             const spentTokenWallet3BalanceEnd = await tokenWallet3.balance() as any;
-//             const owner = (await nft.getInfo()).owner;
-//             expect(spentTokenWallet3BalanceEnd.toString()).to.be.eq((startBalanceTW3).toString());
-//             expect(owner.toString()).to.be.eq((account2.address).toString());
-//         });
-//         it('Deploy DirectBuy and timeout', async function () {
-//             const spentToken: number = 5000000000;
-//             let payload: string;
-//             payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 10)); 
-//             await sleep(1000);
-//             await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
-//             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
-//             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
+            await sleep(5000);
+            const spentTokenWallet2BalanceEnd = await tokenWallet2.balance() as any;
+            const owner = (await nft.getInfo()).owner;
+            expect(spentTokenWallet2BalanceEnd.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(owner.toString()).to.be.eq((account3.address).toString());
+        });
+        /*it('Deploy DirectBuy and timeout', async function () {
+            const spentToken: number = 5000000000;
+            let payload: string;
+            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round(Date.now() / 1000), 10)); 
+            await sleep(1000);
+            await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
-//             const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
-//             logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
+            const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
+            logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
             
-//             directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
-//             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
-//             expect(dbFilled.to.toString()).to.be.eq('2');
+            directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
+            const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
+            expect(dbFilled.to.toString()).to.be.eq('2');
        
-//             await sleep(15000);
-//             await directBuy.closeBuy();
-//             const dbClosed = await directBuy.getEvent('DirectBuyStateChanged') as any;
-//             expect(dbClosed.to.toString()).to.be.eq('4');
-//             const spentTokenWallet3BalanceEnd = await tokenWallet3.balance() as any;
-//             const owner = (await nft.getInfo()).owner;
-//             expect(owner.toString()).to.be.eq((account2.address).toString());
-//             expect(spentTokenWallet3BalanceEnd.toString()).to.be.eq((startBalanceTW3).toString());
+            await sleep(15000);
+            await directBuy.closeBuy();
+            const dbClosed = await directBuy.getEvent('DirectBuyStateChanged') as any;
+            expect(dbClosed.to.toString()).to.be.eq('4');
+            const spentTokenWallet2BalanceEnd = await tokenWallet2.balance() as any;
+            const owner = (await nft.getInfo()).owner;
+            expect(spentTokenWallet2BalanceEnd.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(owner.toString()).to.be.eq((account3.address).toString());
             
-//         });
-//         it('Deploy DirectBuy and instantly cancel', async function () {
-//             const spentToken: number = 5000000000;
-//             let payload: string;
-//             payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round((Date.now() / 1000)+11), 5));
+        });
+        it('Deploy DirectBuy and instantly cancel', async function () {
+            const spentToken: number = 5000000000;
+            let payload: string;
+            payload = (await factoryDirectBuy.buildPayload(0, nft, Math.round((Date.now() / 1000)+11), 5));
             
-//             await sleep(1000);
-//             await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
-//             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
-//             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
+            await sleep(1000);
+            await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, locklift.utils.toNano(0.2), true, payload, locklift.utils.toNano(5));
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
-//             const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
-//             logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
+            const dBCreate = await factoryDirectBuy.getEvent('DirectBuyDeployed') as any;
+            logger.log(`Address DirectBuy ${dBCreate.directBuyAddress.toString()}`);
             
-//             directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
-//             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
-//             expect(dbFilled.to.toString()).to.be.eq('2');
+            directBuy = await DirectBuy.from_addr(dBCreate.directBuyAddress, account3);
+            const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
+            expect(dbFilled.to.toString()).to.be.eq('2');
 
-//             await directBuy.closeBuy();
-//             const dbClosed = await directBuy.getEvent('DirectBuyStateChanged') as any;
-//             expect(dbClosed.to.toString()).to.be.eq('4');
+            await directBuy.closeBuy();
+            const dbClosed = await directBuy.getEvent('DirectBuyStateChanged') as any;
+            expect(dbClosed.to.toString()).to.be.eq('4');
             
-//             await sleep(5000);
-//             const spentTokenWallet3BalanceEnd = await tokenWallet3.balance() as any;
-//             const owner = (await nft.getInfo()).owner;
-//             expect(spentTokenWallet3BalanceEnd.toString()).to.be.eq((startBalanceTW3).toString());
-//             expect(owner.toString()).to.be.eq((account2.address).toString());
-
-//         });
-//     });
+            await sleep(5000);
+            const spentTokenWallet2BalanceEnd = await tokenWallet2.balance() as any;
+            const owner = (await nft.getInfo()).owner;
+            expect(spentTokenWallet2BalanceEnd.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(owner.toString()).to.be.eq((account3.address).toString())
+        });*/
+    });
 });

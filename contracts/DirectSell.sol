@@ -118,14 +118,13 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     address originalGasTo,
     TvmCell payload
   ) external override {
-    tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
-
     (
       address buyer, 
       uint32 callbackId
     ) = ExchangePayload.getSenderAndCallId(sender, payload);
     
     TvmCell emptyPayload;
+    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         
     if (
       msg.sender.value != 0 &&
@@ -136,6 +135,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       ((endTime > 0 && now < endTime) || endTime == 0) &&
       now >= startTime
     ) {
+      tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
       IDirectSellCallback(buyer).directSellSuccess{ 
         value: 0.1 ever, 
         flag: 1, 
@@ -147,8 +147,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       );
 
       changeState(DirectSellStatus.Filled);
-
-      mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
       ITIP4_1NFT(nftAddress).transfer{ 
         value: Gas.TRANSFER_OWNERSHIP_VALUE, 
         flag: 1, 
@@ -183,7 +181,30 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         );
 
         changeState(DirectSellStatus.Expired);
+      
+        ITokenWallet(msg.sender).transfer{ 
+          value: 0, 
+          flag: 64, 
+          bounce: false 
+        }(
+          amount,
+          buyer,
+          uint128(0),
+          originalGasTo,
+          true,
+          emptyPayload
+        );
+
+        ITIP4_1NFT(nftAddress).changeManager{ 
+          value: 0, 
+          flag: 128 
+        }(
+          owner, 
+          originalGasTo, 
+          callbacks
+        );
       } else {
+        tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
         IDirectSellCallback(buyer).directSellNotSuccess{
           value: 0.1 ever, 
           flag: 1, 
@@ -191,21 +212,20 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         }(
           callbackId
         );
-      }
 
-      ITokenWallet(msg.sender).transfer{ 
-        value: 0, 
-        flag: 128, 
-        bounce: false 
-      }(
-        amount,
-        buyer,
-        uint128(0),
-        originalGasTo,
-        true,
-        emptyPayload
-      );
-
+        ITokenWallet(msg.sender).transfer{ 
+          value: 0, 
+          flag: 128, 
+          bounce: false 
+        }(
+          amount,
+          buyer,
+          uint128(0),
+          originalGasTo,
+          true,
+          emptyPayload
+        );
+      } 
     }
   }
 
@@ -277,7 +297,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       owner, 
       callbacks
     );
-
   }
 
   function upgrade(

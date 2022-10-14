@@ -375,5 +375,30 @@ describe("Test DirectSell contract", async function () {
             const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
         });
+        it('Deploy DirectSell and expire', async function () {
+            const spentToken: number = 5000000000;
+            let payload: string;
+            payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 10, tokenRoot, spentToken));
+            await sleep(1000);
+            let callbacks = await Callback(payload);
+            await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
+            const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
+            logger.log(`Address DirectSell ${dSCreate.directSellAddress.toString()}`);
+
+            directSell = await DirectSell.from_addr(dSCreate.directSellAddress, account3);
+            const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
+            expect(dSActive.to.toString()).to.be.eq('2');
+
+            await sleep(10000);
+            await directSell.finishSell(account3);
+            const dSClosed = await directSell.getEvent('DirectSellStateChanged') as any;
+            expect(dSClosed.to.toString()).to.be.eq('5');
+
+            const managerChanged = await nft.getEvent('ManagerChanged') as any;
+            expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
+
+            let owner = (await nft.getInfo()).owner
+            expect(owner.toString()).to.be.eq(account3.address.toString());
+        });
     });
 });

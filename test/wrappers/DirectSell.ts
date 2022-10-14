@@ -80,4 +80,16 @@ export class DirectSell {
             (cc) => cc.methods.closeSell({})
         );
     }
+    async finishSell(initiator: AccountType) {
+        return await initiator.runTarget(
+            {
+                contract: this.contract,
+                value: locklift.utils.toNano(2),
+                flags: 1
+            },
+            (dd) => dd.methods.finishSell({
+                sendGasTo: initiator.address
+            })
+        );
+    }
 }

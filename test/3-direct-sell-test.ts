@@ -267,7 +267,11 @@ describe("Test DirectSell contract", async function () {
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             let owner = (await nft.getInfo()).owner
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
         });
         it('Deploy DirectSell and cancel before start', async function () {
@@ -292,7 +296,11 @@ describe("Test DirectSell contract", async function () {
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             let owner = (await nft.getInfo()).owner
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
         });
         it('Deploy DirectSell with duration and cancel', async function () {
@@ -318,7 +326,11 @@ describe("Test DirectSell contract", async function () {
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             let owner = (await nft.getInfo()).owner
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
         });
         it('Deploy DirectSell and timeout', async function () {
@@ -343,7 +355,11 @@ describe("Test DirectSell contract", async function () {
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             let owner = (await nft.getInfo()).owner
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
         });
         it('Deploy DirectSell and try to but after its closed', async function () {
@@ -397,7 +413,11 @@ describe("Test DirectSell contract", async function () {
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             let owner = (await nft.getInfo()).owner
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
         });
     });

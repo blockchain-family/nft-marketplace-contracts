@@ -152,8 +152,6 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         ((endTime > 0 && now < endTime) || endTime == 0) &&
         now >= startTime
     ) {
-      tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-
       IDirectBuyCallback(nftOwner).directBuySuccess{ 
         value: 0.1 ever, 
         flag: 1, 
@@ -190,7 +188,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         empty
       );
     } else {
-      if (endTime > 0 && now >= endTime) {
+      if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
         IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
           value: 0.1 ever, 
           flag: 1, 
@@ -210,7 +208,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         ); 
 
         TvmCell emptyPayload;
-        ITokenWallet(msg.sender).transfer{ 
+        ITokenWallet(spentTokenWallet).transfer{ 
           value: 0, 
           flag: 128, 
           bounce: false 
@@ -279,7 +277,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     changeState(DirectBuyStatus.Expired);
 
     TvmCell emptyPayload;
-    ITokenWallet(msg.sender).transfer{ 
+    ITokenWallet(spentTokenWallet).transfer{ 
       value: 0, 
       flag: 128, 
       bounce: false 

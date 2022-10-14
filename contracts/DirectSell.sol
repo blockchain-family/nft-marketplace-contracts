@@ -50,7 +50,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     uint128 _price;
     address wallet;
     uint8 status;
-    address sender;
   }
 
   event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo);
@@ -220,8 +219,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         endTime,
         price,
         tokenWallet,
-        currentStatus,
-        msg.sender
+        currentStatus
       );
   }
 

@@ -49,7 +49,6 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     uint128 _price;
     address spentWallet;
     uint8 status;
-    address sender;
     uint64 startTimeBuy;
     uint64 durationTimeBuy;
     uint64 endTimeBuy;
@@ -232,7 +231,6 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         price,
         spentTokenWallet,
         currentStatus,
-        msg.sender,
         startTime,
         durationTime,
         endTime

@@ -12,7 +12,6 @@ let account1: AccountType;
 let account2: AccountType;
 let account3: AccountType;
 
-let collection: CollectionType;
 let nft: NftC;
 
 let tokenRoot: Token;
@@ -51,7 +50,7 @@ describe("Test DirectSell contract", async function () {
         let accForNft: AccountType[] = [];
         accForNft.push(account1);
 
-        const [collection, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
+        const [, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
     });
     it('Deploy TIP-3 token', async function () {

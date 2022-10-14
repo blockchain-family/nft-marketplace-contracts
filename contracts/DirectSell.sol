@@ -136,7 +136,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       ((endTime > 0 && now < endTime) || endTime == 0) &&
       now >= startTime
     ) {
-      IDirectSellCallback(owner).directSellSuccess{ 
+      IDirectSellCallback(buyer).directSellSuccess{ 
         value: 0.1 ever, 
         flag: 1, 
         bounce: false 
@@ -174,7 +174,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
     } else {
       if (endTime > 0 && now >= endTime) {
-        IDirectSellCallback(owner).directSellCancelledOnTime{
+        IDirectSellCallback(buyer).directSellCancelledOnTime{
           value: 0.1 ever, 
           flag: 1, 
           bounce: false 
@@ -183,6 +183,14 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         );
 
         changeState(DirectSellStatus.Expired);
+      } else {
+        IDirectSellCallback(buyer).directSellNotSuccess{
+          value: 0.1 ever, 
+          flag: 1, 
+          bounce: false   
+        }(
+          callbackId
+        );
       }
 
       ITokenWallet(msg.sender).transfer{ 
@@ -257,7 +265,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       currentStatus == DirectSellStatus.Active, 
       DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
     );
-
+    
     changeState(DirectSellStatus.Cancelled);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;

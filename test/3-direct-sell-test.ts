@@ -63,7 +63,6 @@ describe("Test DirectSell contract", async function () {
     });
     it('Deploy FactoryDirectSell', async function () {
         factoryDirectSell = await deployFactoryDirectSell(account1);
-        logger.log("");
     });
 
     describe("DirectSell completed", async function () {
@@ -71,7 +70,6 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000), 0, tokenRoot, spentToken));
-            await sleep(1000);
 
             let callbacks = await Callback(payload);
 
@@ -86,8 +84,6 @@ describe("Test DirectSell contract", async function () {
             await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', locklift.utils.toNano(2));
             const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSFilled.to.toString()).to.be.eq('3');
-
-            await sleep(1000);
 
             const ownerChanged = await nft.getEvent('OwnerChanged') as any;
             expect(ownerChanged.newOwner.toString()).to.be.eq(account2.address.toString());
@@ -104,17 +100,11 @@ describe("Test DirectSell contract", async function () {
 
             startBalanceTW1 += spentToken;
             startBalanceTW2 -= spentToken;
-
-
-
-            logger.log("");
-
         }); 
         it('Deploy limited DirectSell and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000), 5, tokenRoot, spentToken));
-            await sleep(1000);
 
             let callbacks = await Callback(payload);
 
@@ -129,8 +119,6 @@ describe("Test DirectSell contract", async function () {
             await tokenWallet3.transfer(spentToken, directSell.address, 0, true, '', locklift.utils.toNano(2));
             const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSFilled.to.toString()).to.be.eq('3');
-
-            await sleep(1000);
 
             const ownerChanged = await nft.getEvent('OwnerChanged') as any;
             expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
@@ -148,14 +136,11 @@ describe("Test DirectSell contract", async function () {
 
             startBalanceTW2 += spentToken;
             startBalanceTW3 -= spentToken;
-
-            logger.log("");
         });  
         it('Deploy limited DirectSell and try to buy before start', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000) + 10, 10, tokenRoot, spentToken));
-            await sleep(1000);
             let callbacks = await Callback(payload);
 
             await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
@@ -192,8 +177,6 @@ describe("Test DirectSell contract", async function () {
 
             startBalanceTW2 -= spentToken;
             startBalanceTW3 += spentToken;
-
-            logger.log("");
         });  
         it('Deploy unlimited DirectSell and try to buy before start', async function () {
             const spentToken: number = 5000000000;
@@ -237,8 +220,6 @@ describe("Test DirectSell contract", async function () {
 
             startBalanceTW2 += spentToken;
             startBalanceTW3 -= spentToken;
-
-            logger.log("");
         });
     });
 
@@ -247,7 +228,6 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round(Date.now() / 1000), 0, tokenRoot, spentToken));
-            await sleep(10000);
 
             let callbacks = await Callback(payload);
 
@@ -277,7 +257,6 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000) + 5000), 0, tokenRoot, spentToken));
-            await sleep(10000);
 
             let callbacks = await Callback(payload);
 
@@ -306,7 +285,7 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 50, tokenRoot, spentToken));
-            await sleep(10000);
+            //await sleep(10000);
 
             let callbacks = await Callback(payload);
 
@@ -336,7 +315,7 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 10, tokenRoot, spentToken));
-            await sleep(1000);
+            
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
             const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
@@ -364,8 +343,7 @@ describe("Test DirectSell contract", async function () {
         it('Deploy DirectSell and try to but after its closed', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 50, tokenRoot, spentToken));
-            await sleep(10000);
+            payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 5, tokenRoot, spentToken));
 
             let callbacks = await Callback(payload);
 
@@ -394,7 +372,7 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 10, tokenRoot, spentToken));
-            await sleep(1000);
+            
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
             const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
@@ -423,7 +401,7 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 10, tokenRoot, spentToken));
-            await sleep(1000);
+            
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
             const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;

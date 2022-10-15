@@ -11,17 +11,15 @@ let account1: AccountType;
 let account2: AccountType;
 let account3: AccountType;
 let account4: AccountType;
-let account5: AccountType;
 
 let nft: NftC;
 
 let tokenRoot: Token;
-let tokenRoot1: Token;
+
 let tokenWallet1: TokenWallet;
 let tokenWallet2: TokenWallet;
 let tokenWallet3: TokenWallet;
 let tokenWallet4: TokenWallet;
-let tokenWallet5: TokenWallet;
 
 let auctionRoot: AuctionRoot;
 let auction: Auction;
@@ -53,7 +51,6 @@ describe("Test Auction contract", async function () {
         account2 = await deployAccount(1, 30);
         account3 = await deployAccount(2, 60);
         account4 = await deployAccount(3, 20);
-        account5 = await deployAccount(4, 20);
     });
 
     it('Deploy NFT-Collection and Mint Nft', async function () {
@@ -66,7 +63,6 @@ describe("Test Auction contract", async function () {
 
     it('Deploy TIP-3 token', async function () {
         tokenRoot = await deployTokenRoot('Test', 'Test', account1);
-        tokenRoot1 = await deployTokenRoot('NewToken', 'NewToken', account5);
     });
 
     it('Mint TIP-3 token to account', async function () {
@@ -74,12 +70,10 @@ describe("Test Auction contract", async function () {
         tokenWallet2 = await tokenRoot.mint(startBalanceTW2, account2);
         tokenWallet3 = await tokenRoot.mint(startBalanceTW3, account3);
         tokenWallet4 = await tokenRoot.mint(startBalanceTW4, account4);
-        tokenWallet5 = await tokenRoot1.mint(startBalanceTW4, account5);
     });
 
     it('Deploy AuctionRootTip3', async function () {
         auctionRoot = await deployAuctionRoot(account2);
-        logger.log("");
     });
 
     describe("Auction completed", async function () {
@@ -221,9 +215,6 @@ describe("Test Auction contract", async function () {
             startBalanceTW3 = startBalanceTW3 + spentToken + 10000000000;
             startBalanceTW4 = startBalanceTW4 - spentToken - 10000000000;
         });
-    });
-
-    describe("Auction single rebid", async function () {
         it('Two stake with first user rebid', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
@@ -258,13 +249,13 @@ describe("Test Auction contract", async function () {
             await sleep(5000);
             await locklift.tracing.trace(auction.finishAuction(account2));
 
+            await auction.getEvent('AuctionComplete');
+
             const ownerChanged = await nft.getEvent('OwnerChanged') as any;
             expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
 
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
-
-            await auction.getEvent('AuctionComplete');
 
             let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
             spentTokenWallet2Balance = await tokenWallet2.balance() as any;
@@ -300,14 +291,16 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account4.address.toString());
 
-            let owner = (await nft.getInfo()).owner;
-            expect(owner.toString()).to.be.eq(account3.address.toString());
-
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
             await auction.finishAuction(account3);
             await auction.getEvent('AuctionComplete');
+
+            let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
+            expect(spentTokenWallet4Balance.toString()).to.be.eq((startBalanceTW4).toString());
+            let owner = (await nft.getInfo()).owner;
+            expect(owner.toString()).to.be.eq(account3.address.toString());
         });
 
         it('Trying to stake after auction closed', async function () {
@@ -355,13 +348,11 @@ describe("Test Auction contract", async function () {
 
             await sleep(3000);
             await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
-            
-            let spentTokenWallet1Balance = await tokenWallet1.balance() as any;
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
-
             await locklift.tracing.trace(auction.finishAuction(account3));
             await auction.getEvent('AuctionCancelled');
 
+            let spentTokenWallet1Balance = await tokenWallet1.balance() as any;
             let status = (await auction.getInfo()).status;
             let owner = (await nft.getInfo()).owner;
             expect(status.toString()).to.be.eq('3');
@@ -452,6 +443,7 @@ describe("Test Auction contract", async function () {
 
             let owner = (await nft.getInfo()).owner;
             expect(owner.toString()).to.be.eq(account2.address.toString());
+            expect(spentTokenWallet4Balance.toString()).to.be.eq((startBalanceTW4).toString());
         });
 
         it('Trying finish auction before its start', async function () {

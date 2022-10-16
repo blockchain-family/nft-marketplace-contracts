@@ -56,7 +56,6 @@ describe("Test Auction contract", async function () {
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: AccountType[] = [];
         accForNft.push(account2);
-
         const [, nftS] = await deployCollectionAndMintNft(account2, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
     });
@@ -226,7 +225,6 @@ describe("Test Auction contract", async function () {
 
             auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
-
 
             //First user bid
             await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));

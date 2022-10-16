@@ -133,7 +133,6 @@ describe("Test DirectSell contract", async function () {
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
             expect(owner.toString()).to.be.eq(account3.address.toString());
 
-
             startBalanceTW2 += spentToken;
             startBalanceTW3 -= spentToken;
         });  
@@ -173,7 +172,6 @@ describe("Test DirectSell contract", async function () {
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 + spentToken).toString());
             expect(owner.toString()).to.be.eq(account2.address.toString());
-
 
             startBalanceTW2 -= spentToken;
             startBalanceTW3 += spentToken;

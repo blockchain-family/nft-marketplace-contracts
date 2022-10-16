@@ -197,6 +197,10 @@ GETGLOB 12
 SDEQ
 AND
 THROWIFNOT 300
+.loc ../contracts/DirectSell.sol, 104
+PUSHINT 1000000000
+PUSHINT 0
+RAWRESERVE
 .loc ../contracts/DirectSell.sol, 105
 SETGLOB 19
 .loc ../contracts/DirectSell.sol, 106

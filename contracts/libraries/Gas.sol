@@ -8,15 +8,11 @@ library Gas {
     uint128 constant TOKENS_RECEIVED_CALLBACK_VALUE         = 1 ever;
     uint128 constant FINISH_AUCTION_VALUE                   = 1.3 ever;
     uint128 constant UPGRADE_AUCTION_ROOT_MIN_VALUE         = 5 ever;
-    uint128 constant UPGRADE_AUCTION_MIN_VALUE              = 5 ever;
+    uint128 constant CALLBACK_VALUE                         = 0.1 ever;
 
     // tip3
     uint128 constant DEPLOY_EMPTY_WALLET_VALUE              = 0.5 ever;
     uint128 constant DEPLOY_EMPTY_WALLET_GRAMS              = 0.1 ever;
-    uint128 constant GET_WALLET_ADDRESS_VALUE               = 1.2 ever;
-    uint128 constant SET_RECEIVE_CALLBACK_VALUE             = 0.5 ever;
-    uint128 constant GET_TOKEN_WALLET_DETAILS               = 0.5 ever;
-    uint128 constant TRANSFER_TO_RECIPIENT_VALUE            = 0.2 ever;
 
     // true nft
     uint128 constant TRANSFER_OWNERSHIP_VALUE               = 1.1 ever;
@@ -30,7 +26,6 @@ library Gas {
     uint128 constant DIRECT_SELL_INITIAL_BALANCE            = 1 ever;
     uint128 constant DEPLOY_DIRECT_SELL_MIN_VALUE           = 2 ever;
     uint128 constant UPGRADE_DIRECT_SELL_MIN_VALUE          = 5 ever;
-
     uint128 constant FINISH_ORDER_VALUE                     = 1 ever;
     uint128 constant SET_CODE                               = 1 ever;
 

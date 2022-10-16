@@ -153,7 +153,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         now >= startTime
     ) {
       IDirectBuyCallback(nftOwner).directBuySuccess{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
@@ -190,7 +190,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     } else {
       if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
         IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
-          value: 0.1 ever, 
+          value: Gas.CALLBACK_VALUE, 
           flag: 1, 
           bounce: false 
         }(
@@ -224,7 +224,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
         
         IDirectBuyCallback(nftOwner).directBuyNotSuccess{
-          value: 0.1 ever, 
+          value: Gas.CALLBACK_VALUE, 
           flag: 1, 
           bounce: false 
         }(

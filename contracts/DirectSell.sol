@@ -101,7 +101,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       msg.sender == paymentToken, 
       DirectBuySellErrors.NOT_FROM_SPENT_TOKEN_ROOT
     );
-
+    tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
     tokenWallet = _wallet;
     changeState(DirectSellStatus.Active);
   }
@@ -137,7 +137,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     ) {
       tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
       IDirectSellCallback(buyer).directSellSuccess{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
@@ -173,7 +173,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     } else {
       if (endTime > 0 && now >= endTime) {
         IDirectSellCallback(buyer).directSellCancelledOnTime{
-          value: 0.1 ever, 
+          value: Gas.CALLBACK_VALUE, 
           flag: 1, 
           bounce: false 
         }(
@@ -206,7 +206,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       } else {
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
         IDirectSellCallback(buyer).directSellNotSuccess{
-          value: 0.1 ever, 
+          value: Gas.CALLBACK_VALUE, 
           flag: 1, 
           bounce: false   
         }(

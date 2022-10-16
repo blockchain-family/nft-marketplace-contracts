@@ -131,7 +131,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _price
       );
       IDirectSellCallback(nftOwner).directSellDeployed{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
@@ -152,11 +152,10 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         sendGasTo, 
         callbacks
       );
-
     } else {
       emit DirectSellDeclined(msg.sender, nftForSell);
       IDirectSellCallback(nftOwner).directSellDeclined{
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1,
         bounce: false
       }(

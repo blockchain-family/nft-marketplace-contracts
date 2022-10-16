@@ -100,12 +100,10 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     TvmCell payload
   ) override external {
     tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);
-    
     (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload); 
     
     TvmSlice payloadSlice = payload.toSlice();
     (,address nftForBuy) = payloadSlice.decode(uint32, address);
-  
     if (
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&
@@ -127,7 +125,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
       emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
       IDirectBuyCallback(buyer).directBuyDeployed{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
@@ -155,7 +153,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     } else {
       emit DirectBuyDeclined(buyer, tokenRoot, amount);
       IDirectBuyCallback(buyer).directBuyDeployedDeclined{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(

@@ -199,7 +199,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
-                value: 0.1 ever, 
+                value: Gas.CALLBACK_VALUE, 
                 flag: 1, 
                 bounce: false 
             }(
@@ -261,9 +261,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             state = AuctionStatus.Cancelled;
             
             ITIP4_1NFT(nft).changeManager{ value: 0, flag: 128 }(
-                    nftOwner,
-                    sendGasTo,
-                    callbacks
+                nftOwner,
+                sendGasTo,
+                callbacks
             );
         }
     }
@@ -281,7 +281,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
                 IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{
-                    value: 0.1 ever, 
+                    value: Gas.CALLBACK_VALUE, 
                     flag: 1, 
                     bounce: false 
                 }(
@@ -290,7 +290,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 );
             } else {
                 IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{
-                    value: 0.1 ever,
+                    value: Gas.CALLBACK_VALUE,
                     flag: 1, 
                     bounce: false 
                 }(
@@ -346,9 +346,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
             TvmCell cellParams = abi.encode(
               nonce_,
-              currentVersion,
-              price,
               nft,
+              price,
+              currentVersion,
               markerRootAddr,
               tokenRootAddr,
               nftOwner,
@@ -358,10 +358,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               auctionDuration,
               auctionStartTime,
               auctionEndTime,
-              maxBidValue,
               bidDelta,
+              currentBid,
+              maxBidValue,
               nextBidValue,
               paymentToken,
+              tokenWallet,
               state
             );
             

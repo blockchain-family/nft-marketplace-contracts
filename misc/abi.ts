@@ -36,13 +36,17 @@ export class NftAuctionCallbacks {
                 name: 'bidPlacedCallback',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
-                    { name: 'nextBidValue', type: 'uint128' }
+                    { name: 'nextBidValue', type: 'uint128' },
+                    { name: 'nft', type: 'address'},
                 ],
                 outputs: [],
             },
             {
                 name: 'bidNotPlacedCallback', 
-                inputs: [{ name: 'callbackId', type: 'uint32' }],
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address'},
+                ],
                 outputs: [],
             },
             {
@@ -51,6 +55,23 @@ export class NftAuctionCallbacks {
                     { name: 'callbackId', type: 'uint32' },
                     { name: 'newBidAddr', type: 'address' },
                     { name: 'newBidValue', type: 'uint128' },
+                    { name: 'nft', type: 'address'},
+                ],
+                outputs: [],
+            },
+            {
+                name: 'auctionComplete',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address'},
+                ],
+                outputs: [],
+            },
+            {
+                name: 'auctionCancelled',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address'},
                 ],
                 outputs: [],
             },

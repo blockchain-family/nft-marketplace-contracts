@@ -66,7 +66,7 @@ export class Auction {
         return null;
     }
 
-    async finishAuction(initiator: AccountType) {
+    async finishAuction(initiator: AccountType, callbackId: number) {
         return await initiator.runTarget(
             {
                 contract: this.contract,
@@ -74,7 +74,8 @@ export class Auction {
                 flags: 1
             },
             (dd) => dd.methods.finishAuction({
-                sendGasTo: initiator.address
+                sendGasTo: initiator.address,
+                callbackId 
             })
         );
     }

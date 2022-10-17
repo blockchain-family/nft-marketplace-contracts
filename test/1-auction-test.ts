@@ -95,7 +95,7 @@ describe("Test Auction contract", async function () {
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
             await sleep(3000);
-            await locklift.tracing.trace(auction.finishAuction(account2));
+            await auction.finishAuction(account2, 0);
 
             await auction.getEvent('AuctionComplete');
 
@@ -136,7 +136,7 @@ describe("Test Auction contract", async function () {
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
 
             await sleep(3000);
-            await locklift.tracing.trace(auction.finishAuction(account2));
+            await auction.finishAuction(account2, 0);
 
             event = await nft.getEvent('ManagerChanged');
             expect(event.newManager.toString()).to.be.eq(account3.address.toString());
@@ -186,7 +186,7 @@ describe("Test Auction contract", async function () {
             
             //Finish auction
             await sleep(5000);
-            await locklift.tracing.trace(auction.finishAuction(account2));
+            await auction.finishAuction(account2, 0);
             
             await auction.getEvent('AuctionComplete');
 
@@ -245,7 +245,7 @@ describe("Test Auction contract", async function () {
 
             //Finish auction
             await sleep(5000);
-            await locklift.tracing.trace(auction.finishAuction(account2));
+            await auction.finishAuction(account2, 0);
 
             await auction.getEvent('AuctionComplete');
 
@@ -292,7 +292,7 @@ describe("Test Auction contract", async function () {
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
-            await auction.finishAuction(account3);
+            await auction.finishAuction(account3, 0);
             await auction.getEvent('AuctionComplete');
 
             let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
@@ -314,7 +314,7 @@ describe("Test Auction contract", async function () {
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await sleep(3000);
-            await locklift.tracing.trace(auction.finishAuction(account3));
+            await auction.finishAuction(account3, 0);
             await auction.getEvent('AuctionCancelled');
 
             await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
@@ -347,7 +347,7 @@ describe("Test Auction contract", async function () {
             await sleep(3000);
             await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
-            await locklift.tracing.trace(auction.finishAuction(account3));
+            await auction.finishAuction(account3, 0);
             await auction.getEvent('AuctionCancelled');
 
             let spentTokenWallet1Balance = await tokenWallet1.balance() as any;
@@ -371,7 +371,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await auction.finishAuction(account3);
+            await auction.finishAuction(account3, 0);
             await auction.getEvent('AuctionCancelled');
 
             let status = (await auction.getInfo()).status;
@@ -399,7 +399,7 @@ describe("Test Auction contract", async function () {
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
             await sleep(3000);
-            await locklift.tracing.trace(auction.finishAuction(account2));
+            await auction.finishAuction(account2, 0);
             await auction.getEvent('AuctionComplete');
 
             let status = (await auction.getInfo()).status;
@@ -436,7 +436,7 @@ describe("Test Auction contract", async function () {
 
             await sleep(5000);
 
-            await locklift.tracing.trace(auction.finishAuction(account2));
+            await auction.finishAuction(account2, 0);
             await auction.getEvent('AuctionCancelled');
 
             let owner = (await nft.getInfo()).owner;
@@ -459,14 +459,14 @@ describe("Test Auction contract", async function () {
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
-            await auction.finishAuction(account2);
+            await auction.finishAuction(account2, 0);
 
             let owner = (await nft.getInfo()).owner;
             expect(owner.toString()).to.be.eq(account2.address.toString());
             expect(status.toString()).to.be.eq('1');
 
             await sleep(5000);
-            await auction.finishAuction(account2);
+            await auction.finishAuction(account2, 0);
             await auction.getEvent('AuctionCancelled');
         });
     });

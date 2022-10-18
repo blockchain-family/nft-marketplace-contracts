@@ -135,7 +135,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
         emit AuctionActive(buildInfo());
         state = AuctionStatus.Active;
-
         tokenWallet.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 

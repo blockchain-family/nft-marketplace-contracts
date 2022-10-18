@@ -38,7 +38,7 @@
 				{"name":"sender","type":"address"},
 				{"name":"value3","type":"address"},
 				{"name":"originalGasTo","type":"address"},
-				{"name":"payload","type":"cell"}
+				{"name":"value5","type":"cell"}
 			],
 			"outputs": [
 			]
@@ -60,7 +60,8 @@
 		{
 			"name": "finishBuy",
 			"inputs": [
-				{"name":"sendGasTo","type":"address"}
+				{"name":"sendGasTo","type":"address"},
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -68,6 +69,7 @@
 		{
 			"name": "closeBuy",
 			"inputs": [
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]

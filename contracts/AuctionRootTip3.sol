@@ -40,8 +40,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     uint32 currentVersion;
     uint32 currentVersionOffer;
 
-    event AuctionDeployed(address offerAddress, MarketOffer offerInfo);
-    event AuctionDeclined(address nftOwner, address dataAddress);
+    event AuctionDeployed(address offer, MarketOffer offerInfo);
+    event AuctionDeclined(address nftOwner, address nft);
     event AuctionRootUpgrade();
 
     constructor(

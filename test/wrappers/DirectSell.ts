@@ -71,16 +71,18 @@ export class DirectSell {
         return (await this.contract.methods.getInfo({}).call()).value0;
     }
 
-    async closeSell() {
+    async closeSell(callbackId: number) {
         return await this.owner.runTarget(
             {
                 contract: this.contract,
                 value: locklift.utils.toNano(1)
             },
-            (cc) => cc.methods.closeSell({})
+            (cc) => cc.methods.closeSell({
+                callbackId
+            })
         );
     }
-    async finishSell(initiator: AccountType) {
+    async finishSell(initiator: AccountType, callbackId: number) {
         return await initiator.runTarget(
             {
                 contract: this.contract,
@@ -88,7 +90,8 @@ export class DirectSell {
                 flags: 1
             },
             (dd) => dd.methods.finishSell({
-                sendGasTo: initiator.address
+                sendGasTo: initiator.address,
+                callbackId
             })
         );
     }

@@ -53,7 +53,8 @@
 		{
 			"name": "finishSell",
 			"inputs": [
-				{"name":"sendGasTo","type":"address"}
+				{"name":"sendGasTo","type":"address"},
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -61,6 +62,7 @@
 		{
 			"name": "closeSell",
 			"inputs": [
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]

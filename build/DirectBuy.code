@@ -259,17 +259,11 @@ THROW 0
 
 .macro onAcceptTokensTransfer_e63f2284_internal_macro
 .loc ../contracts/DirectBuy.sol, 109
+DROP
 PUSHINT 1000000000
 PUSHINT 0
 RAWRESERVE
 .loc ../contracts/DirectBuy.sol, 110
-ROLL 3
-SWAP
-CALLREF {
-	CALL $ExchangePayload_no_obj_getSenderAndCallId_b6ff786b_macro$
-}
-DROP
-.loc ../contracts/DirectBuy.sol, 111
 ROLL 4
 GETGLOB 12
 SDEQ
@@ -287,6 +281,10 @@ PUSHCONT {
 	PUSH S5
 	GETGLOB 15
 	GEQ
+	PUSH S5
+	GETGLOB 10
+	SDEQ
+	AND
 	AND
 	AND
 }
@@ -304,9 +302,9 @@ PUSHCONT {
 	}
 	.loc ../contracts/DirectBuy.sol, 120
 	TRUE
-	PUSH S3
+	PUSH S2
 	PUSHINT 0
-	PUSH2 S4, S7
+	PUSH2 S6, S7
 	GETGLOB 9
 	FALSE
 	NEWC
@@ -443,8 +441,9 @@ PUSHCONT {
 IF
 PUSHCONT {
 	.loc ../contracts/DirectBuy.sol, 155
+	GETGLOB 13
 	GETGLOB 11
-	PUSH3 S6, S2, S6
+	PUSH3 S7, S3, S7
 	FALSE
 	NEWC
 	STSLICECONST x6_
@@ -453,25 +452,29 @@ PUSHCONT {
 	STSLICE
 	PUSHINT 2803819077499249229031122585109857988247553
 	STUR 143
-	ROLLREV 3
+	ROLLREV 4
 	NEWC
-	STSLICECONST x3e9a6c48
+	STSLICECONST x15f6349a
 	STU 32
+	STSLICE
+	ROTREV
+	NEWC
 	STSLICE
 	SWAP
 	NEWC
 	STSLICE
 	STBREFR
 	STBREFR
+	STBREFR
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 165
+	.loc ../contracts/DirectBuy.sol, 166
 	PUSHINT 3
 	CALLREF {
 		CALL $changeState_268f1153_internal_macro$
 	}
-	.loc ../contracts/DirectBuy.sol, 167
+	.loc ../contracts/DirectBuy.sol, 168
 	PUSH2 S0, S2
 	GETGLOB 11
 	GETGLOB 13
@@ -496,10 +499,10 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 177
+	.loc ../contracts/DirectBuy.sol, 178
 	PUSHREF {
 	}
-	.loc ../contracts/DirectBuy.sol, 178
+	.loc ../contracts/DirectBuy.sol, 179
 	FALSE
 	PUSH S4
 	PUSHINT 100000000
@@ -532,7 +535,7 @@ PUSHCONT {
 	SENDRAWMSG
 }
 PUSHCONT {
-	.loc ../contracts/DirectBuy.sol, 191
+	.loc ../contracts/DirectBuy.sol, 192
 	GETGLOB 18
 	GTINT 0
 	NOW
@@ -543,26 +546,32 @@ PUSHCONT {
 	AND
 	AND
 	PUSHCONT {
-		.loc ../contracts/DirectBuy.sol, 192
-		PUSH2 S1, S5
+		.loc ../contracts/DirectBuy.sol, 193
+		GETGLOB 13
+		PUSH2 S2, S6
 		FALSE
 		NEWC
 		STSLICECONST x6_
 		STI 1
 		STSLICECONST x1_
 		STSLICE
-		PUSHINT 12042311241760164903241885269213816626727589274932173
-		STUR 175
+		PUSHINT 2803819077499249229031122585109857988247553
+		STUR 143
+		ROTREV
+		NEWC
+		STSLICECONST x7db94717
 		STU 32
+		STSLICE
+		STBREFR
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/DirectBuy.sol, 200
+		.loc ../contracts/DirectBuy.sol, 202
 		PUSHINT 5
 		CALLREF {
 			CALL $changeState_268f1153_internal_macro$
 		}
-		.loc ../contracts/DirectBuy.sol, 201
+		.loc ../contracts/DirectBuy.sol, 203
 		PUSH3 S0, S2, S5
 		GETGLOB 9
 		NEWC
@@ -583,10 +592,10 @@ PUSHCONT {
 		ENDC
 		PUSHINT 64
 		SENDRAWMSG
-		.loc ../contracts/DirectBuy.sol, 210
+		.loc ../contracts/DirectBuy.sol, 212
 		PUSHREF {
 		}
-		.loc ../contracts/DirectBuy.sol, 211
+		.loc ../contracts/DirectBuy.sol, 213
 		TRUE
 		PUSH S4
 		PUSHINT 0
@@ -614,25 +623,31 @@ PUSHCONT {
 		STREF
 	}
 	PUSHCONT {
-		.loc ../contracts/DirectBuy.sol, 224
+		.loc ../contracts/DirectBuy.sol, 226
 		PUSHINT 1000000000
 		PUSHINT 0
 		RAWRESERVE
-		.loc ../contracts/DirectBuy.sol, 226
-		PUSH2 S1, S5
+		.loc ../contracts/DirectBuy.sol, 228
+		GETGLOB 13
+		PUSH2 S2, S6
 		FALSE
 		NEWC
 		STSLICECONST x6_
 		STI 1
 		STSLICECONST x1_
 		STSLICE
-		PUSHINT 12042311241760164903241885269213816626727589692397411
-		STUR 175
+		PUSHINT 2803819077499249229031122585109857988247553
+		STUR 143
+		ROTREV
+		NEWC
+		STSLICECONST x6ffd443b
 		STU 32
+		STSLICE
+		STBREFR
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/DirectBuy.sol, 234
+		.loc ../contracts/DirectBuy.sol, 237
 		PUSH3 S0, S2, S5
 		GETGLOB 9
 		NEWC
@@ -666,12 +681,12 @@ BLKDROP 7
 CALL $changeState_268f1153_internal_macro$
 
 .macro changeState_268f1153_internal_macro
-.loc ../contracts/DirectBuy.sol, 247
+.loc ../contracts/DirectBuy.sol, 250
 GETGLOB 20
-.loc ../contracts/DirectBuy.sol, 248
+.loc ../contracts/DirectBuy.sol, 251
 OVER
 SETGLOB 20
-.loc ../contracts/DirectBuy.sol, 249
+.loc ../contracts/DirectBuy.sol, 252
 CALLREF {
 	CALL $buildInfo_38a4648d_internal_macro$
 }
@@ -721,7 +736,7 @@ SENDRAWMSG
 CALL $buildInfo_38a4648d_internal_macro$
 
 .macro buildInfo_38a4648d_internal_macro
-.loc ../contracts/DirectBuy.sol, 254
+.loc ../contracts/DirectBuy.sol, 257
 GETGLOB 10
 GETGLOB 11
 GETGLOB 12
@@ -745,7 +760,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectBuy.sol, 269
+.loc ../contracts/DirectBuy.sol, 272
 OVER
 PUSHCONT {
 	LDREF
@@ -754,10 +769,11 @@ PUSHCONT {
 }
 IF
 LDMSGADDR
+LDU 32
 ENDS
 .loc ../contracts/DirectBuy.sol, 0
 CALLREF {
-	CALL $finishBuy_dbf76a5f_internal_macro$
+	CALL $finishBuy_fc6cdcb7_internal_macro$
 }
 DROP
 CALLREF {
@@ -765,36 +781,57 @@ CALLREF {
 }
 THROW 0
 
-.globl	finishBuy_dbf76a5f_internal
-.type	finishBuy_dbf76a5f_internal, @function
-CALL $finishBuy_dbf76a5f_internal_macro$
+.globl	finishBuy_fc6cdcb7_internal
+.type	finishBuy_fc6cdcb7_internal, @function
+CALL $finishBuy_fc6cdcb7_internal_macro$
 
-.macro finishBuy_dbf76a5f_internal_macro
-.loc ../contracts/DirectBuy.sol, 270
+.macro finishBuy_fc6cdcb7_internal_macro
+.loc ../contracts/DirectBuy.sol, 273
 GETGLOB 20
 EQINT 2
 THROWIFNOT 303
-.loc ../contracts/DirectBuy.sol, 274
+.loc ../contracts/DirectBuy.sol, 277
 NOW
 GETGLOB 18
 GEQ
 THROWIFNOT 304
-.loc ../contracts/DirectBuy.sol, 275
+.loc ../contracts/DirectBuy.sol, 278
 DEPTH
 ADDCONST -2
 PICK
 PUSHINT 1000000000
 GEQ
 THROWIFNOT 104
-.loc ../contracts/DirectBuy.sol, 277
+.loc ../contracts/DirectBuy.sol, 280
+GETGLOB 13
+SWAP
+GETGLOB 9
+FALSE
+NEWC
+STSLICECONST x6_
+STI 1
+STSLICECONST x1_
+STSLICE
+PUSHINT 2803819077499249229031122585109857988247553
+STUR 143
+ROTREV
+NEWC
+STSLICECONST x7db94717
+STU 32
+STSLICE
+STBREFR
+ENDC
+PUSHINT 1
+SENDRAWMSG
+.loc ../contracts/DirectBuy.sol, 288
 PUSHINT 5
 CALLREF {
 	CALL $changeState_268f1153_internal_macro$
 }
-.loc ../contracts/DirectBuy.sol, 279
+.loc ../contracts/DirectBuy.sol, 290
 PUSHREF {
 }
-.loc ../contracts/DirectBuy.sol, 280
+.loc ../contracts/DirectBuy.sol, 291
 TRUE
 ROT
 PUSHINT 0
@@ -836,11 +873,12 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectBuy.sol, 294
+.loc ../contracts/DirectBuy.sol, 305
+LDU 32
 ENDS
 .loc ../contracts/DirectBuy.sol, 0
 CALLREF {
-	CALL $closeBuy_c6ab5cdc_internal_macro$
+	CALL $closeBuy_f4b70997_internal_macro$
 }
 DROP
 CALLREF {
@@ -848,7 +886,7 @@ CALLREF {
 }
 THROW 0
 
-.macro closeBuy_c6ab5cdc_internal_macro
+.macro closeBuy_f4b70997_internal_macro
 .loc ../contracts/DirectBuy.sol, 85
 GETGLOB 9
 PARSEMSGADDR
@@ -860,19 +898,40 @@ GETGLOB 11
 SDEQ
 AND
 THROWIFNOT 302
-.loc ../contracts/DirectBuy.sol, 295
+.loc ../contracts/DirectBuy.sol, 306
 GETGLOB 20
 EQINT 2
 THROWIFNOT 303
-.loc ../contracts/DirectBuy.sol, 300
+.loc ../contracts/DirectBuy.sol, 311
+GETGLOB 13
+SWAP
+GETGLOB 11
+FALSE
+NEWC
+STSLICECONST x6_
+STI 1
+STSLICECONST x1_
+STSLICE
+PUSHINT 2803819077499249229031122585109857988247553
+STUR 143
+ROTREV
+NEWC
+STSLICECONST x7e58cc4b
+STU 32
+STSLICE
+STBREFR
+ENDC
+PUSHINT 1
+SENDRAWMSG
+.loc ../contracts/DirectBuy.sol, 319
 PUSHINT 4
 CALLREF {
 	CALL $changeState_268f1153_internal_macro$
 }
-.loc ../contracts/DirectBuy.sol, 302
+.loc ../contracts/DirectBuy.sol, 321
 PUSHREF {
 }
-.loc ../contracts/DirectBuy.sol, 303
+.loc ../contracts/DirectBuy.sol, 322
 TRUE
 GETGLOB 11
 PUSHINT 0
@@ -914,7 +973,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectBuy.sol, 317
+.loc ../contracts/DirectBuy.sol, 336
 OVER
 PUSHCONT {
 	LDREF
@@ -941,7 +1000,7 @@ CALLREF {
 THROW 0
 
 .macro upgrade_fb9d1513_internal_macro
-.loc ../contracts/DirectBuy.sol, 322
+.loc ../contracts/DirectBuy.sol, 341
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -952,16 +1011,16 @@ GETGLOB 10
 SDEQ
 AND
 THROWIFNOT 305
-.loc ../contracts/DirectBuy.sol, 328
+.loc ../contracts/DirectBuy.sol, 347
 GETGLOB 21
 ROT
 EQUAL
 PUSHCONT {
-	.loc ../contracts/DirectBuy.sol, 329
+	.loc ../contracts/DirectBuy.sol, 348
 	PUSHINT 1000000000
 	PUSHINT 0
 	RAWRESERVE
-	.loc ../contracts/DirectBuy.sol, 330
+	.loc ../contracts/DirectBuy.sol, 349
 	DUP
 	NEWC
 	STSLICECONST x42_
@@ -973,13 +1032,13 @@ PUSHCONT {
 	SENDRAWMSG
 }
 PUSHCONT {
-	.loc ../contracts/DirectBuy.sol, 336
+	.loc ../contracts/DirectBuy.sol, 355
 	PUSHREF {
 		.blob xc0000000000000000000000000549a335b
 	}
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 338
+	.loc ../contracts/DirectBuy.sol, 357
 	GETGLOB 21
 	GETGLOB 20
 	GETGLOB 19
@@ -1018,10 +1077,10 @@ PUSHCONT {
 	STBREFR
 	STBREFR
 	ENDC
-	.loc ../contracts/DirectBuy.sol, 353
+	.loc ../contracts/DirectBuy.sol, 372
 	PUSH S2
 	SETCODE
-	.loc ../contracts/DirectBuy.sol, 354
+	.loc ../contracts/DirectBuy.sol, 373
 	PUSH S2
 	CTOS
 	DUP
@@ -1036,7 +1095,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/DirectBuy.sol, 356
+	.loc ../contracts/DirectBuy.sol, 375
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}
@@ -1482,6 +1541,55 @@ SWAP
 BLKDROP2 1, 2
 .loc ../contracts/libraries/ExchangePayload.sol, 0
 
+.globl	EventDataDecoder_with_obj_isValid_47a0ea0d
+.type	EventDataDecoder_with_obj_isValid_47a0ea0d, @function
+CALL $EventDataDecoder_with_obj_isValid_47a0ea0d_macro$
+
+.macro EventDataDecoder_with_obj_isValid_47a0ea0d_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
+DUP
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
+DUP
+PUSHINT 904
+PUSHINT 1
+SCHKBITREFSQ
+DUP
+PUSHCONT {
+	DROP
+	LDREFRTOS
+	PUSHINT 520
+	PUSHINT 1
+	SCHKBITREFSQ
+}
+IF
+NIP
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
+.globl	EventDataDecoder_no_obj_isValid_47a0ea0d
+.type	EventDataDecoder_no_obj_isValid_47a0ea0d, @function
+CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
+
+.macro EventDataDecoder_no_obj_isValid_47a0ea0d_macro
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
+CTOS
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
+DUP
+PUSHINT 904
+PUSHINT 1
+SCHKBITREFSQ
+DUP
+PUSHCONT {
+	DROP
+	LDREFRTOS
+	PUSHINT 520
+	PUSHINT 1
+	SCHKBITREFSQ
+}
+IF
+NIP
+.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
+
 .globl	EventDataDecoder_with_obj_decode_54438b56
 .type	EventDataDecoder_with_obj_decode_54438b56, @function
 CALL $EventDataDecoder_with_obj_decode_54438b56_macro$
@@ -1613,58 +1721,9 @@ PLDREF
 TUPLE 9
 .loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
 
-.globl	EventDataDecoder_with_obj_isValid_47a0ea0d
-.type	EventDataDecoder_with_obj_isValid_47a0ea0d, @function
-CALL $EventDataDecoder_with_obj_isValid_47a0ea0d_macro$
-
-.macro EventDataDecoder_with_obj_isValid_47a0ea0d_macro
-.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
-DUP
-CTOS
-.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
-DUP
-PUSHINT 904
-PUSHINT 1
-SCHKBITREFSQ
-DUP
-PUSHCONT {
-	DROP
-	LDREFRTOS
-	PUSHINT 520
-	PUSHINT 1
-	SCHKBITREFSQ
-}
-IF
-NIP
-.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
-
-.globl	EventDataDecoder_no_obj_isValid_47a0ea0d
-.type	EventDataDecoder_no_obj_isValid_47a0ea0d, @function
-CALL $EventDataDecoder_no_obj_isValid_47a0ea0d_macro$
-
-.macro EventDataDecoder_no_obj_isValid_47a0ea0d_macro
-.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 29
-CTOS
-.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 30
-DUP
-PUSHINT 904
-PUSHINT 1
-SCHKBITREFSQ
-DUP
-PUSHCONT {
-	DROP
-	LDREFRTOS
-	PUSHINT 520
-	PUSHINT 1
-	SCHKBITREFSQ
-}
-IF
-NIP
-.loc ../node_modules/@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol, 0
-
 .macro public_function_selector
 DUP
-PUSHINT 1688565960
+PUSHINT 1398817332
 LEQ
 IFJMPREF {
 	DUP
@@ -1680,16 +1739,16 @@ IFJMPREF {
 		CALL $onNftChangeManager$
 	}
 	DUP
+	PUSHINT 1195424995
+	EQUAL
+	IFJMPREF {
+		CALL $closeBuy$
+	}
+	DUP
 	PUSHINT 1398817332
 	EQUAL
 	IFJMPREF {
 		CALL $getInfo$
-	}
-	DUP
-	PUSHINT 1688565960
-	EQUAL
-	IFJMPREF {
-		CALL $upgrade$
 	}
 }
 DUP
@@ -1697,10 +1756,10 @@ PUSHINT 2056408247
 LEQ
 IFJMPREF {
 	DUP
-	PUSHINT 1755262835
+	PUSHINT 1688565960
 	EQUAL
 	IFJMPREF {
-		CALL $finishBuy$
+		CALL $upgrade$
 	}
 	DUP
 	PUSHINT 1893244873
@@ -1709,10 +1768,10 @@ IFJMPREF {
 		CALL $onAcceptTokensTransfer$
 	}
 	DUP
-	PUSHINT 2051490787
+	PUSHINT 1976499107
 	EQUAL
 	IFJMPREF {
-		CALL $closeBuy$
+		CALL $finishBuy$
 	}
 	DUP
 	PUSHINT 2056408247

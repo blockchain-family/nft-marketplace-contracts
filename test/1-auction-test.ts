@@ -84,7 +84,7 @@ describe("Test Auction contract", async function () {
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account2);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
@@ -128,7 +128,7 @@ describe("Test Auction contract", async function () {
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
 
             let event = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(event.offerAddress, account2);
+            auction = await Auction.from_addr(event.offer, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
@@ -163,7 +163,7 @@ describe("Test Auction contract", async function () {
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
             
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             //First bid placed
@@ -223,7 +223,7 @@ describe("Test Auction contract", async function () {
             await nft.changeManager(account4, auctionRoot.address, account4.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             //First user bid
@@ -281,7 +281,7 @@ describe("Test Auction contract", async function () {
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await tokenWallet4.transfer(10000, auction.address, 0, true, '', locklift.utils.toNano(2));
@@ -310,7 +310,7 @@ describe("Test Auction contract", async function () {
 
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await sleep(3000);
@@ -341,7 +341,7 @@ describe("Test Auction contract", async function () {
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
             
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await sleep(3000);
@@ -368,7 +368,7 @@ describe("Test Auction contract", async function () {
 
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await auction.finishAuction(account3, 0);
@@ -389,7 +389,7 @@ describe("Test Auction contract", async function () {
 
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', locklift.utils.toNano(2));
@@ -421,7 +421,7 @@ describe("Test Auction contract", async function () {
 
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             let status = (await auction.getInfo()).status;
@@ -453,7 +453,7 @@ describe("Test Auction contract", async function () {
 
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
-            auction = await Auction.from_addr(auctionDeployedEvent.offerAddress, account3);
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             let status = (await auction.getInfo()).status;

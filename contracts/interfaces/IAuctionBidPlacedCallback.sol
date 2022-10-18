@@ -2,9 +2,16 @@ pragma ever-solidity >= 0.62.0;
 
 interface IAuctionBidPlacedCallback {
     
-    function bidPlacedCallback(uint32 callbackId, uint128 nextBidValue, address nft) external;
+    function bidPlacedCallback(
+        uint32 callbackId,
+        uint128 nextBidValue, 
+        address nft
+    ) external;
     
-    function bidNotPlacedCallback(uint32 callbackId, address nft) external;
+    function bidNotPlacedCallback(
+        uint32 callbackId, 
+        address nft
+    ) external;
     
     function bidRaisedCallback(
         uint32 callbackId, 

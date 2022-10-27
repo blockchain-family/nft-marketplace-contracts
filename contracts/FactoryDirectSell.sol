@@ -28,14 +28,14 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   uint32 currectVersionDirectSell;
 
   event DirectSellDeployed(
-    address directSellAddress,
+    address directSell,
     address sender,
     address paymentToken,
     address nft,
     uint64  nonce,
     uint128 price
   );
-  event DirectSellDeclined(address sender, address _nftAddress);
+  event DirectSellDeclined(address sender, address nft);
   event FactoryDirectSellUpgrade();
 
   constructor(address _owner, address sendGasTo) public OwnableInternal(_owner) {
@@ -99,7 +99,6 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
     (,address nftForSell) = payloadSlice.decode(uint32, address);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-    
     if (
       msg.sender.value != 0 && msg.sender == nftForSell &&
       msg.value >= (Gas.DEPLOY_DIRECT_SELL_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
@@ -131,7 +130,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _price
       );
       IDirectSellCallback(nftOwner).directSellDeployed{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
@@ -152,16 +151,16 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         sendGasTo, 
         callbacks
       );
-
     } else {
       emit DirectSellDeclined(msg.sender, nftForSell);
       IDirectSellCallback(nftOwner).directSellDeclined{
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1,
         bounce: false
       }(
         callbackId,
-        msg.sender
+        msg.sender,
+        nftForSell
       );
 
       ITIP4_1NFT(msg.sender).changeManager{
@@ -172,7 +171,6 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         sendGasTo, 
         callbacks
       );
-
     }
   }
 
@@ -249,6 +247,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         nonce_,
         owner(),
         currentVersion,
+        currectVersionDirectSell,
         directSellCode
       );
       

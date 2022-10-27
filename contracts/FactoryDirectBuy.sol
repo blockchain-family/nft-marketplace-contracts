@@ -29,7 +29,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   uint32 currectVersionDirectBuy;
 
   event DirectBuyDeployed(
-    address directBuyAddress,
+    address directBuy,
     address sender,
     address token,
     address nft,
@@ -37,7 +37,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     uint128 amount
   );
 
-  event DirectBuyDeclined(address sender, address token, uint128 amount);
+  event DirectBuyDeclined(address sender, address token, uint128 amount, address nft);
   event FactoryDirectBuyUpgrade();
 
   constructor(address _owner, address sendGasTo) OwnableInternal(_owner) public {
@@ -100,12 +100,10 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     TvmCell payload
   ) override external {
     tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);
-    
     (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload); 
     
     TvmSlice payloadSlice = payload.toSlice();
     (,address nftForBuy) = payloadSlice.decode(uint32, address);
-  
     if (
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&
@@ -127,7 +125,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
       emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
       IDirectBuyCallback(buyer).directBuyDeployed{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
@@ -153,16 +151,17 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         payload
       );
     } else {
-      emit DirectBuyDeclined(buyer, tokenRoot, amount);
+      emit DirectBuyDeclined(buyer, tokenRoot, amount, nftForBuy);
       IDirectBuyCallback(buyer).directBuyDeployedDeclined{ 
-        value: 0.1 ever, 
+        value: Gas.CALLBACK_VALUE, 
         flag: 1, 
         bounce: false 
       }(
         callbackId, 
         buyer, 
         tokenRoot, 
-        amount
+        amount,
+        nftForBuy
       );
 
       TvmCell emptyPayload;
@@ -228,7 +227,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
       );
   }
 
-  function RequestUpgradeDirectSell(
+  function RequestUpgradeDirectBuy(
     address _owner,
     address spentToken, 
     address _nft, 
@@ -249,7 +248,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
       currectVersionDirectBuy, 
       sendGasTo
     );      
-
   }
 
   function upgrade (
@@ -271,6 +269,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         nonce_,
         owner(),
         currentVersion,
+        currectVersionDirectBuy,
         tokenPlatformCode,
         directBuyCode
       );

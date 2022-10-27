@@ -54,7 +54,8 @@
 		{
 			"name": "finishAuction",
 			"inputs": [
-				{"name":"sendGasTo","type":"address"}
+				{"name":"sendGasTo","type":"address"},
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]

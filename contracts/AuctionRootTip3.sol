@@ -40,8 +40,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     uint32 currentVersion;
     uint32 currentVersionOffer;
 
-    event AuctionDeployed(address offerAddress, MarketOffer offerInfo);
-    event AuctionDeclined(address nftOwner, address dataAddress);
+    event AuctionDeployed(address offer, MarketOffer offerInfo);
+    event AuctionDeclined(address nftOwner, address nft);
     event AuctionRootUpgrade();
 
     constructor(
@@ -99,8 +99,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         TvmSlice payloadSlice = payload.toSlice();
         (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
         if (payloadSlice.bits() == 555) {
-            (   
-                ,address paymentToken,
+            (  ,address paymentToken,
                 uint128 price,
                 uint64 auctionStartTime,
                 uint64 auctionDuration
@@ -147,7 +146,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 
                 emit AuctionDeployed(offerAddress, offerInfo);
                 IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{
-                     value: 0.1 ever, 
+                     value: Gas.CALLBACK_VALUE, 
                      flag: 1, 
                      bounce: false 
                 }(
@@ -172,7 +171,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
             IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{
-                value: 0.1 ever, 
+                value: Gas.CALLBACK_VALUE, 
                 flag: 1, 
                 bounce: false 
             }(
@@ -226,33 +225,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
-    function _resolveNft(
-        address collection,
-        uint256 id
-    ) internal virtual view returns (address nft) {
-        TvmCell code = _buildNftCode(collection);
-        TvmCell state = _buildNftState(code, id);
-        uint256 hashState = tvm.hash(state);
-        nft = address.makeAddrStd(address(this).wid, hashState);
-    }
-
-   function _buildNftCode(address collection) internal virtual view returns (TvmCell) {
-        TvmBuilder salt;
-        salt.store(collection);
-        return tvm.setCodeSalt(codeNft, salt.toCell());
-    }
-
-    function _buildNftState(
-        TvmCell code,
-        uint256 id
-    ) internal virtual pure returns (TvmCell) {
-        return tvm.buildStateInit({
-            contr: TIP4_1Nft,
-            varInit: {_id: id},
-            code: code
-        });
-    }
-    
     function RequestUpgradeAuction(
         address _nft,
         uint64 _nonce,
@@ -301,6 +273,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 nonce_,
                 owner(),
                 currentVersion,
+                currentVersionOffer,
                 auctionBidDelta,
                 auctionBidDeltaDecimals,
                 codeNft,

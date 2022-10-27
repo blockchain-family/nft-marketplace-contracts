@@ -8,7 +8,7 @@ export class NftAuctionCallbacks {
                 name: 'auctionTip3DeployedCallback',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
-                    { name: 'offerAddress', type: 'address' },
+                    { name: 'offer', type: 'address' },
                     { name: 'offerInfo',
                       components: [
                         { name: 'collection', type: 'address'},
@@ -28,7 +28,7 @@ export class NftAuctionCallbacks {
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
                     { name: 'nftOwner', type: 'address' },
-                    { name: 'dataAddress', type: 'address' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
             },
@@ -36,13 +36,17 @@ export class NftAuctionCallbacks {
                 name: 'bidPlacedCallback',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
-                    { name: 'nextBidValue', type: 'uint128' }
+                    { name: 'nextBidValue', type: 'uint128' },
+                    { name: 'nft', type: 'address'},
                 ],
                 outputs: [],
             },
             {
                 name: 'bidNotPlacedCallback', 
-                inputs: [{ name: 'callbackId', type: 'uint32' }],
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address'},
+                ],
                 outputs: [],
             },
             {
@@ -51,6 +55,23 @@ export class NftAuctionCallbacks {
                     { name: 'callbackId', type: 'uint32' },
                     { name: 'newBidAddr', type: 'address' },
                     { name: 'newBidValue', type: 'uint128' },
+                    { name: 'nft', type: 'address'},
+                ],
+                outputs: [],
+            },
+            {
+                name: 'auctionComplete',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address'},
+                ],
+                outputs: [],
+            },
+            {
+                name: 'auctionCancelled',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address'},
                 ],
                 outputs: [],
             },
@@ -71,7 +92,7 @@ export class NftAuctionCallbacks {
                 name: 'directBuyDeployed',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
-                    { name: 'directBuyAddress', type: 'address' },
+                    { name: 'directBuy', type: 'address' },
                     { name: 'sender', type: 'address' },
                     { name: 'token', type: 'address' },
                     { name: 'nft', type: 'address' },
@@ -87,6 +108,7 @@ export class NftAuctionCallbacks {
                     { name: 'sender', type: 'address' },
                     { name: 'token', type: 'address' },
                     { name: 'amount', type: 'uint128' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
             },
@@ -96,6 +118,15 @@ export class NftAuctionCallbacks {
                     { name: 'callbackId', type: 'uint32' },
                     { name: 'oldOwner', type: 'address' },
                     { name: 'newOwner', type: 'address' },
+                    { name: 'nft', type: 'address' },
+                ],
+                outputs: [],
+            },
+            {
+                name: 'directBuyNotSuccess',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
             },
@@ -103,6 +134,15 @@ export class NftAuctionCallbacks {
                 name: 'directBuyCancelledOnTime',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address' },
+                ],
+                outputs: [],
+            },
+            {
+                name: 'directBuyClose',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
             },
@@ -110,10 +150,10 @@ export class NftAuctionCallbacks {
                 name: 'directSellDeployed',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
-                    { name: 'directSellAddress', type: 'address' },
+                    { name: 'directSell', type: 'address' },
                     { name: 'sender', type: 'address' },
                     { name: 'paymentToken', type: 'address' },
-                    { name: 'nftAddress', type: 'address' },
+                    { name: 'nft', type: 'address' },
                     { name: 'nonce', type: 'uint64' },
                     { name: 'amount', type: 'uint128' },
                 ],
@@ -124,6 +164,7 @@ export class NftAuctionCallbacks {
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
                     { name: 'sender', type: 'address' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
             },
@@ -133,6 +174,15 @@ export class NftAuctionCallbacks {
                     { name: 'callbackId', type: 'uint32' },
                     { name: 'oldOwner', type: 'address' },
                     { name: 'newOwner', type: 'address' },
+                    { name: 'nft', type: 'address' },
+                ],
+                outputs: [],
+            },
+            {
+                name: 'directSellNotSuccess',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
             },
@@ -140,9 +190,18 @@ export class NftAuctionCallbacks {
                 name: 'directSellCancelledOnTime',
                 inputs: [
                     { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address' },
                 ],
                 outputs: [],
-            }
+            },
+            {
+                name: 'directSellClose',
+                inputs: [
+                    { name: 'callbackId', type: 'uint32' },
+                    { name: 'nft', type: 'address' },
+                ],
+                outputs: [],
+            },
         ],
         data: [],
         events: [],

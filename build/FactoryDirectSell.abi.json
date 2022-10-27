@@ -102,7 +102,7 @@
 		{
 			"name": "DirectSellDeployed",
 			"inputs": [
-				{"name":"directSellAddress","type":"address"},
+				{"name":"directSell","type":"address"},
 				{"name":"sender","type":"address"},
 				{"name":"paymentToken","type":"address"},
 				{"name":"nft","type":"address"},
@@ -116,7 +116,7 @@
 			"name": "DirectSellDeclined",
 			"inputs": [
 				{"name":"sender","type":"address"},
-				{"name":"_nftAddress","type":"address"}
+				{"name":"nft","type":"address"}
 			],
 			"outputs": [
 			]

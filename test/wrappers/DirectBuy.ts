@@ -70,7 +70,7 @@ export class DirectBuy {
         return (await this.contract.methods.getInfo({}).call()).value0;
     }
 
-    async finishBuy(initiator: AccountType) {
+    async finishBuy(initiator: AccountType, callbackId: number) {
         return await initiator.runTarget(
             {
                 contract: this.contract,
@@ -78,18 +78,21 @@ export class DirectBuy {
                 flags: 1
             },
             (dd) => dd.methods.finishBuy({
-                sendGasTo: initiator.address
+                sendGasTo: initiator.address,
+                callbackId
             })
         );
     }
 
-    async closeBuy() {
+    async closeBuy(callbackId: number) {
         return await this.owner.runTarget(
             {
                 contract: this.contract,
                 value: locklift.utils.toNano(1)
             },
-            (cc) => cc.methods.closeBuy({})
+            (cc) => cc.methods.closeBuy({
+                callbackId
+            })
         );
     }
 }

@@ -62,7 +62,7 @@
 			]
 		},
 		{
-			"name": "RequestUpgradeDirectSell",
+			"name": "RequestUpgradeDirectBuy",
 			"inputs": [
 				{"name":"_owner","type":"address"},
 				{"name":"spentToken","type":"address"},
@@ -107,7 +107,7 @@
 		{
 			"name": "DirectBuyDeployed",
 			"inputs": [
-				{"name":"directBuyAddress","type":"address"},
+				{"name":"directBuy","type":"address"},
 				{"name":"sender","type":"address"},
 				{"name":"token","type":"address"},
 				{"name":"nft","type":"address"},
@@ -122,7 +122,8 @@
 			"inputs": [
 				{"name":"sender","type":"address"},
 				{"name":"token","type":"address"},
-				{"name":"amount","type":"uint128"}
+				{"name":"amount","type":"uint128"},
+				{"name":"nft","type":"address"}
 			],
 			"outputs": [
 			]

@@ -135,7 +135,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
         emit AuctionActive(buildInfo());
         state = AuctionStatus.Active;
-
         tokenWallet.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
@@ -164,10 +163,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             now >= auctionStartTime &&
             state == AuctionStatus.Active
         ) {
-            processBid(callbackId, buyer, amount, original_gas_to, nextBidValue);
+            processBid(callbackId, buyer, amount, original_gas_to);
         } else {
             emit BidDeclined(buyer, amount);
-            sendBidResultCallback(callbackId, buyer, false, 0);
+            sendBidResultCallback(callbackId, buyer, false, 0, nft);
             TvmCell empty;
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
                 amount,
@@ -184,8 +183,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint32 _callbackId,
         address _newBidSender,
         uint128 _bid,
-        address original_gas_to,
-        uint128 _nextBidValue
+        address original_gas_to
     ) private {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         Bid _currentBid = currentBid;
@@ -194,18 +192,19 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         currentBid = newBid;
         calculateAndSetNextBid();
 
-        emit BidPlaced(_newBidSender, _bid, _nextBidValue);
-        sendBidResultCallback(_callbackId, _newBidSender, true, _nextBidValue);
+        emit BidPlaced(_newBidSender, _bid, nextBidValue);
+        sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, nft);
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
-                value: 0.1 ever, 
+                value: Gas.CALLBACK_VALUE, 
                 flag: 1, 
                 bounce: false 
             }(
                 _callbackId,
                 currentBid.addr,
-                currentBid.value
+                currentBid.value,
+                nft
             );
 
             TvmBuilder builder;
@@ -227,7 +226,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     }
 
     function finishAuction(
-        address sendGasTo
+        address sendGasTo,
+        uint32 callbackId
     ) public {
         require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
         require(msg.value >= Gas.FINISH_AUCTION_VALUE, BaseErrors.not_enough_value);
@@ -236,6 +236,15 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             
             emit AuctionComplete(nftOwner, currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
+
+            IAuctionBidPlacedCallback(msg.sender).auctionComplete{
+                value: Gas.CALLBACK_VALUE, 
+                    flag: 1, 
+                    bounce: false     
+            }(
+                callbackId,
+                nft
+            );
 
             ITIP4_1NFT(nft).transfer{
                 value: Gas.TRANSFER_OWNERSHIP_VALUE, 
@@ -257,13 +266,22 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 empty
             );
         } else {
-            emit AuctionCancelled();
+            emit AuctionCancelled(); 
             state = AuctionStatus.Cancelled;
             
+            IAuctionBidPlacedCallback(msg.sender).auctionCancelled{
+                value: Gas.TRANSFER_OWNERSHIP_VALUE, 
+                flag: 1, 
+                bounce: false
+            }(
+                callbackId,
+                nft
+            );
+
             ITIP4_1NFT(nft).changeManager{ value: 0, flag: 128 }(
-                    nftOwner,
-                    sendGasTo,
-                    callbacks
+                nftOwner,
+                sendGasTo,
+                callbacks
             );
         }
     }
@@ -276,25 +294,28 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint32 callbackId,
         address _callbackTarget,
         bool _isBidPlaced,
-        uint128 _nextBidValue
+        uint128 _nextBidValue,
+        address _nft
     ) private pure {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
                 IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{
-                    value: 0.1 ever, 
+                    value: Gas.CALLBACK_VALUE, 
                     flag: 1, 
                     bounce: false 
                 }(
                     callbackId,
-                    _nextBidValue
+                    _nextBidValue,
+                    _nft
                 );
             } else {
                 IAuctionBidPlacedCallback(_callbackTarget).bidNotPlacedCallback{
-                    value: 0.1 ever,
+                    value: Gas.CALLBACK_VALUE,
                     flag: 1, 
                     bounce: false 
                 }(
-                    callbackId
+                    callbackId,
+                    _nft
                 );
             }
         }
@@ -346,9 +367,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
             TvmCell cellParams = abi.encode(
               nonce_,
-              currentVersion,
-              price,
               nft,
+              price,
+              currentVersion,
               markerRootAddr,
               tokenRootAddr,
               nftOwner,
@@ -358,10 +379,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               auctionDuration,
               auctionStartTime,
               auctionEndTime,
-              maxBidValue,
               bidDelta,
+              currentBid,
+              maxBidValue,
               nextBidValue,
               paymentToken,
+              tokenWallet,
               state
             );
             

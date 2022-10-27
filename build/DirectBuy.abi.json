@@ -27,7 +27,7 @@
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{
@@ -38,7 +38,7 @@
 				{"name":"sender","type":"address"},
 				{"name":"value3","type":"address"},
 				{"name":"originalGasTo","type":"address"},
-				{"name":"payload","type":"cell"}
+				{"name":"value5","type":"cell"}
 			],
 			"outputs": [
 			]
@@ -60,7 +60,8 @@
 		{
 			"name": "finishBuy",
 			"inputs": [
-				{"name":"sendGasTo","type":"address"}
+				{"name":"sendGasTo","type":"address"},
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -68,6 +69,7 @@
 		{
 			"name": "closeBuy",
 			"inputs": [
+				{"name":"callbackId","type":"uint32"}
 			],
 			"outputs": [
 			]
@@ -96,7 +98,7 @@
 			"inputs": [
 				{"name":"from","type":"uint8"},
 				{"name":"to","type":"uint8"},
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"sender","type":"address"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value2","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value2","type":"tuple"}
 			],
 			"outputs": [
 			]

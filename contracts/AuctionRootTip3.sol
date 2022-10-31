@@ -35,8 +35,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint64 deployNonce;
     }
 
-    uint16 public auctionBidDelta;
-    uint16 public auctionBidDeltaDecimals;
     uint32 currentVersion;
     uint32 currentVersionOffer;
 
@@ -68,11 +66,11 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
             _offerCode,
             _deploymentFee,
             _marketFee, 
-            _marketFeeDecimals
+            _marketFeeDecimals,
+            _auctionBidDelta,
+            _auctionBidDeltaDecimals
         );
 
-        auctionBidDelta = _auctionBidDelta;
-        auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
         currentVersion++;
         currentVersionOffer++;
 
@@ -130,6 +128,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     auctionStartTime, 
                     auctionDuration,
                     auctionBidDelta,
+                    auctionBidDeltaDecimals,
                     paymentToken,
                     nftOwner
                 );

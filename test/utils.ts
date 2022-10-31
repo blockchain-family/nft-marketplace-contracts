@@ -215,8 +215,8 @@ export const deployAuctionRoot = async function (owner: AccountType) {
             _deploymentFee: 0,
             _marketFee: 0,
             _marketFeeDecimals: 0,
-            _auctionBidDelta: 100,
-            _auctionBidDeltaDecimals: 1,
+            _auctionBidDelta: 500,
+            _auctionBidDeltaDecimals: 10000,
             _sendGasTo: owner.address
 
         },

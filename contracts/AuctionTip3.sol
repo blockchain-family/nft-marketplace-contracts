@@ -52,6 +52,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     }
 
     uint16 public bidDelta;
+    uint16 public bidDeltaDecimals;
     Bid public currentBid;
     uint128 public maxBidValue;
     uint128 public nextBidValue;
@@ -85,6 +86,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint64 _auctionStartTime,
         uint64 _auctionDuration,
         uint16 _bidDelta,
+        uint16 _bidDeltaDecimals,
         address _paymentToken,
         address sendGasTo
     ) public {
@@ -104,6 +106,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         auctionEndTime = _auctionStartTime + _auctionDuration;
         maxBidValue = 0;
         bidDelta = _bidDelta;
+        bidDeltaDecimals = _bidDeltaDecimals;
         nextBidValue = price;
         paymentToken = _paymentToken;
 
@@ -288,7 +291,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     }
 
     function calculateAndSetNextBid() private {
-        nextBidValue = maxBidValue + math.muldivc(maxBidValue, uint128(bidDelta), uint128(10000));
+        nextBidValue = maxBidValue + math.muldivc(maxBidValue, uint128(bidDelta), uint128(bidDeltaDecimals));
     }
 
     function sendBidResultCallback(
@@ -381,6 +384,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               auctionStartTime,
               auctionEndTime,
               bidDelta,
+              bidDeltaDecimals,
               currentBid,
               maxBidValue,
               nextBidValue,

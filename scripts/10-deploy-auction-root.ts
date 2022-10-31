@@ -31,8 +31,8 @@ async function main() {
             _deploymentFee: 0,
             _marketFee: 0,
             _marketFeeDecimals: 0,
-            _auctionBidDelta: 100,
-            _auctionBidDeltaDecimals: 1,
+            _auctionBidDelta: 500,
+            _auctionBidDeltaDecimals: 10000,
             _sendGasTo: account.address
             
         },

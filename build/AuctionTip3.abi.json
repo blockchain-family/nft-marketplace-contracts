@@ -16,6 +16,7 @@
 				{"name":"_auctionStartTime","type":"uint64"},
 				{"name":"_auctionDuration","type":"uint64"},
 				{"name":"_bidDelta","type":"uint16"},
+				{"name":"_bidDeltaDecimals","type":"uint16"},
 				{"name":"_paymentToken","type":"address"},
 				{"name":"sendGasTo","type":"address"}
 			],
@@ -154,11 +155,35 @@
 			]
 		},
 		{
+			"name": "auctionBidDelta",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"auctionBidDelta","type":"uint16"}
+			]
+		},
+		{
+			"name": "auctionBidDeltaDecimals",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"auctionBidDeltaDecimals","type":"uint16"}
+			]
+		},
+		{
 			"name": "bidDelta",
 			"inputs": [
 			],
 			"outputs": [
 				{"name":"bidDelta","type":"uint16"}
+			]
+		},
+		{
+			"name": "bidDeltaDecimals",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"bidDeltaDecimals","type":"uint16"}
 			]
 		},
 		{
@@ -264,12 +289,15 @@
 		{"name":"deploymentFee","type":"uint128"},
 		{"name":"marketFee","type":"uint128"},
 		{"name":"marketFeeDecimals","type":"uint8"},
+		{"name":"auctionBidDelta","type":"uint16"},
+		{"name":"auctionBidDeltaDecimals","type":"uint16"},
 		{"name":"paymentToken","type":"address"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"auctionStartTime","type":"uint64"},
 		{"name":"auctionDuration","type":"uint64"},
 		{"name":"auctionEndTime","type":"uint64"},
 		{"name":"bidDelta","type":"uint16"},
+		{"name":"bidDeltaDecimals","type":"uint16"},
 		{"components":[{"name":"addr","type":"address"},{"name":"value","type":"uint128"}],"name":"currentBid","type":"tuple"},
 		{"name":"maxBidValue","type":"uint128"},
 		{"name":"nextBidValue","type":"uint128"},

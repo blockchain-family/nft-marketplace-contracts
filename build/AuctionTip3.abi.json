@@ -155,22 +155,6 @@
 			]
 		},
 		{
-			"name": "auctionBidDelta",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"auctionBidDelta","type":"uint16"}
-			]
-		},
-		{
-			"name": "auctionBidDeltaDecimals",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"auctionBidDeltaDecimals","type":"uint16"}
-			]
-		},
-		{
 			"name": "bidDelta",
 			"inputs": [
 			],
@@ -289,8 +273,6 @@
 		{"name":"deploymentFee","type":"uint128"},
 		{"name":"marketFee","type":"uint128"},
 		{"name":"marketFeeDecimals","type":"uint8"},
-		{"name":"auctionBidDelta","type":"uint16"},
-		{"name":"auctionBidDeltaDecimals","type":"uint16"},
 		{"name":"paymentToken","type":"address"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"auctionStartTime","type":"uint64"},

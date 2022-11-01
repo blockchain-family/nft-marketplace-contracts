@@ -54,7 +54,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo);
   event DirectSellUpgrade();
-  
+
   constructor(
     uint64 _startTime,
     uint64 _durationTime,
@@ -69,10 +69,10 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       if(startTime > 0 && durationTime > 0) {
         endTime = startTime + durationTime;
       }
-      
+
       price = _price;
       currentVersion++;
-      
+
       ITokenRoot(paymentToken).deployWallet{
         value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
         flag: 1,
@@ -85,8 +85,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   modifier onlyOwner() {
     require(
-      msg.sender.value != 0 && 
-      msg.sender == owner, 
+      msg.sender.value != 0 &&
+      msg.sender == owner,
       DirectBuySellErrors.NOT_OWNER_DIRECT_BUY_SELL
     );
     _;
@@ -98,8 +98,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   function onTokenWallet(address _wallet) external {
     require(
-      msg.sender.value != 0 && 
-      msg.sender == paymentToken, 
+      msg.sender.value != 0 &&
+      msg.sender == paymentToken,
       DirectBuySellErrors.NOT_FROM_SPENT_TOKEN_ROOT
     );
     tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
@@ -120,13 +120,13 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     TvmCell payload
   ) external override {
     (
-      address buyer, 
+      address buyer,
       uint32 callbackId
     ) = ExchangePayload.getSenderAndCallId(sender, payload);
-    
+
     TvmCell emptyPayload;
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-        
+
     if (
       msg.sender.value != 0 &&
       msg.sender == tokenWallet &&
@@ -137,32 +137,34 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       now >= startTime
     ) {
       tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
-      IDirectSellCallback(buyer).directSellSuccess{ 
-        value: Gas.CALLBACK_VALUE, 
-        flag: 1, 
-        bounce: false 
+      IDirectSellCallback(buyer).directSellSuccess{
+        value: Gas.CALLBACK_VALUE,
+        flag: 1,
+        bounce: false
       }(
-        callbackId, 
-        owner, 
+        callbackId,
+        owner,
         buyer,
         nftAddress
       );
 
       changeState(DirectSellStatus.Filled);
-      ITIP4_1NFT(nftAddress).transfer{ 
-        value: Gas.TRANSFER_OWNERSHIP_VALUE, 
-        flag: 1, 
-        bounce: false 
+      callbacks[buyer] = ITIP4_1NFT.CallbackParams(0.01 ever, emptyPayload);
+
+      ITIP4_1NFT(nftAddress).transfer{
+        value: Gas.TRANSFER_OWNERSHIP_VALUE,
+        flag: 1,
+        bounce: false
       }(
         buyer,
         originalGasTo,
         callbacks
       );
 
-      ITokenWallet(tokenWallet).transfer{ 
-        value: 0, 
-        flag: 128, 
-        bounce: false 
+      ITokenWallet(tokenWallet).transfer{
+        value: 0,
+        flag: 128,
+        bounce: false
       }(
         price,
         owner,
@@ -175,20 +177,20 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     } else {
       if (endTime > 0 && now >= endTime) {
         IDirectSellCallback(buyer).directSellCancelledOnTime{
-          value: Gas.CALLBACK_VALUE, 
-          flag: 1, 
-          bounce: false 
+          value: Gas.CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
         }(
           callbackId,
           nftAddress
         );
 
         changeState(DirectSellStatus.Expired);
-      
-        ITokenWallet(msg.sender).transfer{ 
-          value: 0, 
-          flag: 64, 
-          bounce: false 
+
+        ITokenWallet(msg.sender).transfer{
+          value: 0,
+          flag: 64,
+          bounce: false
         }(
           amount,
           buyer,
@@ -198,29 +200,29 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
           emptyPayload
         );
 
-        ITIP4_1NFT(nftAddress).changeManager{ 
-          value: 0, 
-          flag: 128 
+        ITIP4_1NFT(nftAddress).changeManager{
+          value: 0,
+          flag: 128
         }(
-          owner, 
-          originalGasTo, 
+          owner,
+          originalGasTo,
           callbacks
         );
       } else {
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
         IDirectSellCallback(buyer).directSellNotSuccess{
-          value: Gas.CALLBACK_VALUE, 
-          flag: 1, 
-          bounce: false   
+          value: Gas.CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
         }(
           callbackId,
           nftAddress
         );
 
-        ITokenWallet(msg.sender).transfer{ 
-          value: 0, 
-          flag: 128, 
-          bounce: false 
+        ITokenWallet(msg.sender).transfer{
+          value: 0,
+          flag: 128,
+          bounce: false
         }(
           amount,
           buyer,
@@ -229,7 +231,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
           true,
           emptyPayload
         );
-      } 
+      }
     }
   }
 
@@ -257,50 +259,50 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   function finishSell(address sendGasTo, uint32 callbackId) public {
     require(
-      currentStatus == DirectSellStatus.Active, 
+      currentStatus == DirectSellStatus.Active,
       DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
     );
-    
+
     require(
-      now >= endTime, 
+      now >= endTime,
       DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS
     );
-    
+
     require(
-      msg.value >= Gas.FINISH_ORDER_VALUE, 
+      msg.value >= Gas.FINISH_ORDER_VALUE,
       BaseErrors.not_enough_value
     );
 
     IDirectSellCallback(msg.sender).directSellCancelledOnTime{
-      value: Gas.CALLBACK_VALUE, 
-      flag: 1, 
-      bounce: false 
+      value: Gas.CALLBACK_VALUE,
+      flag: 1,
+      bounce: false
     }(
       callbackId,
       nftAddress
     );
     changeState(DirectSellStatus.Expired);
-    
+
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-    ITIP4_1NFT(nftAddress).changeManager{ 
-      value: 0, 
-      flag: 128 
+    ITIP4_1NFT(nftAddress).changeManager{
+      value: 0,
+      flag: 128
     }(
-      owner, 
-      sendGasTo, 
+      owner,
+      sendGasTo,
       callbacks
     );
   }
 
   function closeSell(uint32 callbackId) external onlyOwner {
     require(
-      currentStatus == DirectSellStatus.Active, 
+      currentStatus == DirectSellStatus.Active,
       DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
     );
     IDirectSellCallback(owner).directSellClose{
-      value: Gas.CALLBACK_VALUE, 
-      flag: 1, 
-      bounce: false 
+      value: Gas.CALLBACK_VALUE,
+      flag: 1,
+      bounce: false
     }(
       callbackId,
       nftAddress
@@ -308,12 +310,12 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     changeState(DirectSellStatus.Cancelled);
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
-    ITIP4_1NFT(nftAddress).changeManager{ 
-      value: 0, 
-      flag: 128 
+    ITIP4_1NFT(nftAddress).changeManager{
+      value: 0,
+      flag: 128
     }(
-      owner, 
-      owner, 
+      owner,
+      owner,
       callbacks
     );
   }
@@ -324,8 +326,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     address sendGasTo
   ) override external {
     require(
-      msg.sender.value != 0 && 
-      msg.sender == factoryDirectSell, 
+      msg.sender.value != 0 &&
+      msg.sender == factoryDirectSell,
       DirectBuySellErrors.NOT_FACTORY_DIRECT_SELL
     );
 
@@ -353,7 +355,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         currentStatus,
         currentVersion
       );
-      
+
       tvm.setcode(newCode);
       tvm.setCurrentCode(newCode);
 
@@ -361,5 +363,5 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     }
   }
 
-  function onCodeUpgrade(TvmCell data) private {} 
+  function onCodeUpgrade(TvmCell data) private {}
 }

@@ -83,8 +83,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
   modifier onlyOwner() {
     require(
-      msg.sender.value != 0 && 
-      msg.sender == owner, 
+      msg.sender.value != 0 &&
+      msg.sender == owner,
       DirectBuySellErrors.NOT_OWNER_DIRECT_BUY_SELL
     );
     _;
@@ -108,9 +108,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
   ) external override {
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
     if (
-        tokenRoot == spentToken && 
+        tokenRoot == spentToken &&
         msg.sender.value != 0 &&
-        msg.sender == spentTokenWallet && 
+        msg.sender == spentTokenWallet &&
         amount >= price &&
         sender == factoryDirectBuy
     ) {
@@ -118,9 +118,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     } else {
       TvmCell emptyPayload;
       ITokenWallet(msg.sender).transfer{
-        value: 0, 
-        flag: 128, 
-        bounce: false 
+        value: 0,
+        flag: 128,
+        bounce: false
       }(
         amount,
         sender,
@@ -152,34 +152,36 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         ((endTime > 0 && now < endTime) || endTime == 0) &&
         now >= startTime
     ) {
-      IDirectBuyCallback(nftOwner).directBuySuccess{ 
-        value: Gas.CALLBACK_VALUE, 
-        flag: 1, 
-        bounce: false 
+      IDirectBuyCallback(nftOwner).directBuySuccess{
+        value: Gas.CALLBACK_VALUE,
+        flag: 1,
+        bounce: false
       }(
         callbackId,
-        nftOwner, 
+        nftOwner,
         owner,
         nftAddress
       );
 
       changeState(DirectBuyStatus.Filled);
 
+      TvmCell empty;
+      callbacks[owner] = ITIP4_1NFT.CallbackParams(0.01 ever, empty);
+
       ITIP4_1NFT(nftAddress).transfer{
-        value: Gas.TRANSFER_OWNERSHIP_VALUE, 
-        flag: 1, 
-        bounce: false 
+        value: Gas.TRANSFER_OWNERSHIP_VALUE,
+        flag: 1,
+        bounce: false
       }(
         owner,
         sendGasTo,
         callbacks
       );
 
-      TvmCell empty;
       ITokenWallet(spentTokenWallet).transfer{
-        value: 0, 
-        flag: 128, 
-        bounce: false 
+        value: 0,
+        flag: 128,
+        bounce: false
       }(
         price,
         nftOwner,
@@ -191,9 +193,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     } else {
       if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
         IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
-          value: Gas.CALLBACK_VALUE, 
-          flag: 1, 
-          bounce: false 
+          value: Gas.CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
         }(
           callbackId,
           nftAddress
@@ -201,19 +203,19 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
         changeState(DirectBuyStatus.Expired);
         ITIP4_1NFT(msg.sender).changeManager{
-          value: 0, 
-          flag: 64 
+          value: 0,
+          flag: 64
         }(
-          nftOwner, 
-          sendGasTo, 
+          nftOwner,
+          sendGasTo,
           callbacks
-        ); 
+        );
 
         TvmCell emptyPayload;
-        ITokenWallet(spentTokenWallet).transfer{ 
-          value: 0, 
-          flag: 128, 
-          bounce: false 
+        ITokenWallet(spentTokenWallet).transfer{
+          value: 0,
+          flag: 128,
+          bounce: false
         }(
           price,
           owner,
@@ -224,24 +226,24 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         );
       } else {
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-        
+
         IDirectBuyCallback(nftOwner).directBuyNotSuccess{
-          value: Gas.CALLBACK_VALUE, 
-          flag: 1, 
-          bounce: false 
+          value: Gas.CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
         }(
           callbackId,
           nftAddress
-        );  
+        );
 
         ITIP4_1NFT(msg.sender).changeManager{
-          value: 0, 
-          flag: 128 
+          value: 0,
+          flag: 128
         }(
-          nftOwner, 
-          sendGasTo, 
+          nftOwner,
+          sendGasTo,
           callbacks
-        ); 
+        );
       }
     }
   }
@@ -271,16 +273,16 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
   function finishBuy(address sendGasTo, uint32 callbackId) public {
     require(
-      currentStatus == DirectBuyStatus.Active, 
+      currentStatus == DirectBuyStatus.Active,
       DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
     );
     require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
     require(msg.value >= Gas.FINISH_ORDER_VALUE, BaseErrors.not_enough_value);
 
     IDirectBuyCallback(msg.sender).directBuyCancelledOnTime{
-      value: Gas.CALLBACK_VALUE, 
-      flag: 1, 
-      bounce: false 
+      value: Gas.CALLBACK_VALUE,
+      flag: 1,
+      bounce: false
     }(
       callbackId,
       nftAddress
@@ -288,10 +290,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     changeState(DirectBuyStatus.Expired);
 
     TvmCell emptyPayload;
-    ITokenWallet(spentTokenWallet).transfer{ 
-      value: 0, 
-      flag: 128, 
-      bounce: false 
+    ITokenWallet(spentTokenWallet).transfer{
+      value: 0,
+      flag: 128,
+      bounce: false
     }(
       price,
       owner,
@@ -304,25 +306,25 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
   function closeBuy(uint32 callbackId) external onlyOwner {
     require(
-      currentStatus == DirectBuyStatus.Active, 
+      currentStatus == DirectBuyStatus.Active,
       DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
     );
 
     IDirectBuyCallback(owner).directBuyClose{
-      value: Gas.CALLBACK_VALUE, 
-      flag: 1, 
-      bounce: false 
+      value: Gas.CALLBACK_VALUE,
+      flag: 1,
+      bounce: false
     }(
       callbackId,
       nftAddress
     );
     changeState(DirectBuyStatus.Cancelled);
-    
+
     TvmCell emptyPayload;
-    ITokenWallet(spentTokenWallet).transfer{ 
-      value: 0, 
-      flag: 128, 
-      bounce: false 
+    ITokenWallet(spentTokenWallet).transfer{
+      value: 0,
+      flag: 128,
+      bounce: false
     }(
       price,
       owner,
@@ -339,8 +341,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     address sendGasTo
   ) override external {
     require(
-      msg.sender.value != 0 && 
-      msg.sender == factoryDirectBuy, 
+      msg.sender.value != 0 &&
+      msg.sender == factoryDirectBuy,
       DirectBuySellErrors.NOT_FACTORY_DIRECT_BUY
     );
 
@@ -368,7 +370,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         currentStatus,
         currentVersion
       );
-      
+
       tvm.setcode(newCode);
       tvm.setCurrentCode(newCode);
 
@@ -376,5 +378,5 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     }
   }
 
-  function onCodeUpgrade(TvmCell data) private {} 
+  function onCodeUpgrade(TvmCell data) private {}
 }

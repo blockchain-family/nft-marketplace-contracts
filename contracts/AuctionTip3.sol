@@ -250,6 +250,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 nft
             );
 
+            TvmCell empty;
+            callbacks[currentBid.addr] = ITIP4_1NFT.CallbackParams(0.01 ever, empty);
+
             ITIP4_1NFT(nft).transfer{
                 value: Gas.TRANSFER_OWNERSHIP_VALUE,
                 flag: 1,
@@ -259,8 +262,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 sendGasTo,
                 callbacks
             );
-
-            TvmCell empty;
             ITokenWallet(tokenWallet).transfer{ value: 0, flag: 128, bounce: false }(
                 maxBidValue,
                 nftOwner,

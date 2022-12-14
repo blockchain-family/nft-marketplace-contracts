@@ -81,8 +81,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         address _tokenRootAddr,
         address _nftOwner,
         uint128 _deploymentFee,
-        uint128 _marketFee,
-        uint8 _marketFeeDecimals,
+        uint32 _marketFeeNumerator,
+        uint32 _marketFeeDenominator,
         uint64 _auctionStartTime,
         uint64 _auctionDuration,
         uint16 _bidDelta,
@@ -97,8 +97,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             _tokenRootAddr,
             _nftOwner,
             _deploymentFee,
-            _marketFee,
-            _marketFeeDecimals
+            _marketFeeNumerator,
+            _marketFeeDenominator
         );
 
         auctionDuration = _auctionDuration;
@@ -143,6 +143,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
     function getTypeContract() external pure returns (string) {
         return "Auction";
+    }
+
+    function getMarketFee() external pure returns (uint32, uint32) {
+        return (marketFeeNumerator, marketFeeDenominator);
     }
 
     function onAcceptTokensTransfer(
@@ -238,6 +242,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
 
+            uint128 fee = math.div(math.muldivc(maxBidValue, marketFeeNumerator), marketFeeDenominator);
+            uint128 balance = maxBidValue - fee;
+
             emit AuctionComplete(nftOwner, currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
 
@@ -262,9 +269,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 sendGasTo,
                 callbacks
             );
-            ITokenWallet(tokenWallet).transfer{ value: 0, flag: 128, bounce: false }(
-                maxBidValue,
+            ITokenWallet(tokenWallet).transfer{value: 0.5, flag: 0, bounce: false }(
+                balance,
                 nftOwner,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                sendGasTo,
+                false,
+                empty
+            );
+            ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }(
+                fee,
+                markerRootAddr,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
                 sendGasTo,
                 false,
@@ -379,8 +394,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               tokenRootAddr,
               nftOwner,
               deploymentFee,
-              marketFee,
-              marketFeeDecimals,
+              marketFeeNumerator,
+              marketFeeDenominator,
               auctionDuration,
               auctionStartTime,
               auctionEndTime,

@@ -5,4 +5,8 @@ library AuctionErrors {
     uint8 constant bid_is_too_low            = 251;
     uint8 constant wrong_data_sender         = 252;
     uint8 constant auction_not_active        = 253;
+    uint8 constant wrong_recipient           = 254;
+    uint8 constant wrong_amount              = 255;
+    uint8 constant low_gas                  = 256;
+
 }

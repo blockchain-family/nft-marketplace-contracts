@@ -40,6 +40,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
   uint8 currentStatus;
   uint32 currentVersion;
 
+  uint32 marketFeeNumerator;
+  uint32 marketFeeDenominator;
+
   struct DirectBuyInfo {
     address factory;
     address creator;
@@ -61,7 +64,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     uint128 _amount,
     uint64 _startTime,
     uint64 _durationTime,
-    address _spentTokenWallet
+    address _spentTokenWallet,
+    uint32 _marketFeeNumerator,
+    uint32 _marketFeeDenominator
   ) public {
     if (msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
       changeState(DirectBuyStatus.Create);
@@ -74,7 +79,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         endTime = _startTime + _durationTime;
       }
       spentTokenWallet = _spentTokenWallet;
-
+      marketFeeNumerator = _marketFeeNumerator;
+      marketFeeDenominator = _marketFeeDenominator;
       currentVersion++;
     } else {
       msg.sender.transfer(0, false, 128 + 32);
@@ -92,6 +98,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
   function getTypeContract() external pure returns (string) {
     return "DirectBuy";
+  }
+
+  function getMarketFee() external pure returns (uint32, uint32) {
+      return (marketFeeNumerator, marketFeeDenominator);
   }
 
   function getInfo() external view returns (DirectBuyInfo) {
@@ -152,6 +162,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         ((endTime > 0 && now < endTime) || endTime == 0) &&
         now >= startTime
     ) {
+
+      uint128 fee = math.div(math.muldivc(price, marketFeeNumerator), marketFeeDenominator);
+      uint128 balance = price - fee;
+
       IDirectBuyCallback(nftOwner).directBuySuccess{
         value: Gas.CALLBACK_VALUE,
         flag: 1,
@@ -179,17 +193,32 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       );
 
       ITokenWallet(spentTokenWallet).transfer{
-        value: 0,
-        flag: 128,
+        value: 0.5,
+        flag: 0,
         bounce: false
       }(
-        price,
+        balance,
         nftOwner,
         Gas.DEPLOY_EMPTY_WALLET_GRAMS,
         sendGasTo,
         false,
         empty
       );
+
+      ITokenWallet(spentTokenWallet).transfer{
+        value: 0,
+        flag: 128,
+        bounce: false
+      }(
+        fee,
+        factoryDirectBuy,
+        Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+        sendGasTo,
+        false,
+        empty
+      );
+
+
     } else {
       if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
         IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{

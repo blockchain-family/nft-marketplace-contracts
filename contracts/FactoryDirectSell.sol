@@ -26,6 +26,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
 
   uint32 currentVersion;
   uint32 currectVersionDirectSell;
+  uint32 marketFeeNumerator;
+  uint32 marketFeeDenominator;
 
   event DirectSellDeployed(
     address directSell,
@@ -38,17 +40,29 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   event DirectSellDeclined(address sender, address nft);
   event FactoryDirectSellUpgrade();
 
-  constructor(address _owner, address sendGasTo) public OwnableInternal(_owner) {
+  constructor(
+    address _owner,
+    address sendGasTo,
+    uint32 _marketFeeNumerator,
+    uint32 _marketFeeDenominator
+    )
+    public OwnableInternal(_owner)
+  {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
     currentVersion++;
-
+    marketFeeNumerator = _marketFeeNumerator;
+    marketFeeDenominator = _marketFeeDenominator;
     _transferOwnership(_owner);
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
 
   function getTypeContract() external pure returns (string) {
     return "FactoryDirectSell";
+  }
+
+  function getMarketFee() external pure returns (uint32, uint32) {
+      return (marketFeeNumerator, marketFeeDenominator);
   }
 
   function setCodeDirectSell(TvmCell _directSellCode) public onlyOwner {
@@ -119,7 +133,13 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
       address directSell = new DirectSell{
         stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, nftForSell, _nonce),
         value: Gas.DEPLOY_DIRECT_SELL_MIN_VALUE
-      }(_startAuction, durationTime, _price);
+      }(
+        _startAuction,
+        durationTime,
+        _price,
+        marketFeeNumerator;
+        marketFeeDenominator;
+        );
 
       emit DirectSellDeployed(
         directSell,

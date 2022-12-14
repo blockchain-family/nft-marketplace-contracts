@@ -9,6 +9,7 @@ library Gas {
     uint128 constant FINISH_AUCTION_VALUE                   = 1.3 ever;
     uint128 constant UPGRADE_AUCTION_ROOT_MIN_VALUE         = 5 ever;
     uint128 constant CALLBACK_VALUE                         = 0.1 ever;
+    uint128 constant WITHDRAW_VALUE                         = 1 ever;
 
     // tip3
     uint128 constant DEPLOY_EMPTY_WALLET_VALUE              = 0.5 ever;

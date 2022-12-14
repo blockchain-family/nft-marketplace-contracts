@@ -27,6 +27,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
   uint32 currentVersion;
   uint32 currectVersionDirectBuy;
+  uint32 marketFeeNumerator;
+  uint32 marketFeeDenominator;
 
   event DirectBuyDeployed(
     address directBuy,
@@ -40,17 +42,28 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   event DirectBuyDeclined(address sender, address token, uint128 amount, address nft);
   event FactoryDirectBuyUpgrade();
 
-  constructor(address _owner, address sendGasTo) OwnableInternal(_owner) public {
+  constructor(
+    address _owner,
+    address sendGasTo,
+    uint32 _marketFeeNumerator,
+    uint32 _marketFeeDenominator
+  ) OwnableInternal(_owner) public
+  {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
     currentVersion++;
-
+    marketFeeNumerator = _marketFeeNumerator;
+    marketFeeDenominator = _marketFeeDenominator;
     _transferOwnership(_owner);
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
 
   function getTypeContract() external pure returns (string) {
     return "FactoryDirectBuy";
+  }
+
+  function getMarketFee() external pure returns (uint32, uint32) {
+      return (marketFeeNumerator, marketFeeDenominator);
   }
 
   function buildDirectBuyCreationPayload(
@@ -120,7 +133,9 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         amount,
         startTime,
         durationTime,
-        getTokenWallet(tokenRoot, directBuyAddress)
+        getTokenWallet(tokenRoot, directBuyAddress),
+        marketFeeNumerator;
+        marketFeeDenominator;
       );
 
       emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);

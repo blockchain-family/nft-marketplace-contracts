@@ -13,8 +13,8 @@ import '../modules/access/OwnableInternal.sol';
 
 
 abstract contract OffersRoot is IOffersRoot, OwnableInternal {
-    uint8 public marketFee;
-    uint8 public marketFeeDecimals;
+    uint32 public marketFeeNumerator;
+    uint32 public marketFeeDenominator;
     uint16 public auctionBidDelta;
     uint16 public auctionBidDeltaDecimals;
     uint128 public deploymentFee;
@@ -28,8 +28,8 @@ abstract contract OffersRoot is IOffersRoot, OwnableInternal {
         address _owner,
         TvmCell _offerCode,
         uint128 _deploymentFee,
-        uint8 _marketFee, 
-        uint8 _marketFeeDecimals,
+        uint32 _marketFeeNumerator,
+        uint32 _marketFeeDenominator,
         uint16 _auctionBidDelta,
         uint16 _auctionBidDeltaDecimals
     )  
@@ -43,8 +43,8 @@ abstract contract OffersRoot is IOffersRoot, OwnableInternal {
         _transferOwnership(_owner);
 
         deploymentFee = _deploymentFee;
-        marketFee = _marketFee;
-        marketFeeDecimals = _marketFeeDecimals;
+        marketFeeNumerator = _marketFeeNumerator;
+        marketFeeDenominator = _marketFeeDenominator;
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
 
@@ -63,10 +63,10 @@ abstract contract OffersRoot is IOffersRoot, OwnableInternal {
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
     }
 
-    function changeMarketFee(uint8 _value, uint8 _decimals) override external onlyOwner {
+    function changeMarketFee(uint32 _numerator, uint32 _denominator) override external onlyOwner {
         tvm.accept();
-        marketFee = _value;
-        marketFeeDecimals = _decimals;
+        marketFeeNumerator = _numerator;
+        marketFeeDenominator = _denominator;
     }
 
 }

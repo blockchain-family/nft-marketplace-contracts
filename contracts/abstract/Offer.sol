@@ -20,9 +20,9 @@ abstract contract Offer {
     address public nftOwner;
 
     uint128 public deploymentFee;
-    // Market fee in EVER's
-    uint128 public marketFee;
-    uint8 public marketFeeDecimals;
+    // Market fee
+    uint32 public marketFeeNumerator;
+    uint32 public marketFeeDenominator;
 
     function setDefaultProperties(
         uint128 _price,
@@ -30,8 +30,8 @@ abstract contract Offer {
         address _tokenRootAddr,
         address _nftOwner,
         uint128 _deploymentFee,
-        uint128 _marketFee,
-        uint8 _marketFeeDecimals
+        uint32 _marketFeeNumerator,
+        uint32 _marketFeeDenominator
     ) 
         internal 
     {   
@@ -40,9 +40,7 @@ abstract contract Offer {
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
         deploymentFee = _deploymentFee;
-
-        uint128 decimals = uint128(uint128(10) ** uint128(_marketFeeDecimals));
-        marketFee = math.divc(math.muldiv(price, uint128(_marketFee), uint128(100)), decimals);
+        marketFeeNumerator = _marketFeeNumerator;
         marketFeeDecimals = _marketFeeDecimals;
     }
 

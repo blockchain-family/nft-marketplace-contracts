@@ -34,6 +34,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
   uint64 endTime;
 
   uint128 price;
+  uint32 marketFeeNumerator;
+  uint32 marketFeeDenominator;
 
   address tokenWallet;
   uint8 currentStatus;
@@ -58,7 +60,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
   constructor(
     uint64 _startTime,
     uint64 _durationTime,
-    uint128 _price
+    uint128 _price,
+    uint32 _marketFeeNumerator,
+    uint32 _marketFeeDenominator
   ) public {
     if (msg.sender.value != 0 && msg.sender == factoryDirectSell) {
       changeState(DirectSellStatus.Create);
@@ -69,7 +73,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       if(startTime > 0 && durationTime > 0) {
         endTime = startTime + durationTime;
       }
-
+      marketFeeNumerator = _marketFeeNumerator;
+      marketFeeDenominator = _marketFeeDenominator;
       price = _price;
       currentVersion++;
 
@@ -94,6 +99,10 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   function getTypeContract() external pure returns (string) {
     return "DirectSell";
+  }
+
+  function getMarketFee() external pure returns (uint32, uint32) {
+      return (marketFeeNumerator, marketFeeDenominator);
   }
 
   function onTokenWallet(address _wallet) external {
@@ -148,6 +157,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         nftAddress
       );
 
+      uint128 fee = math.div(math.muldivc(price, marketFeeNumerator), marketFeeDenominator);
+      uint128 balance = price - fee;
+
       changeState(DirectSellStatus.Filled);
       callbacks[buyer] = ITIP4_1NFT.CallbackParams(0.01 ever, emptyPayload);
 
@@ -162,12 +174,25 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       );
 
       ITokenWallet(tokenWallet).transfer{
+        value: 0.5,
+        flag: 0,
+        bounce: false
+      }(
+        balance,
+        owner,
+        Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+        originalGasTo,
+        false,
+        emptyPayload
+      );
+
+      ITokenWallet(tokenWallet).transfer{
         value: 0,
         flag: 128,
         bounce: false
       }(
-        price,
-        owner,
+        fee,
+        factoryDirectSell,
         Gas.DEPLOY_EMPTY_WALLET_GRAMS,
         originalGasTo,
         false,

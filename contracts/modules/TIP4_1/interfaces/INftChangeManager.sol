@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 interface INftChangeManager {
 

@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -8,7 +8,6 @@ import './abstract/OffersRoot.sol';
 
 import './errors/BaseErrors.sol';
 import './errors/AuctionErrors.sol';
-
 
 import './libraries/Gas.sol';
 
@@ -47,8 +46,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         address _owner,
         TvmCell _offerCode,
         uint128 _deploymentFee,
-        uint32 _marketFeeNumerator,
-        uint32 _marketFeeDenominator,
+        MarketFee _fee,
         uint16 _auctionBidDelta,
         uint16 _auctionBidDeltaDecimals,
         address _sendGasTo
@@ -59,18 +57,19 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     {
         tvm.accept();
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         // Method and properties are declared in OffersRoot
         setDefaultProperties(
             _codeNft,
             _owner,
             _offerCode,
             _deploymentFee,
-            _marketFeeNumerator,
-            _marketFeeDenominator,
+            _fee,
             _auctionBidDelta,
             _auctionBidDeltaDecimals
         );
-
+        emit MarketFeeDefaultChanged(_fee);
         currentVersion++;
         currentVersionOffer++;
 
@@ -79,10 +78,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
 
     function getTypeContract() external pure returns (string) {
         return "AuctionRoot";
-    }
-
-    function getMarketFee() external pure returns (uint32, uint32) {
-        return (marketFeeNumerator, marketFeeDenominator);
     }
 
     function onNftChangeManager(
@@ -127,8 +122,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     collection,
                     nftOwner,
                     deploymentFeePart * 2,
-                    marketFeeNumerator,
-                    marketFeeDenominator,
+                    fee,
                     auctionStartTime, 
                     auctionDuration,
                     auctionBidDelta,
@@ -228,14 +222,15 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
-    function widhraw(address tokenWallet, uint128 amount, address recipien, address remainingGasTo) external view onlyOwner {
+    function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {
         require(recipient.value != 0, AuctionErrors.wrong_recipient);
         require(msg.value >= Gas.WITHDRAW_VALUE, AuctionErrors.low_gas);
 
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
         TvmCell emptyPayload;
         ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }
-            (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, true, emptyPayload);
+            (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
+        emit MarketFeeWithdrawn(recipient, amount, tokenWallet);
     }
 
     function RequestUpgradeAuction(
@@ -292,8 +287,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 codeNft,
                 offerCode,
                 deploymentFee,
-                marketFeeNumerator,
-                marketFeeDenominator,
+                fee,
                 deploymentFeePart
             );
             

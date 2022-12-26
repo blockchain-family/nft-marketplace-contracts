@@ -1,9 +1,12 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
-interface IOffersRoot {
-    
+import "../structures/IMarketFeeStructure.sol";
+
+interface IOffersRoot is IMarketFeeStructure {
+
     function changeDeploymentFee(uint128 _value) external;
     function changeBidDelta(uint16 _auctionBidDelta, uint16 _auctionBidDeltaDecimals) external;
-    function changeMarketFee(uint8 _value, uint8 _decimals) external;
-
+    function setMarketFee(MarketFee _fee) external;
+    function setMarketFeeForAuction(address auction, MarketFee _fee) external;
+    function getMarketFee() external view returns (MarketFee);
 }

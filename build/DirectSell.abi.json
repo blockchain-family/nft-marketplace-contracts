@@ -8,7 +8,8 @@
 			"inputs": [
 				{"name":"_startTime","type":"uint64"},
 				{"name":"_durationTime","type":"uint64"},
-				{"name":"_price","type":"uint128"}
+				{"name":"_price","type":"uint128"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -19,6 +20,22 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "getMarketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -102,6 +119,15 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "MarketFeeWithheld",
+			"inputs": [
+				{"name":"value0","type":"uint128"},
+				{"name":"tokenRoot","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
@@ -119,6 +145,7 @@
 		{"name":"price","type":"uint128"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"currentStatus","type":"uint8"},
-		{"name":"currentVersion","type":"uint32"}
+		{"name":"currentVersion","type":"uint32"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
 	]
 }

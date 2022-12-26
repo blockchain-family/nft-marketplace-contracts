@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 import "@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol";
 import "@broxus/credit-processor/contracts/interfaces/structures/ICreditEventDataStructure.sol";

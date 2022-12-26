@@ -1,4 +1,4 @@
-pragma ever-solidity >=0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -18,16 +18,16 @@ import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
 import "./Nft.sol";
 import "./DirectSell.sol";
+import "./interfaces/IEventsMarketFee.sol";
+import "./interfaces/IOffer.sol";
 
-contract FactoryDirectSell is OwnableInternal, INftChangeManager {
+contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventMarketFee {
   uint64 static nonce_;
   
   TvmCell directSellCode;
 
   uint32 currentVersion;
   uint32 currectVersionDirectSell;
-  uint32 marketFeeNumerator;
-  uint32 marketFeeDenominator;
 
   event DirectSellDeployed(
     address directSell,
@@ -40,29 +40,44 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
   event DirectSellDeclined(address sender, address nft);
   event FactoryDirectSellUpgrade();
 
+  MarketFee fee;
+
   constructor(
     address _owner,
     address sendGasTo,
-    uint32 _marketFeeNumerator,
-    uint32 _marketFeeDenominator
+    MarketFee _fee
     )
-    public OwnableInternal(_owner)
-  {
-    tvm.accept();
-    tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
-    currentVersion++;
-    marketFeeNumerator = _marketFeeNumerator;
-    marketFeeDenominator = _marketFeeDenominator;
-    _transferOwnership(_owner);
-    sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
-  }
+    public
+    OwnableInternal(_owner)
+    {
+      tvm.accept();
+      tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+      currentVersion++;
+      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+      fee = _fee;
+      emit MarketFeeDefaultChanged(_fee);
+      _transferOwnership(_owner);
+      sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
+    }
 
   function getTypeContract() external pure returns (string) {
     return "FactoryDirectSell";
   }
 
-  function getMarketFee() external pure returns (uint32, uint32) {
-      return (marketFeeNumerator, marketFeeDenominator);
+  function getMarketFee() external view override returns (MarketFee) {
+    return fee;
+  }
+
+ function setMarketFeeForDirectSell(address directSell, MarketFee _fee) external onlyOwner {
+      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+      IOffer(directSell).setMarketFee{value: 0, flag: 64, bounce:false}(_fee);
+      emit MarketFeeChanged(directSell, _fee);
+  }
+
+  function setMarketFee(MarketFee _fee) external override onlyOwner {
+      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+      fee = _fee;
+      emit MarketFeeDefaultChanged(_fee);
   }
 
   function setCodeDirectSell(TvmCell _directSellCode) public onlyOwner {
@@ -137,8 +152,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         _startAuction,
         durationTime,
         _price,
-        marketFeeNumerator;
-        marketFeeDenominator;
+        fee
         );
 
       emit DirectSellDeployed(
@@ -225,6 +239,19 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
       );
   }
 
+  function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {
+    require(recipient.value != 0, DirectBuySellErrors.WRONG_RECIPIENT);
+    require(msg.value >= Gas.WITHDRAW_VALUE, DirectBuySellErrors.LOW_GAS);
+
+    tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+    TvmCell emptyPayload;
+    ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }
+        (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
+
+    emit MarketFeeWithdrawn(recipient, amount, tokenWallet);
+ }
+
+
   function RequestUpgradeDirectSell(
     address _owner, 
     address _paymentToken, 
@@ -268,7 +295,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager {
         owner(),
         currentVersion,
         currectVersionDirectSell,
-        directSellCode
+        directSellCode,
+        fee
       );
       
       tvm.setcode(newCode);

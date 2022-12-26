@@ -1,5 +1,5 @@
 import { Account } from "locklift/build/factory";
-import { Address, Contract } from "locklift";
+import {Address, Contract, toNano} from "locklift";
 import { FactorySource } from "../../build/factorySource";
 import { NftC } from "./nft";
 
@@ -71,28 +71,21 @@ export class DirectBuy {
     }
 
     async finishBuy(initiator: AccountType, callbackId: number) {
-        return await initiator.runTarget(
-            {
-                contract: this.contract,
-                value: locklift.utils.toNano(2),
-                flags: 1
-            },
-            (dd) => dd.methods.finishBuy({
+        return await this.contract.methods.finishBuy({
                 sendGasTo: initiator.address,
                 callbackId
-            })
-        );
+            }).send({
+                from: initiator.address,
+                amount: toNano(2)
+        });
     }
 
     async closeBuy(callbackId: number) {
-        return await this.owner.runTarget(
-            {
-                contract: this.contract,
-                value: locklift.utils.toNano(1)
-            },
-            (cc) => cc.methods.closeBuy({
+        return await this.contract.methods.closeBuy({
                 callbackId
-            })
-        );
+            }).send({
+            from: this.owner.address,
+            amount: toNano(1)
+        });
     }
 }

@@ -37,21 +37,28 @@ export class TokenWallet {
         return (await this.contract.methods.balance({answerId: 0}).call()).value0;
     }
 
+    async balanceSafe() {
+        let balance = '0';
+        await this.contract.methods.balance({answerId: 0})
+            .call()
+            .then(r => balance = r.value0)
+            .catch(e => {/* ignored */});
+        return balance;
+    }
+
     async transfer(amount: number, receiver: Address, deployWalletValue: string|number, notify: boolean, payload = '', value: any) {
         const owner = this._owner as AccountType;
-        return await owner.runTarget(
-            {
-                contract: this.contract,
-                value: value || toNano(5)
-            },
-            (token) => token.methods.transfer({
+        return await locklift.transactions.waitFinalized(
+             this.contract.methods.transfer({
                 amount: amount,
                 recipient: receiver,
                 deployWalletValue: deployWalletValue,
                 remainingGasTo: owner.address,
                 notify: notify,
                 payload: payload
-            })
-        );
+            }).send({
+                from: owner.address,
+                amount: toNano(5)
+        }));
     }
 }

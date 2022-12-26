@@ -1,4 +1,4 @@
-import {Address, Contract} from "locklift";
+import {Address, Contract, toNano} from "locklift";
 import {TokenWallet} from "./token_wallet";
 import {FactorySource} from "../../build/factorySource";
 import {Account} from "locklift/build/factory";
@@ -37,16 +37,14 @@ export class Token {
     async deployWallet(user: AccountType) {
         const token = this.contract;
         await user.runTarget(
-            {
-                contract: token,
-                value: locklift.utils.toNano(2),
-            },
-            (token) => token.methods.deployWallet({
+            token.methods.deployWallet({
                 answerId: 0,
                 walletOwner: user.address,
-                deployWalletValue: locklift.utils.toNano(1)
-            })
-        );
+                deployWalletValue: toNano(1)
+            }).send({
+                from:user.address,
+                amount: toNano(2)
+            }));
 
         const addr = await this.walletAddr(user.address);
         logger.log(`User token wallet: ${addr.toString()}`);
@@ -54,20 +52,18 @@ export class Token {
     }
 
     async mint(mint_amount: any, user: AccountType) {
-        await locklift.tracing.trace(this.owner.runTarget(
-            {
-                contract: this.contract,
-                value: locklift.utils.toNano(5),
-            },
-            (token) => token.methods.mint({
+        await locklift.tracing.trace(
+            this.contract.methods.mint({
                 amount: mint_amount,
                 recipient: user.address,
-                deployWalletValue: locklift.utils.toNano(1),
+                deployWalletValue: toNano(1),
                 remainingGasTo: this.owner.address,
                 notify: false,
                 payload: ''
-            })
-        ));
+            }).send({
+                from: this.owner.address,
+                amount: toNano(5)
+            }));
 
         const walletAddr = await this.walletAddr(user.address);
         logger.log(`User token wallet: ${walletAddr.toString()}`);

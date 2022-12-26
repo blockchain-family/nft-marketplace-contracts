@@ -1,4 +1,4 @@
-pragma ever-solidity >=0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -14,6 +14,8 @@ import "./libraries/ExchangePayload.sol";
 import "./interfaces/IDirectSellCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
 
+import "./structures/IMarketFeeStructure.sol";
+
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 
 import "./Nft.sol";
@@ -22,7 +24,8 @@ import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenRoot.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
-contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
+
+contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure {
   address static factoryDirectSell;
   address static owner;
   address static paymentToken;
@@ -34,12 +37,12 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
   uint64 endTime;
 
   uint128 price;
-  uint32 marketFeeNumerator;
-  uint32 marketFeeDenominator;
 
   address tokenWallet;
   uint8 currentStatus;
   uint32 currentVersion;
+
+  MarketFee fee;
 
   struct DirectSellInfo {
     address factory;
@@ -56,25 +59,24 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
 
   event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo);
   event DirectSellUpgrade();
+  event MarketFeeWithheld(uint128, address tokenRoot);
 
   constructor(
     uint64 _startTime,
     uint64 _durationTime,
     uint128 _price,
-    uint32 _marketFeeNumerator,
-    uint32 _marketFeeDenominator
-  ) public {
+    MarketFee _fee
+  ) public
+ {
     if (msg.sender.value != 0 && msg.sender == factoryDirectSell) {
       changeState(DirectSellStatus.Create);
       tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
-
+      fee = _fee;
       startTime = _startTime;
       durationTime = _durationTime;
       if(startTime > 0 && durationTime > 0) {
         endTime = startTime + durationTime;
       }
-      marketFeeNumerator = _marketFeeNumerator;
-      marketFeeDenominator = _marketFeeDenominator;
       price = _price;
       currentVersion++;
 
@@ -101,8 +103,18 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
     return "DirectSell";
   }
 
-  function getMarketFee() external pure returns (uint32, uint32) {
-      return (marketFeeNumerator, marketFeeDenominator);
+  function getMarketFee() external view returns (MarketFee) {
+    return fee;
+  }
+
+  function setMarketFee(MarketFee _fee) external onlyFactory {
+      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+      fee= _fee;
+  }
+
+  modifier onlyFactory() virtual {
+      require(msg.sender.value != 0 && msg.sender == factoryDirectSell, 100);
+      _;
   }
 
   function onTokenWallet(address _wallet) external {
@@ -157,10 +169,11 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         nftAddress
       );
 
-      uint128 fee = math.div(math.muldivc(price, marketFeeNumerator), marketFeeDenominator);
-      uint128 balance = price - fee;
+      uint128 currentFee = math.muldivc(price, fee.numerator, fee.denominator);
+      uint128 balance = price - currentFee;
 
       changeState(DirectSellStatus.Filled);
+      emit MarketFeeWithheld(currentFee, paymentToken);
       callbacks[buyer] = ITIP4_1NFT.CallbackParams(0.01 ever, emptyPayload);
 
       ITIP4_1NFT(nftAddress).transfer{
@@ -174,7 +187,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
       );
 
       ITokenWallet(tokenWallet).transfer{
-        value: 0.5,
+        value: 0.5 ever,
         flag: 0,
         bounce: false
       }(
@@ -191,7 +204,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         flag: 128,
         bounce: false
       }(
-        fee,
+        currentFee,
         factoryDirectSell,
         Gas.DEPLOY_EMPTY_WALLET_GRAMS,
         originalGasTo,
@@ -378,7 +391,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest {
         price,
         tokenWallet,
         currentStatus,
-        currentVersion
+        currentVersion,
+        fee
       );
 
       tvm.setcode(newCode);

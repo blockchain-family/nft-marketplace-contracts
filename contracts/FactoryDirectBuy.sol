@@ -1,4 +1,4 @@
-pragma ever-solidity >=0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -18,8 +18,11 @@ import "./DirectBuy.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
 import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
+import "./structures/IMarketFeeStructure.sol";
+import "./interfaces/IEventsMarketFee.sol";
+import "./interfaces/IOffer.sol";
 
-contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
+contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMarketFeeStructure, IEventMarketFee, IOffer {
   uint64 static nonce_;
 
   TvmCell tokenPlatformCode;
@@ -27,8 +30,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
 
   uint32 currentVersion;
   uint32 currectVersionDirectBuy;
-  uint32 marketFeeNumerator;
-  uint32 marketFeeDenominator;
+  MarketFee fee;
 
   event DirectBuyDeployed(
     address directBuy,
@@ -45,15 +47,16 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
   constructor(
     address _owner,
     address sendGasTo,
-    uint32 _marketFeeNumerator,
-    uint32 _marketFeeDenominator
+    MarketFee _fee
   ) OwnableInternal(_owner) public
   {
     tvm.accept();
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+
+    require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
     currentVersion++;
-    marketFeeNumerator = _marketFeeNumerator;
-    marketFeeDenominator = _marketFeeDenominator;
+    fee = _fee;
+    emit MarketFeeDefaultChanged(_fee);
     _transferOwnership(_owner);
     sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
   }
@@ -62,8 +65,20 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
     return "FactoryDirectBuy";
   }
 
-  function getMarketFee() external pure returns (uint32, uint32) {
-      return (marketFeeNumerator, marketFeeDenominator);
+  function getMarketFee() external view override returns (MarketFee) {
+      return fee;
+  }
+
+  function setMarketFee(MarketFee _fee) external override onlyOwner {
+      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+      fee = _fee;
+      emit MarketFeeDefaultChanged(_fee);
+  }
+
+  function setMarketFeeForDirectBuy(address directBuy, MarketFee _fee) external onlyOwner {
+      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+      IOffer(directBuy).setMarketFee{value: 0, flag: 64, bounce:false}(_fee);
+      emit MarketFeeChanged(directBuy, _fee);
   }
 
   function buildDirectBuyCreationPayload(
@@ -134,8 +149,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         startTime,
         durationTime,
         getTokenWallet(tokenRoot, directBuyAddress),
-        marketFeeNumerator;
-        marketFeeDenominator;
+        fee
       );
 
       emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
@@ -194,6 +208,17 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
       );
     }
   }
+
+  function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {
+    require(recipient.value != 0, DirectBuySellErrors.WRONG_RECIPIENT);
+    require(msg.value >= Gas.WITHDRAW_VALUE, DirectBuySellErrors.LOW_GAS);
+
+    tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+    TvmCell emptyPayload;
+    ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }
+        (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
+    emit MarketFeeWithdrawn(recipient,amount, tokenWallet);
+ }
 
   function _buildDirectBuyStateInit(
     address _owner,
@@ -286,7 +311,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal {
         currentVersion,
         currectVersionDirectBuy,
         tokenPlatformCode,
-        directBuyCode
+        directBuyCode,
+        fee
       );
             
       tvm.setcode(newCode);

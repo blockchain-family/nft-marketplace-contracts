@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 library BaseErrors {
     uint8 constant message_sender_is_not_my_owner    = 100;
@@ -11,4 +11,5 @@ library BaseErrors {
     uint8 constant zero_owner_for_ownership_transfer = 107;
     uint8 constant operation_not_permited            = 108;
     uint8 constant value_too_low                     = 109;
+    uint8 constant denominator_not_be_zero           = 110;
 }

@@ -1,6 +1,6 @@
 import { Account } from "locklift/build/factory";
 import { CallbackType } from "../utils";
-import { Address, Contract, zeroAddress } from "locklift";
+import {Address, Contract, toNano, zeroAddress} from "locklift";
 import { FactorySource } from "../../build/factorySource";
 
 declare type AccountType = Account<FactorySource["Wallet"]>
@@ -26,18 +26,14 @@ export class NftC {
     }
 
     async changeManager(initiator: AccountType, newManager: Address, sendGasTo: Address, callbacks: CallbackType[]) {
-        return await initiator.runTarget(
-            {
-                contract: this.contract,
-                value: locklift.utils.toNano(5),
-                flags: 1
-            },
-            (dd) => dd.methods.changeManager({
+        return await this.contract.methods.changeManager({
                 newManager,
-                sendGasTo: sendGasTo.toString() == zeroAddress ? this.owner.address: sendGasTo,
+                sendGasTo: sendGasTo == zeroAddress ? this.owner.address: sendGasTo,
                 callbacks       
-            })
-        );
+            }).send({
+            from: initiator.address,
+            amount: toNano(6)
+        });
     }
 
     async getEvents(event_name: string) {

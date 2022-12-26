@@ -1,5 +1,5 @@
 import { Account } from "locklift/build/factory";
-import { Address, Contract } from "locklift";
+import {Address, Contract, toNano} from "locklift";
 import { FactorySource } from "../../build/factorySource";
 import { Token } from "./token";
 
@@ -67,16 +67,12 @@ export class Auction {
     }
 
     async finishAuction(initiator: AccountType, callbackId: number) {
-        return await initiator.runTarget(
-            {
-                contract: this.contract,
-                value: locklift.utils.toNano(2),
-                flags: 1
-            },
-            (dd) => dd.methods.finishAuction({
+        return await this.contract.methods.finishAuction({
                 sendGasTo: initiator.address,
-                callbackId 
-            })
+                callbackId}).send({
+                from: initiator.address,
+                amount: toNano(2)
+            }
         );
     }
 

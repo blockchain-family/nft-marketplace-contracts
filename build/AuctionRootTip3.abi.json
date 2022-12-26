@@ -10,8 +10,7 @@
 				{"name":"_owner","type":"address"},
 				{"name":"_offerCode","type":"cell"},
 				{"name":"_deploymentFee","type":"uint128"},
-				{"name":"_marketFee","type":"uint8"},
-				{"name":"_marketFeeDecimals","type":"uint8"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
 				{"name":"_auctionBidDelta","type":"uint16"},
 				{"name":"_auctionBidDeltaDecimals","type":"uint16"},
 				{"name":"_sendGasTo","type":"address"}
@@ -53,6 +52,17 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
+			]
+		},
+		{
+			"name": "withdraw",
+			"inputs": [
+				{"name":"tokenWallet","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"recipient","type":"address"},
+				{"name":"remainingGasTo","type":"address"}
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -101,10 +111,26 @@
 			]
 		},
 		{
-			"name": "changeMarketFee",
+			"name": "getMarketFee",
 			"inputs": [
-				{"name":"_value","type":"uint8"},
-				{"name":"_decimals","type":"uint8"}
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setMarketFeeForAuction",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -123,22 +149,6 @@
 				{"name":"newOwner","type":"address"}
 			],
 			"outputs": [
-			]
-		},
-		{
-			"name": "marketFee",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"marketFee","type":"uint8"}
-			]
-		},
-		{
-			"name": "marketFeeDecimals",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"marketFeeDecimals","type":"uint8"}
 			]
 		},
 		{
@@ -203,6 +213,33 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "MarketFeeDefaultChanged",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "MarketFeeChanged",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "MarketFeeWithdrawn",
+			"inputs": [
+				{"name":"recipient","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"tokenWallet","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
@@ -210,14 +247,13 @@
 		{"name":"_timestamp","type":"uint64"},
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"owner_","type":"address"},
-		{"name":"marketFee","type":"uint8"},
-		{"name":"marketFeeDecimals","type":"uint8"},
 		{"name":"auctionBidDelta","type":"uint16"},
 		{"name":"auctionBidDeltaDecimals","type":"uint16"},
 		{"name":"deploymentFee","type":"uint128"},
 		{"name":"deploymentFeePart","type":"uint128"},
 		{"name":"codeNft","type":"cell"},
 		{"name":"offerCode","type":"cell"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"currentVersion","type":"uint32"},
 		{"name":"currentVersionOffer","type":"uint32"}

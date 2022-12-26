@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -74,6 +74,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     event AuctionComplete(address seller, address buyer, uint128 value);
     event AuctionCancelled();
     event AuctionUpgrade();
+    event MarketFeeWithheld(uint128 amount, address tokenRoot);
 
     constructor(
         uint128 _price,
@@ -81,8 +82,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         address _tokenRootAddr,
         address _nftOwner,
         uint128 _deploymentFee,
-        uint32 _marketFeeNumerator,
-        uint32 _marketFeeDenominator,
+        MarketFee _fee,
         uint64 _auctionStartTime,
         uint64 _auctionDuration,
         uint16 _bidDelta,
@@ -97,8 +97,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             _tokenRootAddr,
             _nftOwner,
             _deploymentFee,
-            _marketFeeNumerator,
-            _marketFeeDenominator
+            _fee
         );
 
         auctionDuration = _auctionDuration;
@@ -143,10 +142,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
     function getTypeContract() external pure returns (string) {
         return "Auction";
-    }
-
-    function getMarketFee() external pure returns (uint32, uint32) {
-        return (marketFeeNumerator, marketFeeDenominator);
     }
 
     function onAcceptTokensTransfer(
@@ -242,11 +237,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
 
-            uint128 fee = math.div(math.muldivc(maxBidValue, marketFeeNumerator), marketFeeDenominator);
-            uint128 balance = maxBidValue - fee;
+            uint128 currentFee = math.muldivc(maxBidValue, fee.numerator, fee.denominator);
+            uint128 balance = maxBidValue - currentFee;
 
             emit AuctionComplete(nftOwner, currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
+            emit MarketFeeWithheld(currentFee, paymentToken);
 
             IAuctionBidPlacedCallback(msg.sender).auctionComplete{
                 value: Gas.CALLBACK_VALUE,
@@ -269,7 +265,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 sendGasTo,
                 callbacks
             );
-            ITokenWallet(tokenWallet).transfer{value: 0.5, flag: 0, bounce: false }(
+            ITokenWallet(tokenWallet).transfer{value: 0.5 ever, flag: 0, bounce: false }(
                 balance,
                 nftOwner,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
@@ -278,7 +274,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 empty
             );
             ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }(
-                fee,
+                currentFee,
                 markerRootAddr,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
                 sendGasTo,
@@ -394,8 +390,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               tokenRootAddr,
               nftOwner,
               deploymentFee,
-              marketFeeNumerator,
-              marketFeeDenominator,
+              fee,
               auctionDuration,
               auctionStartTime,
               auctionEndTime,

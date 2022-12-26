@@ -1,4 +1,4 @@
-.version sol 0.62.0
+.version sol 0.61.2
 
 .macro constructor
 DROP
@@ -34,7 +34,7 @@ PUSHCONT {
 }
 IF
 CALLREF {
-	CALL $setOwnership_3e1af783_internal_macro$
+	CALL $setOwnership_internal_macro$
 }
 .loc ../node_modules/@broxus/contracts/contracts/utils/CheckPubKey.sol, 0
 CALLREF {
@@ -67,18 +67,18 @@ LDREF
 ENDS
 .loc ../node_modules/@broxus/contracts/contracts/wallets/Account.sol, 0
 CALLREF {
-	CALL $sendTransaction_c96c9ed1_internal_macro$
+	CALL $sendTransaction_internal_macro$
 }
 IFREF {
 	CALL $upd_only_time_in_c4$
 }
 THROW 0
 
-.globl	sendTransaction_c96c9ed1_internal
-.type	sendTransaction_c96c9ed1_internal, @function
-CALL $sendTransaction_c96c9ed1_internal_macro$
+.globl	sendTransaction_internal
+.type	sendTransaction_internal, @function
+CALL $sendTransaction_internal_macro$
 
-.macro sendTransaction_c96c9ed1_internal_macro
+.macro sendTransaction_internal_macro
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 14
 GETGLOB 5
 DUP
@@ -111,11 +111,11 @@ SWAP
 SENDRAWMSG
 .loc ../node_modules/@broxus/contracts/contracts/wallets/Account.sol, 0
 
-.globl	setOwnership_3e1af783_internal
-.type	setOwnership_3e1af783_internal, @function
-CALL $setOwnership_3e1af783_internal_macro$
+.globl	setOwnership_internal
+.type	setOwnership_internal, @function
+CALL $setOwnership_internal_macro$
 
-.macro setOwnership_3e1af783_internal_macro
+.macro setOwnership_internal_macro
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 23
 GETGLOB 10
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 25
@@ -153,7 +153,7 @@ LDU 256
 ENDS
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 0
 CALLREF {
-	CALL $transferOwnership_d23e8489_internal_macro$
+	CALL $transferOwnership_internal_macro$
 }
 DROP
 CALLREF {
@@ -161,7 +161,7 @@ CALLREF {
 }
 THROW 0
 
-.macro transferOwnership_d23e8489_internal_macro
+.macro transferOwnership_internal_macro
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 14
 GETGLOB 5
 DUP
@@ -181,7 +181,7 @@ THROWIFNOT 1102
 ACCEPT
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 39
 CALLREF {
-	CALL $setOwnership_3e1af783_internal_macro$
+	CALL $setOwnership_internal_macro$
 }
 .loc ../node_modules/@broxus/contracts/contracts/access/ExternalOwner.sol, 0
 

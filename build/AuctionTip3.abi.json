@@ -11,8 +11,7 @@
 				{"name":"_tokenRootAddr","type":"address"},
 				{"name":"_nftOwner","type":"address"},
 				{"name":"_deploymentFee","type":"uint128"},
-				{"name":"_marketFee","type":"uint128"},
-				{"name":"_marketFeeDecimals","type":"uint8"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
 				{"name":"_auctionStartTime","type":"uint64"},
 				{"name":"_auctionDuration","type":"uint64"},
 				{"name":"_bidDelta","type":"uint16"},
@@ -91,6 +90,22 @@
 			]
 		},
 		{
+			"name": "getMarketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "nft",
 			"inputs": [
 			],
@@ -136,22 +151,6 @@
 			],
 			"outputs": [
 				{"name":"deploymentFee","type":"uint128"}
-			]
-		},
-		{
-			"name": "marketFee",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"marketFee","type":"uint128"}
-			]
-		},
-		{
-			"name": "marketFeeDecimals",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"marketFeeDecimals","type":"uint8"}
 			]
 		},
 		{
@@ -258,6 +257,15 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "MarketFeeWithheld",
+			"inputs": [
+				{"name":"amount","type":"uint128"},
+				{"name":"tokenRoot","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
@@ -271,8 +279,7 @@
 		{"name":"tokenRootAddr","type":"address"},
 		{"name":"nftOwner","type":"address"},
 		{"name":"deploymentFee","type":"uint128"},
-		{"name":"marketFee","type":"uint128"},
-		{"name":"marketFeeDecimals","type":"uint8"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
 		{"name":"paymentToken","type":"address"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"auctionStartTime","type":"uint64"},

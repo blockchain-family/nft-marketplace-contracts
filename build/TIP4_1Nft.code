@@ -1,4 +1,4 @@
-.version sol 0.62.0
+.version sol 0.61.2
 
 .macro constructor
 DROP
@@ -224,7 +224,7 @@ LDDICT
 ENDS
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 CALLREF {
-	CALL $transfer_ae58e9f8_internal_macro$
+	CALL $transfer_internal_macro$
 }
 DROP
 CALLREF {
@@ -232,11 +232,11 @@ CALLREF {
 }
 THROW 0
 
-.globl	transfer_ae58e9f8_internal
-.type	transfer_ae58e9f8_internal, @function
-CALL $transfer_ae58e9f8_internal_macro$
+.globl	transfer_internal
+.type	transfer_internal, @function
+CALL $transfer_internal_macro$
 
-.macro transfer_ae58e9f8_internal_macro
+.macro transfer_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 315
 GETGLOB 9
 GETGLOB 14
@@ -249,27 +249,28 @@ RAWRESERVE
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 101
 BLKPUSH 3, 2
 CALLREF {
-	CALL $_beforeTransfer_63506687_internal_macro$
+	CALL $_beforeTransfer_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 103
 GETGLOB 13
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 104
 PUSH S3
 CALLREF {
-	CALL $_changeOwner_99fc451f_internal_macro$
+	CALL $_changeOwner_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 105
 PUSH S3
 CALLREF {
-	CALL $_changeManager_68db239d_internal_macro$
+	CALL $_changeManager_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 107
 BLKPUSH 3, 3
 CALLREF {
-	CALL $_afterTransfer_324f3fbc_internal_macro$
+	CALL $_afterTransfer_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 109
-XCPU S1, S0
+SWAP
+DUP
 PUSHINT 267
 DICTMIN
 PUSHCONT {
@@ -410,7 +411,7 @@ LDDICT
 ENDS
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 CALLREF {
-	CALL $changeOwner_071b1a9c_internal_macro$
+	CALL $changeOwner_internal_macro$
 }
 DROP
 CALLREF {
@@ -418,11 +419,11 @@ CALLREF {
 }
 THROW 0
 
-.globl	changeOwner_071b1a9c_internal
-.type	changeOwner_071b1a9c_internal, @function
-CALL $changeOwner_071b1a9c_internal_macro$
+.globl	changeOwner_internal
+.type	changeOwner_internal, @function
+CALL $changeOwner_internal_macro$
 
-.macro changeOwner_071b1a9c_internal_macro
+.macro changeOwner_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 315
 GETGLOB 9
 GETGLOB 14
@@ -436,23 +437,24 @@ RAWRESERVE
 GETGLOB 13
 BLKPUSH 3, 3
 CALLREF {
-	CALL $_beforeChangeOwner_181183e6_internal_macro$
+	CALL $_beforeChangeOwner_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 150
 GETGLOB 13
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 151
 PUSH S3
 CALLREF {
-	CALL $_changeOwner_99fc451f_internal_macro$
+	CALL $_changeOwner_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 153
 PUSH3 S0, S3, S2
 PUSH S4
 CALLREF {
-	CALL $_afterChangeOwner_25282549_internal_macro$
+	CALL $_afterChangeOwner_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 155
-XCPU S1, S0
+SWAP
+DUP
 PUSHINT 267
 DICTMIN
 PUSHCONT {
@@ -562,11 +564,11 @@ IF
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 DROP2
 
-.globl	_changeOwner_99fc451f_internal
-.type	_changeOwner_99fc451f_internal, @function
-CALL $_changeOwner_99fc451f_internal_macro$
+.globl	_changeOwner_internal
+.type	_changeOwner_internal, @function
+CALL $_changeOwner_internal_macro$
 
-.macro _changeOwner_99fc451f_internal_macro
+.macro _changeOwner_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 176
 GETGLOB 13
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 177
@@ -625,7 +627,7 @@ LDDICT
 ENDS
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 CALLREF {
-	CALL $changeManager_e1c92650_internal_macro$
+	CALL $changeManager_internal_macro$
 }
 DROP
 CALLREF {
@@ -633,7 +635,7 @@ CALLREF {
 }
 THROW 0
 
-.macro changeManager_e1c92650_internal_macro
+.macro changeManager_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 315
 GETGLOB 9
 GETGLOB 14
@@ -647,23 +649,24 @@ RAWRESERVE
 GETGLOB 14
 BLKPUSH 3, 3
 CALLREF {
-	CALL $_beforeChangeManager_8db9b38b_internal_macro$
+	CALL $_beforeChangeManager_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 207
 GETGLOB 14
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 208
 PUSH S3
 CALLREF {
-	CALL $_changeManager_68db239d_internal_macro$
+	CALL $_changeManager_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 210
 PUSH3 S0, S3, S2
 PUSH S4
 CALLREF {
-	CALL $_afterChangeManager_724406a5_internal_macro$
+	CALL $_afterChangeManager_internal_macro$
 }
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 212
-XCPU S1, S0
+SWAP
+DUP
 PUSHINT 267
 DICTMIN
 PUSHCONT {
@@ -773,11 +776,11 @@ IF
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 DROP2
 
-.globl	_changeManager_68db239d_internal
-.type	_changeManager_68db239d_internal, @function
-CALL $_changeManager_68db239d_internal_macro$
+.globl	_changeManager_internal
+.type	_changeManager_internal, @function
+CALL $_changeManager_internal_macro$
 
-.macro _changeManager_68db239d_internal_macro
+.macro _changeManager_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 233
 GETGLOB 14
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 234
@@ -828,7 +831,7 @@ SETGLOB 4
 ENDS
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 CALLREF {
-	CALL $getInfo_5a9b0b89_internal_macro$
+	CALL $getInfo_internal_macro$
 }
 PUSH S4
 PUSHCONT {
@@ -906,7 +909,7 @@ IFREF {
 }
 THROW 0
 
-.macro getInfo_5a9b0b89_internal_macro
+.macro getInfo_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 254
 GETGLOB 4
 PUSHINT 0
@@ -922,56 +925,56 @@ GETGLOB 14
 GETGLOB 12
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 
-.globl	_beforeTransfer_63506687_internal
-.type	_beforeTransfer_63506687_internal, @function
-CALL $_beforeTransfer_63506687_internal_macro$
+.globl	_beforeTransfer_internal
+.type	_beforeTransfer_internal, @function
+CALL $_beforeTransfer_internal_macro$
 
-.macro _beforeTransfer_63506687_internal_macro
+.macro _beforeTransfer_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 267
 BLKDROP 3
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 
-.globl	_afterTransfer_324f3fbc_internal
-.type	_afterTransfer_324f3fbc_internal, @function
-CALL $_afterTransfer_324f3fbc_internal_macro$
+.globl	_afterTransfer_internal
+.type	_afterTransfer_internal, @function
+CALL $_afterTransfer_internal_macro$
 
-.macro _afterTransfer_324f3fbc_internal_macro
+.macro _afterTransfer_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 275
 BLKDROP 3
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 
-.globl	_beforeChangeOwner_181183e6_internal
-.type	_beforeChangeOwner_181183e6_internal, @function
-CALL $_beforeChangeOwner_181183e6_internal_macro$
+.globl	_beforeChangeOwner_internal
+.type	_beforeChangeOwner_internal, @function
+CALL $_beforeChangeOwner_internal_macro$
 
-.macro _beforeChangeOwner_181183e6_internal_macro
+.macro _beforeChangeOwner_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 284
 BLKDROP 4
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 
-.globl	_afterChangeOwner_25282549_internal
-.type	_afterChangeOwner_25282549_internal, @function
-CALL $_afterChangeOwner_25282549_internal_macro$
+.globl	_afterChangeOwner_internal
+.type	_afterChangeOwner_internal, @function
+CALL $_afterChangeOwner_internal_macro$
 
-.macro _afterChangeOwner_25282549_internal_macro
+.macro _afterChangeOwner_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 293
 BLKDROP 4
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 
-.globl	_beforeChangeManager_8db9b38b_internal
-.type	_beforeChangeManager_8db9b38b_internal, @function
-CALL $_beforeChangeManager_8db9b38b_internal_macro$
+.globl	_beforeChangeManager_internal
+.type	_beforeChangeManager_internal, @function
+CALL $_beforeChangeManager_internal_macro$
 
-.macro _beforeChangeManager_8db9b38b_internal_macro
+.macro _beforeChangeManager_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 302
 BLKDROP 4
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
 
-.globl	_afterChangeManager_724406a5_internal
-.type	_afterChangeManager_724406a5_internal, @function
-CALL $_afterChangeManager_724406a5_internal_macro$
+.globl	_afterChangeManager_internal
+.type	_afterChangeManager_internal, @function
+CALL $_afterChangeManager_internal_macro$
 
-.macro _afterChangeManager_724406a5_internal_macro
+.macro _afterChangeManager_internal_macro
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 311
 BLKDROP 4
 .loc ../contracts/modules/TIP4_1/TIP4_1Nft.sol, 0
@@ -995,7 +998,7 @@ LDU 32
 ENDS
 .loc ../contracts/modules/TIP6/TIP6.sol, 0
 CALLREF {
-	CALL $supportsInterface_01ffc9a7_internal_macro$
+	CALL $supportsInterface_internal_macro$
 }
 OVER
 PUSHCONT {
@@ -1048,7 +1051,7 @@ IFREF {
 }
 THROW 0
 
-.macro supportsInterface_01ffc9a7_internal_macro
+.macro supportsInterface_internal_macro
 .loc ../contracts/modules/TIP6/TIP6.sol, 16
 GETGLOB 4
 PUSHINT 0

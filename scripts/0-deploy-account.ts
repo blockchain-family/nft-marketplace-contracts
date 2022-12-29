@@ -1,11 +1,12 @@
 import { Migration } from "./migration";
+import {toNano, WalletTypes} from "locklift";
 const { Command } = require('commander');
 const program = new Command();
 
 const migration = new Migration();
 
 async function main() {
-    const signer = (await locklift.keystore.getSigner("0"));
+    const signer = (await locklift.keystore.getSigner("0"))!;
     program
         .allowUnknownOption()
         .option('-n, --key_number <key_number>', 'count of accounts')
@@ -16,21 +17,25 @@ async function main() {
 
     const key_number = +(options.key_number || '0');
     const balance = +(options.balance || '10');
-
-    const contractName = "Wallet";
-    let accountFactory = locklift.factory.getAccountsFactory(contractName);
-    const { account: wallet, tx } = await accountFactory.deployNewAccount({
-        publicKey: (signer?.publicKey) as string,
-        initParams: {
-            _randomNonce: locklift.utils.getRandomNonce(),
-        },
-        constructorParams: {},
-        value: locklift.utils.toNano(balance),
+    console.log(await locklift.provider.getBalance(locklift.giver));
+    const account = await locklift.factory.accounts.addNewAccount({
+      type: WalletTypes.WalletV3,
+      value: toNano(balance),
+      publicKey: signer.publicKey,
     });
+    // let accountFactory = locklift.factory.getAccountsFactory(contractName);
+    // const { account: wallet, tx } = await accountFactory.deployNewAccount({
+    //     publicKey: (signer?.publicKey) as string,
+    //     initParams: {
+    //         _randomNonce: locklift.utils.getRandomNonce(),
+    //     },
+    //     constructorParams: {},
+    //     value: locklift.utils.toNano(balance),
+    // });
 
     const name = `Account${key_number + 1}`;
-    migration.store(wallet.address, contractName, name);
-    console.log(`${name}: ${wallet.address.toString()}`);
+    migration.store(account.account.address, "Wallet", name);
+    console.log(`${name}: ${account.account.address.toString()}`);
 }
 
 main()

@@ -65,12 +65,13 @@ const giverAbi = {
 export class GiverWallet implements Giver {
   public giverContract: Contract<typeof giverWallet>;
 
-  constructor(ever: ProviderRpcClient, readonly keyPair: Ed25519KeyPair, address: string) {
+  constructor(private readonly ever: ProviderRpcClient,readonly keyPair: Ed25519KeyPair, private readonly address: string) {
     const giverAddr = new Address(address);
     this.giverContract = new ever.Contract(giverWallet, giverAddr);
   }
 
   public async sendTo(sendTo: Address, value: string): Promise<{ transaction: Transaction; output?: {} }> {
+    console.log(await this.ever.getBalance(this.giverContract.address))
     return this.giverContract.methods
       .sendTransaction({
         value: value,
@@ -134,3 +135,19 @@ const testnetGiverAbi = {
   ],
   events: []
 } as const;
+
+export class GiverWalletV2 implements Giver {
+  constructor(
+    private readonly ever: ProviderRpcClient,
+    readonly keyPair: Ed25519KeyPair,
+    private readonly address: string,
+  ) {}
+  sendTo(sendTo: Address, value: string) {
+    return this.ever.sendMessage({
+      sender: new Address(this.address),
+      recipient: sendTo,
+      amount: value, // 10 EVER
+      bounce: false,
+    });
+  }
+}

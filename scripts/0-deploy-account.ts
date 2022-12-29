@@ -17,7 +17,7 @@ async function main() {
 
     const key_number = +(options.key_number || '0');
     const balance = +(options.balance || '10');
-    console.log(await locklift.provider.getBalance(locklift.giver));
+
     const account = await locklift.factory.accounts.addNewAccount({
       type: WalletTypes.WalletV3,
       value: toNano(balance),

@@ -1,12 +1,11 @@
 import { Migration } from "./migration";
-import {toNano, WalletTypes} from "locklift";
 const { Command } = require('commander');
 const program = new Command();
 
 const migration = new Migration();
+import {getRandomNonce, toNano, WalletTypes} from "locklift";
 
 async function main() {
-    const signer = (await locklift.keystore.getSigner("0"))!;
     program
         .allowUnknownOption()
         .option('-n, --key_number <key_number>', 'count of accounts')
@@ -16,26 +15,28 @@ async function main() {
     const options = program.opts();
 
     const key_number = +(options.key_number || '0');
-    const balance = +(options.balance || '10');
+    const balance = +(options.balance || '1');
 
-    const account = await locklift.factory.accounts.addNewAccount({
-      type: WalletTypes.WalletV3,
-      value: toNano(balance),
-      publicKey: signer.publicKey,
-    });
-    // let accountFactory = locklift.factory.getAccountsFactory(contractName);
-    // const { account: wallet, tx } = await accountFactory.deployNewAccount({
-    //     publicKey: (signer?.publicKey) as string,
-    //     initParams: {
-    //         _randomNonce: locklift.utils.getRandomNonce(),
-    //     },
-    //     constructorParams: {},
-    //     value: locklift.utils.toNano(balance),
-    // });
+    const signer = await locklift.keystore.getSigner(key_number.toString());
+    const { account } = (await locklift.factory.accounts.addNewAccount({
+        type: WalletTypes.EverWallet, // or WalletTypes.HighLoadWallet,
+        //Value which will send to the new account from a giver
+        value: toNano(balance),
+        //owner publicKey
+        publicKey: signer!.publicKey,
+        nonce: getRandomNonce()
+    }));
+
+    await locklift.provider.sendMessage({
+        sender: account.address,
+        recipient: account.address,
+        amount: toNano(0.1),
+        bounce: false
+    })
 
     const name = `Account${key_number + 1}`;
-    migration.store(account.account.address, "Wallet", name);
-    console.log(`${name}: ${account.account.address.toString()}`);
+    migration.store(account.address, 'EverWallet', name);
+    console.log(`${name}: ${account.address.toString()}`);
 }
 
 main()

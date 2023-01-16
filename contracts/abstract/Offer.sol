@@ -61,12 +61,13 @@ abstract contract Offer is IOffer {
 
         _;
     }
+
     function getMarketFee() external view override returns (MarketFee) {
         return fee;
     }
 
     function setMarketFee(MarketFee _fee) external override onlyMarketRoot {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
-        fee= _fee;
+        fee = _fee;
     }
 }

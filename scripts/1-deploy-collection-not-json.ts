@@ -1,5 +1,6 @@
 import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
+import {WalletTypes} from "locklift";
 
 const migration = new Migration();
 const ora = require('ora');
@@ -8,14 +9,17 @@ const BigNumber = require('bignumber.js');
 const INCREMENT = 20;
 
 async function main() {
-    const tempAdmin = migration.load("Wallet", "Account1");
     const signer = (await locklift.keystore.getSigner('0'));
-    
+    const account = await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.EverWallet,
+      address: migration.getAddress('Account1')
+    });
+
     const response = await prompts([
         {
             type: 'text',
             name: 'owner',
-            message: 'Get Collection Owner Address (default ' + tempAdmin.address + ')',
+            message: 'Get Collection Owner Address (default ' + account.address + ')',
             validate: (value:string) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
@@ -35,7 +39,7 @@ async function main() {
             {
                 type: 'text',
                 name: 'nftOwner',
-                message: 'Get NFTs Owner Address (default ' + tempAdmin.address + ')',
+                message: 'Get NFTs Owner Address (default ' + account.address + ')',
                 validate: (value:string) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
             },
             {
@@ -72,10 +76,10 @@ async function main() {
     const amount = config.nftAmount;
 
     const requiredGas = new BigNumber(config.nftAmount).times(3.4).plus(5).shiftedBy(9);
-    const balanceStart = await locklift.provider.getBalance(tempAdmin.address);
+    const balanceStart = await locklift.provider.getBalance(account.address);
 
     if (requiredGas.gt(balanceStart)) {
-        throw Error('NOT ENOUGH BALANCE ON ' + tempAdmin.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
+        throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
     }
 
     const spinner = ora('Deploying Collection').start();
@@ -91,8 +95,9 @@ async function main() {
             codeNft: Nft.code,
             codeIndex: Index.code,
             codeIndexBasis: IndexBasis.code,
-            owner: tempAdmin.address,
-            remainOnNft: locklift.utils.toNano(1)
+            owner: account.address,
+            remainOnNft: locklift.utils.toNano(1),
+            json: "{}"
         },
         initParams: {
             nonce_: locklift.utils.getRandomNonce()
@@ -101,8 +106,6 @@ async function main() {
     });
 
     migration.store(collection.address, "Collection", "Collection");
-    let accountFactory = locklift.factory.getAccountsFactory('Wallet');
-    const acc = accountFactory.getAccount(tempAdmin.address,  (signer?.publicKey) as string);
 
     if (config.nftAmount > 0) {
         spinner.text = 'Deploying Nfts'
@@ -129,22 +132,19 @@ async function main() {
         try {
 
             for (let i = 0; i < amount; i += INCREMENT) {
-                spinner.text = `Minting NFT ${i}/${amount}: ${config.nftUrl}:`
+                spinner.text = `Minting NFT ${i}/${amount}:`
                 let jsons = payloads.slice(i, i + INCREMENT);
 
-                let tx = await acc.runTarget(
-                    {
-                        contract: collection,
-                        value: locklift.utils.toNano(jsons.length * 3.3 + 2),
-                    },
-                    (batch) => batch.methods.batchMintNft({
-                        _owner: (config.nftOwner || tempAdmin.address),
+                let tx = await collection.methods.batchMintNft({
+                        _owner: (config.nftOwner || account.address),
                         _jsons: jsons
-                    }),
-                );
+                    }).send({
+                        from: account.address,
+                        amount: locklift.utils.toNano(jsons.length * 3.3 + 2)
+                    });
 
-                spinner.text = `Minted NFT ${(i + 1) * INCREMENT}/${amount}: Tx: ${tx.transaction.id}`
-                tx_results.push({txStatus: tx.transaction.origStatus, txId: tx.transaction.id, jsons})
+                spinner.text = `Minted NFT ${(i + 1) * INCREMENT}/${amount}: Tx: ${tx.id.hash}`
+                tx_results.push({txStatus: tx.origStatus, txId: tx.id.hash, jsons})
             }
         } catch (e) {
             console.error(e)
@@ -153,20 +153,14 @@ async function main() {
 
     if(config.owner) {
         spinner.text = 'Transfer ownership back'
-        await acc.runTarget(
-            {
-                contract: collection,
-                value: locklift.utils.toNano(1)
-            },
-            (collectionOwner) => collectionOwner.methods.transferOwnership({
-                newOwner: config.owner
-            }),
-        );
-
+        await collection.methods.transferOwnership({
+                newOwner: response.owner
+        }).send({
+            from: account.address,
+            amount: locklift.utils.toNano(1)
+        });
         console.log('Transfer ownership to: ' + config.owner)
     }
-
-    await logContract(collection)
     console.log(tx_results)
 
     spinner.stopAndPersist({ text: 'Deploy complete' })

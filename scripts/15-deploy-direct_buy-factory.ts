@@ -19,14 +19,20 @@ async function main() {
         type: WalletTypes.EverWallet,
         address: migration.getAddress('Account1')
     });
-
     const signer = (await locklift.keystore.getSigner('0'));
+
+    let fee = {
+        numerator: 2,
+        denominator: 100
+    }
+
     const {contract: factoryDirectBuy, tx } = await locklift.factory.deployContract({
         contract: "FactoryDirectBuy",
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: account.address,
-            sendGasTo: account.address
+            sendGasTo: account.address,
+            _fee: fee
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0
@@ -37,9 +43,6 @@ async function main() {
     console.log(`FactoryDirectBuy: ${factoryDirectBuy.address}`);
     migration.store(factoryDirectBuy.address, "FactoryDirectBuy", "FactoryDirectBuy");
 
-    const accountFactory = locklift.factory.getAccountsFactory("Wallet");
-    const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
-
     const DirectBuy = (await locklift.factory.getContractArtifacts('DirectBuy'));
     const TokenWalletPlatform = (await locklift.factory.getContractArtifacts('TokenWalletPlatform'));
 
@@ -48,7 +51,7 @@ async function main() {
     await factoryDirectBuy.methods.setCodeTokenPlatform({
         _tokenPlatformCode: TokenWalletPlatform.code
     }).send({
-        from: acc.address,
+        from: account.address,
         amount: locklift.utils.toNano(1)
     })
 
@@ -56,7 +59,7 @@ async function main() {
     await factoryDirectBuy.methods.setCodeDirectBuy({
         _directBuyCode: DirectBuy.code
     }).send({
-        from: acc.address,
+        from: account.address,
         amount: locklift.utils.toNano(1)
     })
 
@@ -64,7 +67,7 @@ async function main() {
         await factoryDirectBuy.methods.transferOwnership({
             newOwner: response.owner
         }).send({
-            from: acc.address,
+            from: account.address,
             amount: locklift.utils.toNano(1)
         })
     }

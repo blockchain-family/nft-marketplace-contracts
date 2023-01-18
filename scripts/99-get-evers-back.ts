@@ -1,24 +1,30 @@
 import { Migration } from "./migration";
+import {WalletTypes} from "locklift";
 
 const ora = require('ora');
 const migration = new Migration();
+const BigNumber = require('bignumber.js');
 
 async function main() {
     // @ts-ignore
     const giverAddress = locklift.giver.giverContract.address;
     const signer = await locklift.keystore.getSigner("0");
-    const account  = locklift.factory.getDeployedContract("Wallet", migration.load("Wallet", "Account1").address);
-    
-    const spinner = ora(`Swiping Temporary Admin: ${account.address} back to Giver ${giverAddress}`).start();
-    spinner.text = 'Waiting for Bounces to Complete'
+    let account = await locklift.factory.accounts.addExistingAccount({
+        type: WalletTypes.EverWallet,
+        address: migration.getAddress('Account1')
+    });
+    const walletBalance = await locklift.provider.getBalance(account.address);
+    console.log('Balance:', Number(walletBalance));
 
-    await locklift.tracing.trace(account.methods.sendTransaction({
-        dest: giverAddress,
-        value: 0,
-        bounce: false,
-        flags: 128,
-        payload: ""
-    }).sendExternal({publicKey: signer?.publicKey as string}));
+    const spinner = ora(`Swiping Temporary Admin: ${account.address} back to Giver ${giverAddress}`).start();
+    spinner.text = 'Waiting for Bounces to Complete';
+
+    await locklift.provider.sendMessage({
+        sender: account.address,
+        recipient: giverAddress,
+        amount: new BigNumber(walletBalance).shiftedBy(9).toString(),
+        bounce: false
+    });
 
     spinner.stopAndPersist({text: 'Swipe Complete'})
 }

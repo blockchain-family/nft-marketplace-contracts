@@ -233,7 +233,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     ) public {
         require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
         require(state == AuctionStatus.Active, AuctionErrors.auction_not_active);
-        require(msg.value >= Gas.FINISH_AUCTION_VALUE, BaseErrors.not_enough_value);
+        require(msg.value >= (Gas.FINISH_AUCTION_VALUE + Gas.FEE_VALUE), BaseErrors.not_enough_value);
         mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
         if (maxBidValue >= price) {
 
@@ -242,7 +242,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
             emit AuctionComplete(nftOwner, currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
-            emit MarketFeeWithheld(currentFee, paymentToken);
 
             IAuctionBidPlacedCallback(msg.sender).auctionComplete{
                 value: Gas.CALLBACK_VALUE,
@@ -265,7 +264,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 sendGasTo,
                 callbacks
             );
-            ITokenWallet(tokenWallet).transfer{value: 0.5 ever, flag: 0, bounce: false }(
+            ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }(
                 balance,
                 nftOwner,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
@@ -273,7 +272,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 false,
                 empty
             );
-            ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }(
+            if (currentFee >  0) {
+                emit MarketFeeWithheld(currentFee, paymentToken);
+                ITokenWallet(tokenWallet).transfer{value: 0.5 ever, flag: 0, bounce: false }(
                 currentFee,
                 markerRootAddr,
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS,
@@ -281,6 +282,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 false,
                 empty
             );
+            }
+
         } else {
             emit AuctionCancelled();
             state = AuctionStatus.Cancelled;

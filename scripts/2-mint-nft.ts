@@ -1,12 +1,16 @@
 import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
+import {WalletTypes} from "locklift";
 
 const migration = new Migration();
 const ora = require('ora');
 const prompts = require('prompts');
 
 async function main() {
-    const account = migration.load("Wallet", "Account1");
+    const account = await locklift.factory.accounts.addExistingAccount({
+      type: WalletTypes.EverWallet,
+      address: migration.getAddress('Account1')
+    });
 
     const response = await prompts([
         {
@@ -68,20 +72,13 @@ async function main() {
     }
     let payload = JSON.stringify(item)
 
-    const accountFactory = locklift.factory.getAccountsFactory("Wallet");
-    const signer = (await locklift.keystore.getSigner('0'));  
-    const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
-    await locklift.tracing.trace(acc.runTarget(
-        {
-            contract: collection,
-            value: locklift.utils.toNano(10)
-        },
-        (nft) => nft.methods.mintNft({
+    await collection.methods.mintNft({
             _owner: response.owner,
             _json: payload
-        
-        }),
-    ));
+        }).send({
+            from: account.address,
+            amount: locklift.utils.toNano(10)
+        });
 
     let totalMinted = await collection.methods.totalMinted({answerId: 0}).call()
     let nftAddress = await collection.methods.nftAddress({answerId: 0, id: (Number(totalMinted.count)-1).toFixed()}).call()

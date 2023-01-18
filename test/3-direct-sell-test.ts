@@ -94,6 +94,8 @@ describe("Test DirectSell contract", async function () {
             denominator: 100
         } as MarketFee;
         factoryDirectSell = await deployFactoryDirectSell(account1, fee);
+        const dSMFChanged = await factoryDirectSell.getEvent('MarketFeeDefaultChanged') as any;
+        expect(dSMFChanged.fee).to.be.not.null;
     });
     it('Get address token wallet for FactoryDirectSell', async function () {
         factoryDirectSellTWAddress = await tokenRoot.walletAddr(factoryDirectSell.address);
@@ -495,8 +497,7 @@ describe("Test DirectSell contract", async function () {
             expect(dSActive.to.toString()).to.be.eq('2');
 
             await sleep(10000);
-            await tokenWallet3.transfer(spentToken, directSell.address, 0, true, '', locklift.utils.toNano(2));
-            directSell = await DirectSell.from_addr(dSCreate.directSell, account3);
+            await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', locklift.utils.toNano(2));
             const dSExpired = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSExpired.to.toString()).to.be.eq('5');
 
@@ -511,7 +512,71 @@ describe("Test DirectSell contract", async function () {
             expect(owner.toString()).to.be.eq(account3.address.toString());
         });
     });
-        describe("Change market fee for factory", async function () {
+    describe("Change market fee for direct sell", async function () {
+         it('Change market fee and success buy', async function () {
+            const spentToken: number = 5000000000;
+            let payload: string;
+            payload = (await factoryDirectSell.buildPayload(0, nft, Math.round((Date.now() / 1000)), 10, tokenRoot, spentToken));
+
+            let callbacks = await Callback(payload);
+            await nft.changeManager(account3, factoryDirectSell.address, account3.address, callbacks);
+            const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
+            logger.log(`Address DirectSell ${dSCreate.directSell.toString()}`);
+
+            directSell = await DirectSell.from_addr(dSCreate.directSell, account3);
+            const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
+            expect(dSActive.to.toString()).to.be.eq('2');
+
+            let oldFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            expect(oldFee).to.eql(fee);
+
+            let setFee = {
+                numerator: 20,
+                denominator: 100
+            } as MarketFee;
+
+            await factoryDirectSell.contract.methods.setMarketFeeForDirectSell({directSell: directSell.address, _fee: setFee}).send({
+                from: account1.address,
+                amount: toNano(2)
+            });
+
+            let newFee = (await directSell.contract.methods.getMarketFee().call()).value0;
+            expect(setFee.numerator.toString()).to.be.eq(newFee.numerator);
+            expect(setFee.denominator.toString()).to.be.eq(newFee.denominator);
+
+            const dBMFChanged = await factoryDirectSell.getEvent('MarketFeeChanged') as any;
+            expect(dBMFChanged.fee).to.be.not.null;
+
+            sleep(5000);
+            await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', locklift.utils.toNano(2));
+
+            const dSFilles = await directSell.getEvent('DirectSellStateChanged') as any;
+            expect(dSFilles.to.toString()).to.be.eq('3');
+
+            const managerChanged = await nft.getEvent('ManagerChanged') as any;
+            expect(managerChanged.newManager.toString()).to.be.eq(account2.address.toString());
+
+            let currentFee = new BigNumber(spentToken).div(newFee.denominator).times(newFee.numerator);
+            const expectedAccountBalance = new BigNumber(startBalanceTW3).plus(spentToken).minus(currentFee);
+            const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
+            const expectedTWFactoryDSBalance = startBalanceTWfactoryDirectSell.plus(currentFee);
+            expect(factoryDSTokenWalletBalance.toString()).to.be.eq(expectedTWFactoryDSBalance.toString());
+
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+            expect(spentTokenWallet3Balance.toString()).to.be.eq(expectedAccountBalance.toString());
+
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
+
+            let owner = (await nft.getInfo()).owner;
+            expect(owner.toString()).to.be.eq(account2.address.toString());
+
+            startBalanceTW3 = startBalanceTW3 + spentToken - currentFee.toNumber();
+            startBalanceTW2 -= spentToken;
+            startBalanceTWfactoryDirectSell = startBalanceTWfactoryDirectSell.plus(currentFee);
+         });
+    });
+    describe("Change market fee for factory", async function () {
         it('Change market fee', async function () {
             let oldFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
             expect(oldFee).to.eql(fee);
@@ -607,7 +672,7 @@ describe("Test DirectSell contract", async function () {
             startBalanceTW2 = startBalanceTW2 + withdrawAmount;
         });
         it('Trying withdraw more then have', async function () {
-            const withdrawAmount = 2000000000;
+            const withdrawAmount = 2200000000;
             const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
             expect(factoryDSTokenWalletBalance.toString()).to.be.eq(startBalanceTWfactoryDirectSell.toString());
             let spentTokenWallet2Balance = await tokenWallet2.balance();
@@ -639,7 +704,8 @@ describe("Test DirectSell contract", async function () {
                 tokenWallet:factoryDirectSellTW.address,
                 amount: withdrawAmount,
                 recipient:account2.address,
-                remainingGasTo:account1.address}).send({
+                remainingGasTo:account1.address
+            }).send({
                     from: account1.address,
                     amount: toNano(2)
                 });

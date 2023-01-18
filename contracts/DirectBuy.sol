@@ -165,7 +165,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     if (
         msg.sender.value != 0 &&
         msg.sender == nftAddress &&
-        msg.value >= (Gas.DIRECT_BUY_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
+        msg.value >= (Gas.DIRECT_BUY_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE + Gas.FEE_VALUE) &&
         currentStatus == DirectBuyStatus.Active &&
         ((endTime > 0 && now < endTime) || endTime == 0) &&
         now >= startTime
@@ -186,7 +186,6 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       );
 
       changeState(DirectBuyStatus.Filled);
-      emit MarketFeeWithheld(currentFee, spentToken);
 
       TvmCell empty;
       callbacks[owner] = ITIP4_1NFT.CallbackParams(0.01 ever, empty);
@@ -202,8 +201,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       );
 
       ITokenWallet(spentTokenWallet).transfer{
-        value: 0.5 ever,
-        flag: 0,
+        value: 0,
+        flag: 128,
         bounce: false
       }(
         balance,
@@ -213,20 +212,21 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         false,
         empty
       );
-
-      ITokenWallet(spentTokenWallet).transfer{
-        value: 0,
-        flag: 128,
-        bounce: false
-      }(
-        currentFee,
-        factoryDirectBuy,
-        Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-        sendGasTo,
-        false,
-        empty
-      );
-      emit MarketFeeWithheld(currentFee,spentToken);
+      if (currentFee > 0) {
+        emit MarketFeeWithheld(currentFee, spentToken);
+        ITokenWallet(spentTokenWallet).transfer{
+          value: 0.5 ever,
+          flag: 0,
+          bounce: false
+        }(
+          currentFee,
+          factoryDirectBuy,
+          Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+          sendGasTo,
+          false,
+          empty
+        );
+      }
 
     } else {
       if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {

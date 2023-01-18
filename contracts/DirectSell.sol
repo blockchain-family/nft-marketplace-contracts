@@ -151,7 +151,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     if (
       msg.sender.value != 0 &&
       msg.sender == tokenWallet &&
-      msg.value >= (Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
+      msg.value >= (Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE + Gas.FEE_VALUE) &&
       currentStatus == DirectSellStatus.Active &&
       amount >= price &&
       ((endTime > 0 && now < endTime) || endTime == 0) &&
@@ -173,7 +173,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       uint128 balance = price - currentFee;
 
       changeState(DirectSellStatus.Filled);
-      emit MarketFeeWithheld(currentFee, paymentToken);
       callbacks[buyer] = ITIP4_1NFT.CallbackParams(0.01 ever, emptyPayload);
 
       ITIP4_1NFT(nftAddress).transfer{
@@ -187,8 +186,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       );
 
       ITokenWallet(tokenWallet).transfer{
-        value: 0.5 ever,
-        flag: 0,
+        value: 0,
+        flag: 128,
         bounce: false
       }(
         balance,
@@ -199,9 +198,11 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         emptyPayload
       );
 
-      ITokenWallet(tokenWallet).transfer{
-        value: 0,
-        flag: 128,
+      if (currentFee > 0) {
+        emit MarketFeeWithheld(currentFee, paymentToken);
+        ITokenWallet(tokenWallet).transfer{
+        value: 0.5 ever,
+        flag: 0,
         bounce: false
       }(
         currentFee,
@@ -211,6 +212,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         false,
         emptyPayload
       );
+     }
+
 
     } else {
       if (endTime > 0 && now >= endTime) {

@@ -525,6 +525,9 @@ PUSHCONT {
 	PUSHINT 500000000
 	ADD
 	UFITS 128
+	PUSHINT 500000000
+	ADD
+	UFITS 128
 	GEQ
 	GETGLOB 20
 	EQINT 2
@@ -593,21 +596,10 @@ PUSHCONT {
 	CALLREF {
 		CALL $changeState_internal_macro$
 	}
-	.loc ../contracts/DirectBuy.sol, 189
-	GETGLOB 12
-	PUSH S2
-	PUSHSLICE xc0000000000000000000000000677bf5e3
-	NEWC
-	STSLICE
-	STU 128
-	STSLICE
-	ENDC
-	PUSHINT 0
-	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 191
+	.loc ../contracts/DirectBuy.sol, 190
 	PUSHREF {
 	}
-	.loc ../contracts/DirectBuy.sol, 192
+	.loc ../contracts/DirectBuy.sol, 191
 	PUSHINT 10000000
 	OVER
 	PAIR
@@ -625,7 +617,7 @@ PUSHCONT {
 	PUSHINT 267
 	DICTSETB
 	POP S4
-	.loc ../contracts/DirectBuy.sol, 194
+	.loc ../contracts/DirectBuy.sol, 193
 	PUSH2 S3, S5
 	GETGLOB 11
 	GETGLOB 13
@@ -650,44 +642,13 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 204
+	.loc ../contracts/DirectBuy.sol, 203
 	DUP
 	FALSE
 	PUSH S7
 	PUSHINT 100000000
 	PUSH S12
 	ROLL 6
-	GETGLOB 19
-	FALSE
-	NEWC
-	STSLICECONST x6_
-	STI 1
-	STSLICECONST x1_
-	STSLICE
-	PUSHINT 2868722788230934574387753789225109188247553
-	STUR 143
-	ROLLREV 6
-	NEWC
-	STSLICECONST x73e22143
-	STU 128
-	STSLICE
-	STU 128
-	ROLLREV 3
-	NEWC
-	STSLICE
-	STI 1
-	STREF
-	STBREFR
-	STBREFR
-	ENDC
-	PUSHINT 0
-	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 217
-	FALSE
-	PUSH S5
-	PUSHINT 100000000
-	GETGLOB 10
-	PUSH S5
 	GETGLOB 19
 	FALSE
 	NEWC
@@ -713,17 +674,58 @@ PUSHCONT {
 	ENDC
 	PUSHPOW2 7
 	SENDRAWMSG
-	.loc ../contracts/DirectBuy.sol, 229
-	GETGLOB 12
-	SWAP
-	PUSHSLICE xc0000000000000000000000000677bf5e3
-	NEWC
-	STSLICE
-	STU 128
-	STSLICE
-	ENDC
-	PUSHINT 0
-	SENDRAWMSG
+	.loc ../contracts/DirectBuy.sol, 215
+	OVER
+	GTINT 0
+	PUSHCONT {
+		.loc ../contracts/DirectBuy.sol, 216
+		GETGLOB 12
+		PUSH S2
+		PUSHSLICE xc0000000000000000000000000677bf5e3
+		NEWC
+		STSLICE
+		STU 128
+		STSLICE
+		ENDC
+		PUSHINT 0
+		SENDRAWMSG
+		.loc ../contracts/DirectBuy.sol, 217
+		DUP
+		FALSE
+		PUSH S6
+		PUSHINT 100000000
+		GETGLOB 10
+		PUSH S6
+		GETGLOB 19
+		FALSE
+		NEWC
+		STSLICECONST x6_
+		STI 1
+		STSLICECONST x1_
+		STSLICE
+		PUSHINT 2868722788230934574387753789225109188247553
+		STUR 143
+		ROLLREV 6
+		NEWC
+		STSLICECONST x73e22143
+		STU 128
+		STSLICE
+		STU 128
+		ROLLREV 3
+		NEWC
+		STSLICE
+		STI 1
+		STREF
+		STBREFR
+		STBREFR
+		ENDC
+		PUSHINT 0
+		SENDRAWMSG
+		.loc ../contracts/DirectBuy.sol, 0
+	}
+	IF
+	.loc ../contracts/DirectBuy.sol, 0
+	DROP2
 }
 PUSHCONT {
 	.loc ../contracts/DirectBuy.sol, 232
@@ -864,8 +866,8 @@ PUSHCONT {
 	.loc ../contracts/DirectBuy.sol, 0
 }
 IFELSE
-.loc ../contracts/DirectBuy.sol, 0
 BLKDROP 7
+.loc ../contracts/DirectBuy.sol, 0
 
 .globl	changeState_internal
 .type	changeState_internal, @function

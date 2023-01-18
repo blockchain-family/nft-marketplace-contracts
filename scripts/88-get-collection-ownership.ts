@@ -1,5 +1,6 @@
 import { Migration } from "./migration";
 import { isValidEverAddress} from "../test/utils";
+import {WalletTypes} from "locklift";
 
 const migration = new Migration();
 const prompts = require('prompts')
@@ -13,23 +14,19 @@ async function main() {
             validate: (value:string) => isValidEverAddress(value) ? true : 'Invalid Everscale address'
         }
     ])
-
-    const signer = await locklift.keystore.getSigner("0");
-    let accountFactory = locklift.factory.getAccountsFactory('Wallet');
-    const acc = accountFactory.getAccount(migration.load("Wallet", "Account1").address,  (signer?.publicKey) as string);
+    const account = await locklift.factory.accounts.addExistingAccount({
+        type: WalletTypes.EverWallet,
+        address: migration.getAddress('Account1')
+    });
     const collection = locklift.factory.getDeployedContract("Collection", migration.load("Collection", "Collection").address);
 
-        if(response.owner) {
-        await acc.runTarget(
-            {
-                contract: collection,
-                value: locklift.utils.toNano(1)
-            },
-            (collectionOwner) => collectionOwner.methods.transferOwnership({
+    if(response.owner) {
+        await collection.methods.transferOwnership({
                 newOwner: response.owner
-            }),
-        );
-
+            }).send({
+                from: account.address,
+                amount: locklift.utils.toNano(1)
+            });
         console.log('Transfer ownership to: ' + response.owner)
     }
 }

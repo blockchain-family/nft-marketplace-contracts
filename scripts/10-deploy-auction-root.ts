@@ -16,8 +16,6 @@ async function main() {
 
     ]);
 
-    // const account = migration.load("Wallet", "Account1");
-    // const signer = (await locklift.keystore.getSigner('0'));
     const signer = (await locklift.keystore.getSigner('0'));
     const account = await locklift.factory.accounts.addExistingAccount({
       type: WalletTypes.EverWallet,
@@ -57,10 +55,6 @@ async function main() {
     migration.store(auctionRootTip3.address, contractName, contractName);
 
     if (response.owner) {
-        const account = await locklift.factory.accounts.addExistingAccount({
-          type: WalletTypes.EverWallet,
-          address: migration.getAddress('Account1')
-        });
         await auctionRootTip3.methods.transferOwnership({
             newOwner: response.owner
         }).send({

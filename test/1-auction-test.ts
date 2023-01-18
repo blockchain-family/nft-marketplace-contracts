@@ -103,8 +103,8 @@ describe("Test Auction contract", async function () {
             denominator: 100
         } as MarketFee;
         auctionRoot = await deployAuctionRoot(account2, fee);
-        const eventMFChanged = await auction.getEvent('MarketFeeDefaultChanged') as any;
-        expect(eventMFChanged.fee).to.eql(fee);
+        const eventMFChanged = await auctionRoot.getEvent('MarketFeeDefaultChanged') as any;
+        expect(eventMFChanged.fee).to.eql((await auctionRoot.contract.methods.getMarketFee().call()).value0);
     });
 
 

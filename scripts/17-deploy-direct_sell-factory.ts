@@ -21,12 +21,18 @@ async function main() {
         address: migration.getAddress('Account1')
     });
 
+    let fee = {
+        numerator: 2,
+        denominator: 100
+    }
+
     const {contract: factoryDirectSell, tx } = await locklift.factory.deployContract({
         contract: "FactoryDirectSell",
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: account.address,
-            sendGasTo: account.address
+            sendGasTo: account.address,
+            _fee: fee
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0

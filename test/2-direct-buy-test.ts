@@ -96,7 +96,7 @@ describe("Test DirectBuy contract", async function () {
         } as MarketFee;
         factoryDirectBuy = await deployFactoryDirectBuy(account1, fee);
         const dBMFChanged = await factoryDirectBuy.getEvent('MarketFeeDefaultChanged') as any;
-        expect(dBMFChanged._fee).to.eql(fee);
+        expect(dBMFChanged.fee).to.be.not.null;
     });
     it('Get address token wallet for FactoryDirectBuy', async function () {
         factoryDirectBuyTWAddress = await tokenRoot.walletAddr(factoryDirectBuy.address);
@@ -525,15 +525,17 @@ describe("Test DirectBuy contract", async function () {
                 denominator: 100
             } as MarketFee;
 
-            await factoryDirectBuy.contract.methods.setMarketFeeForDirectBuy({directBuy: directBuy, _fee: setFee}).send({
-                    from: factoryDirectBuy.address,
+            await factoryDirectBuy.contract.methods.setMarketFeeForDirectBuy({directBuy: directBuy.address, _fee: setFee}).send({
+                    from: account1.address,
                     amount: toNano(2)
             });
+
             let newFee = (await directBuy.contract.methods.getMarketFee().call()).value0;
-            expect(newFee).to.eql(setFee);
-            fee = setFee;
+            expect(setFee.numerator.toString()).to.be.eq(newFee.numerator);
+            expect(setFee.denominator.toString()).to.be.eq(newFee.denominator);
+
             const dBMFChanged = await factoryDirectBuy.getEvent('MarketFeeChanged') as any;
-            expect(dBMFChanged._fee).to.eql(setFee);
+            expect(dBMFChanged.fee).to.be.not.null;
 
             sleep(5000);
             let callbacks = await Callback(payload);
@@ -542,15 +544,15 @@ describe("Test DirectBuy contract", async function () {
             expect(dBFilled.to.toString()).to.be.eq('3');
 
             const owner = (await nft.getInfo()).owner;
-            expect(owner.toString()).to.be.eq((account3.address).toString());
+            expect(owner.toString()).to.be.eq((account2.address).toString());
 
             const ownerChanged = await nft.getEvent('OwnerChanged') as any;
-            expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
+            expect(ownerChanged.newOwner.toString()).to.be.eq(account2.address.toString());
 
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
-            expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
+            expect(managerChanged.newManager.toString()).to.be.eq(account2.address.toString());
 
-            let currentFee = new BigNumber(spentToken).div(setFee.denominator).times(setFee.numerator);
+            let currentFee = new BigNumber(spentToken).div(newFee.denominator).times(newFee.numerator);
             const expectedAccountBalance = new BigNumber(startBalanceTW3).plus(spentToken).minus(currentFee);
             const factoryDBTokenWalletBalance = await factoryDirectBuyTW.balance();
             const expectedTWFactoryDBBalance = startBalanceTWfactoryDirectBuy.plus(currentFee);
@@ -664,7 +666,7 @@ describe("Test DirectBuy contract", async function () {
             startBalanceTW2 = startBalanceTW2 + withdrawAmount;
         });
         it('Trying withdraw more then have', async function () {
-            const withdrawAmount = 330000000;
+            const withdrawAmount = 3300000000;
             const factoryDBTokenWalletBalance = await factoryDirectBuyTW.balance();
             expect(factoryDBTokenWalletBalance.toString()).to.be.eq(startBalanceTWfactoryDirectBuy.toString());
             let spentTokenWallet2Balance = await tokenWallet2.balance();

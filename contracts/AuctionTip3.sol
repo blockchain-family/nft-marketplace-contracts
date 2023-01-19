@@ -66,6 +66,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     AuctionStatus state;
 
     uint32 currentVersion;
+    address weverVault;
+    address weverRoot;
 
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
@@ -88,7 +90,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint16 _bidDelta,
         uint16 _bidDeltaDecimals,
         address _paymentToken,
-        address sendGasTo
+        address sendGasTo,
+        address _weverVault,
+        address _weverRoot
     ) public {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
         setDefaultProperties(
@@ -108,6 +112,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         bidDeltaDecimals = _bidDeltaDecimals;
         nextBidValue = price;
         paymentToken = _paymentToken;
+        weverVault = _weverVault;
+        weverRoot = _weverRoot;
 
         emit AuctionCreated(buildInfo());
         state = AuctionStatus.Created;
@@ -169,15 +175,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         } else {
             emit BidDeclined(buyer, amount);
             sendBidResultCallback(callbackId, buyer, false, 0, nft);
+
             TvmCell empty;
-            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
-                amount,
-                buyer,
-                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                original_gas_to,
-                true,
-                empty
-            );
+            _transfer(amount, buyer, original_gas_to, msg.sender, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS, empty);
         }
     }
 
@@ -214,6 +214,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             builder.store(currentBid.addr);
             builder.store(currentBid.value);
 
+            _transfer(_currentBid.value, _currentBid.addr, original_gas_to, msg.sender, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS, builder.toCell());
+
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
                 _currentBid.value,
                 _currentBid.addr,
@@ -224,6 +226,29 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             );
         } else {
             original_gas_to.transfer({ value: 0, flag: 128, bounce: false });
+        }
+    }
+
+      function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gas, TvmCell payload) private {
+        TvmCell emptyPayload;
+        if (paymentToken == weverRoot) {
+            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
+                amount,
+                weverVault,
+                uint128(0),
+                user,
+                true,
+                emptyPayload
+            );
+        } else {
+            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
+                amount,
+                user,
+                gas,
+                remainingGasTo,
+                true,
+                payload
+            );
         }
     }
 
@@ -264,14 +289,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 sendGasTo,
                 callbacks
             );
-            ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }(
-                balance,
-                nftOwner,
-                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                sendGasTo,
-                false,
-                empty
-            );
+            _transfer(balance, nftOwner, sendGasTo, tokenWallet, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS, empty);
+
             if (currentFee >  0) {
                 emit MarketFeeWithheld(currentFee, paymentToken);
                 ITokenWallet(tokenWallet).transfer{value: 0.5 ever, flag: 0, bounce: false }(

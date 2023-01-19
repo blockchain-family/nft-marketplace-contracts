@@ -41,6 +41,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     event AuctionDeclined(address nftOwner, address nft);
     event AuctionRootUpgrade();
 
+    address weverVault;
+    address weverRoot;
+
     constructor(
         TvmCell _codeNft,
         address _owner,
@@ -49,7 +52,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         MarketFee _fee,
         uint16 _auctionBidDelta,
         uint16 _auctionBidDeltaDecimals,
-        address _sendGasTo
+        address _sendGasTo,
+        address _weverVault,
+        address _weverRoot
     ) OwnableInternal(
         _owner
     )
@@ -72,7 +77,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         emit MarketFeeDefaultChanged(_fee);
         currentVersion++;
         currentVersionOffer++;
-
+        weverVault = _weverVault;
+        weverRoot = _weverRoot;
         _sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
@@ -128,7 +134,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     auctionBidDelta,
                     auctionBidDeltaDecimals,
                     paymentToken,
-                    nftOwner
+                    nftOwner,
+                    weverVault,
+                    weverRoot
                 );
 
                 MarketOffer offerInfo = MarketOffer(

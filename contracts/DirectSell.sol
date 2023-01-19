@@ -43,6 +43,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
   uint32 currentVersion;
 
   MarketFee fee;
+  address weverVault;
+  address weverRoot;
 
   struct DirectSellInfo {
     address factory;
@@ -65,7 +67,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     uint64 _startTime,
     uint64 _durationTime,
     uint128 _price,
-    MarketFee _fee
+    MarketFee _fee,
+    address _weverVault,
+    address _weverRoot
   ) public
  {
     if (msg.sender.value != 0 && msg.sender == factoryDirectSell) {
@@ -74,6 +78,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       fee = _fee;
       startTime = _startTime;
       durationTime = _durationTime;
+      weverVault = _weverVault;
+      weverRoot = _weverRoot;
       if(startTime > 0 && durationTime > 0) {
         endTime = startTime + durationTime;
       }
@@ -185,36 +191,23 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         callbacks
       );
 
-      ITokenWallet(tokenWallet).transfer{
-        value: 0,
-        flag: 128,
-        bounce: false
-      }(
-        balance,
-        owner,
-        Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-        originalGasTo,
-        false,
-        emptyPayload
-      );
+      _transfer(balance, owner, originalGasTo, tokenWallet, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS);
 
       if (currentFee > 0) {
         emit MarketFeeWithheld(currentFee, paymentToken);
         ITokenWallet(tokenWallet).transfer{
-        value: 0.5 ever,
-        flag: 0,
-        bounce: false
-      }(
-        currentFee,
-        factoryDirectSell,
-        Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-        originalGasTo,
-        false,
-        emptyPayload
-      );
+          value: 0.5 ever,
+          flag: 0,
+          bounce: false
+        }(
+          currentFee,
+          factoryDirectSell,
+          Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+          originalGasTo,
+          false,
+          emptyPayload
+        );
      }
-
-
     } else {
       if (endTime > 0 && now >= endTime) {
         IDirectSellCallback(buyer).directSellCancelledOnTime{
@@ -228,18 +221,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
 
         changeState(DirectSellStatus.Expired);
 
-        ITokenWallet(msg.sender).transfer{
-          value: 0,
-          flag: 64,
-          bounce: false
-        }(
-          amount,
-          buyer,
-          uint128(0),
-          originalGasTo,
-          true,
-          emptyPayload
-        );
+        _transfer(amount, buyer, originalGasTo, msg.sender, 0.5 ever, 1, uint128(0));
 
         ITIP4_1NFT(nftAddress).changeManager{
           value: 0,
@@ -259,22 +241,33 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
           callbackId,
           nftAddress
         );
-
-        ITokenWallet(msg.sender).transfer{
-          value: 0,
-          flag: 128,
-          bounce: false
-        }(
-          amount,
-          buyer,
-          uint128(0),
-          originalGasTo,
-          true,
-          emptyPayload
-        );
+        _transfer(amount, buyer, originalGasTo, msg.sender, 0, 128, uint128(0));
       }
     }
   }
+
+  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gas) private {
+        TvmCell emptyPayload;
+        if (paymentToken == weverRoot) {
+            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
+                amount,
+                weverVault,
+                uint128(0),
+                user,
+                true,
+                emptyPayload
+            );
+        } else {
+            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
+                amount,
+                user,
+                gas,
+                remainingGasTo,
+                true,
+                emptyPayload
+            );
+        }
+    }
 
   function changeState(uint8 newState) private {
     uint8 prevStateN = currentStatus;

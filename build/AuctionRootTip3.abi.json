@@ -13,7 +13,9 @@
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
 				{"name":"_auctionBidDelta","type":"uint16"},
 				{"name":"_auctionBidDeltaDecimals","type":"uint16"},
-				{"name":"_sendGasTo","type":"address"}
+				{"name":"_sendGasTo","type":"address"},
+				{"name":"_weverVault","type":"address"},
+				{"name":"_weverRoot","type":"address"}
 			],
 			"outputs": [
 			]
@@ -256,6 +258,8 @@
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"currentVersion","type":"uint32"},
-		{"name":"currentVersionOffer","type":"uint32"}
+		{"name":"currentVersionOffer","type":"uint32"},
+		{"name":"weverVault","type":"address"},
+		{"name":"weverRoot","type":"address"}
 	]
 }

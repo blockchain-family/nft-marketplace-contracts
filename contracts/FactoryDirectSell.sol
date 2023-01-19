@@ -41,11 +41,15 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
   event FactoryDirectSellUpgrade();
 
   MarketFee fee;
+  address weverVault;
+  address weverRoot;
 
   constructor(
     address _owner,
     address sendGasTo,
-    MarketFee _fee
+    MarketFee _fee,
+    address _weverVault,
+    address _weverRoot
     )
     public
     OwnableInternal(_owner)
@@ -56,6 +60,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
       require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
       fee = _fee;
       emit MarketFeeDefaultChanged(_fee);
+      weverVault = _weverVault;
+      weverRoot = _weverRoot;
       _transferOwnership(_owner);
       sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
@@ -152,7 +158,9 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
         _startAuction,
         durationTime,
         _price,
-        fee
+        fee,
+        weverVault,
+        weverRoot
         );
 
       emit DirectSellDeployed(
@@ -296,7 +304,9 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
         currentVersion,
         currectVersionDirectSell,
         directSellCode,
-        fee
+        fee,
+        weverVault,
+        weverRoot
       );
       
       tvm.setcode(newCode);

@@ -8,7 +8,9 @@
 			"inputs": [
 				{"name":"_owner","type":"address"},
 				{"name":"sendGasTo","type":"address"},
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"name":"_weverVault","type":"address"},
+				{"name":"_weverRoot","type":"address"}
 			],
 			"outputs": [
 			]
@@ -211,6 +213,8 @@
 		{"name":"directSellCode","type":"cell"},
 		{"name":"currentVersion","type":"uint32"},
 		{"name":"currectVersionDirectSell","type":"uint32"},
-		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
+		{"name":"weverVault","type":"address"},
+		{"name":"weverRoot","type":"address"}
 	]
 }

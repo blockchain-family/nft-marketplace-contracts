@@ -42,6 +42,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
   uint32 currentVersion;
 
   MarketFee fee;
+  address weverVault;
+  address weverRoot;
 
   struct DirectBuyInfo {
     address factory;
@@ -66,7 +68,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     uint64 _startTime,
     uint64 _durationTime,
     address _spentTokenWallet,
-    MarketFee _fee
+    MarketFee _fee,
+    address _weverVault,
+    address _weverRoot
   ) public {
     if (msg.sender.value != 0 && msg.sender == factoryDirectBuy) {
       changeState(DirectBuyStatus.Create);
@@ -74,6 +78,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       price = _amount;
       startTime = _startTime;
       durationTime = _durationTime;
+      weverVault = _weverVault;
+      weverRoot = _weverRoot;
+
       if (_startTime > 0 && _durationTime > 0) {
         endTime = _startTime + _durationTime;
       }
@@ -200,18 +207,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         callbacks
       );
 
-      ITokenWallet(spentTokenWallet).transfer{
-        value: 0,
-        flag: 128,
-        bounce: false
-      }(
-        balance,
-        nftOwner,
-        Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-        sendGasTo,
-        false,
-        empty
-      );
+      _transfer(balance, nftOwner, sendGasTo, spentTokenWallet, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS);
+
       if (currentFee > 0) {
         emit MarketFeeWithheld(currentFee, spentToken);
         ITokenWallet(spentTokenWallet).transfer{
@@ -249,19 +246,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
           callbacks
         );
 
-        TvmCell emptyPayload;
-        ITokenWallet(spentTokenWallet).transfer{
-          value: 0,
-          flag: 128,
-          bounce: false
-        }(
-          price,
-          owner,
-          0,
-          sendGasTo,
-          true,
-          emptyPayload
-        );
+        _transfer(price, owner, sendGasTo, spentTokenWallet, 0, 128, uint128(0));
+
       } else {
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
@@ -309,6 +295,29 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       );
   }
 
+  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gas) private {
+        TvmCell emptyPayload;
+        if (spentToken == weverRoot) {
+            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
+                amount,
+                weverVault,
+                uint128(0),
+                user,
+                true,
+                emptyPayload
+            );
+        } else {
+            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
+                amount,
+                user,
+                gas,
+                remainingGasTo,
+                true,
+                emptyPayload
+            );
+        }
+    }
+
   function finishBuy(address sendGasTo, uint32 callbackId) public {
     require(
       currentStatus == DirectBuyStatus.Active,
@@ -327,19 +336,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     );
     changeState(DirectBuyStatus.Expired);
 
-    TvmCell emptyPayload;
-    ITokenWallet(spentTokenWallet).transfer{
-      value: 0,
-      flag: 128,
-      bounce: false
-    }(
-      price,
-      owner,
-      0,
-      sendGasTo,
-      true,
-      emptyPayload
-    );
+    _transfer(price, owner, sendGasTo, spentTokenWallet, 0, 128, uint128(0));
   }
 
   function closeBuy(uint32 callbackId) external onlyOwner {
@@ -358,19 +355,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     );
     changeState(DirectBuyStatus.Cancelled);
 
-    TvmCell emptyPayload;
-    ITokenWallet(spentTokenWallet).transfer{
-      value: 0,
-      flag: 128,
-      bounce: false
-    }(
-      price,
-      owner,
-      0,
-      owner,
-      true,
-      emptyPayload
-    );
+    _transfer(price, owner, owner, spentTokenWallet, 0, 128, uint128(0));
   }
 
   function upgrade(

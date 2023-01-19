@@ -31,6 +31,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
   uint32 currentVersion;
   uint32 currectVersionDirectBuy;
   MarketFee fee;
+  address weverVault;
+  address weverRoot;
 
   event DirectBuyDeployed(
     address directBuy,
@@ -44,30 +46,34 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
   event DirectBuyDeclined(address sender, address token, uint128 amount, address nft);
   event FactoryDirectBuyUpgrade();
 
-  constructor(
-    address _owner,
-    address sendGasTo,
-    MarketFee _fee
-  ) OwnableInternal(_owner) public
-  {
-    tvm.accept();
-    tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+    constructor(
+        address _owner,
+        address sendGasTo,
+        MarketFee _fee,
+        address _weverVault,
+        address _weverRoot
+    ) OwnableInternal(_owner) public
+    {
+        tvm.accept();
+        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
-    require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
-    currentVersion++;
-    fee = _fee;
-    emit MarketFeeDefaultChanged(_fee);
-    _transferOwnership(_owner);
-    sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
-  }
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        currentVersion++;
+        fee = _fee;
+        emit MarketFeeDefaultChanged(_fee);
+        weverVault = _weverVault;
+        weverRoot = _weverRoot;
+        _transferOwnership(_owner);
+        sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
+    }
 
-  function getTypeContract() external pure returns (string) {
-    return "FactoryDirectBuy";
-  }
+    function getTypeContract() external pure returns (string) {
+        return "FactoryDirectBuy";
+    }
 
-  function getMarketFee() external view override returns (MarketFee) {
-      return fee;
-  }
+    function getMarketFee() external view override returns (MarketFee) {
+        return fee;
+    }
 
   function setMarketFee(MarketFee _fee) external override onlyOwner {
       require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
@@ -149,7 +155,9 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         startTime,
         durationTime,
         getTokenWallet(tokenRoot, directBuyAddress),
-        fee
+        fee,
+        weverVault,
+        weverRoot
       );
 
       emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
@@ -193,21 +201,29 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         nftForBuy
       );
 
-      TvmCell emptyPayload;
-      ITokenWallet(msg.sender).transfer{ 
-        value: 0, 
-        flag: 128, 
-        bounce: false
-      }(
-        amount,
-        buyer,
-        uint128(0),
-        originalGasTo,
-        true,
-        emptyPayload
-      );
+        TvmCell emptyPayload;
+        if (tokenRoot == weverRoot) {
+            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                amount,
+                weverVault,
+                uint128(0),
+                buyer,
+                true,
+                emptyPayload
+            );
+        } else {
+            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
+                amount,
+                buyer,
+                uint128(0),
+                originalGasTo,
+                true,
+                emptyPayload
+            );
+        }
     }
   }
+
 
   function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {
     require(recipient.value != 0, DirectBuySellErrors.WRONG_RECIPIENT);

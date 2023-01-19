@@ -9,7 +9,9 @@
 				{"name":"_startTime","type":"uint64"},
 				{"name":"_durationTime","type":"uint64"},
 				{"name":"_price","type":"uint128"},
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"name":"_weverVault","type":"address"},
+				{"name":"_weverRoot","type":"address"}
 			],
 			"outputs": [
 			]
@@ -146,6 +148,8 @@
 		{"name":"tokenWallet","type":"address"},
 		{"name":"currentStatus","type":"uint8"},
 		{"name":"currentVersion","type":"uint32"},
-		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
+		{"name":"weverVault","type":"address"},
+		{"name":"weverRoot","type":"address"}
 	]
 }

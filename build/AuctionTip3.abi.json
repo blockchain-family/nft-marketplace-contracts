@@ -17,7 +17,9 @@
 				{"name":"_bidDelta","type":"uint16"},
 				{"name":"_bidDeltaDecimals","type":"uint16"},
 				{"name":"_paymentToken","type":"address"},
-				{"name":"sendGasTo","type":"address"}
+				{"name":"sendGasTo","type":"address"},
+				{"name":"_weverVault","type":"address"},
+				{"name":"_weverRoot","type":"address"}
 			],
 			"outputs": [
 			]
@@ -291,6 +293,8 @@
 		{"name":"maxBidValue","type":"uint128"},
 		{"name":"nextBidValue","type":"uint128"},
 		{"name":"state","type":"uint8"},
-		{"name":"currentVersion","type":"uint32"}
+		{"name":"currentVersion","type":"uint32"},
+		{"name":"weverVault","type":"address"},
+		{"name":"weverRoot","type":"address"}
 	]
 }

@@ -43,8 +43,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
   uint32 currentVersion;
 
   MarketFee fee;
-  address weverVault;
-  address weverRoot;
+  address public weverVault;
+  address public weverRoot;
 
   struct DirectSellInfo {
     address factory;

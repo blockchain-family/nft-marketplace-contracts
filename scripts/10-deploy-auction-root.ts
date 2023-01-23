@@ -13,7 +13,18 @@ async function main() {
             message: 'AuctionRootTip3 owner',
             validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
-
+        {
+            type: 'text',
+            name: 'weverRoot',
+            message: 'Wever root address',
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+        },
+        {
+            type: 'text',
+            name: 'weverVault',
+            message: 'Wever vault address',
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+        }
     ]);
 
     const signer = (await locklift.keystore.getSigner('0'));
@@ -42,8 +53,9 @@ async function main() {
             _fee: fee,
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
-            _sendGasTo: account.address
-            
+            _sendGasTo: account.address,
+            _weverVault: response.weverRoot,
+            _weverRoot: response.weverVault
         },
         initParams: {
            nonce_: locklift.utils.getRandomNonce(),

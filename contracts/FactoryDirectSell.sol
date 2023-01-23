@@ -41,8 +41,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
   event FactoryDirectSellUpgrade();
 
   MarketFee fee;
-  address weverVault;
-  address weverRoot;
+  address public weverVault;
+  address public weverRoot;
 
   constructor(
     address _owner,

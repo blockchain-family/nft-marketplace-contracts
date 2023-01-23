@@ -42,8 +42,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
   uint32 currentVersion;
 
   MarketFee fee;
-  address weverVault;
-  address weverRoot;
+    address public weverVault;
+    address public weverRoot;
 
   struct DirectBuyInfo {
     address factory;

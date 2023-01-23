@@ -31,8 +31,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
   uint32 currentVersion;
   uint32 currectVersionDirectBuy;
   MarketFee fee;
-  address weverVault;
-  address weverRoot;
+  address public weverVault;
+  address public weverRoot;
 
   event DirectBuyDeployed(
     address directBuy,

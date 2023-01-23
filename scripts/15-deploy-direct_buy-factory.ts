@@ -12,6 +12,18 @@ async function main() {
             name: 'owner',
             message: 'FactoryDirectBuy owner',
             validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+        },
+        {
+            type: 'text',
+            name: 'weverRoot',
+            message: 'Wever root address',
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+        },
+        {
+            type: 'text',
+            name: 'weverVault',
+            message: 'Wever vault address',
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
 
@@ -32,7 +44,9 @@ async function main() {
         constructorParams: {
             _owner: account.address,
             sendGasTo: account.address,
-            _fee: fee
+            _fee: fee,
+            _weverVault: response.weverRoot,
+            _weverRoot: response.weverVault
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0

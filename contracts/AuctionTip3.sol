@@ -66,8 +66,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     AuctionStatus state;
 
     uint32 currentVersion;
-    address weverVault;
-    address weverRoot;
+    address public weverVault;
+    address public weverRoot;
 
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
@@ -216,14 +216,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
             _transfer(_currentBid.value, _currentBid.addr, original_gas_to, msg.sender, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS, builder.toCell());
 
-            ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
-                _currentBid.value,
-                _currentBid.addr,
-                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                original_gas_to,
-                false,
-                builder.toCell()
-            );
         } else {
             original_gas_to.transfer({ value: 0, flag: 128, bounce: false });
         }

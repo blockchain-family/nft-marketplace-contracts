@@ -41,8 +41,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     event AuctionDeclined(address nftOwner, address nft);
     event AuctionRootUpgrade();
 
-    address weverVault;
-    address weverRoot;
+    address public weverVault;
+    address public weverRoot;
 
     constructor(
         TvmCell _codeNft,

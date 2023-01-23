@@ -12,4 +12,5 @@ library BaseErrors {
     uint8 constant operation_not_permited            = 108;
     uint8 constant value_too_low                     = 109;
     uint8 constant denominator_not_be_zero           = 110;
+    uint8 constant not_wever_root                    = 111;
 }

@@ -318,6 +318,18 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         }
     }
 
+    function onAcceptTokensBurn(
+        uint128 amount,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    )  external {
+        require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
+        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+        user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+   }
+
   function finishBuy(address sendGasTo, uint32 callbackId) public {
     require(
       currentStatus == DirectBuyStatus.Active,

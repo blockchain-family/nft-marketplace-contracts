@@ -224,6 +224,18 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     }
   }
 
+    function onAcceptTokensBurn(
+        uint128 amount,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    )  external {
+        require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
+        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+        user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+    }
+
 
   function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {
     require(recipient.value != 0, DirectBuySellErrors.WRONG_RECIPIENT);

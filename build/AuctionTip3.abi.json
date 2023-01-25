@@ -41,6 +41,16 @@
 			]
 		},
 		{
+			"name": "buildAuctionPayload",
+			"inputs": [
+				{"name":"callbackId","type":"uint32"},
+				{"name":"bayer","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
 			"name": "onAcceptTokensTransfer",
 			"inputs": [
 				{"name":"token_root","type":"address"},
@@ -205,6 +215,22 @@
 			],
 			"outputs": [
 				{"name":"nextBidValue","type":"uint128"}
+			]
+		},
+		{
+			"name": "weverVault",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverVault","type":"address"}
+			]
+		},
+		{
+			"name": "weverRoot",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverRoot","type":"address"}
 			]
 		}
 	],

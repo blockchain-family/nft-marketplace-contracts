@@ -80,7 +80,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       durationTime = _durationTime;
       weverVault = _weverVault;
       weverRoot = _weverRoot;
-      if(startTime > 0 && durationTime > 0) {
+      if (startTime > 0 && durationTime > 0) {
         endTime = startTime + durationTime;
       }
       price = _price;
@@ -138,6 +138,17 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     return buildInfo();
   }
 
+  function buildDirectSellPayload(
+      uint32 callbackId,
+      address bayer
+  ) external pure returns (TvmCell) {
+    TvmBuilder builder;
+    builder.store(callbackId);
+    builder.store(bayer);
+
+    return builder.toCell();
+  }
+
   function onAcceptTokensTransfer(
     address, /*token_root*/
     uint128 amount,
@@ -146,10 +157,16 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     address originalGasTo,
     TvmCell payload
   ) external override {
-    (
-      address buyer,
-      uint32 callbackId
-    ) = ExchangePayload.getSenderAndCallId(sender, payload);
+
+    uint32 callbackId = 0;
+    address buyer = sender;
+    TvmSlice payloadSlice = payload.toSlice();
+    if (payloadSlice.bits() >= 32) {
+        callbackId = payloadSlice.decode(uint32);
+        if (payloadSlice.bits() >= 267) {
+            buyer = payloadSlice.decode(address);
+        }
+    }
 
     TvmCell emptyPayload;
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
@@ -164,6 +181,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       now >= startTime
     ) {
       tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+
       IDirectSellCallback(buyer).directSellSuccess{
         value: Gas.CALLBACK_VALUE,
         flag: 1,

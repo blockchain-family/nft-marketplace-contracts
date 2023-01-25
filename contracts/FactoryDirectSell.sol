@@ -58,10 +58,13 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
       tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
       currentVersion++;
       require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+
       fee = _fee;
       emit MarketFeeDefaultChanged(_fee);
+
       weverVault = _weverVault;
       weverRoot = _weverRoot;
+
       _transferOwnership(_owner);
       sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
@@ -100,7 +103,6 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
 
   function buildDirectSellCreationPayload(
     uint32 callbackId,
-    address _nftAddress,
     uint64 _startTime,
     uint64 durationTime,
     address _paymentToken,
@@ -108,7 +110,6 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
   ) external pure returns (TvmCell) {
     TvmBuilder builder;
     builder.store(callbackId);
-    builder.store(_nftAddress);
     builder.store(_startTime);
     builder.store(durationTime);
     builder.store(_paymentToken);
@@ -129,13 +130,15 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
     require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
     tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
 
-    (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
+    uint32 callbackId = 0;
     TvmSlice payloadSlice = payload.toSlice();
-    (,address nftForSell) = payloadSlice.decode(uint32, address);
+    if (payloadSlice.bits() >= 32) {
+        callbackId = payloadSlice.decode(uint32);
+    }
 
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
     if (
-      msg.sender.value != 0 && msg.sender == nftForSell &&
+      msg.sender.value != 0 &&
       msg.value >= (Gas.DEPLOY_DIRECT_SELL_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE) &&
       payloadSlice.bits() == 523
     ) {
@@ -152,7 +155,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
       );
       uint64 _nonce = tx.timestamp;
       address directSell = new DirectSell{
-        stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, nftForSell, _nonce),
+        stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, msg.sender, _nonce),
         value: Gas.DEPLOY_DIRECT_SELL_MIN_VALUE
       }(
         _startAuction,
@@ -167,7 +170,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
         directSell,
         msg.sender,
         _paymentToken,
-        nftForSell,
+        msg.sender,
         _nonce,
         _price
       );
@@ -180,7 +183,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
         directSell,
         msg.sender,
         _paymentToken,
-        nftForSell,
+        msg.sender,
         _nonce,
         _price
       );
@@ -194,7 +197,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
         callbacks
       );
     } else {
-      emit DirectSellDeclined(msg.sender, nftForSell);
+      emit DirectSellDeclined(msg.sender, msg.sender);
       IDirectSellCallback(nftOwner).directSellDeclined{
         value: Gas.CALLBACK_VALUE, 
         flag: 1,
@@ -202,7 +205,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager,IOffer, IEventM
       }(
         callbackId,
         msg.sender,
-        nftForSell
+        msg.sender
       );
 
       ITIP4_1NFT(msg.sender).changeManager{

@@ -99,14 +99,18 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
         bool isDeclined = false;
 
+        uint32 callbackId = 0;
         TvmSlice payloadSlice = payload.toSlice();
-        (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
-        if (payloadSlice.bits() == 555) {
-            (  ,address paymentToken,
+        if (payloadSlice.bits() >= 32) {
+            callbackId = payloadSlice.decode(uint32);
+        }
+
+        if (payloadSlice.bits() == 523) {
+            (address paymentToken,
                 uint128 price,
                 uint64 auctionStartTime,
                 uint64 auctionDuration
-            ) = payloadSlice.decode(uint32, address, uint128, uint64, uint64);
+            ) = payloadSlice.decode(address, uint128, uint64, uint64);
             if (
                 paymentToken.value > 0 &&
                 price >= 0 &&

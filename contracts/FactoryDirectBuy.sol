@@ -89,16 +89,18 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
 
   function buildDirectBuyCreationPayload(
     uint32 callbackId,
+    address buyer,
     address nft,
     uint64 startTime,
     uint64 durationTime
   ) external pure returns (TvmCell) {
     TvmBuilder builder;
     builder.store(callbackId);
+    builder.store(buyer);
     builder.store(nft);
     builder.store(startTime);
     builder.store(durationTime);
-    
+
     return builder.toCell();
   }
 
@@ -134,10 +136,21 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     TvmCell payload
   ) override external {
     tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);
-    (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload); 
-    
+
+    uint32 callbackId = 0;
+    address buyer = sender;
+    address nftForBuy;
     TvmSlice payloadSlice = payload.toSlice();
-    (,address nftForBuy) = payloadSlice.decode(uint32, address);
+    if (payloadSlice.bits() >= 32) {
+        callbackId = payloadSlice.decode(uint32);
+        if (payloadSlice.bits() >= 267) {
+            buyer = payloadSlice.decode(address);
+            if (payloadSlice.bits() >= 267) {
+                nftForBuy = payloadSlice.decode(address);
+            }
+        }
+    }
+
     if (
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&

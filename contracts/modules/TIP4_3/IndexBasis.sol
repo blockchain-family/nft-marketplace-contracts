@@ -9,7 +9,7 @@ import './interfaces/IIndexBasis.sol';
 
 
 /// @title This contract helps to find all collections by the code hash of which
-/// 
+
 contract IndexBasis is IIndexBasis {
 
     /// Collection token contract address

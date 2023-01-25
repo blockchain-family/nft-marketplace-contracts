@@ -60,7 +60,6 @@
 			"name": "buildDirectSellCreationPayload",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
-				{"name":"_nftAddress","type":"address"},
 				{"name":"_startTime","type":"uint64"},
 				{"name":"durationTime","type":"uint64"},
 				{"name":"_paymentToken","type":"address"},
@@ -131,6 +130,22 @@
 				{"name":"newOwner","type":"address"}
 			],
 			"outputs": [
+			]
+		},
+		{
+			"name": "weverVault",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverVault","type":"address"}
+			]
+		},
+		{
+			"name": "weverRoot",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverRoot","type":"address"}
 			]
 		}
 	],

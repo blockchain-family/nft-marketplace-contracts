@@ -54,8 +54,8 @@ async function main() {
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
             _sendGasTo: account.address,
-            _weverVault: response.weverRoot,
-            _weverRoot: response.weverVault
+            _weverVault: response.weverVault,
+            _weverRoot: response.weverRoot
         },
         initParams: {
            nonce_: locklift.utils.getRandomNonce(),

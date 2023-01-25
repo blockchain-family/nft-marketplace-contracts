@@ -57,6 +57,16 @@
 			]
 		},
 		{
+			"name": "buildDirectSellPayload",
+			"inputs": [
+				{"name":"callbackId","type":"uint32"},
+				{"name":"bayer","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"cell"}
+			]
+		},
+		{
 			"name": "onAcceptTokensTransfer",
 			"inputs": [
 				{"name":"value0","type":"address"},
@@ -106,6 +116,22 @@
 				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
+			]
+		},
+		{
+			"name": "weverVault",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverVault","type":"address"}
+			]
+		},
+		{
+			"name": "weverRoot",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverRoot","type":"address"}
 			]
 		}
 	],

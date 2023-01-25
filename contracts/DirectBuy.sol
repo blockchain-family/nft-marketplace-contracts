@@ -167,7 +167,13 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     TvmCell payload
   ) external override {
     require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
-    (, uint32 callbackId) = ExchangePayload.getSenderAndCallId(address(0), payload);
+
+    uint32 callbackId = 0;
+    TvmSlice payloadSlice = payload.toSlice();
+    if (payloadSlice.bits() >= 32) {
+        callbackId = payloadSlice.decode(uint32);
+    }
+
     mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
     if (
         msg.sender.value != 0 &&

@@ -176,6 +176,22 @@
 			"outputs": [
 				{"name":"deploymentFee","type":"uint128"}
 			]
+		},
+		{
+			"name": "weverVault",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverVault","type":"address"}
+			]
+		},
+		{
+			"name": "weverRoot",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverRoot","type":"address"}
+			]
 		}
 	],
 	"data": [

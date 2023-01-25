@@ -1,7 +1,5 @@
 pragma ever-solidity >= 0.61.2;
 
-import "@broxus/credit-processor/contracts/libraries/EventDataDecoder.sol";
-import "@broxus/credit-processor/contracts/interfaces/structures/ICreditEventDataStructure.sol";
 
 library ExchangePayload {
     
@@ -10,32 +8,19 @@ library ExchangePayload {
         TvmCell _payload
     ) public returns (address, uint32) {
         // Set default values for sender and ID
-        uint32 id;
-        address user = _sender;
+        uint32 callbackId = 0;
+        address buyer = _sender;
 
-        // Is payload from a bridge?
-        if (EventDataDecoder.isValid(_payload)) {
-            // Decode data from bridge
-            ICreditEventDataStructure.CreditEventData data = EventDataDecoder.decode(_payload);
-            TvmSlice layer3Slice = data.layer3.toSlice();
+        TvmSlice payloadSlice = _payload.toSlice();
 
-            // Set sender
-            user = data.user;
-
-            // Check layer 3 size and decode id
-            if (layer3Slice.bits() >= 32) {
-                id = layer3Slice.decode(uint32);
-            }
-        } else {
-            TvmSlice payloadSlice = _payload.toSlice();
-
-            // Check payload size and decode id
-            if (payloadSlice.bits() >= 32) {
-                id = payloadSlice.decode(uint32);
+        if (payloadSlice.bits() >= 32) {
+            callbackId = payloadSlice.decode(uint32);
+            if (payloadSlice.bits() >= 267) {
+                buyer = payloadSlice.decode(address);
             }
         }
 
-        return (user, id);
+        return (buyer, callbackId);
     }
 
 }

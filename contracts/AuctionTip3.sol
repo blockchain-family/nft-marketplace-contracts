@@ -150,6 +150,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         return "Auction";
     }
 
+    function buildAuctionPayload(
+        uint32 callbackId,
+        address bayer
+    ) external pure returns (TvmCell) {
+        TvmBuilder builder;
+        builder.store(callbackId);
+        builder.store(bayer);
+
+        return builder.toCell();
+    }
+
     function onAcceptTokensTransfer(
         address token_root,
         uint128 amount,
@@ -160,7 +171,16 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     ) override external {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
 
-        (address buyer, uint32 callbackId) = ExchangePayload.getSenderAndCallId(sender, payload);
+        uint32 callbackId = 0;
+        address buyer = sender;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 32) {
+            callbackId = payloadSlice.decode(uint32);
+        if (payloadSlice.bits() >= 267) {
+            buyer = payloadSlice.decode(address);
+            }
+        }
+
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
             amount >= nextBidValue &&

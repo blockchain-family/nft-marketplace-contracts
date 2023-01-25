@@ -45,8 +45,8 @@ async function main() {
             _owner: account.address,
             sendGasTo: account.address,
             _fee: fee,
-            _weverVault: response.weverRoot,
-            _weverRoot: response.weverVault
+            _weverVault: response.weverVault,
+            _weverRoot: response.weverRoot
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0

@@ -198,6 +198,95 @@ export const deployTokenRoot = async function (token_name: string, token_symbol:
     return new Token(_root, owner);
 }
 
+export const deployWeverRoot = async function (token_name: string, token_symbol: string, owner: AccountType) {
+    const signer = (await locklift.keystore.getSigner('0'));
+
+    const { contract: tunnel, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: 'TestWeverTunnel',
+        initParams: {
+            _randomNonce: locklift.utils.getRandomNonce(),
+        },
+        publicKey: signer?.publicKey as string,
+        constructorParams: {
+            sources: [],
+            destinations: [],
+            owner_: owner.address,
+        },
+        value: toNano(5)
+    }));
+
+    logger.success(`Tunnel address: ${tunnel.address}`);
+
+    const TokenWallet = await locklift.factory.getContractArtifacts('TokenWalletUpgradeable');
+    const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
+
+     const { contract: _root, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: 'TokenRootUpgradeable',
+        initParams: {
+            name_: token_name,
+            symbol_: token_symbol,
+            decimals_: 9,
+            rootOwner_: tunnel.address,
+            walletCode_: TokenWallet.code,
+            randomNonce_: locklift.utils.getRandomNonce(),
+            deployer_: zeroAddress,
+            platformCode_: TokenWalletPlatform.code
+        },
+        publicKey: signer?.publicKey as string,
+        constructorParams: {
+            initialSupplyTo: zeroAddress,
+            initialSupply: 0,
+            deployWalletValue: 0,
+            mintDisabled: false,
+            burnByRootDisabled: false,
+            burnPaused: false,
+            remainingGasTo: zeroAddress
+        },
+        value: toNano(2)
+    }));
+
+    logger.success(`Wever root address: ${_root.address.toString()}`);
+
+    const { contract: vault, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: 'TestWeverVault',
+        initParams: {
+            _randomNonce: locklift.utils.getRandomNonce(),
+        },
+        publicKey: signer?.publicKey as string,
+        constructorParams: {
+            owner_: owner.address,
+            root_tunnel: tunnel.address,
+            root: _root.address,
+            receive_safe_fee: toNano(1),
+            settings_deploy_wallet_grams: toNano(0.1),
+            initial_balance: toNano(1)
+        },
+        value: toNano(2)
+    }));
+
+    logger.success(`Vault address: ${vault.address}`);
+
+    await tunnel.methods.__updateTunnel({
+            source: vault.address,
+            destination: _root.address,
+        }).send({
+        from: owner.address,
+        amount: toNano(1)
+    });
+
+    await vault.methods.drain({
+            receiver: owner.address,
+        }).send({
+        from: owner.address,
+        amount: toNano(1)
+    });
+
+    return {
+        tokenRoot: new Token(_root, owner),
+        vault: vault.address
+    };
+}
+
 export const deployAuctionRoot = async function (owner: AccountType, fee: MarketFee) {
     const signer = await locklift.keystore.getSigner('0');
 
@@ -270,7 +359,7 @@ export const deployFactoryDirectBuy = async function (owner: AccountType, fee: M
     return new FactoryDirectBuy(factoryDirectBuy, owner);
 };    
 
-export const deployFactoryDirectSell = async function(owner: AccountType, fee: MarketFee) {
+export const deployFactoryDirectSell = async function(owner: AccountType, fee: MarketFee, weverVault: Address, weverRoot: Address) {
     const signer = await locklift.keystore.getSigner('0');
     const {contract: factoryDirectSell} = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: "FactoryDirectSell",
@@ -278,7 +367,9 @@ export const deployFactoryDirectSell = async function(owner: AccountType, fee: M
         constructorParams: {
             _owner: owner.address,
             sendGasTo: owner.address,
-            _fee: fee
+            _fee: fee,
+            _weverVault:weverVault,
+            _weverRoot:weverRoot
         },
         initParams: {
             nonce_: locklift.utils.getRandomNonce()    

@@ -10,7 +10,6 @@ import "./errors/BaseErrors.sol";
 import "./errors/AuctionErrors.sol";
 
 import "./libraries/Gas.sol";
-import "./libraries/ExchangePayload.sol";
 
 import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IAuctionBidPlacedCallback.sol";
@@ -150,13 +149,13 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         return "Auction";
     }
 
-    function buildAuctionPayload(
+    function buildBidPayload(
         uint32 callbackId,
-        address bayer
+        address buyer
     ) external pure returns (TvmCell) {
         TvmBuilder builder;
         builder.store(callbackId);
-        builder.store(bayer);
+        builder.store(buyer);
 
         return builder.toCell();
     }
@@ -176,10 +175,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         TvmSlice payloadSlice = payload.toSlice();
         if (payloadSlice.bits() >= 32) {
             callbackId = payloadSlice.decode(uint32);
+        }
         if (payloadSlice.bits() >= 267) {
             buyer = payloadSlice.decode(address);
             }
-        }
 
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&

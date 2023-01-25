@@ -642,32 +642,32 @@ PUSHCONT {
 	LDU 32
 	POP S2
 	POP S4
-	.loc ../contracts/FactoryDirectBuy.sol, 146
+	.loc ../contracts/FactoryDirectBuy.sol, 0
+}
+IF
+.loc ../contracts/FactoryDirectBuy.sol, 147
+DUP
+SBITS
+PUSHINT 267
+GEQ
+PUSHCONT {
+	.loc ../contracts/FactoryDirectBuy.sol, 148
 	DUP
-	SBITS
-	PUSHINT 267
-	GEQ
-	PUSHCONT {
-		.loc ../contracts/FactoryDirectBuy.sol, 147
-		DUP
-		LDMSGADDR
-		POP S2
-		POP S3
-		.loc ../contracts/FactoryDirectBuy.sol, 148
-		DUP
-		SBITS
-		PUSHINT 267
-		GEQ
-		PUSHCONT {
-			.loc ../contracts/FactoryDirectBuy.sol, 149
-			LDMSGADDR
-			BLKDROP2 1, 2
-			.loc ../contracts/FactoryDirectBuy.sol, 0
-		}
-		IF
-		.loc ../contracts/FactoryDirectBuy.sol, 0
-	}
-	IF
+	LDMSGADDR
+	POP S2
+	POP S3
+	.loc ../contracts/FactoryDirectBuy.sol, 0
+}
+IF
+.loc ../contracts/FactoryDirectBuy.sol, 150
+DUP
+SBITS
+PUSHINT 267
+GEQ
+PUSHCONT {
+	.loc ../contracts/FactoryDirectBuy.sol, 151
+	LDMSGADDR
+	BLKDROP2 1, 2
 	.loc ../contracts/FactoryDirectBuy.sol, 0
 }
 IF

@@ -57,10 +57,10 @@
 			]
 		},
 		{
-			"name": "buildDirectSellPayload",
+			"name": "buildBuyPayload",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
-				{"name":"bayer","type":"address"}
+				{"name":"buyer","type":"address"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}

@@ -9,7 +9,6 @@ import "./errors/DirectBuySellErrors.sol";
 
 import "./libraries/Gas.sol";
 import "./libraries/DirectSellStatus.sol";
-import "./libraries/ExchangePayload.sol";
 
 import "./interfaces/IDirectSellCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
@@ -138,13 +137,13 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     return buildInfo();
   }
 
-  function buildDirectSellPayload(
+  function buildBuyPayload(
       uint32 callbackId,
-      address bayer
+      address buyer
   ) external pure returns (TvmCell) {
     TvmBuilder builder;
     builder.store(callbackId);
-    builder.store(bayer);
+    builder.store(buyer);
 
     return builder.toCell();
   }
@@ -163,9 +162,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     TvmSlice payloadSlice = payload.toSlice();
     if (payloadSlice.bits() >= 32) {
         callbackId = payloadSlice.decode(uint32);
-        if (payloadSlice.bits() >= 267) {
-            buyer = payloadSlice.decode(address);
-        }
+    }
+    if (payloadSlice.bits() >= 267) {
+        buyer = payloadSlice.decode(address);
     }
 
     TvmCell emptyPayload;

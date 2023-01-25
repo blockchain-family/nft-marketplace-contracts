@@ -143,12 +143,12 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     TvmSlice payloadSlice = payload.toSlice();
     if (payloadSlice.bits() >= 32) {
         callbackId = payloadSlice.decode(uint32);
-        if (payloadSlice.bits() >= 267) {
-            buyer = payloadSlice.decode(address);
-            if (payloadSlice.bits() >= 267) {
-                nftForBuy = payloadSlice.decode(address);
-            }
-        }
+    }
+    if (payloadSlice.bits() >= 267) {
+        buyer = payloadSlice.decode(address);
+    }
+    if (payloadSlice.bits() >= 267) {
+        nftForBuy = payloadSlice.decode(address);
     }
 
     if (

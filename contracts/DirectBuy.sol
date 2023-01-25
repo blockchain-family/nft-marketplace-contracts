@@ -9,7 +9,6 @@ import "./errors/DirectBuySellErrors.sol";
 
 import "./libraries/Gas.sol";
 import "./libraries/DirectBuyStatus.sol";
-import "./libraries/ExchangePayload.sol";
 
 import "./interfaces/IDirectBuyCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";

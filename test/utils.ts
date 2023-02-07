@@ -1,6 +1,6 @@
 import { Account } from "locklift/build/factory";
 import { FactorySource } from "../build/factorySource";
-import { Address, Contract, zeroAddress, WalletTypes, toNano } from "locklift";
+import {Address, Contract, zeroAddress, WalletTypes, toNano, getRandomNonce} from "locklift";
 import { Token } from "./wrappers/token";
 import { AuctionRoot } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
@@ -35,18 +35,28 @@ export async function sleep(ms = 1000) {
 
 export const deployAccount = async function (key_number = 0, initial_balance = 10) {
     const signer = (await locklift.keystore.getSigner(key_number.toString()))!;
-    const wallet = (await locklift.factory.accounts.addNewAccount({
-      type: WalletTypes.WalletV3,
-      value: toNano(initial_balance),
-      publicKey: signer.publicKey,
-    })).account;
+    const { account } = (await locklift.factory.accounts.addNewAccount({
+    type: WalletTypes.EverWallet, // or WalletTypes.HighLoadWallet,
+    //Value which will send to the new account from a giver
+    value: toNano(initial_balance),
+    //owner publicKey
+    publicKey: signer!.publicKey,
+    nonce: getRandomNonce()
+    }));
 
-    const walletBalance = await locklift.provider.getBalance(wallet.address);
-    expect(Number(walletBalance)).to.be.above(0, 'Bad user balance');
+    await locklift.provider.sendMessage({
+        sender: account.address,
+        recipient: account.address,
+        amount: toNano(0.1),
+        bounce: false
+    });
 
-    logger.log(`User address: ${wallet.address.toString()}`);
+    const accountBalance = await locklift.provider.getBalance(account.address);
+    expect(Number(accountBalance)).to.be.above(0, 'Bad user balance');
 
-    return wallet;
+    logger.log(`User address: ${account.address.toString()}`);
+
+    return account;
 }
 
 export const deployCollectionAndMintNft = async function (account: AccountType, remainOnNft: 1, pathJsonFile: "nft_to_address.json", accForNft: AccountType[]) {
@@ -220,7 +230,7 @@ export const deployWeverRoot = async function (token_name: string, token_symbol:
     const TokenWallet = await locklift.factory.getContractArtifacts('TokenWalletUpgradeable');
     const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
 
-     const { contract: _root, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+     const { contract: _root } = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: 'TokenRootUpgradeable',
         initParams: {
             name_: token_name,
@@ -247,7 +257,7 @@ export const deployWeverRoot = async function (token_name: string, token_symbol:
 
     logger.success(`Wever root address: ${_root.address.toString()}`);
 
-    const { contract: vault, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+    const { contract: vault} = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: 'TestWeverVault',
         initParams: {
             _randomNonce: locklift.utils.getRandomNonce(),
@@ -282,12 +292,12 @@ export const deployWeverRoot = async function (token_name: string, token_symbol:
     });
 
     return {
-        tokenRoot: new Token(_root, owner),
+        root: new Token(_root, owner),
         vault: vault.address
     };
 }
 
-export const deployAuctionRoot = async function (owner: AccountType, fee: MarketFee) {
+export const deployAuctionRoot = async function (owner: AccountType, fee: MarketFee, weverVault: Address, weverRoot: Address) {
     const signer = await locklift.keystore.getSigner('0');
 
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
@@ -304,7 +314,9 @@ export const deployAuctionRoot = async function (owner: AccountType, fee: Market
             _fee: fee,
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
-            _sendGasTo: owner.address
+            _sendGasTo: owner.address,
+            _weverVault: weverVault,
+            _weverRoot: weverRoot
 
         },
         initParams: {
@@ -318,7 +330,7 @@ export const deployAuctionRoot = async function (owner: AccountType, fee: Market
     return new AuctionRoot(auctionRootTip3, owner);
 }
 
-export const deployFactoryDirectBuy = async function (owner: AccountType, fee: MarketFee) {
+export const deployFactoryDirectBuy = async function (owner: AccountType, fee: MarketFee, weverVault: Address, weverRoot: Address) {
     const signer = await locklift.keystore.getSigner('0');
     const {contract: factoryDirectBuy} = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: "FactoryDirectBuy",
@@ -326,7 +338,9 @@ export const deployFactoryDirectBuy = async function (owner: AccountType, fee: M
         constructorParams: {
             _owner: owner.address,
             sendGasTo: owner.address,
-            _fee: fee
+            _fee: fee,
+            _weverVault: weverVault,
+            _weverRoot: weverRoot
         },
         initParams: {
             nonce_: locklift.utils.getRandomNonce()    
@@ -368,8 +382,8 @@ export const deployFactoryDirectSell = async function(owner: AccountType, fee: M
             _owner: owner.address,
             sendGasTo: owner.address,
             _fee: fee,
-            _weverVault:weverVault,
-            _weverRoot:weverRoot
+            _weverVault: weverVault,
+            _weverRoot: weverRoot
         },
         initParams: {
             nonce_: locklift.utils.getRandomNonce()    

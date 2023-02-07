@@ -21,8 +21,8 @@ export class FactoryDirectBuy {
         return new FactoryDirectBuy(contract, owner);
     }
 
-    async buildPayload(callbackId:number, nft: NftC, startTime: any, durationTime: any) {
-        return (await this.contract.methods.buildDirectBuyCreationPayload({callbackId: callbackId, nft: nft.address, startTime: startTime, durationTime: durationTime}).call()).value0;
+    async buildPayload(callbackId:number, buyer: Account, nft: NftC, startTime: any, durationTime: any) {
+        return (await this.contract.methods.buildDirectBuyCreationPayload({callbackId: callbackId,buyer: buyer.address,nft: nft.address, startTime: startTime, durationTime: durationTime}).call()).value0;
     }
     
     async getEvents(event_name: string) {

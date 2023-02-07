@@ -150,7 +150,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     if (payloadSlice.bits() >= 267) {
         nftForBuy = payloadSlice.decode(address);
     }
-
     if (
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&
@@ -213,7 +212,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         amount,
         nftForBuy
       );
-
+        TvmBuilder builder;
+        builder.store(originalGasTo);
         TvmCell emptyPayload;
         if (tokenRoot == weverRoot) {
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
@@ -222,7 +222,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
                 uint128(0),
                 buyer,
                 true,
-                emptyPayload
+                builder.toCell()
             );
         } else {
             ITokenWallet(msg.sender).transfer{ value: 0, flag: 128, bounce: false }(
@@ -244,10 +244,21 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         address user,
         TvmCell payload
     )  external {
+        address remainingGasTo;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 267) {
+            remainingGasTo = payloadSlice.decode(address);
+        }
         require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
-        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-        user.transfer({ value: 0, flag: 128 + 2, bounce: false });
-    }
+        tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+
+        if (user == remainingGasTo) {
+            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        } else {
+            user.transfer({ value: amount, flag: 1, bounce: false });
+            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        }
+   }
 
 
   function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {

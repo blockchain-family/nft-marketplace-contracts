@@ -27,7 +27,7 @@ async function main() {
         }
     ]);
 
-    const data = fs.readFileSync("nft_to_address.json", 'utf8');
+    const data = fs.readFileSync("nft_to_address_deploy.json", 'utf8');
     if (data) array_json = JSON.parse(data);
 
     const requiredGas = new BigNumber(array_json.length).times(3.4).plus(5).shiftedBy(9);
@@ -59,7 +59,7 @@ async function main() {
         value: locklift.utils.toNano(4)
     });
 
-    // const collection = (await locklift.factory.getDeployedContract('Collection', new Address('0:cefc26eafa88ef527791e995c6704c05fdf74e73237e51d4e5ef7a7ce799503f')));
+    // const collection = (await locklift.factory.getDeployedContract('Collection', new Address('0:432da1db5a47e400ab62570938ec95310610fa483483b3fd7fa25db98cd144e0')));
     console.log('Collection', collection.address);
     migration.store(collection.address, "Collection", "Collection");
 
@@ -104,7 +104,7 @@ async function main() {
             from: account.address,
             amount: locklift.utils.toNano(1)
         });
-    }   
+    }
 }
 
 main()

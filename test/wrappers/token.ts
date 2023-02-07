@@ -50,7 +50,7 @@ export class Token {
         logger.log(`User token wallet: ${addr.toString()}`);
         return await TokenWallet.from_addr(addr, user);
     }
-
+    //new BigNumber(1000).shiftedBy(9).toString()
     async mint(mint_amount: any, user: AccountType) {
         await locklift.tracing.trace(
             this.contract.methods.mint({

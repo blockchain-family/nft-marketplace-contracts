@@ -86,6 +86,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       spentTokenWallet = _spentTokenWallet;
       fee = _fee;
       currentVersion++;
+      owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     } else {
       msg.sender.transfer(0, false, 128 + 32);
     }
@@ -139,6 +140,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         sender == factoryDirectBuy
     ) {
       changeState(DirectBuyStatus.Active);
+      owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     } else {
       TvmCell emptyPayload;
       ITokenWallet(msg.sender).transfer{
@@ -232,6 +234,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
     } else {
       if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
+        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+
         IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
           value: Gas.CALLBACK_VALUE,
           flag: 1,
@@ -242,16 +246,17 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         );
 
         changeState(DirectBuyStatus.Expired);
+
         ITIP4_1NFT(msg.sender).changeManager{
           value: 0,
-          flag: 64
+          flag: 128
         }(
           nftOwner,
           sendGasTo,
           callbacks
         );
 
-        _transfer(price, owner, sendGasTo, spentTokenWallet, 0, 128, uint128(0));
+        _transfer(price, owner, sendGasTo, spentTokenWallet, 0.5 ever, 1, uint128(0));
 
       } else {
         tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
@@ -300,7 +305,9 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       );
   }
 
-  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gas) private {
+  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gasDeployTW) private {
+        TvmBuilder builder;
+        builder.store(remainingGasTo);
         TvmCell emptyPayload;
         if (spentToken == weverRoot) {
             ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
@@ -309,15 +316,15 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
                 uint128(0),
                 user,
                 true,
-                emptyPayload
+                builder.toCell()
             );
         } else {
             ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
                 amount,
                 user,
-                gas,
+                gasDeployTW,
                 remainingGasTo,
-                true,
+                false,
                 emptyPayload
             );
         }
@@ -330,9 +337,20 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         address user,
         TvmCell payload
     )  external {
+        address remainingGasTo;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 267) {
+            remainingGasTo = payloadSlice.decode(address);
+        }
         require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
-        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-        user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+
+        if (user == remainingGasTo) {
+            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        } else {
+            user.transfer({ value: amount, flag: 1, bounce: false });
+            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        }
    }
 
   function finishBuy(address sendGasTo, uint32 callbackId) public {

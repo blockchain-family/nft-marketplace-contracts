@@ -4,25 +4,25 @@
             "name": "Sample Name",
             "description": "Description abount NFT collection!",
             "preview": {
-                "source": "https://",
+                "source": "https://klike.net/uploads/posts/2020-02/1581581024_11.jpg",
                 "mimetype": "image/png"
             },
             "files": [
                 {
-                    "source": "https://",
+                    "source": "https://klike.net/uploads/posts/2020-02/1581581024_11.jpg",
                     "mimetype": "image/png"
                 }
             ],
-            "external_url": "https://"
+            "external_url": "https://klike.net"
     },
     "nfts":   
         [
             {
                 "address": "",
-                "preview_url":	"https://",
-                "url": "https://",
-                "name": "Test1",
-                "description": "Test 1 nft"
+                "preview_url":	"",
+                "url": "",
+                "name": "Winter 1",
+                "description": "Winter 1 nft"
             }
         ]
 }

@@ -86,8 +86,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       currentVersion++;
 
       ITokenRoot(paymentToken).deployWallet{
-        value: Gas.DEPLOY_EMPTY_WALLET_VALUE,
-        flag: 1,
+        value: 0,
+        flag: 128,
         callback: DirectSell.onTokenWallet
       }(address(this), Gas.DEPLOY_EMPTY_WALLET_GRAMS);
     } else {
@@ -131,6 +131,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
     tokenWallet = _wallet;
     changeState(DirectSellStatus.Active);
+    owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
   }
 
   function getInfo() external view returns (DirectSellInfo) {
@@ -173,7 +174,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     if (
       msg.sender.value != 0 &&
       msg.sender == tokenWallet &&
-      msg.value >= (Gas.DIRECT_SELL_INITIAL_BALANCE + Gas.DEPLOY_EMPTY_WALLET_VALUE + Gas.FEE_VALUE) &&
+      msg.value >= (Gas.DEPLOY_EMPTY_WALLET_VALUE + Gas.FEE_VALUE) &&
       currentStatus == DirectSellStatus.Active &&
       amount >= price &&
       ((endTime > 0 && now < endTime) || endTime == 0) &&
@@ -199,8 +200,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       callbacks[buyer] = ITIP4_1NFT.CallbackParams(0.01 ever, emptyPayload);
 
       ITIP4_1NFT(nftAddress).transfer{
-        value: Gas.TRANSFER_OWNERSHIP_VALUE,
-        flag: 1,
+        value: 0,
+        flag: 128,
         bounce: false
       }(
         buyer,
@@ -208,7 +209,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         callbacks
       );
 
-      _transfer(balance, owner, originalGasTo, tokenWallet, 0, 128, Gas.DEPLOY_EMPTY_WALLET_GRAMS);
+      _transfer(balance, owner, originalGasTo, tokenWallet, 0.5 ever, 0, Gas.DEPLOY_EMPTY_WALLET_GRAMS);
 
       if (currentFee > 0) {
         emit MarketFeeWithheld(currentFee, paymentToken);
@@ -226,7 +227,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         );
      }
     } else {
-      if (endTime > 0 && now >= endTime) {
+      if (endTime > 0 && now >= endTime && currentStatus == DirectSellStatus.Active) {
         IDirectSellCallback(buyer).directSellCancelledOnTime{
           value: Gas.CALLBACK_VALUE,
           flag: 1,
@@ -263,7 +264,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     }
   }
 
-  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gas) private {
+  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gasDeployTW) private {
+        TvmBuilder builder;
+        builder.store(remainingGasTo);
         TvmCell emptyPayload;
         if (paymentToken == weverRoot) {
             ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
@@ -272,15 +275,15 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 uint128(0),
                 user,
                 true,
-                emptyPayload
+                builder.toCell()
             );
         } else {
             ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
                 amount,
                 user,
-                gas,
+                gasDeployTW,
                 remainingGasTo,
-                true,
+                false,
                 emptyPayload
             );
         }
@@ -293,9 +296,20 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         address user,
         TvmCell payload
     )  external {
+        address remainingGasTo;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 267) {
+            remainingGasTo = payloadSlice.decode(address);
+        }
         require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
-        user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+
+        if (user == remainingGasTo) {
+            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        } else {
+            user.transfer({ value: amount, flag: 1, bounce: false });
+            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        }
    }
 
   function changeState(uint8 newState) private {
@@ -362,6 +376,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
       currentStatus == DirectSellStatus.Active,
       DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
     );
+    tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
     IDirectSellCallback(owner).directSellClose{
       value: Gas.CALLBACK_VALUE,
       flag: 1,

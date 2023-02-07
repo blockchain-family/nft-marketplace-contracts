@@ -43,7 +43,7 @@ CALLREF {
 .loc ../contracts/FactoryDirectSell.sol, 57
 ACCEPT
 .loc ../contracts/FactoryDirectSell.sol, 58
-PUSHINT 1000000000
+PUSHINT 200000000
 PUSHINT 0
 RAWRESERVE
 .loc ../contracts/FactoryDirectSell.sol, 59
@@ -558,7 +558,7 @@ MYADDR
 SDEQ
 THROWIFNOT 301
 .loc ../contracts/FactoryDirectSell.sol, 131
-PUSHINT 1000000000
+PUSHINT 300000000
 PUSHINT 0
 RAWRESERVE
 .loc ../contracts/FactoryDirectSell.sol, 133
@@ -970,7 +970,7 @@ PUSHINT 1000000000
 GEQ
 THROWIFNOT 307
 .loc ../contracts/FactoryDirectSell.sol, 257
-PUSHINT 1000000000
+PUSHINT 300000000
 PUSHINT 0
 RAWRESERVE
 .loc ../contracts/FactoryDirectSell.sol, 258
@@ -1096,7 +1096,7 @@ PUSHINT 5000000000
 GEQ
 THROWIFNOT 109
 .loc ../contracts/FactoryDirectSell.sol, 274
-PUSHINT 1000000000
+PUSHINT 200000000
 GETPARAM 7
 FIRST
 DEPTH
@@ -1195,7 +1195,7 @@ ROT
 EQUAL
 PUSHCONT {
 	.loc ../contracts/FactoryDirectSell.sol, 295
-	PUSHINT 1000000000
+	PUSHINT 200000000
 	PUSHINT 0
 	RAWRESERVE
 	.loc ../contracts/FactoryDirectSell.sol, 296

@@ -149,17 +149,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         return "Auction";
     }
 
-    function buildBidPayload(
-        uint32 callbackId,
-        address buyer
-    ) external pure returns (TvmCell) {
-        TvmBuilder builder;
-        builder.store(callbackId);
-        builder.store(buyer);
-
-        return builder.toCell();
-    }
-
     function onAcceptTokensTransfer(
         address token_root,
         uint128 amount,
@@ -178,7 +167,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         }
         if (payloadSlice.bits() >= 267) {
             buyer = payloadSlice.decode(address);
-            }
+        }
 
         if (
             msg.value >= Gas.TOKENS_RECEIVED_CALLBACK_VALUE &&
@@ -270,9 +259,20 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         address user,
         TvmCell payload
     )  external {
+        address remainingGasTo;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 267) {
+            remainingGasTo = payloadSlice.decode(address);
+        }
         require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
-        tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
-        user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+
+        if (user == remainingGasTo) {
+            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        } else {
+            user.transfer({ value: amount, flag: 1, bounce: false });
+            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        }
    }
 
     function finishAuction(

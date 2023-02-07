@@ -79,4 +79,8 @@ export class Auction {
     async getInfo() {
         return (await this.contract.methods.getInfo({}).call()).value0;
     }
+
+    async buildPayload(callbackId: number, buyer: AccountType) {
+        return (await this.contract.methods.buildPlaceBidPayload({callbackId: callbackId, buyer: buyer.address}).call()).value0;
+    }
 }

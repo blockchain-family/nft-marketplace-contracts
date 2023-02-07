@@ -32,7 +32,7 @@ export class NftC {
                 callbacks       
             }).send({
             from: initiator.address,
-            amount: toNano(6)
+            amount: toNano(5)
         });
     }
 

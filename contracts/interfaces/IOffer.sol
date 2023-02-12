@@ -4,6 +4,6 @@ import "../structures/IMarketFeeStructure.sol";
 
 interface IOffer is IMarketFeeStructure {
 
-    function setMarketFee(MarketFee _fee) external;
+    function setMarketFee(MarketFee _fee, address sendGasTo) external;
     function getMarketFee() external view returns (MarketFee);
 }

@@ -61,7 +61,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         public 
     {
         tvm.accept();
-        tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+        _reserve();
 
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         // Method and properties are declared in OffersRoot
@@ -82,6 +82,10 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         _sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
+    function _reserve() internal override {
+        tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
+    }
+
     function getTypeContract() external pure returns (string) {
         return "AuctionRoot";
     }
@@ -96,7 +100,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         TvmCell payload
     ) external override {
         require(newManager == address(this));
-        tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+        _reserve();
         bool isDeclined = false;
 
         uint32 callbackId = 0;
@@ -238,9 +242,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         require(recipient.value != 0, AuctionErrors.wrong_recipient);
         require(msg.value >= Gas.WITHDRAW_VALUE, AuctionErrors.low_gas);
 
-        tvm.rawReserve(Gas.AUCTION_ROOT_INITIAL_BALANCE, 0);
+        _reserve();
         TvmCell emptyPayload;
-        ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }
+        ITokenWallet(tokenWallet).transfer{ value: 0, flag: 128, bounce: false }
             (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
         emit MarketFeeWithdrawn(recipient, amount, tokenWallet);
     }
@@ -263,7 +267,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     }
 
     function upgradeOfferCode(TvmCell newCode) public onlyOwner {
-        tvm.rawReserve(Gas.SET_CODE, 0);
+        _reserve();
         offerCode = newCode;
         currentVersionOffer++;
 
@@ -300,7 +304,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 offerCode,
                 deploymentFee,
                 fee,
-                deploymentFeePart
+                deploymentFeePart,
+                weverVault,
+                weverRoot
             );
             
             tvm.setcode(newCode);

@@ -36,7 +36,8 @@
 		{
 			"name": "setMarketFee",
 			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"name":"sendGasTo","type":"address"}
 			],
 			"outputs": [
 			]

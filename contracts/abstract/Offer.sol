@@ -66,8 +66,12 @@ abstract contract Offer is IOffer {
         return fee;
     }
 
-    function setMarketFee(MarketFee _fee) external override onlyMarketRoot {
+    function setMarketFee(MarketFee _fee, address sendGasTo) external override onlyMarketRoot {
+        _reserve();
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee = _fee;
+        sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
+
+    function _reserve() internal virtual;
 }

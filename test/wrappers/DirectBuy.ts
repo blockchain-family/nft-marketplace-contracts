@@ -71,21 +71,21 @@ export class DirectBuy {
     }
 
     async finishBuy(initiator: AccountType, callbackId: number) {
-        return await this.contract.methods.finishBuy({
+        return await locklift.tracing.trace(this.contract.methods.finishBuy({
                 sendGasTo: initiator.address,
                 callbackId
             }).send({
                 from: initiator.address,
-                amount: toNano(2)
-        });
+                amount: toNano(0.5)
+        }));
     }
 
     async closeBuy(callbackId: number) {
-        return await this.contract.methods.closeBuy({
+        return await locklift.tracing.trace(this.contract.methods.closeBuy({
                 callbackId
             }).send({
             from: this.owner.address,
-            amount: toNano(1)
-        });
+            amount: toNano(0.5)
+        }));
     }
 }

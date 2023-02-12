@@ -26,14 +26,14 @@ export class NftC {
     }
 
     async changeManager(initiator: AccountType, newManager: Address, sendGasTo: Address, callbacks: CallbackType[]) {
-        return await this.contract.methods.changeManager({
+        return await locklift.tracing.trace(this.contract.methods.changeManager({
                 newManager,
                 sendGasTo: sendGasTo == zeroAddress ? this.owner.address: sendGasTo,
                 callbacks       
             }).send({
             from: initiator.address,
-            amount: toNano(5)
-        });
+            amount: toNano(2)
+        }));
     }
 
     async getEvents(event_name: string) {

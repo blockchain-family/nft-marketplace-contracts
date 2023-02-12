@@ -67,13 +67,13 @@ export class Auction {
     }
 
     async finishAuction(initiator: AccountType, callbackId: number) {
-        return await this.contract.methods.finishAuction({
+        return await locklift.tracing.trace(this.contract.methods.finishAuction({
                 sendGasTo: initiator.address,
                 callbackId}).send({
                 from: initiator.address,
                 amount: toNano(2)
             }
-        );
+        ));
     }
 
     async getInfo() {

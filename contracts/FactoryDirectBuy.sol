@@ -15,14 +15,14 @@ import "./modules/access/OwnableInternal.sol";
 
 import "./DirectBuy.sol";
 
-import "ton-eth-bridge-token-contracts/contracts/interfaces/ITokenWallet.sol";
-import "ton-eth-bridge-token-contracts/contracts/interfaces/IAcceptTokensTransferCallback.sol";
-import "ton-eth-bridge-token-contracts/contracts/TokenWalletPlatform.sol";
+import "tip3/contracts/interfaces/ITokenWallet.sol";
+import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
+import "tip3/contracts/TokenWalletPlatform.sol";
 import "./structures/IMarketFeeStructure.sol";
 import "./interfaces/IEventsMarketFee.sol";
 import "./interfaces/IOffer.sol";
 
-contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMarketFeeStructure, IEventMarketFee, IOffer {
+contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMarketFeeStructure, IEventMarketFee {
   uint64 static nonce_;
 
   TvmCell tokenPlatformCode;
@@ -55,7 +55,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     ) OwnableInternal(_owner) public
     {
         tvm.accept();
-        tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+        _reserve();
 
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         currentVersion++;
@@ -67,23 +67,29 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
+    function _reserve() internal  {
+        tvm.rawReserve(Gas.FACTORY_DIRECT_BUY_INITIAL_BALANCE, 0);
+    }
+
     function getTypeContract() external pure returns (string) {
         return "FactoryDirectBuy";
     }
 
-    function getMarketFee() external view override returns (MarketFee) {
+    function getMarketFee() external view returns (MarketFee) {
         return fee;
     }
 
-  function setMarketFee(MarketFee _fee) external override onlyOwner {
+  function setMarketFee(MarketFee _fee) external onlyOwner {
+      _reserve();
       require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
       fee = _fee;
       emit MarketFeeDefaultChanged(_fee);
+      msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
   }
 
   function setMarketFeeForDirectBuy(address directBuy, MarketFee _fee) external onlyOwner {
       require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
-      IOffer(directBuy).setMarketFee{value: 0, flag: 64, bounce:false}(_fee);
+      IOffer(directBuy).setMarketFee{value: 0, flag: 64, bounce:false}(_fee, msg.sender);
       emit MarketFeeChanged(directBuy, _fee);
   }
 
@@ -100,12 +106,11 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     builder.store(nft);
     builder.store(startTime);
     builder.store(durationTime);
-
     return builder.toCell();
   }
 
   function setCodeTokenPlatform(TvmCell _tokenPlatformCode) public onlyOwner {
-    tvm.rawReserve(Gas.SET_CODE, 0);
+    _reserve();
     tokenPlatformCode = _tokenPlatformCode;
 
     msg.sender.transfer(
@@ -116,7 +121,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
   } 
 
   function setCodeDirectBuy(TvmCell _directBuyCode) public onlyOwner {
-    tvm.rawReserve(Gas.SET_CODE, 0);  
+    _reserve();
     directBuyCode = _directBuyCode;
     currectVersionDirectBuy++;
 
@@ -135,8 +140,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     address originalGasTo,
     TvmCell payload
   ) override external {
-    tvm.rawReserve(Gas.DEPLOY_DIRECT_BUY_MIN_VALUE, 0);
-
+    _reserve();
     uint32 callbackId = 0;
     address buyer = sender;
     address nftForBuy;
@@ -154,7 +158,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
       payloadSlice.bits() == 128 &&
       msg.sender.value != 0 &&
       msg.sender == getTokenWallet(tokenRoot, address(this)) &&
-      msg.value >= (Gas.DEPLOY_DIRECT_BUY_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE)
+      msg.value >= (Gas.DEPLOY_DIRECT_BUY_MIN_VALUE + Gas.DEPLOY_EMPTY_WALLET_VALUE + Gas.CALLBACK_VALUE)
     ) {
       (uint64 startTime, uint64 durationTime) = payloadSlice.decode(uint64, uint64);
       uint64 nonce = tx.timestamp;
@@ -250,7 +254,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
             remainingGasTo = payloadSlice.decode(address);
         }
         require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
-        tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
+        _reserve();
 
         if (user == remainingGasTo) {
             user.transfer({ value: 0, flag: 128 + 2, bounce: false });
@@ -265,11 +269,12 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     require(recipient.value != 0, DirectBuySellErrors.WRONG_RECIPIENT);
     require(msg.value >= Gas.WITHDRAW_VALUE, DirectBuySellErrors.LOW_GAS);
 
-    tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+    _reserve();
     TvmCell emptyPayload;
     ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }
         (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
     emit MarketFeeWithdrawn(recipient,amount, tokenWallet);
+    msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
  }
 
   function _buildDirectBuyStateInit(
@@ -348,7 +353,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     address sendGasTo
   ) external onlyOwner {
      if (currentVersion == newVersion) {
-			tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
+			_reserve();
 			sendGasTo.transfer({
 				value: 0,
 				flag: 128 + 2,

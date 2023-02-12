@@ -13,7 +13,7 @@ import '../modules/access/OwnableInternal.sol';
 import "../interfaces/IOffer.sol";
 import "../interfaces/IEventsMarketFee.sol";
 
-abstract contract OffersRoot is IOffersRoot, IOffer, IEventMarketFee, OwnableInternal {
+abstract contract OffersRoot is IOffersRoot, IEventMarketFee, OwnableInternal {
     uint16 public auctionBidDelta;
     uint16 public auctionBidDeltaDecimals;
     uint128 public deploymentFee;
@@ -63,19 +63,21 @@ abstract contract OffersRoot is IOffersRoot, IOffer, IEventMarketFee, OwnableInt
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
     }
 
-    function getMarketFee() external view override (IOffersRoot, IOffer) returns (MarketFee) {
+    function getMarketFee() external view override returns (MarketFee) {
         return fee;
     }
 
-    function setMarketFee(MarketFee _fee) override (IOffersRoot, IOffer) external onlyOwner {
+    function setMarketFee(MarketFee _fee) override external onlyOwner {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee = _fee;
         emit MarketFeeDefaultChanged(_fee);
     }
 
+    function _reserve() internal virtual;
+
     function setMarketFeeForAuction(address auction, MarketFee _fee) external override onlyOwner {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
-        IOffer(auction).setMarketFee{value: 0, flag: 64, bounce:false}(_fee);
+        IOffer(auction).setMarketFee{value: 0, flag: 64, bounce:false}(_fee, msg.sender);
         emit MarketFeeChanged(auction, _fee);
     }
 

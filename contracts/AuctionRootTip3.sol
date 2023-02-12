@@ -16,11 +16,12 @@ import "./interfaces/IUpgradableByRequest.sol";
 
 import './modules/TIP4_1/interfaces/INftChangeManager.sol';
 import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
+import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 
 import './Nft.sol';
 import './AuctionTip3.sol';
 
-contract AuctionRootTip3 is OffersRoot, INftChangeManager {
+contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStructure {
 
     uint64 static nonce_;
 
@@ -58,7 +59,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     ) OwnableInternal(
         _owner
     )
-        public 
+        public
     {
         tvm.accept();
         _reserve();
@@ -119,7 +120,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 paymentToken.value > 0 &&
                 price >= 0 &&
                 auctionStartTime > 0 &&
-                auctionDuration > 0 
+                auctionDuration > 0
             ) {
                 address offerAddress = new AuctionTip3 {
                     wid: address(this).wid,
@@ -137,7 +138,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                     nftOwner,
                     deploymentFeePart * 2,
                     fee,
-                    auctionStartTime, 
+                    auctionStartTime,
                     auctionDuration,
                     auctionBidDelta,
                     auctionBidDeltaDecimals,
@@ -148,27 +149,27 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 );
 
                 MarketOffer offerInfo = MarketOffer(
-                    collection, 
-                    nftOwner, 
-                    msg.sender, 
+                    collection,
+                    nftOwner,
+                    msg.sender,
                     offerAddress,
                     price,
                     auctionDuration,
                     tx.timestamp
                 );
-                
+
                 emit AuctionDeployed(offerAddress, offerInfo);
                 IAuctionRootCallback(nftOwner).auctionTip3DeployedCallback{
-                     value: Gas.CALLBACK_VALUE, 
-                     flag: 1, 
-                     bounce: false 
+                     value: Gas.CALLBACK_VALUE,
+                     flag: 1,
+                     bounce: false
                 }(
                     callbackId,
                     offerAddress,
                     offerInfo
                 );
 
-                mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+                mapping(address => CallbackParams) callbacks;
                 ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                     offerAddress,
                     sendGasTo,
@@ -180,20 +181,20 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         } else {
             isDeclined = true;
         }
-        
+
         if (isDeclined) {
             emit AuctionDeclined(nftOwner, msg.sender);
             IAuctionRootCallback(nftOwner).auctionTip3DeployedDeclined{
-                value: Gas.CALLBACK_VALUE, 
-                flag: 1, 
-                bounce: false 
+                value: Gas.CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
             }(
                 callbackId,
                 nftOwner,
                 msg.sender
             );
 
-            mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+            mapping(address => CallbackParams) callbacks;
             ITIP4_1NFT(msg.sender).changeManager{ value: 0, flag: 128 }(
                 nftOwner,
                 sendGasTo,
@@ -205,9 +206,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
     function getOfferAddress(
         address _nft,
         uint64 _nonce
-    ) 
-        internal 
-        view 
+    )
+        internal
+        view
         returns (address)
     {
         TvmCell data = tvm.buildStateInit({
@@ -254,16 +255,16 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
         uint64 _nonce,
         address sendGasTo
     ) external view onlyOwner {
-        require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.value_too_low);  
+        require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.value_too_low);
         tvm.rawReserve(math.max(
-            Gas.AUCTION_ROOT_INITIAL_BALANCE, 
+            Gas.AUCTION_ROOT_INITIAL_BALANCE,
             address(this).balance - msg.value), 2
         );
 
         IUpgradableByRequest(getOfferAddress(_nft, _nonce)).upgrade{
             value: 0,
             flag: 128
-        }(offerCode, currentVersionOffer, sendGasTo);      
+        }(offerCode, currentVersionOffer, sendGasTo);
     }
 
     function upgradeOfferCode(TvmCell newCode) public onlyOwner {
@@ -308,7 +309,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager {
                 weverVault,
                 weverRoot
             );
-            
+
             tvm.setcode(newCode);
             tvm.setCurrentCode(newCode);
 

@@ -1,12 +1,6 @@
 pragma ever-solidity >= 0.61.2;
 
 interface INftChangeOwner {
-
-    struct CallbackParams {
-        uint128 value;      // ever value will send to address
-        TvmCell payload;    // custom payload will be proxied to address
-    }
-
     /// @notice change owner callback processing
     /// @param id Unique NFT id
     /// @param manager Address of NFT manager

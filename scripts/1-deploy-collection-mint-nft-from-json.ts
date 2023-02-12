@@ -1,7 +1,5 @@
 import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
-import {Address} from "locklift/.";
-import {WalletTypes} from "locklift";
 
 const migration = new Migration();
 const BigNumber = require('bignumber.js');
@@ -13,10 +11,7 @@ let array_json: any;
 
 async function main() {
     const signer = (await locklift.keystore.getSigner('0'));
-    const account = await locklift.factory.accounts.addExistingAccount({
-      type: WalletTypes.EverWallet,
-      address: migration.getAddress('Account1')
-    });
+    const account = await migration.loadAccount('Account1');
 
     const response = await prompts([
         {
@@ -61,7 +56,7 @@ async function main() {
 
     // const collection = (await locklift.factory.getDeployedContract('Collection', new Address('0:432da1db5a47e400ab62570938ec95310610fa483483b3fd7fa25db98cd144e0')));
     console.log('Collection', collection.address);
-    migration.store(collection.address, "Collection", "Collection");
+    migration.store(collection, "Collection");
 
     if (array_json.nfts) {
         for (const element of array_json.nfts) {

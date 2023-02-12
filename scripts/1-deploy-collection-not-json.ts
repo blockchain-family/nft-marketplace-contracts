@@ -1,7 +1,5 @@
 import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
-import {WalletTypes} from "locklift";
-
 const migration = new Migration();
 const ora = require('ora');
 const prompts = require('prompts');
@@ -10,10 +8,7 @@ const INCREMENT = 20;
 
 async function main() {
     const signer = (await locklift.keystore.getSigner('0'));
-    const account = await locklift.factory.accounts.addExistingAccount({
-      type: WalletTypes.EverWallet,
-      address: migration.getAddress('Account1')
-    });
+    const account = await migration.loadAccount('Account1');
 
     const response = await prompts([
         {
@@ -71,7 +66,7 @@ async function main() {
         config.nftOwner = response2.nftOwner;
     }
 
-    
+
     const tx_results = []
     const amount = config.nftAmount;
 
@@ -83,7 +78,7 @@ async function main() {
     }
 
     const spinner = ora('Deploying Collection').start();
-    
+
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
     const Index = (await locklift.factory.getContractArtifacts("Index"));
     const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));
@@ -105,7 +100,7 @@ async function main() {
         value: locklift.utils.toNano(4)
     });
 
-    migration.store(collection.address, "Collection", "Collection");
+    migration.store(collection, "Collection");
 
     if (config.nftAmount > 0) {
         spinner.text = 'Deploying Nfts'

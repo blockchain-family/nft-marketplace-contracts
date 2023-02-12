@@ -15,6 +15,7 @@ import "./interfaces/IUpgradableByRequest.sol";
 
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
+import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 
 import "./Nft.sol";
 
@@ -23,7 +24,7 @@ import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "./structures/IMarketFeeStructure.sol";
 
-contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure {
+contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure, ICallbackParamsStructure {
   address static factoryDirectBuy;
   address static owner;
   address static spentToken;
@@ -181,7 +182,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     if (payloadSlice.bits() >= 32) {
         callbackId = payloadSlice.decode(uint32);
     }
-    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+    mapping(address => CallbackParams) callbacks;
     if (
         msg.sender.value != 0 &&
         msg.sender == nftAddress &&
@@ -207,7 +208,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       changeState(DirectBuyStatus.Filled);
 
       TvmCell empty;
-      callbacks[owner] = ITIP4_1NFT.CallbackParams(0.01 ever, empty);
+      callbacks[owner] = CallbackParams(0.01 ever, empty);
 
       ITIP4_1NFT(nftAddress).transfer{
         value: Gas.TRANSFER_OWNERSHIP_VALUE,

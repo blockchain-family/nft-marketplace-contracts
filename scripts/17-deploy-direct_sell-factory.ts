@@ -1,6 +1,5 @@
 import { Migration } from "./migration";
 import { isValidEverAddress} from "../test/utils";
-import {WalletTypes} from "locklift";
 
 const prompts = require('prompts');
 const migration = new Migration();
@@ -28,10 +27,7 @@ async function main() {
     ]);
 
     const signer = (await locklift.keystore.getSigner('0'));
-    const account = await locklift.factory.accounts.addExistingAccount({
-        type: WalletTypes.EverWallet,
-        address: migration.getAddress('Account1')
-    });
+    const account = await migration.loadAccount('Account1');
 
     let fee = {
         numerator: 2,
@@ -55,7 +51,7 @@ async function main() {
     });
 
     console.log(`FactoryDirectSell: ${factoryDirectSell.address}`);
-    migration.store(factoryDirectSell.address, "FactoryDirectSell", "FactoryDirectSell");
+    migration.store(factoryDirectSell, "FactoryDirectSell");
     const DirectSell = (await locklift.factory.getContractArtifacts('DirectSell'));
 
     console.log(`Set code DirectSell`);

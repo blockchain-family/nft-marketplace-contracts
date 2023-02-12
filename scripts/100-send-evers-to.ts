@@ -8,12 +8,8 @@ const prompts = require('prompts');
 const BigNumber = require('bignumber.js');
 
 async function main() {
-    const signer = await locklift.keystore.getSigner('0');
-    let account = await locklift.factory.accounts.addExistingAccount({
-        type: WalletTypes.EverWallet,
-        address: migration.getAddress('Account1')
-    });
-    
+    let account = await migration.loadAccount('Account1');
+
     const response = await prompts([
         {
             type: 'text',
@@ -38,11 +34,11 @@ async function main() {
 
     if (response.from) {
         account = await locklift.factory.accounts.addExistingAccount({
-        type: WalletTypes.EverWallet,
-        address: new Address(response.from)
-    });
+            type: WalletTypes.EverWallet,
+            address: new Address(response.from)
+        });
     }
-    
+
     const spinner = ora(`Send ${response.amount} EVER from ${account.address} to ${response.to}`).start();
     spinner.text = 'Waiting for Bounces to Complete'
 
@@ -52,8 +48,8 @@ async function main() {
       amount: new BigNumber(response.amount).shiftedBy(9).toString(),
       bounce: false
     });
-    
-    spinner.stopAndPersist({text: 'Complete'}); 
+
+    spinner.stopAndPersist({text: 'Complete'});
 }
 
 main()

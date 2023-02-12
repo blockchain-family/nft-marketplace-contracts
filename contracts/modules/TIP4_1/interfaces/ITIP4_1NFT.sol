@@ -1,11 +1,8 @@
 pragma ever-solidity >= 0.61.2;
 
-interface ITIP4_1NFT {
+import "../structures/ICallbackParamsStructure.sol";
 
-    struct CallbackParams {
-        uint128 value;      // ever value will send to address
-        TvmCell payload;    // custom payload will proxying to address
-    }
+interface ITIP4_1NFT is ICallbackParamsStructure {
 
     /// @notice The event emits when NFT created
     /// @dev Emit the event when NFT is ready to use
@@ -37,9 +34,9 @@ interface ITIP4_1NFT {
     /// @return manager Address of NFT manager
     /// @return collection Address of collection smart contract
     function getInfo() external view responsible returns(
-        uint256 id, 
-        address owner, 
-        address manager,  
+        uint256 id,
+        address owner,
+        address manager,
         address collection
         );
 
@@ -52,8 +49,8 @@ interface ITIP4_1NFT {
     /// @param sendGasTo - Address to send remaining gas
     /// @param callbacks - Callbacks array to send by addresses. It can be empty.
     function changeOwner(
-        address newOwner, 
-        address sendGasTo, 
+        address newOwner,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) external;
 
@@ -64,8 +61,8 @@ interface ITIP4_1NFT {
     /// @param sendGasTo - Address to send remaining gas
     /// @param callbacks - Callbacks array to send by addresses. It can be empty.
     function changeManager(
-        address newManager, 
-        address sendGasTo, 
+        address newManager,
+        address sendGasTo,
         mapping(address => CallbackParams)  callbacks
     ) external;
 
@@ -77,9 +74,9 @@ interface ITIP4_1NFT {
     /// @param sendGasTo Address to send remaining gas
     /// @param callbacks Callbacks array to send by addresses. It can be empty
     function transfer(
-        address to, 
-        address sendGasTo, 
+        address to,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) external;
-    
+
 }

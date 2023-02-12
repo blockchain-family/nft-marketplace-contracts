@@ -18,10 +18,7 @@ async function main() {
         }]);
 
     const signer = (await locklift.keystore.getSigner('0'));
-    const account = await locklift.factory.accounts.addExistingAccount({
-      type: WalletTypes.EverWallet,
-      address: migration.getAddress('Account1')
-    });
+    const account = await migration.loadAccount('Account1');
 
     const { contract: tunnel, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: 'TestWeverTunnel',

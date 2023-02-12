@@ -17,6 +17,7 @@ import "./structures/IDirectSellGasValuesStructure.sol";
 import "./modules/access/OwnableInternal.sol";
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
+import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 
 import "./Nft.sol";
 import "./DirectSell.sol";
@@ -28,10 +29,11 @@ contract FactoryDirectSell is
     OwnableInternal,
     INftChangeManager,
     IEventMarketFee,
-    IDirectSellGasValuesStructure
+    IDirectSellGasValuesStructure,
+ICallbackParamsStructure
 {
   uint64 static nonce_;
-  
+
   TvmCell directSellCode;
 
  function calcValue(GasValues value) public pure returns(uint128) {
@@ -200,16 +202,16 @@ contract FactoryDirectSell is
         callbackId = payloadSlice.decode(uint32);
     }
 
-    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+    mapping(address => CallbackParams) callbacks;
     if (
       msg.sender.value != 0 &&
       msg.value >= calcValue(directSellGas.sell) &&
       payloadSlice.bits() >= 523
     ) {
       (
-        uint64 _startAuction, 
-        uint64 durationTime, 
-        address _paymentToken, 
+        uint64 _startAuction,
+        uint64 durationTime,
+        address _paymentToken,
         uint128 _price
       ) = payloadSlice.decode(
         uint64,
@@ -242,10 +244,10 @@ contract FactoryDirectSell is
         _nonce,
         _price
       );
-      IDirectSellCallback(nftOwner).directSellDeployed{ 
+      IDirectSellCallback(nftOwner).directSellDeployed{
         value: Gas.FRONTENT_CALLBACK_VALUE,
-        flag: 1, 
-        bounce: false 
+        flag: 1,
+        bounce: false
       }(
         callbackId,
         directSell,
@@ -257,11 +259,11 @@ contract FactoryDirectSell is
       );
 
       ITIP4_1NFT(msg.sender).changeManager{
-        value: 0, 
-        flag: 128 
+        value: 0,
+        flag: 128
       }(
-        directSell, 
-        sendGasTo, 
+        directSell,
+        sendGasTo,
         callbacks
       );
     } else {
@@ -277,11 +279,11 @@ contract FactoryDirectSell is
       );
 
       ITIP4_1NFT(msg.sender).changeManager{
-        value: 0, 
-        flag: 128 
+        value: 0,
+        flag: 128
       }(
-        nftOwner, 
-        sendGasTo, 
+        nftOwner,
+        sendGasTo,
         callbacks
       );
     }
@@ -332,26 +334,26 @@ contract FactoryDirectSell is
 
 
   function RequestUpgradeDirectSell(
-    address _owner, 
-    address _paymentToken, 
-    address _nft, 
-    uint64 _timeTx, 
+    address _owner,
+    address _paymentToken,
+    address _nft,
+    uint64 _timeTx,
     address sendGasTo
   ) external view onlyOwner {
-    require(msg.value >= Gas.UPGRADE_DIRECT_SELL_MIN_VALUE, BaseErrors.value_too_low);  
+    require(msg.value >= Gas.UPGRADE_DIRECT_SELL_MIN_VALUE, BaseErrors.value_too_low);
     tvm.rawReserve(math.max(
-      Gas.DIRECT_SELL_INITIAL_BALANCE, 
+      Gas.DIRECT_SELL_INITIAL_BALANCE,
       address(this).balance - msg.value), 2
-    ); 
+    );
 
     IUpgradableByRequest(expectedAddressDirectSell(_owner, _paymentToken, _nft, _timeTx)).upgrade{
       value: 0,
       flag: 128
     }(
-      directSellCode, 
-      currectVersionDirectSell, 
+      directSellCode,
+      currectVersionDirectSell,
       sendGasTo
-    );      
+    );
   }
 
   function upgrade(
@@ -379,12 +381,12 @@ contract FactoryDirectSell is
         weverVault,
         weverRoot
       );
-      
+
       tvm.setcode(newCode);
       tvm.setCurrentCode(newCode);
 
       onCodeUpgrade(cellParams);
-    }  
+    }
   }
 
   function onCodeUpgrade(TvmCell data) private {}

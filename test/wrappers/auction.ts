@@ -1,22 +1,20 @@
-import { Account } from "locklift/build/factory";
 import {Address, Contract, toNano} from "locklift";
 import { FactorySource } from "../../build/factorySource";
 import { Token } from "./token";
-
-declare type AccountType = Account<FactorySource["Wallet"]>
+import { Account } from "everscale-standalone-client/nodejs";
 
 export class AuctionRoot {
     public contract: Contract<FactorySource["AuctionRootTip3"]>;
-    public owner: AccountType;
+    public owner: Account;
     public address: Address;
 
-    constructor(auction_contract: Contract<FactorySource["AuctionRootTip3"]>, auction_owner: AccountType) {
+    constructor(auction_contract: Contract<FactorySource["AuctionRootTip3"]>, auction_owner: Account) {
         this.contract = auction_contract;
         this.owner = auction_owner;
         this.address = this.contract.address;
     }
 
-    static async from_addr(addr: Address, owner: AccountType) {
+    static async from_addr(addr: Address, owner: Account) {
         const contract = await locklift.factory.getDeployedContract('AuctionRootTip3', addr);
         return new AuctionRoot(contract, owner);
     }
@@ -28,7 +26,7 @@ export class AuctionRoot {
     async getEvents(event_name: string) {
         return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }
-    
+
     async getEvent(event_name: string) {
         const last_event = (await this.getEvents(event_name)).shift();
         if (last_event) {
@@ -40,16 +38,16 @@ export class AuctionRoot {
 
 export class Auction {
     public contract: Contract<FactorySource["AuctionTip3"]>;
-    public owner: AccountType;
+    public owner: Account;
     public address: Address;
 
-    constructor(auction_contract: Contract<FactorySource["AuctionTip3"]>, auction_owner: AccountType) {
+    constructor(auction_contract: Contract<FactorySource["AuctionTip3"]>, auction_owner: Account) {
         this.contract = auction_contract;
         this.owner = auction_owner;
         this.address = this.contract.address;
     }
 
-    static async from_addr(addr: Address, owner: AccountType) {
+    static async from_addr(addr: Address, owner: Account) {
         const contract = await locklift.factory.getDeployedContract('AuctionTip3', addr);
         return new Auction(contract, owner);
     }
@@ -66,7 +64,7 @@ export class Auction {
         return null;
     }
 
-    async finishAuction(initiator: AccountType, callbackId: number) {
+    async finishAuction(initiator: Account, callbackId: number) {
         return await locklift.tracing.trace(this.contract.methods.finishAuction({
                 sendGasTo: initiator.address,
                 callbackId}).send({
@@ -80,7 +78,7 @@ export class Auction {
         return (await this.contract.methods.getInfo({}).call()).value0;
     }
 
-    async buildPayload(callbackId: number, buyer: AccountType) {
-        return (await this.contract.methods.buildPlaceBidPayload({callbackId: callbackId, buyer: buyer.address}).call()).value0;
+    async buildPayload(callbackId: number, buyer: Account) {
+        return (await this.contract.methods.buildPlaceBidPayload({answerId: 0, callbackId: callbackId, buyer: buyer.address}).call()).value0;
     }
 }

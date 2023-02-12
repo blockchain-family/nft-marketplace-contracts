@@ -35,7 +35,7 @@ async function main() {
     })
 
     const name = `Account${key_number + 1}`;
-    migration.store(account.address, 'EverWallet', name);
+    migration.store(account, name);
     console.log(`${name}: ${account.address.toString()}`);
 }
 

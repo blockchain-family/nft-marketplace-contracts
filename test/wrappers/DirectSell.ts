@@ -1,35 +1,39 @@
-import { Account } from "locklift/build/factory";
 import {Address, Contract, toNano} from "locklift";
 import { FactorySource } from "../../build/factorySource";
 import { Token } from "./token";
+import { Account } from "everscale-standalone-client/nodejs";
 import { NftC } from "./nft";
-
-declare type AccountType = Account<FactorySource["Wallet"]>
 
 export class FactoryDirectSell {
     public contract: Contract<FactorySource["FactoryDirectSell"]>;
-    public owner: AccountType;
+    public owner: Account;
     public address: Address;
 
-    constructor(auction_contract: Contract<FactorySource["FactoryDirectSell"]>, auction_owner: AccountType) {
+    constructor(auction_contract: Contract<FactorySource["FactoryDirectSell"]>, auction_owner: Account) {
         this.contract = auction_contract;
         this.owner = auction_owner;
         this.address = this.contract.address;
     }
 
-    static async from_addr(addr: Address, owner: AccountType) {
+    static async from_addr(addr: Address, owner: Account) {
         const contract = await locklift.factory.getDeployedContract('FactoryDirectSell', addr);
         return new FactoryDirectSell(contract, owner);
     }
 
     async buildPayload(callbackId:number, startTime: any, endTime:any, paymentToken: Token, price: any) {
-        return (await this.contract.methods.buildDirectSellCreationPayload({callbackId: callbackId, _startTime: startTime, durationTime: endTime, _paymentToken: paymentToken.address, _price: price}).call()).value0;
+        return (await this.contract.methods.buildDirectSellCreationPayload({
+            callbackId: callbackId,
+            _startTime: startTime,
+            durationTime: endTime,
+            _paymentToken: paymentToken.address,
+            _price: price
+        }).call()).value0;
     }
 
     async getEvents(event_name: string) {
         return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }
-    
+
     async getEvent(event_name: string) {
         const last_event = (await this.getEvents(event_name)).shift();
         if (last_event) {
@@ -41,16 +45,16 @@ export class FactoryDirectSell {
 
 export class DirectSell {
     public contract: Contract<FactorySource["DirectSell"]>;
-    public owner: AccountType;
+    public owner: Account;
     public address: Address;
 
-    constructor(auction_contract: Contract<FactorySource["DirectSell"]>, auction_owner: AccountType) {
+    constructor(auction_contract: Contract<FactorySource["DirectSell"]>, auction_owner: Account) {
         this.contract = auction_contract;
         this.owner = auction_owner;
         this.address = this.contract.address;
     }
 
-    static async from_addr(addr: Address, owner: AccountType) {
+    static async from_addr(addr: Address, owner: Account) {
         const contract = await locklift.factory.getDeployedContract('DirectSell', addr);
         return new DirectSell(contract, owner);
     }
@@ -58,7 +62,7 @@ export class DirectSell {
     async getEvents(event_name: string) {
         return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }
-    
+
     async getEvent(event_name: string) {
         const last_event = (await this.getEvents(event_name)).shift();
         if (last_event) {
@@ -79,7 +83,7 @@ export class DirectSell {
             amount:toNano(1)
         })
     }
-    async finishSell(initiator: AccountType, callbackId: number) {
+    async finishSell(initiator: Account, callbackId: number) {
         return await this.contract.methods.finishSell({
                 sendGasTo: initiator.address,
                 callbackId

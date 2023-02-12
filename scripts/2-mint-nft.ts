@@ -1,16 +1,12 @@
 import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
-import {WalletTypes} from "locklift";
 
 const migration = new Migration();
 const ora = require('ora');
 const prompts = require('prompts');
 
 async function main() {
-    const account = await locklift.factory.accounts.addExistingAccount({
-      type: WalletTypes.EverWallet,
-      address: migration.getAddress('Account1')
-    });
+    const account = await migration.loadAccount('Account1');
 
     const response = await prompts([
         {
@@ -40,8 +36,8 @@ async function main() {
             message: 'Provide the external url'
         }
     ])
-    
-    const collection = locklift.factory.getDeployedContract("Collection", migration.load("Collection", "Collection").address);
+
+    const collection = migration.loadContract("Collection", "Collection");
 
     console.log(`Collection: ${collection.address}`)
     console.log(`Account: ${account.address}`)

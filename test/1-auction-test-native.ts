@@ -1,21 +1,18 @@
 import {
-    AccountType,
-    CollectionType,
     deployAccount,
-    deployTokenRoot,
     deployAuctionRoot,
     CallbackType,
     sleep,
     deployCollectionAndMintNft,
     deployWeverRoot
 } from "./utils";
+import { Account } from "everscale-standalone-client/nodejs";
 import { AuctionRoot, Auction } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
 import {Address, toNano} from "locklift";
 import { BigNumber } from 'bignumber.js';
-import {DirectBuy} from "./wrappers/DirectBuy";
 BigNumber.config({EXPONENTIAL_AT: 257});
 
 const logger = require('mocha-logger');
@@ -25,10 +22,10 @@ import { lockliftChai } from "locklift";
 import chai from "chai";
 chai.use(lockliftChai);
 
-let account1: AccountType;
-let account2: AccountType;
-let account3: AccountType;
-let account4: AccountType;
+let account1: Account;
+let account2: Account;
+let account3: Account;
+let account4: Account;
 
 let nft: NftC;
 
@@ -84,7 +81,7 @@ async function Callback(payload: string) {
     return (callbacks);
 };
 
-async function balance(account: AccountType){
+async function balance(account: Account){
     return new BigNumber(await locklift.provider.getBalance(account.address));
 };
 
@@ -96,7 +93,7 @@ describe("Test Auction contract", async function () {
         account4 = await deployAccount(3, 100);
     });
     it('Deploy NFT-Collection and Mint Nft', async function () {
-        let accForNft: AccountType[] = [];
+        let accForNft: Account[] = [];
         accForNft.push(account2);
         const [, nftS] = await deployCollectionAndMintNft(account2, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];

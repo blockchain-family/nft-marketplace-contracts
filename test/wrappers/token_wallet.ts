@@ -1,26 +1,23 @@
 import {Address, Contract} from "locklift";
 import {FactorySource} from "../../build/factorySource";
-import {Account} from "locklift/build/factory";
+import { Account } from "everscale-standalone-client/nodejs";
 
 const {toNano} = locklift.utils;
 
 
-declare type AccountType = Account<FactorySource["Wallet"]>;
-
-
 export class TokenWallet {
     public contract: Contract<FactorySource["TokenWalletUpgradeable"]>;
-    public _owner: AccountType | null;
+    public _owner: Account | null;
     public address: Address;
     public name: string | undefined;
 
-    constructor(wallet_contract: Contract<FactorySource["TokenWalletUpgradeable"]>, wallet_owner: AccountType | null) {
+    constructor(wallet_contract: Contract<FactorySource["TokenWalletUpgradeable"]>, wallet_owner: Account | null) {
         this.contract = wallet_contract;
         this._owner = wallet_owner;
         this.address = this.contract.address;
     }
 
-    static async from_addr(addr: Address, owner: AccountType | null) {
+    static async from_addr(addr: Address, owner: Account | null) {
         const wallet = await locklift.factory.getDeployedContract('TokenWalletUpgradeable', addr);
         return new TokenWallet(wallet, owner);
     }
@@ -47,7 +44,7 @@ export class TokenWallet {
     }
 
     async transfer(amount: number, receiver: Address, deployWalletValue: string|number, notify: boolean, payload = '', value: any) {
-        const owner = this._owner as AccountType;
+        const owner = this._owner as Account;
         return await locklift.tracing.trace(
                  this.contract.methods.transfer({
                     amount: amount,

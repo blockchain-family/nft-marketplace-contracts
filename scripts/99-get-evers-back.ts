@@ -1,18 +1,13 @@
 import { Migration } from "./migration";
-import {WalletTypes} from "locklift";
+import { Address } from "locklift";
 
 const ora = require('ora');
 const migration = new Migration();
 const BigNumber = require('bignumber.js');
 
 async function main() {
-    // @ts-ignore
-    const giverAddress = locklift.giver.giverContract.address;
-    const signer = await locklift.keystore.getSigner("0");
-    let account = await locklift.factory.accounts.addExistingAccount({
-        type: WalletTypes.EverWallet,
-        address: migration.getAddress('Account1')
-    });
+    const giverAddress = new Address(locklift.context.network.config.giver.address);
+    const account = await migration.loadAccount('Account1');
     const walletBalance = await locklift.provider.getBalance(account.address);
     console.log('Balance:', Number(walletBalance));
 

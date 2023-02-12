@@ -17,6 +17,7 @@ import "./structures/IMarketFeeStructure.sol";
 import "./structures/IDirectSellGasValuesStructure.sol";
 
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
+import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 
 import "./Nft.sol";
 
@@ -26,7 +27,7 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 
 
-contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure {
+contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure {
   address static factoryDirectSell;
   address static owner;
   address static paymentToken;
@@ -187,7 +188,7 @@ DirectSellGasValues directSellGas;
         buyer = payloadSlice.decode(address);
     }
     TvmCell emptyPayload;
-    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+    mapping(address => CallbackParams) callbacks;
     if (
       msg.sender.value != 0 &&
       msg.sender == tokenWallet &&
@@ -212,7 +213,7 @@ DirectSellGasValues directSellGas;
       uint128 balance = price - currentFee;
 
       changeState(DirectSellStatus.Filled);
-      callbacks[buyer] = ITIP4_1NFT.CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
+      callbacks[buyer] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
       ITIP4_1NFT(nftAddress).transfer{
         value: 0,
@@ -362,7 +363,7 @@ DirectSellGasValues directSellGas;
     );
     changeState(DirectSellStatus.Expired);
 
-    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+    mapping(address => CallbackParams) callbacks;
     ITIP4_1NFT(nftAddress).changeManager{
       value: 0,
       flag: 128
@@ -387,7 +388,7 @@ DirectSellGasValues directSellGas;
     );
     changeState(DirectSellStatus.Cancelled);
 
-    mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+    mapping(address => CallbackParams) callbacks;
     ITIP4_1NFT(nftAddress).changeManager{
       value: 0,
       flag: 128

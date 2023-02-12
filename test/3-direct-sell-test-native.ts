@@ -1,28 +1,26 @@
 
 import {
-    AccountType,
     deployAccount,
-    deployTokenRoot,
     deployCollectionAndMintNft,
     CallbackType,
-    sleep,
     deployFactoryDirectSell, deployWeverRoot
 } from "./utils";
-import { FactoryDirectSell, DirectSell } from "./wrappers/directsell";
+
+import { FactoryDirectSell, DirectSell } from "./wrappers/DirectSell";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
 import {Address, toNano} from "locklift";
 import {BigNumber} from "bignumber.js";
 BigNumber.config({EXPONENTIAL_AT: 257});
-import {Migration} from "../scripts/migration";
+import { Account } from "everscale-standalone-client/nodejs";
 
 const logger = require('mocha-logger');
 const { expect } = require('chai');
 
-let account1: AccountType;
-let account2: AccountType;
-let account3: AccountType;
+let account1: Account;
+let account2: Account;
+let account3: Account;
 
 let nft: NftC;
 
@@ -68,7 +66,7 @@ async function Callback(payload: string) {
     return callbacks;
 };
 
-async function balance(account: AccountType){
+async function balance(account: Account){
     return new BigNumber(await locklift.provider.getBalance(account.address));
 };
 
@@ -79,7 +77,7 @@ describe("Test DirectSell contract", async function () {
         account3 = await deployAccount(2, 130);
     });
     it('Deploy NFT-Collection and Mint Nft', async function () {
-        let accForNft: AccountType[] = [];
+        let accForNft: Account[] = [];
         accForNft.push(account1);
         const [, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];

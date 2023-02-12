@@ -16,11 +16,28 @@
 			]
 		},
 		{
+			"name": "calcValue",
+			"inputs": [
+				{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"value","type":"tuple"}
+			],
+			"outputs": [
+				{"name":"value0","type":"uint128"}
+			]
+		},
+		{
 			"name": "getTypeContract",
 			"inputs": [
 			],
 			"outputs": [
 				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "getGasFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deploy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{
@@ -63,7 +80,8 @@
 				{"name":"_startTime","type":"uint64"},
 				{"name":"durationTime","type":"uint64"},
 				{"name":"_paymentToken","type":"address"},
-				{"name":"_price","type":"uint128"}
+				{"name":"_price","type":"uint128"},
+				{"name":"recipient","type":"address"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
@@ -226,6 +244,7 @@
 		{"name":"owner_","type":"address"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"directSellCode","type":"cell"},
+		{"components":[{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deploy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directSellGas","type":"tuple"},
 		{"name":"currentVersion","type":"uint32"},
 		{"name":"currectVersionDirectSell","type":"uint32"},
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},

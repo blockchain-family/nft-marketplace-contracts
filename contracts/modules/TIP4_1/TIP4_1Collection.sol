@@ -1,4 +1,4 @@
-/// We recommend using the compiler version 0.62.0. 
+/// We recommend using the compiler version 0.62.0.
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
 pragma ever-solidity = 0.61.2;
 
@@ -17,8 +17,8 @@ import './TIP4_1Nft.sol';
 /// You can read more about the technology here (https://github.com/nftalliance/docs/blob/main/src/Standard/TIP-4/1.md)
 /// For detect what interfaces a smart contract implements used TIP-6.1 standard. ...
 /// ... Read more here (https://github.com/nftalliance/docs/blob/main/src/Standard/TIP-6/1.md)
-contract TIP4_1Collection is ITIP4_1Collection, TIP6 {
-    
+abstract contract TIP4_1Collection is ITIP4_1Collection, TIP6 {
+
     /// Code of the TIP4_1Nft conract or of the custom Nft contract based on the TIP4_1Nft
     TvmCell _codeNft;
 
@@ -78,10 +78,10 @@ contract TIP4_1Collection is ITIP4_1Collection, TIP6 {
         nft = address.makeAddrStd(address(this).wid, hashState);
     }
 
-    /// @notice build nft code used TvmCell nft code & salt (address collection) ... 
+    /// @notice build nft code used TvmCell nft code & salt (address collection) ...
     /// ... to create unique nft address BC nft code & id can be repeated
     /// @param collection - collection address
-    /// @return TvmCell nftCode 
+    /// @return TvmCell nftCode
     /// about salt read more here (https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#tvmcodesalt)
     function _buildNftCode(address collection) internal virtual view returns (TvmCell) {
         TvmBuilder salt;

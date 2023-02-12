@@ -1,6 +1,5 @@
 import { Migration } from "./migration";
 import { isValidEverAddress} from "../test/utils";
-import {WalletTypes} from "locklift";
 
 const prompts = require('prompts')
 const migration = new Migration();
@@ -28,11 +27,7 @@ async function main() {
     ]);
 
     const signer = (await locklift.keystore.getSigner('0'));
-    const account = await locklift.factory.accounts.addExistingAccount({
-      type: WalletTypes.EverWallet,
-      address: migration.getAddress('Account1')
-    });
-
+    const account = await migration.loadAccount('Account1');
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
     const AuctionTip3 = (await locklift.factory.getContractArtifacts("AuctionTip3"));
 
@@ -64,7 +59,7 @@ async function main() {
     });
 
     console.log(`AuctionRootTip3: ${auctionRootTip3.address.toString()}`)
-    migration.store(auctionRootTip3.address, contractName, contractName);
+    migration.store(auctionRootTip3, contractName);
 
     if (response.owner) {
         await auctionRootTip3.methods.transferOwnership({

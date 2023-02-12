@@ -1,5 +1,4 @@
 import {
-    AccountType,
     CollectionType,
     deployAccount,
     deployTokenRoot,
@@ -9,6 +8,7 @@ import {
     deployCollectionAndMintNft,
     deployWeverRoot
 } from "./utils";
+import { Account } from "everscale-standalone-client/nodejs";
 import { AuctionRoot, Auction } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
@@ -23,10 +23,10 @@ import { lockliftChai } from "locklift";
 import chai from "chai";
 chai.use(lockliftChai);
 
-let account1: AccountType;
-let account2: AccountType;
-let account3: AccountType;
-let account4: AccountType;
+let account1: Account;
+let account2: Account;
+let account3: Account;
+let account4: Account;
 
 let nft: NftC;
 
@@ -85,7 +85,7 @@ describe("Test Auction contract", async function () {
         account4 = await deployAccount(3, 20);
     });
     it('Deploy NFT-Collection and Mint Nft', async function () {
-        let accForNft: AccountType[] = [];
+        let accForNft: Account[] = [];
         accForNft.push(account2);
         const [, nftS] = await deployCollectionAndMintNft(account2, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];

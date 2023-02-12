@@ -1,4 +1,4 @@
-/// We recommend using the compiler version 0.62.0. 
+/// We recommend using the compiler version 0.62.0.
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
 pragma ever-solidity = 0.61.2;
 
@@ -21,7 +21,7 @@ abstract contract TIP4_3Collection is TIP4_1Collection, ITIP4_3Collection {
     * Errors
     **/
     uint8 constant value_is_empty = 103;
-    
+
     /// TvmCell object code of Index contract
     TvmCell _codeIndex;
 
@@ -29,7 +29,7 @@ abstract contract TIP4_3Collection is TIP4_1Collection, ITIP4_3Collection {
     TvmCell _codeIndexBasis;
 
     /// Values for deploy/destroy
-    uint128 _indexDeployValue = 0.4 ever;
+    uint128 _indexDeployValue = 0.15 ever;
     uint128 _indexDestroyValue = 0.1 ever;
     uint128 _deployIndexBasisValue = 0.4 ever;
 
@@ -71,7 +71,7 @@ abstract contract TIP4_3Collection is TIP4_1Collection, ITIP4_3Collection {
     /// @return code - code of IndexBasis contract
     function indexBasisCode() external view override responsible returns (TvmCell code) {
         return {value: 0, flag: 64, bounce: false} (_codeIndexBasis);
-    }   
+    }
 
     /// @return hash - calculated hash based on the IndexBasis code
     function indexBasisCodeHash() external view override responsible returns (uint256 hash) {
@@ -88,7 +88,7 @@ abstract contract TIP4_3Collection is TIP4_1Collection, ITIP4_3Collection {
     }
 
     /// @notice build IndexBasis code used TvmCell indexBasis code & salt (string stamp)
-    /// @return TvmCell indexBasisCode 
+    /// @return TvmCell indexBasisCode
     /// about salt read more here (https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#tvmcodesalt)
     function _buildIndexBasisCode() internal virtual view returns (TvmCell) {
         string stamp = "nft";
@@ -124,7 +124,7 @@ abstract contract TIP4_3Collection is TIP4_1Collection, ITIP4_3Collection {
     }
 
     /// @notice build Index code used TvmCell index code & salt (string stamp, address collection, address owner)
-    /// @return TvmCell indexBasisCode 
+    /// @return TvmCell indexBasisCode
     /// about salt read more here (https://github.com/tonlabs/TON-Solidity-Compiler/blob/master/API.md#tvmcodesalt)
     function _buildIndexCode(
         address collection,

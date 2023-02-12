@@ -1,13 +1,11 @@
-import { Account } from "locklift/build/factory";
 import { FactorySource } from "../build/factorySource";
 import {Address, Contract, zeroAddress, WalletTypes, toNano, getRandomNonce} from "locklift";
+import { Account } from "everscale-standalone-client/nodejs";
 import { Token } from "./wrappers/token";
 import { AuctionRoot } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
-//@ts-ignore
-import { FactoryDirectBuy } from "./wrappers/directbuy";
-//@ts-ignore
-import { FactoryDirectSell } from "./wrappers/directsell";
+import { FactoryDirectBuy } from "./wrappers/DirectBuy";
+import { FactoryDirectSell } from "./wrappers/DirectSell";
 
 const fs = require('fs')
 const logger = require("mocha-logger");
@@ -20,7 +18,6 @@ type MarketFee = {
 
 export type AddressN = `0:${string}`
 export const isValidEverAddress = (address: string): address is AddressN => /^(?:-1|0):[0-9a-fA-F]{64}$/.test(address);
-export declare type AccountType = Account<FactorySource["Wallet"]>;
 export declare type CollectionType = Contract<FactorySource["Collection"]>;
 
 export type CallbackType = [Address, {
@@ -59,7 +56,7 @@ export const deployAccount = async function (key_number = 0, initial_balance = 1
     return account;
 }
 
-export const deployCollectionAndMintNft = async function (account: AccountType, remainOnNft: 1, pathJsonFile: "nft_to_address.json", accForNft: AccountType[]) {
+export const deployCollectionAndMintNft = async function (account: Account, remainOnNft: 1, pathJsonFile: "nft_to_address.json", accForNft: Account[]) {
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
     const Index = (await locklift.factory.getContractArtifacts("Index"));
     const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));
@@ -137,7 +134,7 @@ export const deployCollectionAndMintNft = async function (account: AccountType, 
 
     return [collection, nftMinted] as const;
 }
-export const deployNFT = async function (account: AccountType, collection: CollectionType, nft_name: string, nft_description: string, nft_url: string, externalUrl: string, ownerNFT = account) {
+export const deployNFT = async function (account: Account, collection: CollectionType, nft_name: string, nft_description: string, nft_url: string, externalUrl: string, ownerNFT = account) {
     let item = {
         "type": "Basic NFT",
         "name": nft_name,
@@ -172,7 +169,7 @@ export const deployNFT = async function (account: AccountType, collection: Colle
     return NftC.from_addr(nftAddress.nft, ownerNFT);
 }
 
-export const deployTokenRoot = async function (token_name: string, token_symbol: string, owner: AccountType) {
+export const deployTokenRoot = async function (token_name: string, token_symbol: string, owner: Account) {
     const signer = await locklift.keystore.getSigner('0');
 
     const TokenWallet = await locklift.factory.getContractArtifacts('TokenWalletUpgradeable');
@@ -208,7 +205,7 @@ export const deployTokenRoot = async function (token_name: string, token_symbol:
     return new Token(_root, owner);
 }
 
-export const deployWeverRoot = async function (token_name: string, token_symbol: string, owner: AccountType) {
+export const deployWeverRoot = async function (token_name: string, token_symbol: string, owner: Account) {
     const signer = (await locklift.keystore.getSigner('0'));
 
     const { contract: tunnel, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
@@ -297,7 +294,7 @@ export const deployWeverRoot = async function (token_name: string, token_symbol:
     };
 }
 
-export const deployAuctionRoot = async function (owner: AccountType, fee: MarketFee, weverVault: Address, weverRoot: Address) {
+export const deployAuctionRoot = async function (owner: Account, fee: MarketFee, weverVault: Address, weverRoot: Address) {
     const signer = await locklift.keystore.getSigner('0');
 
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
@@ -330,7 +327,7 @@ export const deployAuctionRoot = async function (owner: AccountType, fee: Market
     return new AuctionRoot(auctionRootTip3, owner);
 }
 
-export const deployFactoryDirectBuy = async function (owner: AccountType, fee: MarketFee, weverVault: Address, weverRoot: Address) {
+export const deployFactoryDirectBuy = async function (owner: Account, fee: MarketFee, weverVault: Address, weverRoot: Address) {
     const signer = await locklift.keystore.getSigner('0');
     const {contract: factoryDirectBuy} = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: "FactoryDirectBuy",
@@ -343,13 +340,13 @@ export const deployFactoryDirectBuy = async function (owner: AccountType, fee: M
             _weverRoot: weverRoot
         },
         initParams: {
-            nonce_: locklift.utils.getRandomNonce()    
+            nonce_: locklift.utils.getRandomNonce()
         },
         value: toNano(10)
     }));
 
     logger.log(`FactoryDirectBuy address ${factoryDirectBuy.address.toString()}`);
-    
+
     const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
     const DirectBuy = await locklift.factory.getContractArtifacts('DirectBuy');
     await factoryDirectBuy.methods.setCodeTokenPlatform({
@@ -371,9 +368,9 @@ export const deployFactoryDirectBuy = async function (owner: AccountType, fee: M
     logger.log(`DirectBuy is set`);
 
     return new FactoryDirectBuy(factoryDirectBuy, owner);
-};    
+};
 
-export const deployFactoryDirectSell = async function(owner: AccountType, fee: MarketFee, weverVault: Address, weverRoot: Address) {
+export const deployFactoryDirectSell = async function(owner: Account, fee: MarketFee, weverVault: Address, weverRoot: Address) {
     const signer = await locklift.keystore.getSigner('0');
     const {contract: factoryDirectSell} = await locklift.tracing.trace(locklift.factory.deployContract({
         contract: "FactoryDirectSell",
@@ -386,7 +383,7 @@ export const deployFactoryDirectSell = async function(owner: AccountType, fee: M
             _weverRoot: weverRoot
         },
         initParams: {
-            nonce_: locklift.utils.getRandomNonce()    
+            nonce_: locklift.utils.getRandomNonce()
         },
         value: locklift.utils.toNano(10)
     }));
@@ -403,5 +400,5 @@ export const deployFactoryDirectSell = async function(owner: AccountType, fee: M
 
     logger.log(`DirectSell is set`);
 
-    return new FactoryDirectSell(factoryDirectSell, owner);  
+    return new FactoryDirectSell(factoryDirectSell, owner);
 }

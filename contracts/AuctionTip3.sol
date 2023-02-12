@@ -16,6 +16,7 @@ import "./interfaces/IAuctionBidPlacedCallback.sol";
 
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
+import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 
 import "./Nft.sol";
 
@@ -23,7 +24,7 @@ import "tip3/contracts/interfaces/ITokenRoot.sol";
 import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
-contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest {
+contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest, ICallbackParamsStructure {
 
     address paymentToken;
     address tokenWallet;
@@ -288,7 +289,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
         require(state == AuctionStatus.Active, AuctionErrors.auction_not_active);
         require(msg.value >= (Gas.FINISH_AUCTION_VALUE + Gas.FEE_VALUE), BaseErrors.not_enough_value);
-        mapping(address => ITIP4_1NFT.CallbackParams) callbacks;
+        mapping(address => CallbackParams) callbacks;
         if (maxBidValue >= price) {
             _reserve();
             uint128 currentFee = math.muldivc(maxBidValue, fee.numerator, fee.denominator);
@@ -307,7 +308,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             );
 
             TvmCell empty;
-            callbacks[currentBid.addr] = ITIP4_1NFT.CallbackParams(0.01 ever, empty);
+            callbacks[currentBid.addr] = CallbackParams(0.01 ever, empty);
 
             ITIP4_1NFT(nft).transfer{
                 value: Gas.TRANSFER_OWNERSHIP_VALUE,

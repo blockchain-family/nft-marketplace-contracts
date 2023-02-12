@@ -1,4 +1,4 @@
-/// We recommend using the compiler version 0.62.0. 
+/// We recommend using the compiler version 0.62.0.
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
 pragma ever-solidity = 0.61.2;
 
@@ -14,13 +14,14 @@ import './interfaces/INftChangeManager.sol';
 import './interfaces/INftTransfer.sol';
 
 import '../TIP6/TIP6.sol';
+import "./structures/ICallbackParamsStructure.sol";
 
 
 /// @title One of the required contracts of an TIP4-1(Non-Fungible Token Standard) compliant technology.
 /// You can read more about the technology here (https://github.com/nftalliance/docs/blob/main/src/Standard/TIP-4/1.md)
 /// For detect what interfaces a smart contract implements used TIP-6.1 standard. ...
 /// ... Read more here (https://github.com/nftalliance/docs/blob/main/src/Standard/TIP-6/1.md)
-contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
+abstract contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
 
     /**
     * Errors
@@ -69,7 +70,9 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
         _supportedInterfaces[
             bytes4(tvm.functionId(ITIP4_1NFT.getInfo)) ^
             bytes4(tvm.functionId(ITIP4_1NFT.changeOwner)) ^
-            bytes4(tvm.functionId(ITIP4_1NFT.changeManager))
+            bytes4(tvm.functionId(ITIP4_1NFT.changeManager)) ^
+            bytes4(tvm.functionId(ITIP4_1NFT.transfer))
+
         ] = true;
 
         emit NftCreated(_id, _owner, _manager, _collection);
@@ -92,8 +95,8 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
     ///
     /// Emits a {OwnerChanged} event if to != oldOwner && Emits a {ManagerChanged} event if to != oldManager.
     function transfer(
-        address to, 
-        address sendGasTo, 
+        address to,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) public virtual override onlyManager {
         tvm.rawReserve(0, 4);
@@ -123,7 +126,7 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
         }
 
     }
-     
+
     /// @notice Change Nft owner
     /// @param newOwner - the future owner of the token
     /// @param sendGasTo - the address to which the remaining gas will be sent
@@ -139,8 +142,8 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
     ///
     /// Emits a {OwnerChanged} event if newOwner != oldOwner
     function changeOwner(
-        address newOwner, 
-        address sendGasTo, 
+        address newOwner,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) public virtual override onlyManager {
         tvm.rawReserve(0, 4);
@@ -168,7 +171,7 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
             });
         }
 
-    }   
+    }
 
     function _changeOwner(
         address newOwner
@@ -196,8 +199,8 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
     ///
     /// Emits a {ManagerChanged} event if newManager != oldManager.
     function changeManager(
-        address newManager, 
-        address sendGasTo, 
+        address newManager,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) external virtual override onlyManager {
         tvm.rawReserve(0, 4);
@@ -243,12 +246,12 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
     /// @return manager - Nft manager (Used for contract management)
     /// @return collection - Collection address (creator)
     ///
-    /// Both internal message and external message can be called. 
+    /// Both internal message and external message can be called.
     /// In case of calling external message, you need to add the answerId = 0 parameter
     function getInfo() external view virtual override responsible returns(
-        uint256 id, 
-        address owner, 
-        address manager, 
+        uint256 id,
+        address owner,
+        address manager,
         address collection)
     {
         return {value: 0, flag: 64, bounce: false} (
@@ -260,52 +263,52 @@ contract TIP4_1Nft is ITIP4_1NFT, TIP6 {
     }
 
     function _beforeTransfer(
-        address to, 
-        address sendGasTo, 
+        address to,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) internal virtual {
         to; sendGasTo; callbacks; //disable warnings
     }
 
     function _afterTransfer(
-        address to, 
-        address sendGasTo, 
+        address to,
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) internal virtual {
         to; sendGasTo; callbacks; //disable warnings
     }
 
     function _beforeChangeOwner(
-        address oldOwner, 
+        address oldOwner,
         address newOwner,
-        address sendGasTo, 
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) internal virtual {
         oldOwner; newOwner; sendGasTo; callbacks; //disable warnings
-    }   
+    }
 
     function _afterChangeOwner(
-        address oldOwner, 
+        address oldOwner,
         address newOwner,
-        address sendGasTo, 
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) internal virtual {
         oldOwner; newOwner; sendGasTo; callbacks; //disable warnings
     }
 
     function _beforeChangeManager(
-        address oldManager, 
+        address oldManager,
         address newManager,
-        address sendGasTo, 
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) internal virtual {
         oldManager; newManager; sendGasTo; callbacks; //disable warnings
-    }   
+    }
 
     function _afterChangeManager(
-        address oldManager, 
+        address oldManager,
         address newManager,
-        address sendGasTo, 
+        address sendGasTo,
         mapping(address => CallbackParams) callbacks
     ) internal virtual {
         oldManager; newManager; sendGasTo; callbacks; //disable warnings

@@ -2,20 +2,20 @@
     "collection": {
             "type": "Basic NFT",
             "name": "Sample Name",
-            "description": "Description abount NFT collection!",
+            "description": "Description about NFT collection!",
             "preview": {
-                "source": "https://klike.net/uploads/posts/2020-02/1581581024_11.jpg",
+                "source": "",
                 "mimetype": "image/png"
             },
             "files": [
                 {
-                    "source": "https://klike.net/uploads/posts/2020-02/1581581024_11.jpg",
+                    "source": "",
                     "mimetype": "image/png"
                 }
             ],
-            "external_url": "https://klike.net"
+            "external_url": ""
     },
-    "nfts":   
+    "nfts":
         [
             {
                 "address": "",

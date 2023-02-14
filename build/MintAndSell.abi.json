@@ -1,0 +1,131 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"_owner","type":"address"},
+				{"name":"_collection","type":"address"},
+				{"name":"_targetManager","type":"address"},
+				{"name":"_targetGas","type":"uint128"},
+				{"name":"_targetPayload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onNftCode",
+			"inputs": [
+				{"name":"_nftCode","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "createItems",
+			"inputs": [
+				{"name":"_fromId","type":"uint256"},
+				{"name":"_toId","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "createItemsInternal",
+			"inputs": [
+				{"name":"_fromId","type":"uint256"},
+				{"name":"_toId","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "sellItems",
+			"inputs": [
+				{"name":"_fromId","type":"uint256"},
+				{"name":"_toId","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "sellItemsInternal",
+			"inputs": [
+				{"name":"_fromId","type":"uint256"},
+				{"name":"_toId","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "expectedNftAddress",
+			"inputs": [
+				{"name":"_id","type":"uint256"}
+			],
+			"outputs": [
+				{"name":"nft","type":"address"}
+			]
+		},
+		{
+			"name": "drainGas",
+			"inputs": [
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"sendGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "owner",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "transferOwnership",
+			"inputs": [
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+		{"key":1,"name":"nonce_","type":"uint64"}
+	],
+	"events": [
+		{
+			"name": "OwnershipTransferred",
+			"inputs": [
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"owner_","type":"address"},
+		{"name":"nonce_","type":"uint64"},
+		{"name":"collection_","type":"address"},
+		{"name":"targetManager_","type":"address"},
+		{"name":"targetGas_","type":"uint128"},
+		{"name":"targetPayload_","type":"cell"},
+		{"name":"nftCodeHash_","type":"uint256"},
+		{"name":"nftCodeDepth_","type":"uint16"}
+	]
+}

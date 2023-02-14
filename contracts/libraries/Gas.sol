@@ -41,4 +41,6 @@ library Gas {
     uint128 constant UPGRADE_DIRECT_BUY_MIN_VALUE           = 5 ever;
     uint128 constant UPGRADE_DIRECT_SELL_MIN_VALUE          = 5 ever;
 
+    uint128 constant CHANGE_MANAGER_VALUE                   = 0.2 ever;
+
 }

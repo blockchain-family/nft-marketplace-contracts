@@ -13,4 +13,6 @@ library BaseErrors {
     uint8 constant value_too_low                     = 109;
     uint8 constant denominator_not_be_zero           = 110;
     uint8 constant not_wever_root                    = 111;
+    uint8 constant message_sender_is_not_self        = 112;
+    uint8 constant message_sender_is_not_collection  = 113;
 }

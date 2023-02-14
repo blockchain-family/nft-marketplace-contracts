@@ -1,16 +1,14 @@
- pragma ton-solidity >= 0.61.2;
+pragma ton-solidity >= 0.61.2;
+
+import "./IGasValueStructure.sol";
 
 interface IDirectSellGasValuesStructure {
 
-    struct GasValues {
-        uint128 fixedValue;
-        uint128 dynamicGas;
-    }
-
     struct DirectSellGasValues {
-        GasValues deploy;
-        GasValues sell;
-        GasValues buy;
-        GasValues cancel;
+        uint128 gasK;
+        IGasValueStructure.GasValues deployWallet;
+        IGasValueStructure.GasValues sell;
+        IGasValueStructure.GasValues buy;
+        IGasValueStructure.GasValues cancel;
     }
 }

@@ -41,7 +41,6 @@ let auctionRootTWAddress: Address;
 let auctionRootTW: TokenWallet;
 let startBalanceTWAuctionRoot: BigNumber;
 
-
 let auction: Auction;
 
 let startBalance1;
@@ -55,8 +54,8 @@ let startBalanceTW3: number = 60000000000;
 let startBalanceTW4: number = 60000000000;
 
 type MarketFee = {
-    numerator: number;
-    denominator: number;
+    numerator: string;
+    denominator: string;
 }
 let fee: MarketFee;
 
@@ -66,12 +65,21 @@ let bidDeltaDecimals: BigNumber;
 let weverVault: Address;
 let weverRoot: Token;
 
+type GasValue = {
+    fixedValue: string,
+    dynamicGas: string;
+}
+let gasValue: any;
+let changeManagerValue: string;
+let transferValue: string;
+let cancelValue : string;
+
 async function Callback(payload: string) {
     let callback: CallbackType;
     callback = [
         auctionRoot.address,
         {
-            value: locklift.utils.toNano(1.8),
+            value: calcValue(gasValue.start, gasValue.gasK) .toString(),
             payload: payload,
         },
     ];
@@ -79,11 +87,17 @@ async function Callback(payload: string) {
     const callbacks: CallbackType[] = [];
     callbacks.push(callback);
     return (callbacks);
-};
+}
 
 async function balance(account: Account){
     return new BigNumber(await locklift.provider.getBalance(account.address));
-};
+}
+
+function calcValue(gas: GasValue, gasK: string){
+    const gasPrice = new BigNumber(1).shiftedBy(9).div(gasK);
+    return new BigNumber(gas.dynamicGas).times(gasPrice).plus(gas.fixedValue).toNumber();
+}
+
 
 describe("Test Auction contract", async function () {
     it('Deploy account', async function () {
@@ -151,8 +165,8 @@ describe("Test Auction contract", async function () {
     });
     it('Deploy AuctionRootTip3 with fee denominator zero', async function () {
         let fee = {
-            numerator: 10,
-            denominator: 0
+            numerator: '10',
+            denominator: '0'
         } as MarketFee;
         const auctionRootExitCode = await deployAuctionRoot(
             account2, fee, weverVault, weverRoot.address
@@ -161,8 +175,8 @@ describe("Test Auction contract", async function () {
     });
     it('Deploy AuctionRootTip3', async function () {
         let fee = {
-            numerator: 10,
-            denominator: 100
+            numerator: '10',
+            denominator: '100'
         } as MarketFee;
         auctionRoot = await deployAuctionRoot(account2, fee, weverVault, weverRoot.address);
         const eventMFChanged = await auctionRoot.getEvent('MarketFeeDefaultChanged') as any;
@@ -180,7 +194,17 @@ describe("Test Auction contract", async function () {
     it('Get bid delta', async function (){
         bidDelta = new BigNumber((await auctionRoot.contract.methods.auctionBidDelta().call()).auctionBidDelta);
         bidDeltaDecimals = new BigNumber((await auctionRoot.contract.methods.auctionBidDeltaDecimals().call()).auctionBidDeltaDecimals);
-    })
+    });
+    it( 'Get fas value',async function () {
+        gasValue = (await auctionRoot.contract.methods.getGasValue().call()).value0;
+        console.log(gasValue);
+        changeManagerValue =  (calcValue(gasValue.start, gasValue.gasK) + 300000000).toString();
+        transferValue = (calcValue(gasValue.bid, gasValue.gasK) + 250000000).toString();
+        cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
+        console.log('transferValue',transferValue);
+        console.log('changeManagerValue',changeManagerValue);
+        console.log('cancelValue',cancelValue);
+    });
     describe("Auction completed", async function () {
         it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
@@ -188,9 +212,9 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
+            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
 
-            const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed');
+            const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
             let manager = (await nft.getInfo()).manager;
             expect(manager.toString()).to.be.eq(auctionDeployedEvent.offer.toString());
@@ -201,7 +225,7 @@ describe("Test Auction contract", async function () {
             startBalance2 = await balance(account2);
             // console.log('startBalance2',startBalance2.shiftedBy(-9).toNumber());
 
-            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', transferValue);
 
             const spentTokenWallet3Balance = await tokenWallet3.balance();
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -210,7 +234,7 @@ describe("Test Auction contract", async function () {
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
             await sleep(3000);
-            const {traceTree} = await auction.finishAuction(account2, 0);
+            const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
             // console.log("balanceChangeInfo");
@@ -255,7 +279,7 @@ describe("Test Auction contract", async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 3)).toString();
             let callbacks = await Callback(payload);
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
 
@@ -264,7 +288,7 @@ describe("Test Auction contract", async function () {
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await sleep(3000);
-            const {traceTree} = await auction.finishAuction(account3, 0);
+            const {traceTree} = await auction.finishAuction(account3, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
             // console.log("balanceChangeInfo");
@@ -272,7 +296,7 @@ describe("Test Auction contract", async function () {
             //     console.log(addr + ": " + traceTree?.balanceChangeInfo[addr].balanceDiff.shiftedBy(-9).toString());
             // }
 
-            let eventManagerChanged = await nft.getEvent('ManagerChanged');
+            let eventManagerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(eventManagerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
@@ -291,14 +315,14 @@ describe("Test Auction contract", async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10)).toString();
             let callbacks = await Callback(payload);
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
 
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             //First bid placed
-            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '',transferValue);
             let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
@@ -314,7 +338,7 @@ describe("Test Auction contract", async function () {
             // console.log('startBalance2',startBalance2.shiftedBy(-9).toNumber());
 
             //Second bid placed
-            const {traceTree} = await tokenWallet4.transfer(nextBid.toNumber(), auction.address, 0, true, '', toNano(2));
+            const {traceTree} = await tokenWallet4.transfer(nextBid.toNumber(), auction.address, 0, true, '', transferValue);
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
             // console.log("balanceChangeInfo");
             // for(let addr in traceTree?.balanceChangeInfo) {
@@ -338,7 +362,7 @@ describe("Test Auction contract", async function () {
 
             //Finish auction
             await sleep(10000);
-            await auction.finishAuction(account2, 0);
+            await auction.finishAuction(account2, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
             expect(eventAuctionComplete).not.to.be.null;
@@ -383,20 +407,20 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 15)).toString();
 
             let callbacks = await Callback(payload);
-            await nft.changeManager(account4, auctionRoot.address, account4.address, callbacks);
+            await nft.changeManager(account4, auctionRoot.address, account4.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             //First user bid
-            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', transferValue);
             const firstBid = await auction.contract.methods.currentBid({}).call();
             expect(firstBid.currentBid.addr.toString()).to.be.eq(account3.address.toString());
             expect(firstBid.currentBid.value.toString()).to.be.eq(spentToken.toString());
 
             //Second user bid
-            await tokenWallet2.transfer(spentToken + 1000000000, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet2.transfer(spentToken + 1000000000, auction.address, 0, true, '', transferValue);
             const secondBid = await auction.contract.methods.currentBid({}).call();
             expect(secondBid.currentBid.addr.toString()).to.be.eq(account2.address.toString());
             expect(secondBid.currentBid.value.toString()).to.be.eq((spentToken + 1000000000).toString());
@@ -404,7 +428,7 @@ describe("Test Auction contract", async function () {
             startBalance2 = await balance(account2);
 
             //First user rebid
-            await tokenWallet3.transfer(spentToken + 2000000000, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet3.transfer(spentToken + 2000000000, auction.address, 0, true, '', transferValue);
             const rebidFirstBid = await auction.contract.methods.currentBid({}).call();
             expect(rebidFirstBid.currentBid.addr.toString()).to.be.eq(account3.address.toString());
             expect(rebidFirstBid.currentBid.value.toString()).to.be.eq((spentToken + 2000000000).toString());
@@ -419,7 +443,7 @@ describe("Test Auction contract", async function () {
 
             //Finish auction
             await sleep(10000);
-            await auction.finishAuction(account3, 0);
+            await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
             expect(eventAuctionComplete).not.to.be.null;
@@ -470,14 +494,14 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 5)).toString();
 
             let callbacks = await Callback(payload);
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
 
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             startBalance4 = await balance(account4);
-            await tokenWallet4.transfer(1500000000, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet4.transfer(1500000000, auction.address, 0, true, '', transferValue);
 
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account4.address.toString());
@@ -487,7 +511,7 @@ describe("Test Auction contract", async function () {
             expect(status.toString()).to.be.eq('1');
 
             await sleep(3000);
-            await auction.finishAuction(account3, 0);
+            await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
 
@@ -515,19 +539,19 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3)).toString();
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             await sleep(3000);
-            await auction.finishAuction(account3, 0);
+            await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
 
             startBalance1 = await balance(account1);
 
-            await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', transferValue);
 
             let owner = (await nft.getInfo()).owner;
             expect(owner.toString()).to.be.eq(account3.address.toString());
@@ -556,14 +580,14 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3)).toString();
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             startBalance3 = await balance(account3);
 
-            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', transferValue);
 
             const spentTokenWallet3Balance = await tokenWallet3.balance();
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -572,7 +596,7 @@ describe("Test Auction contract", async function () {
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
             await sleep(3000);
-            await auction.finishAuction(account3, 0);
+            await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
 
@@ -597,7 +621,7 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3)).toString();
 
             let callbacks = await Callback(payload);
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
 
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
@@ -606,7 +630,7 @@ describe("Test Auction contract", async function () {
             startBalance1 = await balance(account1);
 
             await sleep(3000);
-            const {traceTree} = await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            const {traceTree} = await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', transferValue);
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent).to.be.not.null;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account1.address.toString());
@@ -615,7 +639,7 @@ describe("Test Auction contract", async function () {
             //     console.log(addr + ": " + traceTree?.balanceChangeInfo[addr].balanceDiff.shiftedBy(-9).toString());
             // }
 
-            await auction.finishAuction(account3, 0);
+            await auction.finishAuction(account3, 0, cancelValue);
             const eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
 
@@ -644,7 +668,7 @@ describe("Test Auction contract", async function () {
 
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeclined') as any;
             expect(auctionDeployedEvent).to.be.not.null;
 
@@ -661,14 +685,14 @@ describe("Test Auction contract", async function () {
 
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             locklift.tracing.setAllowedCodesForAddress(auction.address, { compute: [253]});
 
-            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
 
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account2.address.toString());
@@ -679,7 +703,7 @@ describe("Test Auction contract", async function () {
             startBalance3 = await balance(account3);
 
             await sleep(5000);
-            await auction.finishAuction(account2, 0);
+            await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
             expect(eventAuctionComplete).to.be.not.null;
 
@@ -701,7 +725,7 @@ describe("Test Auction contract", async function () {
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
             expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.2);
 
-            const {traceTree} = await auction.finishAuction(account2, 0);
+            const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             expect(traceTree).to.have.error(253);
 
             const eventAuctionComplete2 = await auction.getEvent('AuctionComplete');
@@ -728,7 +752,7 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)) + 3, 3)).toString();
 
             let callbacks = await Callback(payload);
-            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
+            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
@@ -738,7 +762,7 @@ describe("Test Auction contract", async function () {
 
             startBalance4 = await balance(account4);
 
-            await tokenWallet4.transfer(spentToken, auction.address, 0, true, '', toNano(1.1));
+            await tokenWallet4.transfer(spentToken, auction.address, 0, true, '', transferValue);
             const bidPDeclinedEvent = await auction.getEvent('BidDeclined') as any;
             let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
 
@@ -754,7 +778,7 @@ describe("Test Auction contract", async function () {
 
             await sleep(6000);
 
-            await auction.finishAuction(account2, 0);
+            await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
 
@@ -773,7 +797,7 @@ describe("Test Auction contract", async function () {
 
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
+            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
@@ -782,7 +806,7 @@ describe("Test Auction contract", async function () {
             expect(status.toString()).to.be.eq('1');
 
             locklift.tracing.setAllowedCodesForAddress(auction.address, { compute: [250]});
-            const {traceTree} = await auction.finishAuction(account2, 0);
+            const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             expect(traceTree).to.have.error(250);
 
             let owner = (await nft.getInfo()).owner;
@@ -790,7 +814,7 @@ describe("Test Auction contract", async function () {
             expect(status.toString()).to.be.eq('1');
 
             await sleep(5000);
-            await auction.finishAuction(account2, 0);
+            await auction.finishAuction(account2, 0, cancelValue);
             await auction.getEvent('AuctionCancelled');
         });
     });
@@ -800,8 +824,8 @@ describe("Test Auction contract", async function () {
             expect(oldFee).to.eql(fee);
 
             let setFee = {
-                numerator: 20,
-                denominator: 100
+                numerator: '20',
+                denominator: '100'
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFee({_fee: setFee}).send({
@@ -810,8 +834,8 @@ describe("Test Auction contract", async function () {
             });
 
             let newFee = (await auctionRoot.contract.methods.getMarketFee().call()).value0;
-            expect(setFee.numerator.toString()).to.eql(newFee.numerator);
-            expect(setFee.denominator.toString()).to.eql(newFee.denominator);
+            expect(setFee.numerator).to.eql(newFee.numerator);
+            expect(setFee.denominator).to.eql(newFee.denominator);
             fee = newFee;
         });
         it('Change market fee with zero denominator', async function () {
@@ -819,8 +843,8 @@ describe("Test Auction contract", async function () {
             expect(oldFee).to.eql(fee);
 
             let setFee = {
-                numerator: 20,
-                denominator: 0
+                numerator: '20',
+                denominator: '0'
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFee({_fee: setFee}).send({
@@ -836,8 +860,8 @@ describe("Test Auction contract", async function () {
             expect(oldFee).to.eql(fee);
 
             let setFee = {
-                numerator: 30,
-                denominator: 100
+                numerator: '30',
+                denominator: '100'
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFee({_fee: setFee}).send({
@@ -855,7 +879,7 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 5)).toString();
             let callbacks = await Callback(payload);
 
-            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks);
+            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
@@ -867,8 +891,8 @@ describe("Test Auction contract", async function () {
             expect(oldFee).to.eql(fee);
 
             let setFee = {
-                numerator: 20,
-                denominator: 100
+                numerator: '20',
+                denominator: '100'
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFeeForAuction({auction: auction.address, _fee: setFee}).send({
@@ -885,12 +909,12 @@ describe("Test Auction contract", async function () {
 
             startBalance2 = await balance(account2);
 
-            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', toNano(2));
+            await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', transferValue);
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
             await sleep(5000);
-            await auction.finishAuction(account3, 0);
+            await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
             expect(eventAuctionComplete).not.to.be.null;

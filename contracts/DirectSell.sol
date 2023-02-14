@@ -18,6 +18,7 @@ import "./structures/IDirectSellGasValuesStructure.sol";
 
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
+import "./structures/IGasValueStructure.sol";
 
 import "./Nft.sol";
 
@@ -27,7 +28,7 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 
 
-contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure {
+contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure {
   address static factoryDirectSell;
   address static owner;
   address static paymentToken;
@@ -35,10 +36,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
   uint64 static timeTx;
 
 DirectSellGasValues directSellGas;
-
- function calcValue(GasValues value) public pure returns(uint128) {
-    return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
- }
 
   uint64 startTime;
   uint64 durationTime;
@@ -84,7 +81,7 @@ DirectSellGasValues directSellGas;
     if (
        msg.sender.value != 0 &&
        msg.sender == factoryDirectSell &&
-       msg.sender.value >= calcValue(_directSellGas.deploy)
+       msg.sender.value >= calcValue(_directSellGas.deployWallet)
     ){
       _reserve();
       changeState(DirectSellStatus.Create);
@@ -134,6 +131,9 @@ DirectSellGasValues directSellGas;
   function _reserve() internal  {
         tvm.rawReserve(Gas.DIRECT_SELL_INITIAL_BALANCE, 0);
     }
+  function calcValue(GasValues value) internal pure returns(uint128) {
+    return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
+  }
 
   function getTypeContract() external pure returns (string) {
     return "DirectSell";

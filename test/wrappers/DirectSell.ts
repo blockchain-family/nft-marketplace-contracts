@@ -20,13 +20,14 @@ export class FactoryDirectSell {
         return new FactoryDirectSell(contract, owner);
     }
 
-    async buildPayload(callbackId:number, startTime: any, endTime:any, paymentToken: Token, price: any) {
+    async buildPayload(callbackId:number, startTime: any, endTime:any, paymentToken: Token, price: any, recipient: Address) {
         return (await this.contract.methods.buildDirectSellCreationPayload({
             callbackId: callbackId,
             _startTime: startTime,
             durationTime: endTime,
             _paymentToken: paymentToken.address,
-            _price: price
+            _price: price,
+            recipient: recipient
         }).call()).value0;
     }
 
@@ -75,21 +76,21 @@ export class DirectSell {
         return (await this.contract.methods.getInfo({}).call()).value0;
     }
 
-    async closeSell(callbackId: number) {
-        return await this.contract.methods.closeSell({
+    async closeSell(callbackId: number, gasValue: any) {
+        return await locklift.tracing.trace(this.contract.methods.closeSell({
                 callbackId
             }).send({
             from: this.owner.address,
-            amount:toNano(1)
-        })
+            amount: gasValue
+        }));
     }
-    async finishSell(initiator: Account, callbackId: number) {
+    async finishSell(initiator: Account, callbackId: number, gasValue: any) {
         return await this.contract.methods.finishSell({
                 sendGasTo: initiator.address,
                 callbackId
             }).send({
             from:initiator.address,
-            amount:toNano(2)
+            amount: gasValue
         })
     }
 }

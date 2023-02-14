@@ -14,9 +14,9 @@ abstract contract Offer is IOffer {
 
     uint64 static nonce_;
     address public static nft;
+    address public static markerRootAddr;
 
     uint128 public price;
-    address public markerRootAddr;
     address public tokenRootAddr;
     address public nftOwner;
 
@@ -26,7 +26,6 @@ abstract contract Offer is IOffer {
 
     function setDefaultProperties(
         uint128 _price,
-        address _markerRootAddr,
         address _tokenRootAddr,
         address _nftOwner,
         uint128 _deploymentFee,
@@ -35,7 +34,6 @@ abstract contract Offer is IOffer {
         internal 
     {   
         price = _price;
-        markerRootAddr = _markerRootAddr;
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
         deploymentFee = _deploymentFee;

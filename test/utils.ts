@@ -12,8 +12,8 @@ const logger = require("mocha-logger");
 const { expect } = require("chai");
 
 type MarketFee = {
-    numerator: number;
-    denominator: number;
+    numerator: string;
+    denominator: string;
 }
 
 export type AddressN = `0:${string}`
@@ -340,7 +340,7 @@ export const deployFactoryDirectBuy = async function (owner: Account, fee: Marke
             _weverRoot: weverRoot
         },
         initParams: {
-            nonce_: locklift.utils.getRandomNonce()
+            nonce_: getRandomNonce()
         },
         value: toNano(10)
     }));

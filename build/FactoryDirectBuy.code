@@ -40,26 +40,26 @@ PUSH S4
 CALLREF {
 	CALL $_transferOwnership_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 57
-ACCEPT
-.loc ../contracts/FactoryDirectBuy.sol, 58
-CALLREF {
-	CALL $_reserve_internal_macro$
-}
-.loc ../contracts/FactoryDirectBuy.sol, 60
+.loc ../contracts/FactoryDirectBuy.sol, 62
 PUSH S2
 SECOND
 GTINT 0
 THROWIFNOT 110
-.loc ../contracts/FactoryDirectBuy.sol, 61
+.loc ../contracts/FactoryDirectBuy.sol, 63
+ACCEPT
+.loc ../contracts/FactoryDirectBuy.sol, 64
+CALLREF {
+	CALL $_reserve_internal_macro$
+}
+.loc ../contracts/FactoryDirectBuy.sol, 65
 GETGLOB 14
 INC
 UFITS 32
 SETGLOB 14
-.loc ../contracts/FactoryDirectBuy.sol, 62
+.loc ../contracts/FactoryDirectBuy.sol, 66
 PUSH S2
 SETGLOB 16
-.loc ../contracts/FactoryDirectBuy.sol, 63
+.loc ../contracts/FactoryDirectBuy.sol, 67
 ROT
 PUSHSLICE xc00000000000000000000000003d169c83
 NEWC
@@ -72,17 +72,17 @@ STU 32
 ENDC
 PUSHINT 0
 SENDRAWMSG
-.loc ../contracts/FactoryDirectBuy.sol, 64
+.loc ../contracts/FactoryDirectBuy.sol, 68
 SWAP
 SETGLOB 17
-.loc ../contracts/FactoryDirectBuy.sol, 65
+.loc ../contracts/FactoryDirectBuy.sol, 69
 SETGLOB 18
-.loc ../contracts/FactoryDirectBuy.sol, 66
+.loc ../contracts/FactoryDirectBuy.sol, 70
 SWAP
 CALLREF {
 	CALL $_transferOwnership_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 67
+.loc ../contracts/FactoryDirectBuy.sol, 71
 NEWC
 STSLICECONST x42_
 STSLICE
@@ -91,6 +91,109 @@ STZEROES
 ENDC
 PUSHPOW2 7
 SENDRAWMSG
+.loc ../contracts/FactoryDirectBuy.sol, 73
+PUSHINT 1000000000
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__tonToGas_macro$
+}
+PUSHINT 150000000
+PUSHINT 120000000
+ADD
+UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 100000000
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__tonToGas_macro$
+}
+PAIR
+PUSHINT 150000000
+PUSHINT 100000000
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__tonToGas_macro$
+}
+PAIR
+PUSHINT 300000000
+PUSHINT 150000000
+ADD
+UFITS 128
+PUSHINT 150000000
+ADD
+UFITS 128
+PUSHINT 120000000
+ADD
+UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 200000000
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__tonToGas_macro$
+}
+PAIR
+PUSHINT 150000000
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 10000000
+ADD
+UFITS 128
+PUSHINT 1010000000
+ADD
+UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 300000000
+ADD
+UFITS 128
+PUSHINT 350000000
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__tonToGas_macro$
+}
+PAIR
+PUSHINT 150000000
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 300000000
+ADD
+UFITS 128
+PUSHINT 150000000
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__tonToGas_macro$
+}
+PAIR
+TUPLE 6
+SETGLOB 19
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
 	CALL $c7_to_c4$
@@ -102,17 +205,119 @@ THROW 0
 CALL $_reserve_internal_macro$
 
 .macro _reserve_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 71
+.loc ../contracts/FactoryDirectBuy.sol, 129
 PUSHINT 300000000
 PUSHINT 0
 RAWRESERVE
+.loc ../contracts/FactoryDirectBuy.sol, 0
+
+.globl	calcValue_internal
+.type	calcValue_internal, @function
+CALL $calcValue_internal_macro$
+
+.macro calcValue_internal_macro
+.loc ../contracts/FactoryDirectBuy.sol, 133
+DUP
+FIRST
+SWAP
+SECOND
+MYADDR
+PARSEMSGADDR
+THIRD
+CALLREF {
+	CALL $__gasToTon_macro$
+}
+ADD
+UFITS 128
+.loc ../contracts/FactoryDirectBuy.sol, 0
+
+.macro getGasValue
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/FactoryDirectBuy.sol, 136
+ENDS
+.loc ../contracts/FactoryDirectBuy.sol, 0
+CALLREF {
+	CALL $getGasValue_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 1
+	STUR 98
+	SWAP
+	NEWC
+	STSLICECONST xbb9b5141
+	SWAP
+	UNTUPLE 6
+	REVERSE 7, 0
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	ROLLREV 3
+	NEWC
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.macro getGasValue_internal_macro
+.loc ../contracts/FactoryDirectBuy.sol, 137
+GETGLOB 19
 .loc ../contracts/FactoryDirectBuy.sol, 0
 
 .macro getTypeContract
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/FactoryDirectBuy.sol, 74
+.loc ../contracts/FactoryDirectBuy.sol, 140
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
@@ -146,7 +351,7 @@ IFREF {
 THROW 0
 
 .macro getTypeContract_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 75
+.loc ../contracts/FactoryDirectBuy.sol, 141
 PUSHREF {
 	.blob x466163746f7279446972656374427579
 }
@@ -161,7 +366,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 78
+.loc ../contracts/FactoryDirectBuy.sol, 144
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
 CALLREF {
@@ -199,7 +404,7 @@ IFREF {
 THROW 0
 
 .macro getMarketFee_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 79
+.loc ../contracts/FactoryDirectBuy.sol, 145
 GETGLOB 16
 .loc ../contracts/FactoryDirectBuy.sol, 0
 
@@ -212,7 +417,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 82
+.loc ../contracts/FactoryDirectBuy.sol, 148
 LDU 32
 LDU 32
 ROTREV
@@ -252,19 +457,19 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 83
+.loc ../contracts/FactoryDirectBuy.sol, 149
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 84
+.loc ../contracts/FactoryDirectBuy.sol, 150
 DUP
 SECOND
 GTINT 0
 THROWIFNOT 110
-.loc ../contracts/FactoryDirectBuy.sol, 85
+.loc ../contracts/FactoryDirectBuy.sol, 151
 DUP
 SETGLOB 16
-.loc ../contracts/FactoryDirectBuy.sol, 86
+.loc ../contracts/FactoryDirectBuy.sol, 152
 PUSHSLICE xc00000000000000000000000003d169c83
 NEWC
 STSLICE
@@ -276,7 +481,7 @@ STU 32
 ENDC
 PUSHINT 0
 SENDRAWMSG
-.loc ../contracts/FactoryDirectBuy.sol, 87
+.loc ../contracts/FactoryDirectBuy.sol, 153
 GETGLOB 9
 NEWC
 STSLICECONST x42_
@@ -297,7 +502,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 90
+.loc ../contracts/FactoryDirectBuy.sol, 156
 OVER
 PUSHCONT {
 	LDREF
@@ -345,12 +550,12 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 91
+.loc ../contracts/FactoryDirectBuy.sol, 157
 DUP
 SECOND
 GTINT 0
 THROWIFNOT 110
-.loc ../contracts/FactoryDirectBuy.sol, 92
+.loc ../contracts/FactoryDirectBuy.sol, 158
 GETGLOB 9
 PUSH2 S1, S2
 FALSE
@@ -374,7 +579,7 @@ STBREFR
 ENDC
 PUSHINT 64
 SENDRAWMSG
-.loc ../contracts/FactoryDirectBuy.sol, 93
+.loc ../contracts/FactoryDirectBuy.sol, 159
 SWAP
 PUSHSLICE xc0000000000000000000000000372b03f5
 NEWC
@@ -394,7 +599,7 @@ SENDRAWMSG
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/FactoryDirectBuy.sol, 96
+.loc ../contracts/FactoryDirectBuy.sol, 162
 OVER
 PUSHCONT {
 	LDU 32
@@ -446,22 +651,22 @@ IFREF {
 THROW 0
 
 .macro buildDirectBuyCreationPayload_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 104
+.loc ../contracts/FactoryDirectBuy.sol, 170
 ROLL 4
 NEWC
 STU 32
-.loc ../contracts/FactoryDirectBuy.sol, 105
+.loc ../contracts/FactoryDirectBuy.sol, 171
 ROLL 4
 STSLICER
-.loc ../contracts/FactoryDirectBuy.sol, 106
+.loc ../contracts/FactoryDirectBuy.sol, 172
 ROLL 3
 STSLICER
-.loc ../contracts/FactoryDirectBuy.sol, 107
+.loc ../contracts/FactoryDirectBuy.sol, 173
 XCHG S1, S2
 STU 64
-.loc ../contracts/FactoryDirectBuy.sol, 108
+.loc ../contracts/FactoryDirectBuy.sol, 174
 STU 64
-.loc ../contracts/FactoryDirectBuy.sol, 109
+.loc ../contracts/FactoryDirectBuy.sol, 175
 ENDC
 .loc ../contracts/FactoryDirectBuy.sol, 0
 
@@ -474,7 +679,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 112
+.loc ../contracts/FactoryDirectBuy.sol, 178
 LDREF
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
@@ -514,13 +719,13 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 113
+.loc ../contracts/FactoryDirectBuy.sol, 179
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 114
+.loc ../contracts/FactoryDirectBuy.sol, 180
 SETGLOB 12
-.loc ../contracts/FactoryDirectBuy.sol, 116
+.loc ../contracts/FactoryDirectBuy.sol, 182
 GETGLOB 9
 NEWC
 STSLICECONST x42_
@@ -541,7 +746,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 123
+.loc ../contracts/FactoryDirectBuy.sol, 189
 LDREF
 ENDS
 .loc ../contracts/FactoryDirectBuy.sol, 0
@@ -581,18 +786,18 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 124
+.loc ../contracts/FactoryDirectBuy.sol, 190
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 125
+.loc ../contracts/FactoryDirectBuy.sol, 191
 SETGLOB 13
-.loc ../contracts/FactoryDirectBuy.sol, 126
+.loc ../contracts/FactoryDirectBuy.sol, 192
 GETGLOB 15
 INC
 UFITS 32
 SETGLOB 15
-.loc ../contracts/FactoryDirectBuy.sol, 128
+.loc ../contracts/FactoryDirectBuy.sol, 194
 GETGLOB 9
 NEWC
 STSLICECONST x42_
@@ -613,7 +818,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 135
+.loc ../contracts/FactoryDirectBuy.sol, 201
 OVER
 PUSHCONT {
 	LDREF
@@ -648,27 +853,27 @@ CALLREF {
 THROW 0
 
 .macro onAcceptTokensTransfer_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 143
+.loc ../contracts/FactoryDirectBuy.sol, 209
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 144
+.loc ../contracts/FactoryDirectBuy.sol, 210
 PUSHINT 0
-.loc ../contracts/FactoryDirectBuy.sol, 145
+.loc ../contracts/FactoryDirectBuy.sol, 211
 ROLL 4
-.loc ../contracts/FactoryDirectBuy.sol, 146
+.loc ../contracts/FactoryDirectBuy.sol, 212
 PUSHREFSLICE {
 	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
 }
-.loc ../contracts/FactoryDirectBuy.sol, 147
+.loc ../contracts/FactoryDirectBuy.sol, 213
 PUSH S3
 CTOS
-.loc ../contracts/FactoryDirectBuy.sol, 148
+.loc ../contracts/FactoryDirectBuy.sol, 214
 DUP
 SBITS
 GTINT 31
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 149
+	.loc ../contracts/FactoryDirectBuy.sol, 215
 	DUP
 	LDU 32
 	POP S2
@@ -676,13 +881,13 @@ PUSHCONT {
 	.loc ../contracts/FactoryDirectBuy.sol, 0
 }
 IF
-.loc ../contracts/FactoryDirectBuy.sol, 151
+.loc ../contracts/FactoryDirectBuy.sol, 217
 DUP
 SBITS
 PUSHINT 267
 GEQ
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 152
+	.loc ../contracts/FactoryDirectBuy.sol, 218
 	DUP
 	LDMSGADDR
 	POP S2
@@ -690,19 +895,19 @@ PUSHCONT {
 	.loc ../contracts/FactoryDirectBuy.sol, 0
 }
 IF
-.loc ../contracts/FactoryDirectBuy.sol, 154
+.loc ../contracts/FactoryDirectBuy.sol, 220
 DUP
 SBITS
 PUSHINT 267
 GEQ
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 155
+	.loc ../contracts/FactoryDirectBuy.sol, 221
 	LDMSGADDR
 	BLKDROP2 1, 2
 	.loc ../contracts/FactoryDirectBuy.sol, 0
 }
 IF
-.loc ../contracts/FactoryDirectBuy.sol, 157
+.loc ../contracts/FactoryDirectBuy.sol, 223
 DUP
 SBITS
 PUSHPOW2 7
@@ -731,13 +936,11 @@ PUSHCONT {
 			DEPTH
 			ADDCONST -2
 			PICK
-			PUSHINT 2000000000
-			PUSHINT 500000000
-			ADD
-			UFITS 128
-			PUSHINT 100000000
-			ADD
-			UFITS 128
+			GETGLOB 19
+			INDEX 3
+			CALLREF {
+				CALL $calcValue_internal_macro$
+			}
 			GEQ
 		}
 		IF
@@ -746,20 +949,20 @@ PUSHCONT {
 }
 IF
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 163
+	.loc ../contracts/FactoryDirectBuy.sol, 229
 	DUP
 	LDU 64
 	LDU 64
 	POP S3
-	.loc ../contracts/FactoryDirectBuy.sol, 164
+	.loc ../contracts/FactoryDirectBuy.sol, 230
 	LTIME
-	.loc ../contracts/FactoryDirectBuy.sol, 166
+	.loc ../contracts/FactoryDirectBuy.sol, 232
 	PUSH3 S5, S11, S4
 	PUSH S3
 	CALLREF {
 		CALL $_buildDirectBuyStateInit_internal_macro$
 	}
-	.loc ../contracts/FactoryDirectBuy.sol, 167
+	.loc ../contracts/FactoryDirectBuy.sol, 233
 	DUP
 	HASHCU
 	NEWC
@@ -767,29 +970,39 @@ PUSHCONT {
 	STU 256
 	ENDC
 	CTOS
-	.loc ../contracts/FactoryDirectBuy.sol, 169
+	.loc ../contracts/FactoryDirectBuy.sol, 235
+	GETGLOB 19
 	GETGLOB 18
 	GETGLOB 17
 	GETGLOB 16
-	PUSH S16
-	PUSH S4
+	PUSH S17
+	PUSH S5
 	CALLREF {
 		CALL $getTokenWallet_internal_macro$
 	}
-	BLKSWAP 2, 7
+	BLKSWAP 2, 8
 	SWAP
-	PUSH S16
-	ROLL 8
+	PUSH S17
+	ROLL 9
 	DUP
 	HASHCU
 	NEWC
 	STSLICECONST x801_
 	STU 256
+	ROLLREV 9
+	GETGLOB 19
+	THIRD
+	CALLREF {
+		CALL $calcValue_internal_macro$
+	}
+	ROLL 10
 	NEWC
 	STSLICECONST x62_
 	STB
-	PUSHINT 3112111703474754619475120804657301188247555
-	STUR 143
+	SWAP
+	STGRAMS
+	PUSHINT 3
+	STUR 107
 	OVER
 	CALLREF {
 		CTOS
@@ -815,9 +1028,9 @@ PUSHCONT {
 	}
 	STREF
 	STSLICECONST 1
-	ROLLREV 7
+	ROLLREV 8
 	NEWC
-	STSLICECONST x384e4daf
+	STSLICECONST x082f7d65
 	STU 128
 	STU 64
 	STU 64
@@ -827,19 +1040,54 @@ PUSHCONT {
 	XCHG S2
 	STU 32
 	STU 32
+	ROLLREV 3
+	NEWC
+	STSLICE
 	ROTREV
 	NEWC
 	STSLICE
 	SWAP
+	UNTUPLE 6
+	REVERSE 7, 0
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	ROLLREV 5
 	NEWC
-	STSLICE
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	SWAP
+	NEWC
+	STU 128
+	STBREFR
+	STBREFR
 	STBREFR
 	STBREFR
 	STBREFR
 	ENDC
-	PUSHINT 0
+	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 179
+	.loc ../contracts/FactoryDirectBuy.sol, 250
 	PUSH3 S9, S1, S3
 	PUSH3 S13, S7, S3
 	PUSHSLICE xc0000000000000000000000001
@@ -867,7 +1115,7 @@ PUSHCONT {
 	ENDC
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 180
+	.loc ../contracts/FactoryDirectBuy.sol, 251
 	PUSH S9
 	ROT
 	PUSH3 S4, S11, S5
@@ -903,7 +1151,7 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 194
+	.loc ../contracts/FactoryDirectBuy.sol, 265
 	PUSH S5
 	TRUE
 	PUSH S8
@@ -937,7 +1185,7 @@ PUSHCONT {
 	SENDRAWMSG
 }
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 207
+	.loc ../contracts/FactoryDirectBuy.sol, 278
 	PUSH3 S1, S7, S8
 	PUSH S5
 	PUSHSLICE xc0000000000000000000000001
@@ -960,7 +1208,7 @@ PUSHCONT {
 	ENDC
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 208
+	.loc ../contracts/FactoryDirectBuy.sol, 279
 	PUSH3 S1, S7, S8
 	PUSH3 S5, S6, S5
 	FALSE
@@ -989,19 +1237,19 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 220
+	.loc ../contracts/FactoryDirectBuy.sol, 291
 	PUSH S5
 	NEWC
 	STSLICE
-	.loc ../contracts/FactoryDirectBuy.sol, 221
+	.loc ../contracts/FactoryDirectBuy.sol, 292
 	PUSHREF {
 	}
-	.loc ../contracts/FactoryDirectBuy.sol, 222
+	.loc ../contracts/FactoryDirectBuy.sol, 293
 	PUSH S10
 	GETGLOB 18
 	SDEQ
 	PUSHCONT {
-		.loc ../contracts/FactoryDirectBuy.sol, 223
+		.loc ../contracts/FactoryDirectBuy.sol, 294
 		OVER
 		ENDC
 		TRUE
@@ -1011,7 +1259,7 @@ PUSHCONT {
 		PUSH S14
 	}
 	PUSHCONT {
-		.loc ../contracts/FactoryDirectBuy.sol, 232
+		.loc ../contracts/FactoryDirectBuy.sol, 303
 		DUP
 		TRUE
 		PUSH S9
@@ -1060,7 +1308,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 244
+.loc ../contracts/FactoryDirectBuy.sol, 315
 OVER
 PUSHCONT {
 	LDREF
@@ -1091,26 +1339,26 @@ CALLREF {
 THROW 0
 
 .macro onAcceptTokensBurn_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 251
+.loc ../contracts/FactoryDirectBuy.sol, 322
 PUSHREFSLICE {
 	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
 }
-.loc ../contracts/FactoryDirectBuy.sol, 252
+.loc ../contracts/FactoryDirectBuy.sol, 323
 SWAP
 CTOS
-.loc ../contracts/FactoryDirectBuy.sol, 253
+.loc ../contracts/FactoryDirectBuy.sol, 324
 DUP
 SBITS
 PUSHINT 267
 GEQ
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 254
+	.loc ../contracts/FactoryDirectBuy.sol, 325
 	LDMSGADDR
 	BLKDROP2 1, 2
 	.loc ../contracts/FactoryDirectBuy.sol, 0
 }
 IF
-.loc ../contracts/FactoryDirectBuy.sol, 256
+.loc ../contracts/FactoryDirectBuy.sol, 327
 DROP
 GETGLOB 9
 PARSEMSGADDR
@@ -1122,19 +1370,19 @@ GETGLOB 18
 SDEQ
 AND
 THROWIFNOT 111
-.loc ../contracts/FactoryDirectBuy.sol, 257
+.loc ../contracts/FactoryDirectBuy.sol, 328
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 259
+.loc ../contracts/FactoryDirectBuy.sol, 330
 DUP2
 SDEQ
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 260
+	.loc ../contracts/FactoryDirectBuy.sol, 331
 	OVER
 }
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 262
+	.loc ../contracts/FactoryDirectBuy.sol, 333
 	PUSH2 S4, S1
 	NEWC
 	STSLICECONST x42_
@@ -1146,7 +1394,7 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 263
+	.loc ../contracts/FactoryDirectBuy.sol, 334
 	DUP
 }
 IFELSE
@@ -1170,7 +1418,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 268
+.loc ../contracts/FactoryDirectBuy.sol, 339
 OVER
 PUSHCONT {
 	LDREF
@@ -1222,27 +1470,27 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 269
+.loc ../contracts/FactoryDirectBuy.sol, 340
 OVER
 PARSEMSGADDR
 INDEX 3
 PLDU 256
 THROWIFNOT 308
-.loc ../contracts/FactoryDirectBuy.sol, 270
+.loc ../contracts/FactoryDirectBuy.sol, 341
 DEPTH
 ADDCONST -2
 PICK
 PUSHINT 500000000
 GEQ
 THROWIFNOT 307
-.loc ../contracts/FactoryDirectBuy.sol, 272
+.loc ../contracts/FactoryDirectBuy.sol, 343
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 273
+.loc ../contracts/FactoryDirectBuy.sol, 344
 PUSHREF {
 }
-.loc ../contracts/FactoryDirectBuy.sol, 274
+.loc ../contracts/FactoryDirectBuy.sol, 345
 FALSE
 ROT
 PUSHINT 120000000
@@ -1271,7 +1519,7 @@ STBREFR
 ENDC
 PUSHPOW2 7
 SENDRAWMSG
-.loc ../contracts/FactoryDirectBuy.sol, 276
+.loc ../contracts/FactoryDirectBuy.sol, 347
 PUSHSLICE xc0000000000000000000000001
 NEWC
 STSLICE
@@ -1288,7 +1536,7 @@ STBREFR
 ENDC
 PUSHINT 0
 SENDRAWMSG
-.loc ../contracts/FactoryDirectBuy.sol, 277
+.loc ../contracts/FactoryDirectBuy.sol, 348
 GETGLOB 9
 NEWC
 STSLICECONST x42_
@@ -1305,7 +1553,7 @@ SENDRAWMSG
 CALL $_buildDirectBuyStateInit_internal_macro$
 
 .macro _buildDirectBuyStateInit_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 287
+.loc ../contracts/FactoryDirectBuy.sol, 358
 PUSHINT 0
 NEWC
 STU 256
@@ -1357,7 +1605,7 @@ ENDC
 CALL $getTokenWallet_internal_macro$
 
 .macro getTokenWallet_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 305
+.loc ../contracts/FactoryDirectBuy.sol, 376
 PUSHINT 0
 NEWC
 STU 256
@@ -1398,7 +1646,7 @@ CTOS
 CALL $expectedAddressDirectBuy_internal_macro$
 
 .macro expectedAddressDirectBuy_internal_macro
-.loc ../contracts/FactoryDirectBuy.sol, 322
+.loc ../contracts/FactoryDirectBuy.sol, 393
 CALLREF {
 	CALL $_buildDirectBuyStateInit_internal_macro$
 }
@@ -1419,7 +1667,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 327
+.loc ../contracts/FactoryDirectBuy.sol, 398
 OVER
 PUSHCONT {
 	LDREF
@@ -1474,14 +1722,14 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 334
+.loc ../contracts/FactoryDirectBuy.sol, 405
 DEPTH
 ADDCONST -2
 PICK
 PUSHINT 5000000000
 GEQ
 THROWIFNOT 109
-.loc ../contracts/FactoryDirectBuy.sol, 335
+.loc ../contracts/FactoryDirectBuy.sol, 406
 PUSHINT 150000000
 GETPARAM 7
 FIRST
@@ -1493,7 +1741,7 @@ UFITS 128
 MAX
 PUSHINT 2
 RAWRESERVE
-.loc ../contracts/FactoryDirectBuy.sol, 340
+.loc ../contracts/FactoryDirectBuy.sol, 411
 GETGLOB 15
 GETGLOB 13
 BLKSWAP 4, 3
@@ -1526,7 +1774,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/FactoryDirectBuy.sol, 350
+.loc ../contracts/FactoryDirectBuy.sol, 421
 OVER
 PUSHCONT {
 	LDREF
@@ -1575,16 +1823,16 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/FactoryDirectBuy.sol, 355
+.loc ../contracts/FactoryDirectBuy.sol, 426
 GETGLOB 14
 ROT
 EQUAL
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 356
+	.loc ../contracts/FactoryDirectBuy.sol, 427
 	CALLREF {
 		CALL $_reserve_internal_macro$
 	}
-	.loc ../contracts/FactoryDirectBuy.sol, 357
+	.loc ../contracts/FactoryDirectBuy.sol, 428
 	DUP
 	NEWC
 	STSLICECONST x42_
@@ -1596,13 +1844,13 @@ PUSHCONT {
 	SENDRAWMSG
 }
 PUSHCONT {
-	.loc ../contracts/FactoryDirectBuy.sol, 363
+	.loc ../contracts/FactoryDirectBuy.sol, 434
 	PUSHREF {
 		.blob xc00000000000000000000000005b675736
 	}
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/FactoryDirectBuy.sol, 365
+	.loc ../contracts/FactoryDirectBuy.sol, 436
 	GETGLOB 16
 	GETGLOB 13
 	GETGLOB 12
@@ -1625,10 +1873,10 @@ PUSHCONT {
 	STU 32
 	STU 32
 	ENDC
-	.loc ../contracts/FactoryDirectBuy.sol, 375
+	.loc ../contracts/FactoryDirectBuy.sol, 446
 	PUSH S2
 	SETCODE
-	.loc ../contracts/FactoryDirectBuy.sol, 376
+	.loc ../contracts/FactoryDirectBuy.sol, 447
 	PUSH S2
 	CTOS
 	DUP
@@ -1643,7 +1891,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/FactoryDirectBuy.sol, 378
+	.loc ../contracts/FactoryDirectBuy.sol, 449
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}
@@ -1839,7 +2087,43 @@ LDREF
 ENDS
 CTOS
 LDMSGADDR
+LDU 128
+LDU 128
+LDU 128
+ROTREV
+PAIR
+SWAP
+LDREF
 ENDS
+CTOS
+LDU 128
+LDU 128
+ROTREV
+PAIR
+SWAP
+LDU 128
+LDU 128
+ROTREV
+PAIR
+SWAP
+LDU 128
+LDU 128
+ROTREV
+PAIR
+SWAP
+LDU 128
+LDREF
+ENDS
+CTOS
+LDU 128
+ROTREV
+PAIR
+SWAP
+ROLLREV 6
+TUPLE 6
+SWAP
+ENDS
+SETGLOB 19
 SETGLOB 18
 SETGLOB 17
 SETGLOB 16
@@ -1884,6 +2168,12 @@ PUSHCONT {
 		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
 	}
 	DUP
+	PUSHINT 0
+	BLKPUSH 2, 0
+	PAIR
+	BLKPUSH 4, 0
+	TUPLE 6
+	SETGLOB 19
 	SETGLOB 18
 	SETGLOB 17
 	SETGLOB 16
@@ -1906,6 +2196,7 @@ IFREFELSE {
 }
 
 .macro c7_to_c4
+GETGLOB 19
 GETGLOB 18
 GETGLOB 17
 GETGLOB 16
@@ -1926,7 +2217,7 @@ STU 64
 STREF
 STREF
 STU 32
-ROLLREV 4
+ROLLREV 5
 NEWC
 STU 32
 SWAP
@@ -1935,9 +2226,44 @@ XCHG S2
 STU 32
 STU 32
 STSLICE
-SWAP
+ROTREV
 NEWC
 STSLICE
+SWAP
+UNTUPLE 6
+REVERSE 7, 0
+STU 128
+SWAP
+UNPAIR
+XCHG S2
+STU 128
+STU 128
+SWAP
+UNPAIR
+XCHG S2
+ROLLREV 5
+NEWC
+STU 128
+STU 128
+SWAP
+UNPAIR
+XCHG S2
+STU 128
+STU 128
+SWAP
+UNPAIR
+XCHG S2
+STU 128
+STU 128
+SWAP
+UNPAIR
+XCHG S2
+STU 128
+SWAP
+NEWC
+STU 128
+STBREFR
+STBREFR
 STBREFR
 STBREFR
 ENDC
@@ -2094,7 +2420,7 @@ THROW 0
 
 .macro public_function_selector
 DUP
-PUSHINT 2067891783
+PUSHINT 2048389099
 LEQ
 IFJMPREF {
 	DUP
@@ -2127,7 +2453,7 @@ IFJMPREF {
 		}
 	}
 	DUP
-	PUSHINT 1515676228
+	PUSHINT 1484498735
 	LEQ
 	IFJMPREF {
 		DUP
@@ -2143,22 +2469,28 @@ IFJMPREF {
 			CALL $weverVault$
 		}
 		DUP
+		PUSHINT 1000034625
+		EQUAL
+		IFJMPREF {
+			CALL $getGasValue$
+		}
+		DUP
 		PUSHINT 1484498735
 		EQUAL
 		IFJMPREF {
 			CALL $buildDirectBuyCreationPayload$
 		}
+	}
+	DUP
+	PUSHINT 1745391003
+	LEQ
+	IFJMPREF {
 		DUP
 		PUSHINT 1515676228
 		EQUAL
 		IFJMPREF {
 			CALL $RequestUpgradeDirectBuy$
 		}
-	}
-	DUP
-	PUSHINT 1893244873
-	LEQ
-	IFJMPREF {
 		DUP
 		PUSHINT 1594609630
 		EQUAL
@@ -2177,17 +2509,17 @@ IFJMPREF {
 		IFJMPREF {
 			CALL $onAcceptTokensBurn$
 		}
+	}
+	DUP
+	PUSHINT 2048389099
+	LEQ
+	IFJMPREF {
 		DUP
 		PUSHINT 1893244873
 		EQUAL
 		IFJMPREF {
 			CALL $onAcceptTokensTransfer$
 		}
-	}
-	DUP
-	PUSHINT 2067891783
-	LEQ
-	IFJMPREF {
 		DUP
 		PUSHINT 1903658112
 		EQUAL
@@ -2206,18 +2538,23 @@ IFJMPREF {
 		IFJMPREF {
 			CALL $setMarketFeeForDirectBuy$
 		}
-		DUP
-		PUSHINT 2067891783
-		EQUAL
-		IFJMPREF {
-			CALL $constructor$
-		}
 	}
 }
 DUP
 PUSHINT 2115009618
-EQUAL
+LEQ
 IFJMPREF {
-	CALL $weverRoot$
+	DUP
+	PUSHINT 2067891783
+	EQUAL
+	IFJMPREF {
+		CALL $constructor$
+	}
+	DUP
+	PUSHINT 2115009618
+	EQUAL
+	IFJMPREF {
+		CALL $weverRoot$
+	}
 }
 

@@ -7,7 +7,6 @@
 			"name": "constructor",
 			"inputs": [
 				{"name":"_price","type":"uint128"},
-				{"name":"_markerRootAddr","type":"address"},
 				{"name":"_tokenRootAddr","type":"address"},
 				{"name":"_nftOwner","type":"address"},
 				{"name":"_deploymentFee","type":"uint128"},
@@ -19,7 +18,8 @@
 				{"name":"_paymentToken","type":"address"},
 				{"name":"sendGasTo","type":"address"},
 				{"name":"_weverVault","type":"address"},
-				{"name":"_weverRoot","type":"address"}
+				{"name":"_weverRoot","type":"address"},
+				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployAuction","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"start","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"bid","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"_auctionGas","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -129,19 +129,19 @@
 			]
 		},
 		{
-			"name": "price",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"price","type":"uint128"}
-			]
-		},
-		{
 			"name": "markerRootAddr",
 			"inputs": [
 			],
 			"outputs": [
 				{"name":"markerRootAddr","type":"address"}
+			]
+		},
+		{
+			"name": "price",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"price","type":"uint128"}
 			]
 		},
 		{
@@ -227,7 +227,8 @@
 	],
 	"data": [
 		{"key":1,"name":"nonce_","type":"uint64"},
-		{"key":2,"name":"nft","type":"address"}
+		{"key":2,"name":"nft","type":"address"},
+		{"key":3,"name":"markerRootAddr","type":"address"}
 	],
 	"events": [
 		{
@@ -305,8 +306,8 @@
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"nonce_","type":"uint64"},
 		{"name":"nft","type":"address"},
-		{"name":"price","type":"uint128"},
 		{"name":"markerRootAddr","type":"address"},
+		{"name":"price","type":"uint128"},
 		{"name":"tokenRootAddr","type":"address"},
 		{"name":"nftOwner","type":"address"},
 		{"name":"deploymentFee","type":"uint128"},
@@ -324,6 +325,7 @@
 		{"name":"state","type":"uint8"},
 		{"name":"currentVersion","type":"uint32"},
 		{"name":"weverVault","type":"address"},
-		{"name":"weverRoot","type":"address"}
+		{"name":"weverRoot","type":"address"},
+		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployAuction","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"start","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"bid","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"auctionGas","type":"tuple"}
 	]
 }

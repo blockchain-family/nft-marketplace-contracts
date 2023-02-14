@@ -43,7 +43,7 @@ export class TokenWallet {
         return balance;
     }
 
-    async transfer(amount: number, receiver: Address, deployWalletValue: string|number, notify: boolean, payload = '', value: any) {
+    async transfer(amount: number, receiver: Address, deployWalletValue: string|number, notify: boolean, payload = '', gasValue: any) {
         const owner = this._owner as Account;
         return await locklift.tracing.trace(
                  this.contract.methods.transfer({
@@ -55,7 +55,7 @@ export class TokenWallet {
                     payload: payload
             }).send({
                 from: owner.address,
-                amount: value
+                amount: gasValue
         }));
     }
 }

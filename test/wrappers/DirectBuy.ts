@@ -68,22 +68,22 @@ export class DirectBuy {
         return (await this.contract.methods.getInfo({}).call()).value0;
     }
 
-    async finishBuy(initiator: Account, callbackId: number) {
+    async finishBuy(initiator: Account, callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.finishBuy({
                 sendGasTo: initiator.address,
                 callbackId
             }).send({
                 from: initiator.address,
-                amount: toNano(0.5)
+                amount: gasValue
         }));
     }
 
-    async closeBuy(callbackId: number) {
+    async closeBuy(callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.closeBuy({
                 callbackId
             }).send({
             from: this.owner.address,
-            amount: toNano(0.5)
+            amount: gasValue
         }));
     }
 }

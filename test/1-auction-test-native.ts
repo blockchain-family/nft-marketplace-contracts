@@ -198,7 +198,7 @@ describe("Test Auction contract", async function () {
     it( 'Get fas value',async function () {
         gasValue = (await auctionRoot.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
-        changeManagerValue =  (calcValue(gasValue.start, gasValue.gasK) + 300000000).toString();
+        changeManagerValue =  (calcValue(gasValue.start, gasValue.gasK) + 250000000).toString();
         transferValue = (calcValue(gasValue.bid, gasValue.gasK) + 250000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
         console.log('transferValue',transferValue);

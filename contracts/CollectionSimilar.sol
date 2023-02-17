@@ -20,7 +20,7 @@ contract CollectionSimilar is TIP4_2Collection, TIP4_3Collection, OwnableInterna
 	/// _remainOnNft - the number of EVERs that will remain after the entire mint
 	/// process is completed on the Nft contract
 	uint128 _remainOnNft;
-	NftInfo _pattern;
+	NftInfo[] public _patterns;
 
 	constructor(
 		TvmCell codeNft,
@@ -29,7 +29,7 @@ contract CollectionSimilar is TIP4_2Collection, TIP4_3Collection, OwnableInterna
 		address owner,
 		uint128 remainOnNft,
 		string json,
-		NftInfo pattern
+		NftInfo[] patterns
 	)
 		public
 		OwnableInternal(owner)
@@ -40,7 +40,7 @@ contract CollectionSimilar is TIP4_2Collection, TIP4_3Collection, OwnableInterna
 		tvm.accept();
 		tvm.rawReserve(1 ever, 0);
 		_remainOnNft = remainOnNft;
-		_pattern = pattern;
+		_patterns = patterns;
 	}
 
 	function mintNft(address _owner, uint256 _id, address _sendGasTo) public virtual onlyOwner {
@@ -61,7 +61,7 @@ contract CollectionSimilar is TIP4_2Collection, TIP4_3Collection, OwnableInterna
 			_owner,
 			_sendGasTo,
 			_remainOnNft,
-			NftJson.buildJson(_id, _pattern),
+			NftJson.buildJson(_id, _patterns[_id % _patterns.length]),
 			_indexDeployValue,
 			_indexDestroyValue,
 			_codeIndex

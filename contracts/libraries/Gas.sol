@@ -15,24 +15,24 @@ library Gas {
     // direct sell
     uint128 constant FACTORY_DIRECT_SELL_INITIAL_BALANCE    = 0.2 ever;
     uint128 constant DIRECT_SELL_INITIAL_BALANCE            = 0.15 ever;
-    uint128 constant BUY_EXTRA_GAS_VALUE                    = 0.5 ever;
-    uint128 constant SELL_EXTRA_GAS_VALUE                   = 0.3 ever;
-    uint128 constant CANCEL_EXTRA_GAS_VALUE                 = 0.06 ever;
+    uint128 constant BUY_EXTRA_GAS_VALUE                    = 0.3 ever;
+    uint128 constant SELL_EXTRA_GAS_VALUE                   = 0.2 ever;
+    uint128 constant CANCEL_EXTRA_GAS_VALUE                 = 0.1 ever;
 
     // Auction
     uint128 constant AUCTION_INITIAL_BALANCE                = 0.15 ever;
     uint128 constant AUCTION_ROOT_INITIAL_BALANCE           = 0.5 ever;
     uint128 constant DEPLOY_AUCTION_EXTRA_GAS_VALUE         = 0.2 ever;
-    uint128 constant START_AUCTION_EXTRA_GAS_VALUE          = 0.3 ever;
+    uint128 constant START_AUCTION_EXTRA_GAS_VALUE          = 0.2 ever;
     uint128 constant BID_EXTRA_GAS_VALUE                    = 0.2 ever;
-    uint128 constant CANCEL_AUCTION_EXTRA_GAS_VALUE         = 0.4 ever;
+    uint128 constant CANCEL_AUCTION_EXTRA_GAS_VALUE         = 0.2 ever;
 
     // direct buy
     uint128 constant FACTORY_DIRECT_BUY_INITIAL_BALANCE     = 0.3 ever;
     uint128 constant DIRECT_BUY_INITIAL_BALANCE             = 0.15 ever;
     uint128 constant DEPLOY_DIRECT_BUY_EXTRA_VALUE          = 0.1 ever;
     uint128 constant MAKE_OFFER_EXTRA_GAS_VALUE             = 0.2 ever;
-    uint128 constant ACCEPT_OFFER_EXTRA_GAS_VALUE           = 0.35 ever;
+    uint128 constant ACCEPT_OFFER_EXTRA_GAS_VALUE           = 0.2 ever;
     uint128 constant CANCEL_OFFER_EXTRA_GAS_VALUE           = 0.15 ever;
 
 

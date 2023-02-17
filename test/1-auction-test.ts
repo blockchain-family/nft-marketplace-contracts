@@ -74,7 +74,7 @@ async function Callback(payload: string) {
     callback = [
         auctionRoot.address,
         {
-            value: calcValue(gasValue.start, gasValue.gasK) .toString(),
+            value: calcValue(gasValue.start, gasValue.gasK).toString(),
             payload: payload,
         },
     ];
@@ -151,8 +151,8 @@ describe("Test Auction contract", async function () {
     it( 'Get fas value',async function () {
         gasValue = (await auctionRoot.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
-        changeManagerValue =  (calcValue(gasValue.start, gasValue.gasK) + 300000000).toString();
-        transferValue = (calcValue(gasValue.bid, gasValue.gasK) + 300000000).toString();
+        changeManagerValue =  (calcValue(gasValue.start, gasValue.gasK) + 250000000).toString();
+        transferValue = (calcValue(gasValue.bid, gasValue.gasK) + 250000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
         console.log('transferValue',transferValue);
         console.log('changeManagerValue',changeManagerValue);
@@ -498,7 +498,7 @@ describe("Test Auction contract", async function () {
         it('Trying to finish auction afters its closed', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 5)).toString();
 
             let callbacks = await Callback(payload);
 
@@ -596,7 +596,7 @@ describe("Test Auction contract", async function () {
         it('Trying finish auction before its start', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(((Date.now() / 1000)) + 2), 3)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(((Date.now() / 1000)) + 3), 5)).toString();
 
             let callbacks = await Callback(payload);
 

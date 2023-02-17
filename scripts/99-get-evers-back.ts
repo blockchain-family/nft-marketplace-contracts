@@ -17,7 +17,7 @@ async function main() {
     await locklift.provider.sendMessage({
         sender: account.address,
         recipient: giverAddress,
-        amount: new BigNumber(walletBalance).shiftedBy(9).toString(),
+        amount: walletBalance,
         bounce: false
     });
 

@@ -266,7 +266,7 @@ OVER
 .loc ../contracts/MintAndSell.sol, 77
 PUSHCONT {
 	PUSH2 S0, S2
-	ADDCONST 10
+	ADDCONST 100
 	LESS
 	PUSH2 S1, S2
 	LEQ
@@ -390,6 +390,7 @@ PICK
 PUSH2 S1, S2
 SUB
 UFITS 256
+INC
 GETGLOB 14
 PUSHINT 200000000
 ADD
@@ -468,7 +469,7 @@ OVER
 .loc ../contracts/MintAndSell.sol, 107
 PUSHCONT {
 	PUSH2 S0, S2
-	ADDCONST 10
+	ADDCONST 50
 	LESS
 	PUSH2 S1, S2
 	LEQ
@@ -738,7 +739,7 @@ PUSHINT 130
 SENDRAWMSG
 .loc ../contracts/MintAndSell.sol, 0
 
-.macro upgrade
+.macro getCollectionOwnershipBack
 DROP
 GETGLOB 6
 THROWIFNOT 76
@@ -748,6 +749,74 @@ IFREF {
 	CALL $c4_to_c7$
 }
 .loc ../contracts/MintAndSell.sol, 150
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDMSGADDR
+ENDS
+.loc ../contracts/MintAndSell.sol, 0
+CALLREF {
+	CALL $getCollectionOwnershipBack_internal_macro$
+}
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.macro getCollectionOwnershipBack_internal_macro
+.loc ../contracts/modules/access/OwnableInternal.sol, 31
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+DUP
+PUSHCONT {
+	DROP
+	CALLREF {
+		CALL $owner_internal_macro$
+	}
+	GETGLOB 9
+	SDEQ
+}
+IF
+THROWIFNOT 100
+.loc ../contracts/modules/access/OwnableInternal.sol, 32
+DEPTH
+ADDCONST -2
+PICK
+THROWIFNOT 101
+.loc ../contracts/MintAndSell.sol, 151
+GETGLOB 12
+NEWC
+STSLICECONST x62_
+STSLICE
+PUSHINT 1
+STUR 111
+SWAP
+NEWC
+STSLICECONST x0e04d29e
+STSLICE
+STBREFR
+ENDC
+PUSHINT 64
+SENDRAWMSG
+.loc ../contracts/MintAndSell.sol, 0
+
+.macro upgrade
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/MintAndSell.sol, 157
 OVER
 PUSHCONT {
 	LDREF
@@ -795,7 +864,7 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/MintAndSell.sol, 154
+.loc ../contracts/MintAndSell.sol, 161
 GETGLOB 17
 GETGLOB 16
 GETGLOB 15
@@ -820,10 +889,10 @@ STU 16
 STBREFR
 STBREFR
 ENDC
-.loc ../contracts/MintAndSell.sol, 164
+.loc ../contracts/MintAndSell.sol, 171
 OVER
 SETCODE
-.loc ../contracts/MintAndSell.sol, 165
+.loc ../contracts/MintAndSell.sol, 172
 SWAP
 CTOS
 DUP
@@ -838,7 +907,7 @@ PLDREF
 CTOS
 BLESS
 POP C3
-.loc ../contracts/MintAndSell.sol, 167
+.loc ../contracts/MintAndSell.sol, 174
 CALLREF {
 	CALL $:onCodeUpgrade$
 }
@@ -1232,7 +1301,7 @@ THROW 60
 
 .macro public_function_selector
 DUP
-PUSHINT 1319203182
+PUSHINT 1002676557
 LEQ
 IFJMPREF {
 	DUP
@@ -1248,22 +1317,28 @@ IFJMPREF {
 		CALL $upgrade$
 	}
 	DUP
+	PUSHINT 909466674
+	EQUAL
+	IFJMPREF {
+		CALL $getCollectionOwnershipBack$
+	}
+	DUP
 	PUSHINT 1002676557
 	EQUAL
 	IFJMPREF {
 		CALL $expectedNftAddress$
 	}
+}
+DUP
+PUSHINT 1775174805
+LEQ
+IFJMPREF {
 	DUP
 	PUSHINT 1319203182
 	EQUAL
 	IFJMPREF {
 		CALL $constructor$
 	}
-}
-DUP
-PUSHINT 1958344686
-LEQ
-IFJMPREF {
 	DUP
 	PUSHINT 1551662884
 	EQUAL
@@ -1282,17 +1357,17 @@ IFJMPREF {
 	IFJMPREF {
 		CALL $drainGas$
 	}
+}
+DUP
+PUSHINT 2094397951
+LEQ
+IFJMPREF {
 	DUP
 	PUSHINT 1958344686
 	EQUAL
 	IFJMPREF {
 		CALL $sellItemsInternal$
 	}
-}
-DUP
-PUSHINT 2094397951
-LEQ
-IFJMPREF {
 	DUP
 	PUSHINT 2009274107
 	EQUAL

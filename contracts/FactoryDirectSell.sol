@@ -111,7 +111,9 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
             GasValues(
                 // fixed
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
-                Gas.FRONTENT_CALLBACK_VALUE,
+                Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.NFT_CALLBACK_VALUE +
+                Gas.TRANSFER_OWNERSHIP_VALUE,
                 //dynamic
                 valueToGas(Gas.CANCEL_EXTRA_GAS_VALUE, address(this).wid)
             )
@@ -277,9 +279,13 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
                 msg.sender
             );
 
-            ITIP4_1NFT(msg.sender).changeManager{
+            TvmCell emptyPayload;
+            callbacks[nftOwner] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
+
+            ITIP4_1NFT(msg.sender).transfer{
                 value: 0,
-                flag: 128
+                flag: 128,
+                bounce: false
             }(
                 nftOwner,
                 sendGasTo,

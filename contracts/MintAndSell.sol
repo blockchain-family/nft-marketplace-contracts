@@ -74,7 +74,7 @@ contract MintAndSell is OwnableInternal, INftInfoStructure, ICallbackParamsStruc
         tvm.rawReserve(0, 4);
         uint256 _id = _fromId;
 
-        while (_id  < _fromId + 10 && _id <= _toId) {
+        while (_id  < _fromId + 100 && _id <= _toId) {
             CollectionSimilar(collection_).mintNft{
                 value: 1 ever,
                 flag: 1
@@ -91,7 +91,7 @@ contract MintAndSell is OwnableInternal, INftInfoStructure, ICallbackParamsStruc
     }
 
     function sellItems(uint256 _fromId, uint256 _toId) external onlyOwner {
-        require(msg.value >= (_toId - _fromId) * (targetGas_ + Gas.CHANGE_MANAGER_VALUE + 0.1 ever),
+        require(msg.value >= (_toId - _fromId + 1) * (targetGas_ + Gas.CHANGE_MANAGER_VALUE + 0.1 ever),
                 BaseErrors.value_too_low);
         this.sellItemsInternal{
             value: 0,
@@ -104,7 +104,7 @@ contract MintAndSell is OwnableInternal, INftInfoStructure, ICallbackParamsStruc
         tvm.rawReserve(0, 4);
         uint256 _id = _fromId;
 
-        while (_id  < _fromId + 10 && _id <= _toId) {
+        while (_id  < _fromId + 50 && _id <= _toId) {
             mapping(address => CallbackParams) callbacks;
             callbacks[targetManager_] = CallbackParams(targetGas_, targetPayload_);
             ITIP4_1NFT(_resolveNft(_id)).changeManager{
@@ -145,6 +145,13 @@ contract MintAndSell is OwnableInternal, INftInfoStructure, ICallbackParamsStruc
     function drainGas() external onlyOwner {
         tvm.rawReserve(1 ever, 0);
         msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
+    }
+
+    function getCollectionOwnershipBack(address newOwner) external view onlyOwner {
+        CollectionSimilar(collection_).transferOwnership{
+                value: 0,
+                flag: 64
+            }(newOwner);
     }
 
     function upgrade(

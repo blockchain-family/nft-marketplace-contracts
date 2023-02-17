@@ -132,7 +132,7 @@ describe("Test DirectSell contract", async function () {
         gasValue = (await factoryDirectSell.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
         changeManagerValue =  (calcValue(gasValue.sell, gasValue.gasK) + 200000000).toString();
-        transferValue = (calcValue(gasValue.buy, gasValue.gasK) + 300000000).toString();
+        transferValue = (calcValue(gasValue.buy, gasValue.gasK) + 250000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
         console.log('transferValue',transferValue);
         console.log('changeManagerValue',changeManagerValue);
@@ -684,7 +684,7 @@ describe("Test DirectSell contract", async function () {
 
             let setFee = {
                 numerator: '20',
-                denominator:' 100'
+                denominator: '100'
             } as MarketFee;
 
             await factoryDirectSell.contract.methods.setMarketFee({_fee: setFee}).send({

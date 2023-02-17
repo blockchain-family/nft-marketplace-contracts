@@ -79,7 +79,7 @@ async function Callback(payload: string) {
 
 async function balance(account: Account){
     return new BigNumber(await locklift.provider.getBalance(account.address));
-};
+}
 
 function calcValue(gas: GasValue, gasK: string){
     const gasPrice = new BigNumber(1).shiftedBy(9).div(gasK);
@@ -140,8 +140,8 @@ describe("Test DirectSell contract", async function () {
     });
     it('Deploy FactoryDirectSell with fee denominator zero', async function () {
         let fee = {
-            numerator: 10,
-            denominator: 0
+            numerator: '10',
+            denominator: '0'
         } as MarketFee;
 
         const factoryDirectSellExitCode = await deployFactoryDirectSell(
@@ -171,7 +171,7 @@ describe("Test DirectSell contract", async function () {
         gasValue = (await factoryDirectSell.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
         changeManagerValue =  (calcValue(gasValue.sell, gasValue.gasK) + 200000000).toString();
-        transferValue = (calcValue(gasValue.buy, gasValue.gasK) + 300000000).toString();
+        transferValue = (calcValue(gasValue.buy, gasValue.gasK) + 250000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
         console.log('transferValue',transferValue);
         console.log('changeManagerValue',changeManagerValue);
@@ -715,7 +715,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.3);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
 

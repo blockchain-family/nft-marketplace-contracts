@@ -94,7 +94,6 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
                 // fixed
                 Gas.FACTORY_DIRECT_BUY_INITIAL_BALANCE +
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
-                Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.FRONTENT_CALLBACK_VALUE,

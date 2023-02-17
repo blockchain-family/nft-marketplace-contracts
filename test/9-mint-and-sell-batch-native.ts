@@ -7,7 +7,7 @@ import { Account } from "everscale-standalone-client/nodejs";
 import { expect } from "chai";
 
 const logger = require("mocha-logger");
-import {deployAccount, deployFactoryDirectSell, deployTokenRoot} from "./utils";
+import {deployAccount, deployFactoryDirectSell, deployTokenRoot, deployWeverRoot} from "./utils";
 import {Token} from "./wrappers/token";
 import {DirectSell, FactoryDirectSell} from "./wrappers/DirectSell";
 import {TokenWallet} from "./wrappers/token_wallet";
@@ -24,6 +24,8 @@ let tokenWallet1: TokenWallet;
 let tokenWallet2: TokenWallet;
 let startBalanceTW1: number = 5000000000;
 let startBalanceTW2: number = 5000000000;
+let startBalance1;
+let startBalance2;
 
 let recipient: Address;
 let targetPayload: string;
@@ -32,6 +34,10 @@ let weverVault: Address;
 let weverRoot: Token;
 let fee = { numerator: '0', denominator: '100' };
 
+async function balance(account: Account){
+    return new BigNumber(await locklift.provider.getBalance(account.address));
+}
+
 describe("Test MintAndSell contract", async function () {
     it('Deploy accounts', async function () {
         account1 = await deployAccount(0, 10000);
@@ -39,16 +45,41 @@ describe("Test MintAndSell contract", async function () {
         account2 = await deployAccount(1, 10);
         logger.log(`Account 2: ${account2.address}`);
     });
+    it('Deploy WeverRoot and WeverVault', async function () {
+        let result = await deployWeverRoot('weverTest', 'WTest', account1);
+        weverRoot = result['root'];
+        weverVault = result['vault'];
+    });
     it('Deploy TIP-3 token', async function () {
-        tokenRoot = await deployTokenRoot('Test', 'Test', account1);
-        logger.log(`TokenRoot: ${tokenRoot.address}`);
+        tokenRoot = weverRoot;
     });
     it('Mint TIP-3 token to account', async function () {
-        tokenWallet1 = await tokenRoot.mint(startBalanceTW1, account1);
-        tokenWallet2 = await tokenRoot.mint(startBalanceTW2, account2);
+        let gasValue = 1000000000;
+        let addressTW1 = await tokenRoot.walletAddr(account1.address);
+        tokenWallet1 = await TokenWallet.from_addr(addressTW1, account1);
+        let amount1 = new BigNumber(startBalanceTW1).plus(gasValue).toString();
+        await locklift.provider.sendMessage({
+            sender: account1.address,
+            recipient: weverVault,
+            amount: amount1,
+            bounce: false
+        });
+
+        let addressTW2 = await tokenRoot.walletAddr(account2.address);
+        tokenWallet2 = await TokenWallet.from_addr(addressTW2, account2);
+        let amount2 = new BigNumber(startBalanceTW2).plus(gasValue).toString();
+        await locklift.provider.sendMessage({
+            sender: account2.address,
+            recipient: weverVault,
+            amount: amount2,
+            bounce: false
+        });
+        startBalanceTW1 =  await tokenWallet1.balance() as any;
+        startBalanceTW2 =  await tokenWallet2.balance() as any;
+
     });
     it('Deploy FactoryDirectSell', async function () {
-        factoryDirectSell = await deployFactoryDirectSell(account1, fee, zeroAddress, zeroAddress);
+        factoryDirectSell = await deployFactoryDirectSell(account1, fee, weverVault, weverRoot.address);
         const dSMFChanged = await factoryDirectSell.getEvent('MarketFeeDefaultChanged') as any;
         expect(dSMFChanged.fee).to.be.not.null;
     });
@@ -200,10 +231,15 @@ describe("Test MintAndSell contract", async function () {
         await directSell.closeSell(0, toNano(3));
 
         let nftInfo = await NftForSell.methods.getInfo({answerId: 0}).call();
-        console.log('owner', nftInfo.owner.toString());
-        console.log('manager', nftInfo.manager.toString());
+        // console.log('owner', nftInfo.owner.toString());
+        // console.log('manager', nftInfo.manager.toString());
         expect(nftInfo.owner.toString()).to.be.eq(recipient.toString());
         expect(nftInfo.manager.toString()).to.be.eq(recipient.toString());
+
+        const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+        const spentTokenWallet1Balance = await tokenWallet1.balance() as any;
+        expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1).toString());
     });
     it(`Buy`, async function () {
         // let nft0 = (await collection.methods.nftAddress({answerId: 0, id: 0}).call());
@@ -211,25 +247,37 @@ describe("Test MintAndSell contract", async function () {
         const NftForBuy = await locklift.factory.getDeployedContract("Nft", new Address(nft2.toString()));
 
         let directSellAddress = (await NftForBuy.methods.getInfo({answerId: 0}).call()).manager;
-        console.log('directSellAddress', directSellAddress.toString());
+        logger.log('directSellAddress', directSellAddress.toString());
         const directSell = await DirectSell.from_addr(directSellAddress, account1);
-        await tokenWallet2.transfer(1000000000, directSell.address, 0, true, '', toNano(3));
+
+        startBalance1 = await balance(account1);
+
+        const { traceTree } = await tokenWallet2.transfer(1000000000, directSell.address, 0, true, '', toNano(3));
+        // await traceTree?.beautyPrint();
+        // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
+        // console.log("balanceChangeInfo");
+        // for(let addr in traceTree?.balanceChangeInfo) {
+        //     console.log(addr + ": " + traceTree?.balanceChangeInfo[addr].balanceDiff.shiftedBy(-9).toString());
+        // }
+
 
         const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
         expect(dSFilled.to.toString()).to.be.eq('3');
 
         let currentFee = new BigNumber(1000000000).div(fee.denominator).times(fee.numerator);
-        const expectedAccountBalance = new BigNumber(startBalanceTW1).plus(1000000000).minus(currentFee);
 
-        const spentTokenWallet1Balance = await tokenWallet1.balance() as any;
-        console.log('spentTokenWallet1Balance', spentTokenWallet1Balance);
-        expect(spentTokenWallet1Balance.toString()).to.be.eq(expectedAccountBalance.toString());
+        const expectedAccountBalance = startBalance1.plus(1000000000).minus(currentFee).shiftedBy(-9).toNumber();
+        const everAccount1Balance = (await balance(account1)).shiftedBy(-9).toNumber();
+        expect(everAccount1Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+
+        const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - 1000000000).toString());
 
         let nftInfo = await NftForBuy.methods.getInfo({answerId: 0}).call();
-        console.log('owner', nftInfo.owner.toString());
-        console.log('manager', nftInfo.manager.toString());
         expect(nftInfo.owner.toString()).to.be.eq(account2.address.toString());
         expect(nftInfo.manager.toString()).to.be.eq(account2.address.toString());
+
+        startBalanceTW2 -= 1000000000;
     });
     it(`Finish sell`, async function () {
         let nft3 = (await mintAndSell.methods.expectedNftAddress({_id: 3}).call()).nft;
@@ -241,11 +289,16 @@ describe("Test MintAndSell contract", async function () {
         let directSellInfo = await directSell.getInfo();
         expect(directSellInfo.creator.toString()).to.be.eq(recipient.toString());
 
+        startBalance1 = await balance(account1);
+
         await directSell.finishSell(account2, 0, toNano(3));
 
+        const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+        expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+        const spentTokenWallet1Balance = await tokenWallet1.balance() as any;
+        expect(spentTokenWallet1Balance.toString()).to.be.eq((startBalanceTW1).toString());
+
         let nftInfo = await NftForFinish.methods.getInfo({answerId: 0}).call();
-        console.log('owner', nftInfo.owner.toString());
-        console.log('manager', nftInfo.manager.toString());
         expect(nftInfo.owner.toString()).to.be.eq(recipient.toString());
         expect(nftInfo.manager.toString()).to.be.eq(recipient.toString());
     });

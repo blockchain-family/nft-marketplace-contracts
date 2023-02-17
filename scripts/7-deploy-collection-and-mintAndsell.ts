@@ -25,19 +25,22 @@ async function main() {
             type: 'text',
             name: 'nftOwner',
             message: 'Get NFT Owner Address (default ' + account.address + ')',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+            initial: account.address
         },
         {
             type: 'text',
             name: 'factoryDirectSell',
             message: 'Get FactoryDirectSell address (default ' + savedFactoryDirectSell.address + ')',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+            initial: savedFactoryDirectSell.address
         },
         {
             type: 'text',
             name: 'tokenRoot',
             message: 'Get tokenRoot address (default ' + account.address + ')',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+            initial: account.address
         }
     ]);
 

@@ -21,12 +21,6 @@ async function main() {
 
     const response = await prompts([
         {
-            type: 'text',
-            name: 'owner',
-            message: 'Get Collection owner address (default ' + account.address + ')',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
-        },
-        {
             type: 'number',
             name: 'from',
             message: 'Get NFT from count (default 0)',
@@ -42,7 +36,8 @@ async function main() {
             type: 'text',
             name: 'factoryDirectSell',
             message: 'Get FactoryDirectSell address (default ' + savedFactoryDirectSell.address + ')',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+            initial: savedFactoryDirectSell.address
         }
     ]);
     let mintAndSell = migration.loadContract('MintAndSell', 'MintAndSell');
@@ -52,7 +47,7 @@ async function main() {
     logger.log("Batch mint nft");
     await locklift.tracing.trace(mintAndSell.methods.createItems({_fromId: response.from, _toId: response.to}).send({
         from: account.address,
-        amount: new BigNumber(response.to).minus(response.from).plus(1).times(1.1).plus(1).shiftedBy(9).toString()
+        amount: new BigNumber(response.to).minus(response.from).plus(1).times(1.2).plus(1).shiftedBy(9).toString()
     }));
 
     const factoryDirectSell = await locklift.factory.getDeployedContract(
@@ -71,13 +66,6 @@ async function main() {
             .plus(1)
             .shiftedBy(9).toString()
     }));
-
-    //get ownership collection back
-    // logger.log("Get ownership collection back");
-    // await locklift.tracing.trace(mintAndSell.methods.getCollectionOwnershipBack({newOwner: response.owner}).send({
-    //     from: account.address,
-    //     amount: toNano(1)
-    // }));
 
     //drain gas
     logger.log("Drain gas");

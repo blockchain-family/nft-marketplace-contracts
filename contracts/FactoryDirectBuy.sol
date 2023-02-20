@@ -439,7 +439,10 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
                 currectVersionDirectBuy,
                 tokenPlatformCode,
                 directBuyCode,
-                fee
+                fee,
+                weverVault,
+                weverRoot,
+                directBuyGas
             );
             
             tvm.setcode(newCode);

@@ -1412,6 +1412,7 @@ PUSHCONT {
 	PUSHINT 0
 	SENDRAWMSG
 	.loc ../contracts/AuctionRootTip3.sol, 369
+	GETGLOB 21
 	GETGLOB 23
 	GETGLOB 22
 	GETGLOB 14
@@ -1442,20 +1443,55 @@ PUSHCONT {
 	XCHG S2
 	STU 32
 	STU 32
-	ROLLREV 3
+	ROLLREV 4
 	NEWC
 	STU 128
 	STSLICE
-	SWAP
+	ROTREV
 	NEWC
 	STSLICE
+	SWAP
+	UNTUPLE 6
+	REVERSE 7, 0
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	ROLLREV 5
+	NEWC
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	SWAP
+	NEWC
+	STU 128
+	STBREFR
+	STBREFR
 	STBREFR
 	STBREFR
 	ENDC
-	.loc ../contracts/AuctionRootTip3.sol, 385
+	.loc ../contracts/AuctionRootTip3.sol, 386
 	PUSH S2
 	SETCODE
-	.loc ../contracts/AuctionRootTip3.sol, 386
+	.loc ../contracts/AuctionRootTip3.sol, 387
 	PUSH S2
 	CTOS
 	DUP
@@ -1470,7 +1506,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/AuctionRootTip3.sol, 388
+	.loc ../contracts/AuctionRootTip3.sol, 389
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}

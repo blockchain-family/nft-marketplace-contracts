@@ -440,7 +440,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         spentTokenWallet,
         currentStatus,
         currentVersion,
-        fee
+        fee,
+        weverVault,
+        weverRoot,
+        directBuyGas
       );
 
       tvm.setcode(newCode);

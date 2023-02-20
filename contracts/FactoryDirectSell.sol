@@ -384,7 +384,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
                 directSellCode,
                 fee,
                 weverVault,
-                weverRoot
+                weverRoot,
+                directSellGas
             );
 
             tvm.setcode(newCode);

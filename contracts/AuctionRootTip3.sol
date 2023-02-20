@@ -379,7 +379,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
                 fee,
                 deploymentFeePart,
                 weverVault,
-                weverRoot
+                weverRoot,
+                auctionGas
             );
 
             tvm.setcode(newCode);

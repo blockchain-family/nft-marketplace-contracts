@@ -468,7 +468,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               tokenWallet,
               state,
               weverVault,
-              weverRoot
+              weverRoot,
+              auctionGas
             );
 
             tvm.setcode(newCode);

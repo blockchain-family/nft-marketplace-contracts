@@ -1512,6 +1512,7 @@ PUSHCONT {
 	PUSHINT 0
 	SENDRAWMSG
 	.loc ../contracts/FactoryDirectSell.sol, 379
+	GETGLOB 18
 	GETGLOB 17
 	GETGLOB 16
 	GETGLOB 15
@@ -1533,19 +1534,46 @@ PUSHCONT {
 	XCHG S2
 	STU 32
 	STU 32
+	ROLLREV 3
+	NEWC
+	STSLICE
 	ROTREV
 	NEWC
 	STSLICE
 	SWAP
+	UNTUPLE 5
+	REVERSE 6, 0
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	ROLLREV 4
 	NEWC
-	STSLICE
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	SWAP
+	UNPAIR
+	XCHG S2
+	STU 128
+	STU 128
+	STBREFR
 	STBREFR
 	STBREFR
 	ENDC
-	.loc ../contracts/FactoryDirectSell.sol, 390
+	.loc ../contracts/FactoryDirectSell.sol, 391
 	PUSH S2
 	SETCODE
-	.loc ../contracts/FactoryDirectSell.sol, 391
+	.loc ../contracts/FactoryDirectSell.sol, 392
 	PUSH S2
 	CTOS
 	DUP
@@ -1560,7 +1588,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/FactoryDirectSell.sol, 393
+	.loc ../contracts/FactoryDirectSell.sol, 394
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}

@@ -42,7 +42,6 @@ async function main() {
     ]);
     let mintAndSell = migration.loadContract('MintAndSell', 'MintAndSell');
 
-    // let mintAndSell = await locklift.factory.getDeployedContract('mintAndSell',
     // batch mint nft
     logger.log("Batch mint nft");
     await locklift.tracing.trace(mintAndSell.methods.createItems({_fromId: response.from, _toId: response.to}).send({

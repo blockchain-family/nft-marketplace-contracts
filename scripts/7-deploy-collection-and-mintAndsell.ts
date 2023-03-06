@@ -24,7 +24,7 @@ async function main() {
         {
             type: 'text',
             name: 'nftOwner',
-            message: 'Get NFT Owner Address (default ' + account.address + ')',
+            message: 'Get NFT Owner Address - recipient (default ' + account.address + ')',
             validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
             initial: account.address
         },
@@ -38,13 +38,12 @@ async function main() {
         {
             type: 'text',
             name: 'tokenRoot',
-            message: 'Get tokenRoot address (default ' + account.address + ')',
+            message: 'Get tokenRoot address',
             validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
-            initial: account.address
         }
     ]);
 
-    const data = fs.readFileSync("collection1.json", 'utf8');
+    const data = fs.readFileSync("collection4.json", 'utf8');
     if (data) collection_json = JSON.parse(data);
 
     // deploy collection

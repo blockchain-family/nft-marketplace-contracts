@@ -10,10 +10,6 @@ const fs = require('fs');
 const prompts = require('prompts');
 const logger = require("mocha-logger");
 
-
-let collection_json: any;
-let patterns: any[];
-
 async function main() {
     const signer = (await locklift.keystore.getSigner('0'));
     const account = await migration.loadAccount('Account1');
@@ -23,8 +19,8 @@ async function main() {
         {
             type: 'number',
             name: 'from',
-            message: 'Get NFT from count (default 0)',
-            initial: 0
+            message: 'Get NFT from count (default 1)',
+            initial: 1
         },
         {
             type: 'number',

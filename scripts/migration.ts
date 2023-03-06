@@ -1,60 +1,72 @@
-import * as fs from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import { Address, WalletTypes } from 'locklift';
+import { FactorySource } from '../build/factorySource';
 
-export class Migration {
-    log_path: string;
-    migration_log;
-    balance_history;
-    
-    constructor(log_path = 'migration-log.json') {
-        this.log_path = log_path;
-        this.migration_log = {};
-        this.balance_history = [];
+export class Migration<T extends FactorySource> {
+    migrationLog: Record<string, string>;
+    private readonly logPath: string;
+
+    constructor(logPath = 'migration-log.json') {
+        this.logPath = join(process.cwd(), logPath);
+        this.migrationLog = {};
         this._loadMigrationLog();
     }
 
-    _loadMigrationLog() {
-        if (fs.existsSync(this.log_path)) {
-            const data = fs.readFileSync(this.log_path, 'utf8');
-            if (data) this.migration_log = JSON.parse(data);
-        }
-    }
-
     reset() {
-        this.migration_log = {};
-        this.balance_history = [];
+        this.migrationLog = {};
         this._saveMigrationLog();
     }
 
-    _saveMigrationLog() {
-        fs.writeFileSync(this.log_path, JSON.stringify(this.migration_log));
-    }
+    private _loadMigrationLog = () => {
+        if (existsSync(this.logPath)) {
+            const data = readFileSync(this.logPath, 'utf8');
+            if (data) this.migrationLog = JSON.parse(data);
+        }
+    };
 
-    exists(alias) {
-        return this.migration_log[alias] !== undefined;
-    }
+    private _saveMigrationLog = () => {
+        writeFileSync(this.logPath, JSON.stringify(this.migrationLog, null, 2));
+    };
 
-    load(contractName, alias) {
-        let contract = locklift.factory.getDeployedContract(contractName);
-        if (this.migration_log[alias] !== undefined) {
-            contract = locklift.factory.getDeployedContract(contractName, this.migration_log[alias].address);
+    public loadAccount = async (name: string) => {
+        this._loadMigrationLog();
+
+        if (this.migrationLog[name] !== undefined) {
+            return locklift.factory.accounts.addExistingAccount({
+                address: new Address(this.migrationLog[name]),
+                type: WalletTypes.EverWallet,
+            });
         } else {
-            throw new Error(`Contract ${alias} not found in the migration`);
+            throw new Error(`Contract ${name} not found in the migration`);
         }
-        return contract;
-    }
+    };
 
-    store(contractAddress, contractName, alias) {
-        this.migration_log = {
-            ...this.migration_log,
-            [alias]: {
-                address: contractAddress.toString(),
-                name: contractName
-            }
+    public loadContract = <ContractName extends keyof T>(
+        contract: ContractName,
+        name: string,
+    ) => {
+        this._loadMigrationLog();
+
+        if (this.migrationLog[name] !== undefined) {
+            return locklift.factory.getDeployedContract(
+                contract as keyof FactorySource,
+                new Address(this.migrationLog[name]),
+            );
+        } else {
+            throw new Error(`Contract ${name} not found in the migration`);
         }
+    };
+
+    public store = <T extends { address: Address }>(
+        contract: T,
+        name: string,
+    ): void => {
+        this.migrationLog = {
+            ...this.migrationLog,
+            [name]: contract.address.toString(),
+        };
+
         this._saveMigrationLog();
-    }
-}
-
-module.exports = {
-    Migration
+    };
 }

@@ -9,3 +9,9 @@ node_modules/
 migration-log.json
 
 build/Index*
+build/TokenWallet*
+build/TokenRoot*
+
+build/Callbacks.base64
+build/Callbacks.code
+build/Callbacks.tvc

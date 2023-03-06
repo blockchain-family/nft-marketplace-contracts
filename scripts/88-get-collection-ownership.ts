@@ -13,23 +13,16 @@ async function main() {
             validate: (value:string) => isValidEverAddress(value) ? true : 'Invalid Everscale address'
         }
     ])
+    const account = await migration.loadAccount('Account1');
+    const collection = migration.loadContract("Collection", "Collection");
 
-    const signer = await locklift.keystore.getSigner("0");
-    let accountFactory = locklift.factory.getAccountsFactory('Wallet');
-    const acc = accountFactory.getAccount(migration.load("Wallet", "Account1").address,  (signer?.publicKey) as string);
-    const collection = locklift.factory.getDeployedContract("Collection", migration.load("Collection", "Collection").address);
-
-        if(response.owner) {
-        await acc.runTarget(
-            {
-                contract: collection,
-                value: locklift.utils.toNano(1)
-            },
-            (collectionOwner) => collectionOwner.methods.transferOwnership({
+    if(response.owner) {
+        await collection.methods.transferOwnership({
                 newOwner: response.owner
-            }),
-        );
-
+            }).send({
+                from: account.address,
+                amount: locklift.utils.toNano(1)
+            });
         console.log('Transfer ownership to: ' + response.owner)
     }
 }

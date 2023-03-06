@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -8,42 +8,36 @@ import '../errors/BaseErrors.sol';
 import '../errors/OffersBaseErrors.sol';
 
 import '../interfaces/IOffersRoot.sol';
+import "../interfaces/IOffer.sol";
 
-abstract contract Offer {
+abstract contract Offer is IOffer {
 
     uint64 static nonce_;
     address public static nft;
+    address public static markerRootAddr;
 
     uint128 public price;
-    address public markerRootAddr;
     address public tokenRootAddr;
     address public nftOwner;
 
     uint128 public deploymentFee;
-    // Market fee in EVER's
-    uint128 public marketFee;
-    uint8 public marketFeeDecimals;
+    // Market fee
+    MarketFee fee;
 
     function setDefaultProperties(
         uint128 _price,
-        address _markerRootAddr,
         address _tokenRootAddr,
         address _nftOwner,
         uint128 _deploymentFee,
-        uint128 _marketFee,
-        uint8 _marketFeeDecimals
+        MarketFee _fee
     ) 
         internal 
     {   
         price = _price;
-        markerRootAddr = _markerRootAddr;
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
         deploymentFee = _deploymentFee;
-
-        uint128 decimals = uint128(uint128(10) ** uint128(_marketFeeDecimals));
-        marketFee = math.divc(math.muldiv(price, uint128(_marketFee), uint128(100)), decimals);
-        marketFeeDecimals = _marketFeeDecimals;
+        fee = _fee;
     }
 
     modifier onlyOwner() {
@@ -65,4 +59,17 @@ abstract contract Offer {
 
         _;
     }
+
+    function getMarketFee() external view override returns (MarketFee) {
+        return fee;
+    }
+
+    function setMarketFee(MarketFee _fee, address sendGasTo) external override onlyMarketRoot {
+        _reserve();
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        fee = _fee;
+        sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+    }
+
+    function _reserve() internal virtual;
 }

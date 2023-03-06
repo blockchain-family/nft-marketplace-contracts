@@ -1,4 +1,4 @@
-pragma ever-solidity = 0.62.0;
+pragma ever-solidity = 0.61.2;
 
 /// @title This extension is used to add the owner role to the contract. It is used to manage contracts through internal messages.
 abstract contract OwnableInternal {
@@ -32,5 +32,4 @@ abstract contract OwnableInternal {
         require(msg.value != 0, 101);
         _;
     }
-
 }

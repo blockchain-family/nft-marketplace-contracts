@@ -1,6 +1,6 @@
 /// We recommend using the compiler version 0.62.0. 
 /// You can use other versions, but we do not guarantee compatibility of the compiler version.
-pragma ever-solidity = 0.62.0;
+pragma ever-solidity = 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;

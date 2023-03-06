@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader time;
@@ -45,7 +45,7 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, 
 
 	function mintNft(address _owner, string _json) public virtual onlyOwner {
 		require(
-			msg.value > _remainOnNft + 4 ever,
+			msg.value > _remainOnNft + _indexDeployValue * 2 + 0.3 ever,
 			value_is_less_than_required
 		);
 		tvm.rawReserve(1 ever, 0);

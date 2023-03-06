@@ -7,7 +7,10 @@
 			"name": "constructor",
 			"inputs": [
 				{"name":"_owner","type":"address"},
-				{"name":"sendGasTo","type":"address"}
+				{"name":"sendGasTo","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"name":"_weverVault","type":"address"},
+				{"name":"_weverRoot","type":"address"}
 			],
 			"outputs": [
 			]
@@ -18,6 +21,39 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"string"}
+			]
+		},
+		{
+			"name": "getGasValue",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "getMarketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "setMarketFeeForDirectSell",
+			"inputs": [
+				{"name":"directSell","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -32,11 +68,11 @@
 			"name": "buildDirectSellCreationPayload",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
-				{"name":"_nftAddress","type":"address"},
 				{"name":"_startTime","type":"uint64"},
 				{"name":"durationTime","type":"uint64"},
 				{"name":"_paymentToken","type":"address"},
-				{"name":"_price","type":"uint128"}
+				{"name":"_price","type":"uint128"},
+				{"name":"recipient","type":"address"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
@@ -52,6 +88,17 @@
 				{"name":"value4","type":"address"},
 				{"name":"sendGasTo","type":"address"},
 				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "withdraw",
+			"inputs": [
+				{"name":"tokenWallet","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"recipient","type":"address"},
+				{"name":"remainingGasTo","type":"address"}
 			],
 			"outputs": [
 			]
@@ -93,6 +140,22 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "weverVault",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverVault","type":"address"}
+			]
+		},
+		{
+			"name": "weverRoot",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"weverRoot","type":"address"}
+			]
 		}
 	],
 	"data": [
@@ -129,6 +192,33 @@
 			]
 		},
 		{
+			"name": "MarketFeeDefaultChanged",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "MarketFeeChanged",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "MarketFeeWithdrawn",
+			"inputs": [
+				{"name":"recipient","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"tokenWallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "OwnershipTransferred",
 			"inputs": [
 				{"name":"oldOwner","type":"address"},
@@ -146,6 +236,10 @@
 		{"name":"nonce_","type":"uint64"},
 		{"name":"directSellCode","type":"cell"},
 		{"name":"currentVersion","type":"uint32"},
-		{"name":"currectVersionDirectSell","type":"uint32"}
+		{"name":"currectVersionDirectSell","type":"uint32"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
+		{"name":"weverVault","type":"address"},
+		{"name":"weverRoot","type":"address"},
+		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directSellGas","type":"tuple"}
 	]
 }

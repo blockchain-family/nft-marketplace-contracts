@@ -10,20 +10,39 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'FactoryDirectSell owner',
-            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'    
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+        },
+        {
+            type: 'text',
+            name: 'weverRoot',
+            message: 'Wever root address',
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+        },
+        {
+            type: 'text',
+            name: 'weverVault',
+            message: 'Wever vault address',
+            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
 
-    const account = migration.load("Wallet", "Account1");
     const signer = (await locklift.keystore.getSigner('0'));
-    const accountFactory = locklift.factory.getAccountsFactory("Wallet");
-    const acc = accountFactory.getAccount(account.address, (signer?.publicKey) as string);
+    const account = await migration.loadAccount('Account1');
+
+    let fee = {
+        numerator: 2,
+        denominator: 100
+    }
+
     const {contract: factoryDirectSell, tx } = await locklift.factory.deployContract({
         contract: "FactoryDirectSell",
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: account.address,
-            sendGasTo: account.address
+            sendGasTo: account.address,
+            _fee: fee,
+            _weverVault: response.weverVault,
+            _weverRoot: response.weverRoot
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0
@@ -32,30 +51,25 @@ async function main() {
     });
 
     console.log(`FactoryDirectSell: ${factoryDirectSell.address}`);
-    migration.store(factoryDirectSell.address, "FactoryDirectSell", "FactoryDirectSell");
+    migration.store(factoryDirectSell, "FactoryDirectSell");
     const DirectSell = (await locklift.factory.getContractArtifacts('DirectSell'));
 
     console.log(`Set code DirectSell`);
-    await acc.runTarget(
-        {
-            contract:factoryDirectSell,
-            value: locklift.utils.toNano(1),
-        },
-        (dS) => dS.methods.setCodeDirectSell({
-            _directSellCode: DirectSell.code,
-        }),
-    );
+    await factoryDirectSell.methods.setCodeDirectSell({
+        _directSellCode: DirectSell.code,
+    }).send({
+        from: account.address,
+        amount: locklift.utils.toNano(1)
+    })
 
     if (response.owner) {
-        await acc.runTarget(
-            {
-                contract: factoryDirectSell,
-                value: locklift.utils.toNano(1),
-            },
-            (directSell) => directSell.methods.transferOwnership({
-                newOwner: response.owner
-            }),
-        );
+        console.log(`Transfer ownership`);
+        await factoryDirectSell.methods.transferOwnership({
+            newOwner: response.owner
+        }).send({
+            from: account.address,
+            amount: locklift.utils.toNano(1)
+        })
     }
 }
 

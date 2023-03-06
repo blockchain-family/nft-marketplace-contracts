@@ -2,27 +2,27 @@
     "collection": {
             "type": "Basic NFT",
             "name": "Sample Name",
-            "description": "Description abount NFT collection!",
+            "description": "Description about NFT collection!",
             "preview": {
-                "source": "https://",
+                "source": "",
                 "mimetype": "image/png"
             },
             "files": [
                 {
-                    "source": "https://",
+                    "source": "",
                     "mimetype": "image/png"
                 }
             ],
-            "external_url": "https://"
+            "external_url": ""
     },
-    "nfts":   
+    "nfts":
         [
             {
                 "address": "",
-                "preview_url":	"https://",
-                "url": "https://",
-                "name": "Test1",
-                "description": "Test 1 nft"
+                "preview_url":	"",
+                "url": "",
+                "name": "Winter 1",
+                "description": "Winter 1 nft"
             }
         ]
 }

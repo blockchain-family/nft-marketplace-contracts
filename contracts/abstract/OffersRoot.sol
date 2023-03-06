@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 pragma AbiHeader expire;
 pragma AbiHeader pubkey;
@@ -10,11 +10,10 @@ import '../errors/OffersBaseErrors.sol';
 import '../interfaces/IOffersRoot.sol';
 
 import '../modules/access/OwnableInternal.sol';
+import "../interfaces/IOffer.sol";
+import "../interfaces/IEventsMarketFee.sol";
 
-
-abstract contract OffersRoot is IOffersRoot, OwnableInternal {
-    uint8 public marketFee;
-    uint8 public marketFeeDecimals;
+abstract contract OffersRoot is IOffersRoot, IEventMarketFee, OwnableInternal {
     uint16 public auctionBidDelta;
     uint16 public auctionBidDeltaDecimals;
     uint128 public deploymentFee;
@@ -23,13 +22,14 @@ abstract contract OffersRoot is IOffersRoot, OwnableInternal {
     TvmCell codeNft;
     TvmCell offerCode;
 
+    MarketFee fee;
+
     function setDefaultProperties(
         TvmCell _codeNft,
         address _owner,
         TvmCell _offerCode,
         uint128 _deploymentFee,
-        uint8 _marketFee, 
-        uint8 _marketFeeDecimals,
+        MarketFee _fee,
         uint16 _auctionBidDelta,
         uint16 _auctionBidDeltaDecimals
     )  
@@ -43,8 +43,8 @@ abstract contract OffersRoot is IOffersRoot, OwnableInternal {
         _transferOwnership(_owner);
 
         deploymentFee = _deploymentFee;
-        marketFee = _marketFee;
-        marketFeeDecimals = _marketFeeDecimals;
+        fee = _fee;
+        emit MarketFeeDefaultChanged(_fee);
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
 
@@ -63,10 +63,22 @@ abstract contract OffersRoot is IOffersRoot, OwnableInternal {
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
     }
 
-    function changeMarketFee(uint8 _value, uint8 _decimals) override external onlyOwner {
-        tvm.accept();
-        marketFee = _value;
-        marketFeeDecimals = _decimals;
+    function getMarketFee() external view override returns (MarketFee) {
+        return fee;
+    }
+
+    function setMarketFee(MarketFee _fee) override external onlyOwner {
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        fee = _fee;
+        emit MarketFeeDefaultChanged(_fee);
+    }
+
+    function _reserve() internal virtual;
+
+    function setMarketFeeForAuction(address auction, MarketFee _fee) external override onlyOwner {
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        IOffer(auction).setMarketFee{value: 0, flag: 64, bounce:false}(_fee, msg.sender);
+        emit MarketFeeChanged(auction, _fee);
     }
 
 }

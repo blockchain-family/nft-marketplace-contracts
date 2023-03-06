@@ -1,4 +1,4 @@
-pragma ever-solidity >= 0.62.0;
+pragma ever-solidity >= 0.61.2;
 
 import './interfaces/IIndexBasis.sol';
 
@@ -9,7 +9,7 @@ import './interfaces/IIndexBasis.sol';
 
 
 /// @title This contract helps to find all collections by the code hash of which
-/// 
+
 contract IndexBasis is IIndexBasis {
 
     /// Collection token contract address

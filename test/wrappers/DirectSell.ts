@@ -20,14 +20,16 @@ export class FactoryDirectSell {
         return new FactoryDirectSell(contract, owner);
     }
 
-    async buildPayload(callbackId:number, startTime: any, endTime:any, paymentToken: Token, price: any, recipient: Address) {
+    async buildPayload(callbackId:number, startTime: any, endTime:any, paymentToken: Token, price: any, recipient: Address, dCollection?: Address, dNftId?: number) {
         return (await this.contract.methods.buildDirectSellCreationPayload({
             callbackId: callbackId,
             _startTime: startTime,
             durationTime: endTime,
             _paymentToken: paymentToken.address,
             _price: price,
-            recipient: recipient
+            recipient: recipient,
+            discountCollection: dCollection || null,
+            discountNftId: typeof(dNftId) === "undefined" ? null : dNftId
         }).call()).value0;
     }
 

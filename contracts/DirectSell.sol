@@ -15,6 +15,7 @@ import "./interfaces/IUpgradableByRequest.sol";
 
 import "./structures/IMarketFeeStructure.sol";
 import "./structures/IDirectSellGasValuesStructure.sol";
+import './structures/IDiscountCollectionsStructure.sol';
 
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
 import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
@@ -28,7 +29,7 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 
 
-contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure {
+contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, IDiscountCollectionsStructure {
     address static factoryDirectSell;
     address static owner;
     address static paymentToken;
@@ -50,6 +51,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     MarketFee fee;
     address public weverVault;
     address public weverRoot;
+    optional(DiscontInfo) discontOpt;
+    address discountNft;
 
     struct DirectSellInfo {
         address factory;
@@ -75,7 +78,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         MarketFee _fee,
         address _weverVault,
         address _weverRoot,
-        DirectSellGasValues _directSellGas
+        DirectSellGasValues _directSellGas,
+        optional(DiscontInfo) _discontOpt
     ) public
     {
         if (
@@ -95,7 +99,17 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 endTime = startTime + durationTime;
             }
             price = _price;
+            discontOpt = _discontOpt;
             currentVersion++;
+
+            if (discontOpt.hasValue()){
+                discountNft = _resolveNft(discontOpt.get().nftId);
+                ITIP4_1NFT(discountNft).getInfo{
+                    value: 0.05 ever,
+                    flag: 0,
+                    callback: DirectSell.onGetInfo
+                }();
+            }
 
             ITokenRoot(paymentToken).deployWallet{
                 value: 0,
@@ -105,6 +119,15 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         } else {
             msg.sender.transfer(0, false, 128 + 32);
         }
+    }
+
+    modifier onlyOwner() {
+        require(
+            msg.sender.value != 0 &&
+            msg.sender == owner,
+            DirectBuySellErrors.NOT_OWNER_DIRECT_BUY_SELL
+        );
+        _;
     }
 
     function onTokenWallet(address _wallet) external {
@@ -119,13 +142,28 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    modifier onlyOwner() {
-        require(
-            msg.sender.value != 0 &&
-            msg.sender == owner,
-            DirectBuySellErrors.NOT_OWNER_DIRECT_BUY_SELL
-        );
-        _;
+    function onGetInfo(
+        uint256 _id,
+        address _owner,
+        address _manager,
+        address _collection
+    ) external {
+        require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
+        if (_owner == owner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
+            fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
+        }
+    }
+
+    function _resolveNft(uint256 _id) internal view returns (address) {
+        TvmCell data = tvm.buildDataInit({
+            contr: TIP4_1Nft,
+            varInit: {_id: _id},
+            pubkey: 0
+        });
+        uint256 dataHash = tvm.hash(data);
+        uint16 dataDepth = data.depth();
+        uint256 hash = tvm.stateInitHash(discontOpt.get().feeInfo.codeHash, dataHash, discontOpt.get().feeInfo.codeDepth, dataDepth);
+        return address.makeAddrStd(address(this).wid, hash);
     }
 
     function _reserve() internal  {
@@ -448,7 +486,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 fee,
                 weverVault,
                 weverRoot,
-                directSellGas
+                directSellGas,
+                discontOpt
             );
 
               tvm.setcode(newCode);

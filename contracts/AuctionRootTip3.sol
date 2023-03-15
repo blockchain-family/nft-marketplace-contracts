@@ -11,15 +11,16 @@ import './errors/AuctionErrors.sol';
 
 import './libraries/Gas.sol';
 
-import "./interfaces/IAuctionRootCallback.sol";
-import "./interfaces/IUpgradableByRequest.sol";
+import './interfaces/IAuctionRootCallback.sol';
+import './interfaces/IUpgradableByRequest.sol';
 
-import "./structures/IAuctionGasValuesStructure.sol";
-import "./structures/IGasValueStructure.sol";
+import './structures/IAuctionGasValuesStructure.sol';
+import './structures/IGasValueStructure.sol';
+import './structures/IDiscountCollectionsStructure.sol';
 
 import './modules/TIP4_1/interfaces/INftChangeManager.sol';
 import './modules/TIP4_1/interfaces/ITIP4_1NFT.sol';
-import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
+import './modules/TIP4_1/structures/ICallbackParamsStructure.sol';
 
 import './Nft.sol';
 import './AuctionTip3.sol';
@@ -50,11 +51,12 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
     address public weverVault;
     address public weverRoot;
 
+    mapping (address => CollectionFeeInfo) public collectionsSpecialRules;
+
     constructor(
         TvmCell _codeNft,
         address _owner,
         TvmCell _offerCode,
-        uint128 _deploymentFee,
         MarketFee _fee,
         uint16 _auctionBidDelta,
         uint16 _auctionBidDeltaDecimals,
@@ -75,7 +77,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
             _codeNft,
             _owner,
             _offerCode,
-            _deploymentFee,
             _fee,
             _auctionBidDelta,
             _auctionBidDeltaDecimals
@@ -161,6 +162,16 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         return "AuctionRoot";
     }
 
+    function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
+        collectionsSpecialRules[collection] = collectionFeeInfo;
+    }
+
+    function removeCollectionsSpecialRules(address collection) external override onlyOwner {
+        if (collectionsSpecialRules.exists(collection)) {
+            delete collectionsSpecialRules[collection];
+        }
+    }
+
     function onNftChangeManager(
         uint256 /*id*/,
         address nftOwner,
@@ -179,7 +190,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         if (payloadSlice.bits() >= 32) {
             callbackId = payloadSlice.decode(uint32);
         }
-        if (payloadSlice.bits() == 523) {
+        if (payloadSlice.bits() >= 523) {
             (
                 address paymentToken,
                 uint128 price,
@@ -194,6 +205,18 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
                 msg.value >= calcValue(auctionGas.start) &&
                 msg.sender.value != 0
             ) {
+                optional(DiscontInfo) discontOpt;
+                if (payloadSlice.refs() >= 1) {
+                    TvmSlice discontSlice = payloadSlice.loadRefAsSlice();
+                    if (discontSlice.bits() >= 523) {
+                        address discountCollection = discontSlice.decode(address);
+                        uint256 nftId = discontSlice.decode(uint256);
+                        if (collectionsSpecialRules.exists(discountCollection)) {
+                            discontOpt.set(DiscontInfo(discountCollection, nftId, collectionsSpecialRules.at(discountCollection)));
+                        }
+                    }
+                }
+
                 address offerAddress = new AuctionTip3 {
                     wid: address(this).wid,
                     value: calcValue(auctionGas.deployAuction),
@@ -208,7 +231,6 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
                     price,
                     collection,
                     nftOwner,
-                    deploymentFeePart * 2,
                     fee,
                     auctionStartTime,
                     auctionDuration,
@@ -218,7 +240,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
                     nftOwner,
                     weverVault,
                     weverRoot,
-                    auctionGas
+                    auctionGas,
+                    discontOpt
                 );
 
                 MarketOffer offerInfo = MarketOffer(
@@ -301,7 +324,9 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         address paymentToken,
         uint128 price,
         uint64 auctionStartTime,
-        uint64 auctionDuration
+        uint64 auctionDuration,
+        optional(address) discountCollection,
+        optional(uint256) discountNftId
     ) external pure responsible returns(TvmCell) {
         TvmBuilder builder;
         builder.store(callbackId);
@@ -309,6 +334,15 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         builder.store(price);
         builder.store(auctionStartTime);
         builder.store(auctionDuration);
+
+        TvmBuilder discontBuilder;
+        if (discountCollection.hasValue()) {
+            discontBuilder.store(discountCollection.get());
+        }
+        if (discountNftId.hasValue()) {
+            discontBuilder.store(discountNftId.get());
+        }
+        builder.storeRef(discontBuilder);
         return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
@@ -375,12 +409,11 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
                 auctionBidDeltaDecimals,
                 codeNft,
                 offerCode,
-                deploymentFee,
                 fee,
-                deploymentFeePart,
                 weverVault,
                 weverRoot,
-                auctionGas
+                auctionGas,
+                collectionsSpecialRules
             );
 
             tvm.setcode(newCode);

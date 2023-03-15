@@ -19,8 +19,17 @@ export class AuctionRoot {
         return new AuctionRoot(contract, owner);
     }
 
-    async buildPayload(callbackId: number, paymentToken: Token, price: any, auctionStartTime: any, auctionDuration: any) {
-        return (await this.contract.methods.buildAuctionCreationPayload({callbackId: callbackId, paymentToken: paymentToken.address, price: price, auctionStartTime: auctionStartTime, auctionDuration: auctionDuration, answerId: 0}).call()).value0;
+    async buildPayload(callbackId: number, paymentToken: Token, price: any, auctionStartTime: any, auctionDuration: any, dCollection?: Address, dNftId?: number ) {
+        return (await this.contract.methods.buildAuctionCreationPayload({
+            callbackId: callbackId,
+            paymentToken: paymentToken.address,
+            price: price,
+            auctionStartTime: auctionStartTime,
+            auctionDuration: auctionDuration,
+            answerId: 0,
+            discountCollection: dCollection || null,
+            discountNftId: typeof(dNftId) === "undefined" ? null : dNftId
+        }).call()).value0;
     }
 
     async getEvents(event_name: string) {

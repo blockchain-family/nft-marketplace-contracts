@@ -12,10 +12,12 @@ import "./interfaces/IDirectBuyCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IEventsMarketFee.sol";
 import "./interfaces/IOffer.sol";
+import "./interfaces/IOffersRoot.sol";
 
 import "./structures/IMarketFeeStructure.sol";
 import "./structures/IGasValueStructure.sol";
 import "./structures/IDirectBuyGasValuesStructure.sol";
+import './structures/IDiscountCollectionsStructure.sol';
 
 import "./modules/access/OwnableInternal.sol";
 
@@ -25,7 +27,7 @@ import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "tip3/contracts/TokenWalletPlatform.sol";
 
-contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMarketFeeStructure, IEventMarketFee, IGasValueStructure, IDirectBuyGasValuesStructure {
+contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IOffersRoot, IEventMarketFee, IGasValueStructure, IDirectBuyGasValuesStructure {
     uint64 static nonce_;
 
     TvmCell tokenPlatformCode;
@@ -38,6 +40,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
     address public weverVault;
     address public weverRoot;
     DirectBuyGasValues directBuyGas;
+    mapping (address => CollectionFeeInfo) public collectionsSpecialRules;
 
     event DirectBuyDeployed(
         address directBuy,
@@ -140,11 +143,11 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         return "FactoryDirectBuy";
     }
 
-    function getMarketFee() external view returns (MarketFee) {
+    function getMarketFee() external view override returns (MarketFee) {
         return fee;
     }
 
-    function setMarketFee(MarketFee _fee) external onlyOwner {
+    function setMarketFee(MarketFee _fee) external override onlyOwner {
         _reserve();
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee = _fee;
@@ -152,10 +155,20 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    function setMarketFeeForDirectBuy(address directBuy, MarketFee _fee) external onlyOwner {
+    function setMarketFeeForChildContract(address directBuy, MarketFee _fee) external override onlyOwner {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         IOffer(directBuy).setMarketFee{value: 0, flag: 64, bounce:false}(_fee, msg.sender);
         emit MarketFeeChanged(directBuy, _fee);
+    }
+
+    function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
+        collectionsSpecialRules[collection] = collectionFeeInfo;
+    }
+
+    function removeCollectionsSpecialRules(address collection) external override onlyOwner {
+        if (collectionsSpecialRules.exists(collection)) {
+            delete collectionsSpecialRules[collection];
+        }
     }
 
     function buildDirectBuyCreationPayload(
@@ -163,7 +176,9 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         address buyer,
         address nft,
         uint64 startTime,
-        uint64 durationTime
+        uint64 durationTime,
+        optional(address) discountCollection,
+        optional(uint256) discountNftId
     ) external pure returns (TvmCell) {
         TvmBuilder builder;
         builder.store(callbackId);
@@ -171,6 +186,15 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
         builder.store(nft);
         builder.store(startTime);
         builder.store(durationTime);
+
+        TvmBuilder discontBuilder;
+        if (discountCollection.hasValue()) {
+            discontBuilder.store(discountCollection.get());
+        }
+        if (discountNftId.hasValue()) {
+            discontBuilder.store(discountNftId.get());
+        }
+        builder.storeRef(discontBuilder);
         return builder.toCell();
     }
 
@@ -220,13 +244,25 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
             nftForBuy = payloadSlice.decode(address);
         }
         if (
-            payloadSlice.bits() == 128 &&
+            payloadSlice.bits() >= 128 &&
             msg.sender.value != 0 &&
             msg.sender == getTokenWallet(tokenRoot, address(this)) &&
             msg.value >= calcValue(directBuyGas.make)
         ) {
             (uint64 startTime, uint64 durationTime) = payloadSlice.decode(uint64, uint64);
             uint64 nonce = tx.timestamp;
+
+            optional(DiscontInfo) discontOpt;
+            if (payloadSlice.refs() >= 1) {
+                TvmSlice discontSlice = payloadSlice.loadRefAsSlice();
+                if (discontSlice.bits() >= 523) {
+                    address discountCollection = discontSlice.decode(address);
+                    uint256 nftId = discontSlice.decode(uint256);
+                    if (collectionsSpecialRules.exists(discountCollection)) {
+                        discontOpt.set(DiscontInfo(discountCollection, nftId, collectionsSpecialRules.at(discountCollection)));
+                    }
+                }
+            }
 
             TvmCell stateInit = _buildDirectBuyStateInit(buyer, tokenRoot, nftForBuy, nonce);
             address directBuyAddress = address(tvm.hash(stateInit));
@@ -243,7 +279,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
                 fee,
                 weverVault,
                 weverRoot,
-                directBuyGas
+                directBuyGas,
+                discontOpt
             );
 
             emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
@@ -442,7 +479,8 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IMa
                 fee,
                 weverVault,
                 weverRoot,
-                directBuyGas
+                directBuyGas,
+                collectionsSpecialRules
             );
             
             tvm.setcode(newCode);

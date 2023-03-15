@@ -15,6 +15,7 @@ import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IAuctionBidPlacedCallback.sol";
 
 import "./structures/IAuctionGasValuesStructure.sol";
+import './structures/IDiscountCollectionsStructure.sol';
 
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
@@ -26,7 +27,7 @@ import "tip3/contracts/interfaces/ITokenRoot.sol";
 import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
-contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest, ICallbackParamsStructure, IAuctionGasValuesStructure {
+contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest, ICallbackParamsStructure, IAuctionGasValuesStructure, IDiscountCollectionsStructure {
 
     address paymentToken;
     address tokenWallet;
@@ -71,6 +72,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     address public weverVault;
     address public weverRoot;
     AuctionGasValues auctionGas;
+    optional(DiscontInfo) discontOpt;
+    address discountNft;
 
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
@@ -85,7 +88,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         uint128 _price,
         address _tokenRootAddr,
         address _nftOwner,
-        uint128 _deploymentFee,
         MarketFee _fee,
         uint64 _auctionStartTime,
         uint64 _auctionDuration,
@@ -95,7 +97,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         address sendGasTo,
         address _weverVault,
         address _weverRoot,
-        AuctionGasValues _auctionGas
+        AuctionGasValues _auctionGas,
+        optional(DiscontInfo) _discontOpt
     ) public {
         if (
            msg.sender.value != 0 &&
@@ -107,7 +110,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 _price,
                 _tokenRootAddr,
                 _nftOwner,
-                _deploymentFee,
                 _fee
             );
             auctionDuration = _auctionDuration;
@@ -121,6 +123,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             weverVault = _weverVault;
             weverRoot = _weverRoot;
             auctionGas = _auctionGas;
+            discontOpt = _discontOpt;
+
+
+            if (discontOpt.hasValue()){
+                discountNft = _resolveNft(discontOpt.get().nftId);
+                ITIP4_1NFT(discountNft).getInfo{
+                    value: 0.05 ever,
+                    flag: 0,
+                    callback: AuctionTip3.onGetInfo
+                }();
+            }
 
             emit AuctionCreated(buildInfo());
             state = AuctionStatus.Created;
@@ -154,6 +167,18 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         nftOwner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
+    function onGetInfo(
+        uint256 _id,
+        address _owner,
+        address _manager,
+        address _collection
+    ) external {
+        require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
+        if (_owner == nftOwner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
+            fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
+        }
+    }
+
     function _reserve() internal override {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
     }
@@ -164,6 +189,18 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
     function getTypeContract() external pure returns (string) {
         return "Auction";
+    }
+
+    function _resolveNft(uint256 _id) internal view returns (address) {
+        TvmCell data = tvm.buildDataInit({
+            contr: TIP4_1Nft,
+            varInit: {_id: _id},
+            pubkey: 0
+        });
+        uint256 dataHash = tvm.hash(data);
+        uint16 dataDepth = data.depth();
+        uint256 hash = tvm.stateInitHash(discontOpt.get().feeInfo.codeHash, dataHash, discontOpt.get().feeInfo.codeDepth, dataDepth);
+        return address.makeAddrStd(address(this).wid, hash);
     }
 
     function onAcceptTokensTransfer(
@@ -454,7 +491,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               markerRootAddr,
               tokenRootAddr,
               nftOwner,
-              deploymentFee,
               fee,
               auctionDuration,
               auctionStartTime,
@@ -469,7 +505,8 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
               state,
               weverVault,
               weverRoot,
-              auctionGas
+              auctionGas,
+              discontOpt
             );
 
             tvm.setcode(newCode);

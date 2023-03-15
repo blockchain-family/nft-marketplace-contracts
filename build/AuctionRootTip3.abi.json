@@ -9,7 +9,6 @@
 				{"name":"_codeNft","type":"cell"},
 				{"name":"_owner","type":"address"},
 				{"name":"_offerCode","type":"cell"},
-				{"name":"_deploymentFee","type":"uint128"},
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
 				{"name":"_auctionBidDelta","type":"uint16"},
 				{"name":"_auctionBidDeltaDecimals","type":"uint16"},
@@ -37,6 +36,23 @@
 			]
 		},
 		{
+			"name": "addCollectionsSpecialRules",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionFeeInfo","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "removeCollectionsSpecialRules",
+			"inputs": [
+				{"name":"collection","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "onNftChangeManager",
 			"inputs": [
 				{"name":"value0","type":"uint256"},
@@ -58,7 +74,9 @@
 				{"name":"paymentToken","type":"address"},
 				{"name":"price","type":"uint128"},
 				{"name":"auctionStartTime","type":"uint64"},
-				{"name":"auctionDuration","type":"uint64"}
+				{"name":"auctionDuration","type":"uint64"},
+				{"name":"discountCollection","type":"optional(address)"},
+				{"name":"discountNftId","type":"optional(uint256)"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
@@ -104,14 +122,6 @@
 			]
 		},
 		{
-			"name": "changeDeploymentFee",
-			"inputs": [
-				{"name":"_value","type":"uint128"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "changeBidDelta",
 			"inputs": [
 				{"name":"_auctionBidDelta","type":"uint16"},
@@ -137,7 +147,7 @@
 			]
 		},
 		{
-			"name": "setMarketFeeForAuction",
+			"name": "setMarketFeeForChildContract",
 			"inputs": [
 				{"name":"auction","type":"address"},
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
@@ -178,14 +188,6 @@
 			]
 		},
 		{
-			"name": "deploymentFee",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"deploymentFee","type":"uint128"}
-			]
-		},
-		{
 			"name": "weverVault",
 			"inputs": [
 			],
@@ -199,6 +201,14 @@
 			],
 			"outputs": [
 				{"name":"weverRoot","type":"address"}
+			]
+		},
+		{
+			"name": "collectionsSpecialRules",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionsSpecialRules","type":"map(address,tuple)"}
 			]
 		}
 	],
@@ -275,8 +285,6 @@
 		{"name":"owner_","type":"address"},
 		{"name":"auctionBidDelta","type":"uint16"},
 		{"name":"auctionBidDeltaDecimals","type":"uint16"},
-		{"name":"deploymentFee","type":"uint128"},
-		{"name":"deploymentFeePart","type":"uint128"},
 		{"name":"codeNft","type":"cell"},
 		{"name":"offerCode","type":"cell"},
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
@@ -285,6 +293,7 @@
 		{"name":"currentVersionOffer","type":"uint32"},
 		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployAuction","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"start","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"bid","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"auctionGas","type":"tuple"},
 		{"name":"weverVault","type":"address"},
-		{"name":"weverRoot","type":"address"}
+		{"name":"weverRoot","type":"address"},
+		{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionsSpecialRules","type":"map(address,tuple)"}
 	]
 }

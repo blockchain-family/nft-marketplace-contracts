@@ -43,6 +43,10 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, 
 		_remainOnNft = remainOnNft;
 	}
 
+	function codeDepth() public view returns(uint16) {
+        return (_buildNftCode(address(this)).depth());
+	}
+
 	function mintNft(address _owner, string _json) public virtual onlyOwner {
 		require(
 			msg.value > _remainOnNft + _indexDeployValue * 2 + 0.3 ever,

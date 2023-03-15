@@ -17,6 +17,7 @@ import "./interfaces/IOffersRoot.sol";
 
 import "./structures/IDirectSellGasValuesStructure.sol";
 import "./structures/IGasValueStructure.sol";
+import './structures/IDiscountCollectionsStructure.sol';
 
 import "./modules/access/OwnableInternal.sol";
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
@@ -26,7 +27,7 @@ import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 import "./Nft.sol";
 import "./DirectSell.sol";
 
-contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFee, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure {
+contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, IEventMarketFee, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure {
     uint64 static nonce_;
 
     TvmCell directSellCode;
@@ -49,6 +50,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
     address public weverVault;
     address public weverRoot;
     DirectSellGasValues directSellGas;
+    mapping (address => CollectionFeeInfo) public collectionsSpecialRules;
 
     constructor(
         address _owner,
@@ -138,20 +140,30 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
         return directSellGas;
     }
 
-    function getMarketFee() external view returns (MarketFee) {
+    function getMarketFee() external view override returns (MarketFee) {
         return fee;
     }
 
-    function setMarketFeeForDirectSell(address directSell, MarketFee _fee) external onlyOwner {
+    function setMarketFeeForChildContract(address directSell, MarketFee _fee) external override onlyOwner {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         IOffer(directSell).setMarketFee{value: 0, flag: 64, bounce:false}(_fee, msg.sender);
         emit MarketFeeChanged(directSell, _fee);
     }
 
-    function setMarketFee(MarketFee _fee) external onlyOwner {
+    function setMarketFee(MarketFee _fee) external override onlyOwner {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee = _fee;
         emit MarketFeeDefaultChanged(_fee);
+    }
+
+    function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
+        collectionsSpecialRules[collection] = collectionFeeInfo;
+    }
+
+    function removeCollectionsSpecialRules(address collection) external  override onlyOwner {
+        if (collectionsSpecialRules.exists(collection)) {
+            delete collectionsSpecialRules[collection];
+        }
     }
 
     function setCodeDirectSell(TvmCell _directSellCode) public onlyOwner {
@@ -172,7 +184,9 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
         uint64 durationTime,
         address _paymentToken,
         uint128 _price,
-        address recipient
+        address recipient,
+        optional(address) discountCollection,
+        optional(uint256) discountNftId
     ) external pure returns (TvmCell) {
         TvmBuilder builder;
         builder.store(callbackId);
@@ -181,6 +195,15 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
         builder.store(_paymentToken);
         builder.store(_price);
         builder.store(recipient);
+
+        TvmBuilder discontBuilder;
+        if (discountCollection.hasValue()) {
+            discontBuilder.store(discountCollection.get());
+        }
+        if (discountNftId.hasValue()) {
+            discontBuilder.store(discountNftId.get());
+        }
+        builder.storeRef(discontBuilder);
         return builder.toCell();
     }
 
@@ -208,20 +231,31 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
             msg.value >= calcValue(directSellGas.sell) &&
             payloadSlice.bits() >= 523
         ) {
-        (
-            uint64 _startAuction,
-            uint64 durationTime,
-            address _paymentToken,
-            uint128 _price
-        ) = payloadSlice.decode(
-            uint64,
-            uint64,
-            address,
-            uint128
-        );
-        if (payloadSlice.bits() >= 267) {
-            nftOwner = payloadSlice.decode(address);
-        }
+            (
+                uint64 _startAuction,
+                uint64 durationTime,
+                address _paymentToken,
+                uint128 _price
+            ) = payloadSlice.decode(
+                uint64,
+                uint64,
+                address,
+                uint128
+            );
+            if (payloadSlice.bits() >= 267) {
+                nftOwner = payloadSlice.decode(address);
+            }
+            optional(DiscontInfo) discontOpt;
+            if (payloadSlice.refs() >= 1) {
+                TvmSlice discontSlice = payloadSlice.loadRefAsSlice();
+                if (discontSlice.bits() >= 523) {
+                    address discountCollection = discontSlice.decode(address);
+                    uint256 nftId = discontSlice.decode(uint256);
+                    if (collectionsSpecialRules.exists(discountCollection)) {
+                        discontOpt.set(DiscontInfo(discountCollection, nftId, collectionsSpecialRules.at(discountCollection)));
+                    }
+                }
+            }
             uint64 _nonce = tx.timestamp;
             address directSell = new DirectSell{
                 stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, msg.sender, _nonce),
@@ -234,7 +268,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
                 fee,
                 weverVault,
                 weverRoot,
-                directSellGas
+                directSellGas,
+                discontOpt
             );
 
             emit DirectSellDeployed(
@@ -385,7 +420,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IEventMarketFe
                 fee,
                 weverVault,
                 weverRoot,
-                directSellGas
+                directSellGas,
+                collectionsSpecialRules
             );
 
             tvm.setcode(newCode);

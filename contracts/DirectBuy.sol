@@ -25,8 +25,9 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 import "./structures/IMarketFeeStructure.sol";
 import "./structures/IDirectBuyGasValuesStructure.sol";
+import './structures/IDiscountCollectionsStructure.sol';
 
-contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure, ICallbackParamsStructure, IDirectBuyGasValuesStructure {
+contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure, ICallbackParamsStructure, IDirectBuyGasValuesStructure, IDiscountCollectionsStructure {
   address static factoryDirectBuy;
   address static owner;
   address static spentToken;
@@ -47,6 +48,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
   address public weverVault;
   address public weverRoot;
   DirectBuyGasValues directBuyGas;
+  optional(DiscontInfo) discontOpt;
+  address discountNft;
 
   struct DirectBuyInfo {
     address factory;
@@ -74,7 +77,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     MarketFee _fee,
     address _weverVault,
     address _weverRoot,
-    DirectBuyGasValues _directBuyGas
+    DirectBuyGasValues _directBuyGas,
+    optional(DiscontInfo) _discontOpt
   ) public {
     if (msg.sender.value != 0 &&
         msg.sender == factoryDirectBuy) {
@@ -92,7 +96,18 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       spentTokenWallet = _spentTokenWallet;
       fee = _fee;
       directBuyGas = _directBuyGas;
+      discontOpt = _discontOpt;
       currentVersion++;
+
+      if (discontOpt.hasValue()){
+        discountNft = _resolveNft(discontOpt.get().nftId);
+        ITIP4_1NFT(discountNft).getInfo{
+          value: 0.05 ever,
+          flag: 0,
+          callback: DirectBuy.onGetInfo
+        }();
+      }
+
       owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     } else {
       msg.sender.transfer(0, false, 128 + 32);
@@ -106,6 +121,30 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       DirectBuySellErrors.NOT_OWNER_DIRECT_BUY_SELL
     );
     _;
+  }
+
+  function onGetInfo(
+      uint256 _id,
+      address _owner,
+      address _manager,
+      address _collection
+  ) external {
+      require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
+      if (_owner == owner &&  discontOpt.hasValue() && _collection == discontOpt.get().collection) {
+          fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
+      }
+  }
+
+  function _resolveNft(uint256 _id) internal view returns (address) {
+      TvmCell data = tvm.buildDataInit({
+          contr: TIP4_1Nft,
+          varInit: {_id: _id},
+          pubkey: 0
+      });
+      uint256 dataHash = tvm.hash(data);
+      uint16 dataDepth = data.depth();
+      uint256 hash = tvm.stateInitHash(discontOpt.get().feeInfo.codeHash, dataHash, discontOpt.get().feeInfo.codeDepth, dataDepth);
+      return address.makeAddrStd(address(this).wid, hash);
   }
 
   function _reserve() internal  {
@@ -443,7 +482,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         fee,
         weverVault,
         weverRoot,
-        directBuyGas
+        directBuyGas,
+        discontOpt
       );
 
       tvm.setcode(newCode);

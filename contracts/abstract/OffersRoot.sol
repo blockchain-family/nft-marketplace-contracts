@@ -16,8 +16,6 @@ import "../interfaces/IEventsMarketFee.sol";
 abstract contract OffersRoot is IOffersRoot, IEventMarketFee, OwnableInternal {
     uint16 public auctionBidDelta;
     uint16 public auctionBidDeltaDecimals;
-    uint128 public deploymentFee;
-    uint128 deploymentFeePart;
 
     TvmCell codeNft;
     TvmCell offerCode;
@@ -28,7 +26,6 @@ abstract contract OffersRoot is IOffersRoot, IEventMarketFee, OwnableInternal {
         TvmCell _codeNft,
         address _owner,
         TvmCell _offerCode,
-        uint128 _deploymentFee,
         MarketFee _fee,
         uint16 _auctionBidDelta,
         uint16 _auctionBidDeltaDecimals
@@ -41,23 +38,13 @@ abstract contract OffersRoot is IOffersRoot, IEventMarketFee, OwnableInternal {
         offerCode = _offerCode;
 
         _transferOwnership(_owner);
-
-        deploymentFee = _deploymentFee;
         fee = _fee;
         emit MarketFeeDefaultChanged(_fee);
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
-
-        (deploymentFeePart, ) = math.divmod(deploymentFee, 4);
     }
 
-    function changeDeploymentFee(uint128 _value) override external onlyOwner {
-        tvm.accept();
-        deploymentFee = _value;
-        (deploymentFeePart, ) = math.divmod(deploymentFee, 4);
-    }
-
-    function changeBidDelta(uint16 _auctionBidDelta, uint16 _auctionBidDeltaDecimals) override external onlyOwner {
+    function changeBidDelta(uint16 _auctionBidDelta, uint16 _auctionBidDeltaDecimals) external onlyOwner {
         tvm.accept();
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
@@ -75,7 +62,7 @@ abstract contract OffersRoot is IOffersRoot, IEventMarketFee, OwnableInternal {
 
     function _reserve() internal virtual;
 
-    function setMarketFeeForAuction(address auction, MarketFee _fee) external override onlyOwner {
+    function setMarketFeeForChildContract(address auction, MarketFee _fee) external override onlyOwner {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         IOffer(auction).setMarketFee{value: 0, flag: 64, bounce:false}(_fee, msg.sender);
         emit MarketFeeChanged(auction, _fee);

@@ -1,12 +1,14 @@
 pragma ever-solidity >= 0.61.2;
 
 import "../structures/IMarketFeeStructure.sol";
+import "../structures/IDiscountCollectionsStructure.sol";
 
-interface IOffersRoot is IMarketFeeStructure {
+interface IOffersRoot is IMarketFeeStructure, IDiscountCollectionsStructure {
 
-    function changeDeploymentFee(uint128 _value) external;
-    function changeBidDelta(uint16 _auctionBidDelta, uint16 _auctionBidDeltaDecimals) external;
     function setMarketFee(MarketFee _fee) external;
-    function setMarketFeeForAuction(address auction, MarketFee _fee) external;
+    function setMarketFeeForChildContract(address auction, MarketFee _fee) external;
     function getMarketFee() external view returns (MarketFee);
+
+    function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external;
+    function removeCollectionsSpecialRules(address collection) external;
 }

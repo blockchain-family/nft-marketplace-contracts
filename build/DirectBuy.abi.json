@@ -13,7 +13,19 @@
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
 				{"name":"_weverVault","type":"address"},
 				{"name":"_weverRoot","type":"address"},
-				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"_directBuyGas","type":"tuple"}
+				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"_directBuyGas","type":"tuple"},
+				{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"_discontOpt","type":"optional(tuple)"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onGetInfo",
+			"inputs": [
+				{"name":"_id","type":"uint256"},
+				{"name":"_owner","type":"address"},
+				{"name":"_manager","type":"address"},
+				{"name":"_collection","type":"address"}
 			],
 			"outputs": [
 			]
@@ -188,6 +200,8 @@
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
 		{"name":"weverVault","type":"address"},
 		{"name":"weverRoot","type":"address"},
-		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directBuyGas","type":"tuple"}
+		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directBuyGas","type":"tuple"},
+		{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"discontOpt","type":"optional(tuple)"},
+		{"name":"discountNft","type":"address"}
 	]
 }

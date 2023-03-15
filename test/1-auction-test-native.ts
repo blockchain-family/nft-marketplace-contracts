@@ -11,7 +11,7 @@ import { AuctionRoot, Auction } from "./wrappers/auction";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
-import {Address, toNano} from "locklift";
+import {Address, Contract, toNano} from "locklift";
 import { BigNumber } from 'bignumber.js';
 BigNumber.config({EXPONENTIAL_AT: 257});
 
@@ -20,6 +20,7 @@ const { expect } = require('chai');
 
 import { lockliftChai } from "locklift";
 import chai from "chai";
+import {FactorySource} from "../build/factorySource";
 chai.use(lockliftChai);
 
 let account1: Account;
@@ -73,6 +74,8 @@ let gasValue: any;
 let changeManagerValue: string;
 let transferValue: string;
 let cancelValue : string;
+
+
 
 async function Callback(payload: string) {
     let callback: CallbackType;
@@ -895,7 +898,7 @@ describe("Test Auction contract", async function () {
                 denominator: '100'
             } as MarketFee;
 
-            await auctionRoot.contract.methods.setMarketFeeForAuction({auction: auction.address, _fee: setFee}).send({
+            await auctionRoot.contract.methods.setMarketFeeForChildContract({auction: auction.address, _fee: setFee}).send({
                     from: account2.address,
                     amount: toNano(2)
             });

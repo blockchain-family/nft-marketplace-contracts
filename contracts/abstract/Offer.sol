@@ -20,7 +20,6 @@ abstract contract Offer is IOffer {
     address public tokenRootAddr;
     address public nftOwner;
 
-    uint128 public deploymentFee;
     // Market fee
     MarketFee fee;
 
@@ -28,7 +27,6 @@ abstract contract Offer is IOffer {
         uint128 _price,
         address _tokenRootAddr,
         address _nftOwner,
-        uint128 _deploymentFee,
         MarketFee _fee
     ) 
         internal 
@@ -36,7 +34,6 @@ abstract contract Offer is IOffer {
         price = _price;
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
-        deploymentFee = _deploymentFee;
         fee = _fee;
     }
 

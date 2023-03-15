@@ -17,6 +17,14 @@
 			]
 		},
 		{
+			"name": "codeDepth",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"uint16"}
+			]
+		},
+		{
 			"name": "mintNft",
 			"inputs": [
 				{"name":"_owner","type":"address"},

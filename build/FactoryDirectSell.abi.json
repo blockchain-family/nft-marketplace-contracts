@@ -40,7 +40,7 @@
 			]
 		},
 		{
-			"name": "setMarketFeeForDirectSell",
+			"name": "setMarketFeeForChildContract",
 			"inputs": [
 				{"name":"directSell","type":"address"},
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
@@ -52,6 +52,23 @@
 			"name": "setMarketFee",
 			"inputs": [
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "addCollectionsSpecialRules",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionFeeInfo","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "removeCollectionsSpecialRules",
+			"inputs": [
+				{"name":"collection","type":"address"}
 			],
 			"outputs": [
 			]
@@ -72,7 +89,9 @@
 				{"name":"durationTime","type":"uint64"},
 				{"name":"_paymentToken","type":"address"},
 				{"name":"_price","type":"uint128"},
-				{"name":"recipient","type":"address"}
+				{"name":"recipient","type":"address"},
+				{"name":"discountCollection","type":"optional(address)"},
+				{"name":"discountNftId","type":"optional(uint256)"}
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
@@ -155,6 +174,14 @@
 			],
 			"outputs": [
 				{"name":"weverRoot","type":"address"}
+			]
+		},
+		{
+			"name": "collectionsSpecialRules",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionsSpecialRules","type":"map(address,tuple)"}
 			]
 		}
 	],
@@ -240,6 +267,7 @@
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
 		{"name":"weverVault","type":"address"},
 		{"name":"weverRoot","type":"address"},
-		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directSellGas","type":"tuple"}
+		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directSellGas","type":"tuple"},
+		{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionsSpecialRules","type":"map(address,tuple)"}
 	]
 }

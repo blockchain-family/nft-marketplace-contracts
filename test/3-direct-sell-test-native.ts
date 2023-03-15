@@ -755,7 +755,7 @@ describe("Test DirectSell contract", async function () {
                 denominator: '100'
             } as MarketFee;
 
-            await factoryDirectSell.contract.methods.setMarketFeeForDirectSell({directSell: directSell.address, _fee: setFee}).send({
+            await factoryDirectSell.contract.methods.setMarketFeeForChildContract(){directSell: directSell.address, _fee: setFee}).send({
                 from: account1.address,
                 amount: toNano(2)
             });

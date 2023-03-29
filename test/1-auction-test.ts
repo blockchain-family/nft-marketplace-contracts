@@ -425,7 +425,7 @@ describe("Test Auction contract", async function () {
             startBalanceTWAuctionRoot = startBalanceTWAuctionRoot.plus(currentFee);
         });
     });
-    describe("Delete dscount Collection", async function () {
+    describe("Delete discount Collection", async function () {
         it('Delete discount collection', async function () {
             await auctionRoot.contract.methods.removeCollectionsSpecialRules({
             collection: discountCollection.address

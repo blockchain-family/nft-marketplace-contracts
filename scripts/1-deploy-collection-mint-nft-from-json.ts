@@ -67,13 +67,13 @@ async function main() {
                 "description": element.description,
                 "preview": {
                     "source": element.preview_url,
-                    "mimetype": "image/png"
+                    "mimetype": element.mimetype_preview
                 },
                 "files": [
                     {
 
                         "source": element.url,
-                        "mimetype": "image/png"
+                        "mimetype": element.mimetype
                     }
                 ],
                 "external_url": ""

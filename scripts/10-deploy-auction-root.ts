@@ -44,7 +44,6 @@ async function main() {
             _codeNft: Nft.code,
             _owner: account.address,
             _offerCode: AuctionTip3.code,
-            _deploymentFee: 0,
             _fee: fee,
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,

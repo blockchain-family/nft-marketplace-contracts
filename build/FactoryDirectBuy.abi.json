@@ -239,6 +239,23 @@
 			]
 		},
 		{
+			"name": "AddCollectionRules",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionFeeInfo","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "RemoveCollectionRules",
+			"inputs": [
+				{"name":"collection","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "MarketFeeDefaultChanged",
 			"inputs": [
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}

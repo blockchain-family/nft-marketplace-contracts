@@ -91,7 +91,7 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, 
 			_codeIndex
 		);
 
-		emit NftCreated(id, nftAddr, owner, msg.sender, msg.sender);
+		emit NftCreated(id, nftAddr, owner, owner, msg.sender);
 	}
 
 	function setRemainOnNft(uint128 remainOnNft) external virtual onlyOwner {

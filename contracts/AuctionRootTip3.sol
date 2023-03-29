@@ -13,6 +13,7 @@ import './libraries/Gas.sol';
 
 import './interfaces/IAuctionRootCallback.sol';
 import './interfaces/IUpgradableByRequest.sol';
+import "./interfaces/IEventCollectionsSpecialRules.sol";
 
 import './structures/IAuctionGasValuesStructure.sol';
 import './structures/IGasValueStructure.sol';
@@ -25,7 +26,7 @@ import './modules/TIP4_1/structures/ICallbackParamsStructure.sol';
 import './Nft.sol';
 import './AuctionTip3.sol';
 
-contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStructure, IAuctionGasValuesStructure, IGasValueStructure {
+contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStructure, IAuctionGasValuesStructure, IGasValueStructure, IEventCollectionsSpecialRules {
 
     uint64 static nonce_;
 
@@ -164,11 +165,13 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
 
     function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
         collectionsSpecialRules[collection] = collectionFeeInfo;
+    emit AddCollectionRules(collection, collectionFeeInfo);
     }
 
     function removeCollectionsSpecialRules(address collection) external override onlyOwner {
         if (collectionsSpecialRules.exists(collection)) {
             delete collectionsSpecialRules[collection];
+            emit RemoveCollectionRules(collection);
         }
     }
 

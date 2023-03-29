@@ -14,6 +14,7 @@ import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IEventsMarketFee.sol";
 import "./interfaces/IOffer.sol";
 import "./interfaces/IOffersRoot.sol";
+import "./interfaces/IEventCollectionsSpecialRules.sol";
 
 import "./structures/IDirectSellGasValuesStructure.sol";
 import "./structures/IGasValueStructure.sol";
@@ -27,7 +28,7 @@ import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 import "./Nft.sol";
 import "./DirectSell.sol";
 
-contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, IEventMarketFee, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure {
+contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, IEventMarketFee, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, IEventCollectionsSpecialRules {
     uint64 static nonce_;
 
     TvmCell directSellCode;
@@ -158,11 +159,13 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, I
 
     function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
         collectionsSpecialRules[collection] = collectionFeeInfo;
+        emit AddCollectionRules(collection, collectionFeeInfo);
     }
 
     function removeCollectionsSpecialRules(address collection) external  override onlyOwner {
         if (collectionsSpecialRules.exists(collection)) {
             delete collectionsSpecialRules[collection];
+            emit RemoveCollectionRules(collection);
         }
     }
 

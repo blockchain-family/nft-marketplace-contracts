@@ -75,6 +75,10 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     optional(DiscontInfo) discontOpt;
     address discountNft;
 
+    uint128 royaltyNumerator;
+    uint128 royaltyDenominator;
+    address royaltyReceiver;
+
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
     event BidPlaced(address buyer, uint128 value, uint128 nextBidValue);
@@ -139,6 +143,11 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             state = AuctionStatus.Created;
             currentVersion++;
 
+            (royaltyNumerator, royaltyReceiver) = IRoyalty(nftAddress).royaltyInfo{
+                value: 0.05 ever,
+                flag: 0,
+            }(price);
+
             ITokenRoot(paymentToken).deployWallet {
                 value: calcValue(auctionGas.deployWallet),
                 flag: 1,
@@ -177,6 +186,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         if (_owner == nftOwner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
             fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
         }
+    }
+
+    function onBounce(TvmSlice body) external {
+        _reserve();
+        uint32 functionId = body.decode(uint32);
+        if (functionId == tvm.functionId(IRoyalty.royaltyInfo)) {
+            if (msg,.sender == nftAddress) {
+                (royaltyNumerator, royaltyReceiver) = IRoyalty(collection).royaltyInfo(price);
+            }
+        }
+        owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
     function _reserve() internal override {
@@ -340,8 +360,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         mapping(address => CallbackParams) callbacks;
         if (maxBidValue >= price) {
             _reserve();
-            uint128 currentFee = math.muldivc(maxBidValue, fee.numerator, fee.denominator);
-            uint128 balance = maxBidValue - currentFee;
+            uint128 currentFee = math.muldivc(price, fee.numerator, fee.denominator);
+            uint128 royalty = math.muldivc((price - currentFee), royaltyNumerator, royaltyDenominator);
+            uint128 balance = price - currentFee - royalty;
 
             emit AuctionComplete(nftOwner, currentBid.addr, maxBidValue);
             state = AuctionStatus.Complete;
@@ -368,6 +389,22 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 callbacks
             );
             _transfer(balance, nftOwner, sendGasTo, tokenWallet, Gas.TOKEN_TRANSFER_VALUE, 1, Gas.DEPLOY_EMPTY_WALLET_GRAMS, empty);
+
+            if (royalty > 0) {
+                emit RoyaltyWithdrawn(royaltyReceiver, royalty, paymentToken);
+                ITokenWallet(tokenWallet).transfer{
+                    value: Gas.ROYALTY_DEPLOY_WALLET_GRAMS + Gas.ROYALTY_EXTRA_VALUE,
+                    flag: 0,
+                    bounce: false
+                }(
+                    royalty,
+                    royaltyReceiver,
+                    Gas.ROYALTY_DEPLOY_WALLET_GRAMS,
+                    originalGasTo,
+                    false,
+                    emptyPayload
+                );
+            }
 
             if (currentFee >  0) {
                 emit MarketFeeWithheld(currentFee, paymentToken);
@@ -484,29 +521,32 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
             emit AuctionUpgrade();
 
             TvmCell cellParams = abi.encode(
-              nonce_,
-              nft,
-              price,
-              currentVersion,
-              markerRootAddr,
-              tokenRootAddr,
-              nftOwner,
-              fee,
-              auctionDuration,
-              auctionStartTime,
-              auctionEndTime,
-              bidDelta,
-              bidDeltaDecimals,
-              currentBid,
-              maxBidValue,
-              nextBidValue,
-              paymentToken,
-              tokenWallet,
-              state,
-              weverVault,
-              weverRoot,
-              auctionGas,
-              discontOpt
+                nonce_,
+                nft,
+                price,
+                currentVersion,
+                markerRootAddr,
+                tokenRootAddr,
+                nftOwner,
+                fee,
+                auctionDuration,
+                auctionStartTime,
+                auctionEndTime,
+                bidDelta,
+                bidDeltaDecimals,
+                currentBid,
+                maxBidValue,
+                nextBidValue,
+                paymentToken,
+                tokenWallet,
+                state,
+                weverVault,
+                weverRoot,
+                auctionGas,
+                discontOpt,
+                royaltyNumerator,
+                royaltyDenominator,
+                royaltyReceiver
             );
 
             tvm.setcode(newCode);

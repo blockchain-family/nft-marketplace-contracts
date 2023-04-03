@@ -11,6 +11,8 @@ library Gas {
     uint128 constant FEE_DEPLOY_WALLET_GRAMS                = 0.1 ever;
     uint128 constant FEE_EXTRA_VALUE                        = 0.1 ever;
     uint128 constant TRANSFER_OWNERSHIP_VALUE               = 1.01 ever;
+    uint128 constant ROYALTY_EXTRA_VALUE                    = 0.1 ever;
+    uint128 constant ROYALTY_DEPLOY_WALLET_GRAMS            = 0.1 ever;
 
     // direct sell
     uint128 constant FACTORY_DIRECT_SELL_INITIAL_BALANCE    = 0.2 ever;

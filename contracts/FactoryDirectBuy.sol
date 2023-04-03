@@ -13,7 +13,7 @@ import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IEventsMarketFee.sol";
 import "./interfaces/IOffer.sol";
 import "./interfaces/IOffersRoot.sol";
-import "./interfaces/IEventCollectionsSpecialRules.sol";
+import "./interfaces/IEventsCollectionsSpecialRules.sol";
 
 import "./structures/IMarketFeeStructure.sol";
 import "./structures/IGasValueStructure.sol";
@@ -28,7 +28,7 @@ import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "tip3/contracts/TokenWalletPlatform.sol";
 
-contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IOffersRoot, IEventMarketFee, IGasValueStructure, IDirectBuyGasValuesStructure, IEventCollectionsSpecialRules {
+contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IOffersRoot, IEventMarketFee, IGasValueStructure, IDirectBuyGasValuesStructure, IEventsCollectionsSpecialRules {
     uint64 static nonce_;
 
     TvmCell tokenPlatformCode;
@@ -383,7 +383,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IOf
         TvmCell emptyPayload;
         ITokenWallet(tokenWallet).transfer{value: 0, flag: 128, bounce: false }
             (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
-        emit MarketFeeWithdrawn(recipient,amount, tokenWallet);
+        emit MarketFeeWithdrawn(recipient, amount, tokenWallet);
         msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 

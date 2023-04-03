@@ -14,7 +14,7 @@ import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IEventsMarketFee.sol";
 import "./interfaces/IOffer.sol";
 import "./interfaces/IOffersRoot.sol";
-import "./interfaces/IEventCollectionsSpecialRules.sol";
+import "./interfaces/IEventsCollectionsSpecialRules.sol";
 
 import "./structures/IDirectSellGasValuesStructure.sol";
 import "./structures/IGasValueStructure.sol";
@@ -28,7 +28,7 @@ import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 import "./Nft.sol";
 import "./DirectSell.sol";
 
-contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, IEventMarketFee, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, IEventCollectionsSpecialRules {
+contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, IEventMarketFee, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, IEventsCollectionsSpecialRules {
     uint64 static nonce_;
 
     TvmCell directSellCode;

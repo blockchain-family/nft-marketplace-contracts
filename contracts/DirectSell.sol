@@ -53,6 +53,9 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     address public weverRoot;
     optional(DiscontInfo) discontOpt;
     address discountNft;
+    uint128 royaltyNumerator;
+    uint128 royaltyDenominator;
+    address royaltyReceiver;
 
     struct DirectSellInfo {
         address factory;
@@ -111,6 +114,11 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 }();
             }
 
+            (royaltyNumerator, royaltyReceiver) = IRoyalty(nftAddress).royaltyInfo{
+                value: 0.05 ever,
+                flag: 0,
+            }(price);
+
             ITokenRoot(paymentToken).deployWallet{
                 value: 0,
                 flag: 128,
@@ -152,6 +160,17 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         if (_owner == owner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
             fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
         }
+    }
+
+    function onBounce(TvmSlice body) external {
+        _reserve();
+        uint32 functionId = body.decode(uint32);
+        if (functionId == tvm.functionId(IRoyalty.royaltyInfo)) {
+            if (msg,.sender == nftAddress) {
+                (royaltyNumerator, royaltyReceiver) = IRoyalty(collection).royaltyInfo(price);
+            }
+        }
+        owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
     function _resolveNft(uint256 _id) internal view returns (address) {
@@ -248,7 +267,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             );
 
             uint128 currentFee = math.muldivc(price, fee.numerator, fee.denominator);
-            uint128 balance = price - currentFee;
+            uint128 royalty = math.muldivc((price - currentFee), royaltyNumerator, royaltyDenominator);
+            uint128 balance = price - currentFee - royalty;
 
             changeState(DirectSellStatus.Filled);
             callbacks[buyer] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
@@ -264,6 +284,22 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             );
 
             _transfer(balance, owner, originalGasTo, tokenWallet, Gas.TOKEN_TRANSFER_VALUE, 1, Gas.DEPLOY_EMPTY_WALLET_GRAMS);
+
+            if (royalty > 0) {
+                emit RoyaltyWithdrawn(royaltyReceiver, royalty, paymentToken);
+                ITokenWallet(tokenWallet).transfer{
+                    value: Gas.ROYALTY_DEPLOY_WALLET_GRAMS + Gas.ROYALTY_EXTRA_VALUE,
+                    flag: 0,
+                    bounce: false
+                }(
+                    royalty,
+                    royaltyReceiver,
+                    Gas.ROYALTY_DEPLOY_WALLET_GRAMS,
+                    originalGasTo,
+                    false,
+                    emptyPayload
+                );
+            }
 
             if (currentFee > 0) {
                 emit MarketFeeWithheld(currentFee, paymentToken);
@@ -487,7 +523,10 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 weverVault,
                 weverRoot,
                 directSellGas,
-                discontOpt
+                discontOpt,
+                royaltyNumerator,
+                royaltyDenominator,
+                royaltyReceiver
             );
 
               tvm.setcode(newCode);

@@ -175,9 +175,18 @@
 			]
 		},
 		{
+			"name": "MarketFeeChanged",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "MarketFeeWithheld",
 			"inputs": [
-				{"name":"value0","type":"uint128"},
+				{"name":"amount","type":"uint128"},
 				{"name":"tokenRoot","type":"address"}
 			],
 			"outputs": [

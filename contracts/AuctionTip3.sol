@@ -26,6 +26,7 @@ import "./Nft.sol";
 import "tip3/contracts/interfaces/ITokenRoot.sol";
 import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
+import "./interfaces/IEventsMarketFeeOffers.sol";
 
 contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest, ICallbackParamsStructure, IAuctionGasValuesStructure, IDiscountCollectionsStructure {
 
@@ -176,6 +177,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
         if (_owner == nftOwner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
             fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
+            emit MarketFeeChanged(address(this), fee);
         }
     }
 

@@ -9,8 +9,9 @@ import '../errors/OffersBaseErrors.sol';
 
 import '../interfaces/IOffersRoot.sol';
 import "../interfaces/IOffer.sol";
+import "../interfaces/IEventsMarketFeeOffers.sol";
 
-abstract contract Offer is IOffer {
+abstract contract Offer is IOffer, IEventsMarketFeeOffers {
 
     uint64 static nonce_;
     address public static nft;
@@ -35,6 +36,7 @@ abstract contract Offer is IOffer {
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
         fee = _fee;
+        emit MarketFeeChanged(address(this), fee);
     }
 
     modifier onlyOwner() {
@@ -65,6 +67,7 @@ abstract contract Offer is IOffer {
         _reserve();
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee = _fee;
+        emit MarketFeeChanged(address(this), fee);
         sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 

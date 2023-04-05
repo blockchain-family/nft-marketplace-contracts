@@ -164,15 +164,20 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
     }
 
     function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
+        _reserve();
+        require(collectionFeeInfo.denominator > 0, BaseErrors.denominator_not_be_zero);
         collectionsSpecialRules[collection] = collectionFeeInfo;
         emit AddCollectionRules(collection, collectionFeeInfo);
+        msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
     function removeCollectionsSpecialRules(address collection) external override onlyOwner {
+        _reserve();
         if (collectionsSpecialRules.exists(collection)) {
             delete collectionsSpecialRules[collection];
             emit RemoveCollectionRules(collection);
         }
+        msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
     function onNftChangeManager(

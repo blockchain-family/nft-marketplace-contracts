@@ -12,6 +12,7 @@ import "./libraries/DirectSellStatus.sol";
 
 import "./interfaces/IDirectSellCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
+import "./interfaces/IEventsMarketFeeOffers.sol";
 
 import "./structures/IMarketFeeStructure.sol";
 import "./structures/IDirectSellGasValuesStructure.sol";
@@ -29,7 +30,7 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 
 
-contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, IDiscountCollectionsStructure {
+contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMarketFeeStructure, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, IDiscountCollectionsStructure, IEventsMarketFeeOffers {
     address static factoryDirectSell;
     address static owner;
     address static paymentToken;
@@ -72,7 +73,6 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
 
     event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo);
     event DirectSellUpgrade();
-    event MarketFeeWithheld(uint128, address tokenRoot);
 
     constructor(
         uint64 _startTime,
@@ -104,6 +104,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             price = _price;
             discontOpt = _discontOpt;
             currentVersion++;
+
+            emit MarketFeeChanged(address(this), fee);
 
             if (discontOpt.hasValue()){
                 discountNft = _resolveNft(discontOpt.get().nftId);
@@ -159,6 +161,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
         if (_owner == owner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
             fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
+            emit MarketFeeChanged(address(this), fee);
         }
     }
 
@@ -204,6 +207,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         _reserve();
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee= _fee;
+        emit MarketFeeChanged(address(this), fee);
         sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 

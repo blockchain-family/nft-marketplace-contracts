@@ -12,6 +12,7 @@ import "./libraries/DirectBuyStatus.sol";
 
 import "./interfaces/IDirectBuyCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
+import "./interfaces/IEventsMarketFeeOffers.sol";
 
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/ITIP4_1NFT.sol";
@@ -27,7 +28,8 @@ import "./structures/IMarketFeeStructure.sol";
 import "./structures/IDirectBuyGasValuesStructure.sol";
 import './structures/IDiscountCollectionsStructure.sol';
 
-contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure, ICallbackParamsStructure, IDirectBuyGasValuesStructure, IDiscountCollectionsStructure {
+
+contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure, ICallbackParamsStructure, IDirectBuyGasValuesStructure, IDiscountCollectionsStructure, IEventsMarketFeeOffers {
     address static factoryDirectBuy;
     address static owner;
     address static spentToken;
@@ -102,6 +104,8 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
             discontOpt = _discontOpt;
             currentVersion++;
 
+      emit MarketFeeChanged(address(this), fee);
+
             if (discontOpt.hasValue()){
                 discountNft = _resolveNft(discontOpt.get().nftId);
                 ITIP4_1NFT(discountNft).getInfo{
@@ -140,6 +144,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
         if (_owner == owner &&  discontOpt.hasValue() && _collection == discontOpt.get().collection) {
             fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
+          emit MarketFeeChanged(address(this), fee);
         }
     }
 
@@ -186,6 +191,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         _reserve();
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee= _fee;
+      emit MarketFeeChanged(address(this), fee);
         sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 

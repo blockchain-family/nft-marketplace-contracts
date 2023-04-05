@@ -301,6 +301,15 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "MarketFeeChanged",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [

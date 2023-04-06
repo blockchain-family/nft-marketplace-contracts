@@ -104,7 +104,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
             discontOpt = _discontOpt;
             currentVersion++;
 
-      emit MarketFeeChanged(address(this), fee);
+            emit MarketFeeChanged(address(this), fee);
 
             if (discontOpt.hasValue()){
                 discountNft = _resolveNft(discontOpt.get().nftId);
@@ -144,7 +144,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
         if (_owner == owner &&  discontOpt.hasValue() && _collection == discontOpt.get().collection) {
             fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
-          emit MarketFeeChanged(address(this), fee);
+            emit MarketFeeChanged(address(this), fee);
         }
     }
 
@@ -191,7 +191,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         _reserve();
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee= _fee;
-      emit MarketFeeChanged(address(this), fee);
+        emit MarketFeeChanged(address(this), fee);
         sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 

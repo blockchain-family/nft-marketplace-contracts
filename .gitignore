@@ -15,3 +15,5 @@ build/TokenRoot*
 build/Callbacks.base64
 build/Callbacks.code
 build/Callbacks.tvc
+
+/collection*.json

@@ -29,6 +29,13 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "./interfaces/IEventsMarketFeeOffers.sol";
 
 contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByRequest, ICallbackParamsStructure, IAuctionGasValuesStructure, IDiscountCollectionsStructure {
+    uint64 static nonce_;
+    address public static nft;
+    address public static markerRootAddr;
+
+    uint128 public price;
+    address public tokenRootAddr;
+    address public nftOwner;
 
     address paymentToken;
     address tokenWallet;
@@ -146,7 +153,7 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
 
             (royaltyNumerator, royaltyReceiver) = IRoyalty(nftAddress).royaltyInfo{
                 value: 0.05 ever,
-                flag: 0,
+                flag: 0
             }(price);
 
             ITokenRoot(paymentToken).deployWallet {
@@ -190,11 +197,11 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         }
     }
 
-    function onBounce(TvmSlice body) external {
+    onBounce(TvmSlice body) external {
         _reserve();
         uint32 functionId = body.decode(uint32);
         if (functionId == tvm.functionId(IRoyalty.royaltyInfo)) {
-            if (msg,.sender == nftAddress) {
+            if (msg.sender == nftAddress) {
                 (royaltyNumerator, royaltyReceiver) = IRoyalty(collection).royaltyInfo(price);
             }
         }

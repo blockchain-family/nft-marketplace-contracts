@@ -13,7 +13,6 @@ import './libraries/Gas.sol';
 
 import './interfaces/IAuctionRootCallback.sol';
 import './interfaces/IUpgradableByRequest.sol';
-import "./interfaces/IEventsCollectionsSpecialRules.sol";
 
 import './structures/IAuctionGasValuesStructure.sol';
 import './structures/IGasValueStructure.sol';
@@ -26,7 +25,7 @@ import './modules/TIP4_1/structures/ICallbackParamsStructure.sol';
 import './Nft.sol';
 import './AuctionTip3.sol';
 
-contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStructure, IAuctionGasValuesStructure, IGasValueStructure, IEventsCollectionsSpecialRules {
+contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStructure, IAuctionGasValuesStructure {
 
     uint64 static nonce_;
 
@@ -42,17 +41,18 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
 
     uint32 currentVersion;
     uint32 currentVersionOffer;
+    uint16 public auctionBidDelta;
+    uint16 public auctionBidDeltaDecimals;
+    TvmCell codeNft;
+    TvmCell offerCode;
 
     AuctionGasValues auctionGas;
+    address public weverVault;
+    address public weverRoot;
 
     event AuctionDeployed(address offer, MarketOffer offerInfo);
     event AuctionDeclined(address nftOwner, address nft);
     event AuctionRootUpgrade();
-
-    address public weverVault;
-    address public weverRoot;
-
-    mapping (address => CollectionFeeInfo) public collectionsSpecialRules;
 
     constructor(
         TvmCell _codeNft,
@@ -64,29 +64,22 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         address _sendGasTo,
         address _weverVault,
         address _weverRoot
-    ) OwnableInternal(
+    ) OffersRoot(
+        _fee,
         _owner
-    )
-        public
+    ) public
     {
-        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         tvm.accept();
         _reserve();
 
-        // Method and properties are declared in OffersRoot
-        setDefaultProperties(
-            _codeNft,
-            _owner,
-            _offerCode,
-            _fee,
-            _auctionBidDelta,
-            _auctionBidDeltaDecimals
-        );
-        emit MarketFeeDefaultChanged(_fee);
         currentVersion++;
         currentVersionOffer++;
         weverVault = _weverVault;
         weverRoot = _weverRoot;
+        auctionBidDelta = _auctionBidDelta;
+        auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
+        codeNft = _codeNft;
+        offerCode = _offerCode;
 
         auctionGas = AuctionGasValues(
         //gasK
@@ -155,29 +148,14 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         return auctionGas;
     }
 
-    function calcValue(GasValues value) internal pure returns(uint128) {
-        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
-    }
-
     function getTypeContract() external pure returns (string) {
         return "AuctionRoot";
     }
 
-    function addCollectionsSpecialRules(address collection, CollectionFeeInfo collectionFeeInfo) external override onlyOwner {
-        _reserve();
-        require(collectionFeeInfo.denominator > 0, BaseErrors.denominator_not_be_zero);
-        collectionsSpecialRules[collection] = collectionFeeInfo;
-        emit AddCollectionRules(collection, collectionFeeInfo);
-        msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
-    }
-
-    function removeCollectionsSpecialRules(address collection) external override onlyOwner {
-        _reserve();
-        if (collectionsSpecialRules.exists(collection)) {
-            delete collectionsSpecialRules[collection];
-            emit RemoveCollectionRules(collection);
-        }
-        msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
+    function changeBidDelta(uint16 _auctionBidDelta, uint16 _auctionBidDeltaDecimals) external onlyOwner {
+        tvm.accept();
+        auctionBidDelta = _auctionBidDelta;
+        auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
     }
 
     function onNftChangeManager(
@@ -354,22 +332,13 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
-    function withdraw(address tokenWallet, uint128 amount, address recipient, address remainingGasTo) external onlyOwner {
-        require(recipient.value != 0, AuctionErrors.wrong_recipient);
-        require(msg.value >= Gas.WITHDRAW_VALUE, AuctionErrors.low_gas);
-        _reserve();
-        TvmCell emptyPayload;
-        ITokenWallet(tokenWallet).transfer{ value: 0, flag: 128, bounce: false }
-            (amount, recipient, Gas.DEPLOY_EMPTY_WALLET_GRAMS, remainingGasTo, false, emptyPayload);
-        emit MarketFeeWithdrawn(recipient, amount, tokenWallet);
-    }
 
     function RequestUpgradeAuction(
         address _nft,
         uint64 _nonce,
         address sendGasTo
     ) external view onlyOwner {
-        require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.value_too_low);
+        require(msg.value >= Gas.UPGRADE_AUCTION_ROOT_MIN_VALUE, BaseErrors.low_gas);
         tvm.rawReserve(math.max(
             Gas.AUCTION_ROOT_INITIAL_BALANCE,
             address(this).balance - msg.value), 2

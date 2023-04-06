@@ -12,7 +12,7 @@ import "../interfaces/IOffer.sol";
 import "../interfaces/IEventsMarketFeeOffers.sol";
 
 abstract contract Offer is IOffer, IEventsMarketFeeOffers {
-    uint128 public price;
+
     address public tokenRootAddr;
     address public nftOwner;
 
@@ -20,14 +20,12 @@ abstract contract Offer is IOffer, IEventsMarketFeeOffers {
     MarketFee fee;
 
     function setDefaultProperties(
-        uint128 _price,
         address _tokenRootAddr,
         address _nftOwner,
         MarketFee _fee
     ) 
         internal 
-    {   
-        price = _price;
+    {
         tokenRootAddr = _tokenRootAddr;
         nftOwner = _nftOwner;
         fee = _fee;
@@ -50,7 +48,6 @@ abstract contract Offer is IOffer, IEventsMarketFeeOffers {
             msg.sender == markerRootAddr, 
             OffersBaseErrors.message_sender_is_not_my_root
         );
-
         _;
     }
 
@@ -66,5 +63,11 @@ abstract contract Offer is IOffer, IEventsMarketFeeOffers {
         sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    function _reserve() internal virtual;
+    function _reserve() internal virtual {
+        tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
+    }
+
+    function calcValue(IGasValueStructure.GasValues value) internal pure returns(uint128) {
+        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
+    }
 }

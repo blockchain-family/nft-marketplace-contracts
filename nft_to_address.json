@@ -1,0 +1,28 @@
+  {
+    "collection": {
+            "type": "Basic NFT",
+            "name": "Sample Name",
+            "description": "Description about NFT collection!",
+            "preview": {
+                "source": "",
+                "mimetype": "image/png"
+            },
+            "files": [
+                {
+                    "source": "",
+                    "mimetype": "image/png"
+                }
+            ],
+            "external_url": ""
+    },
+    "nfts":
+        [
+            {
+                "address": "",
+                "preview_url":	"",
+                "url": "",
+                "name": "Winter 1",
+                "description": "Winter 1 nft"
+            }
+        ]
+}

@@ -94,7 +94,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
     event AuctionComplete(address seller, address buyer, uint128 value);
     event AuctionCancelled();
     event AuctionUpgrade();
-    event MarketFeeWithheld(uint128 amount, address tokenRoot);
 
     constructor(
         uint128 _price,
@@ -111,6 +110,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         address _weverRoot,
         AuctionGasValues _auctionGas,
         optional(DiscontInfo) _discontOpt
+    ) Offer(
+        _fee,
+        _nftOwner
     ) public {
         if (
            msg.sender.value != 0 &&
@@ -118,12 +120,9 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
            msg.sender.value >= calcValue(_auctionGas.deployAuction)
         ) {
             _reserve();
-            setDefaultProperties (
-                _price,
-                _tokenRootAddr,
-                _nftOwner,
-                _fee
-            );
+
+            price = _price;
+            tokenRootAddr = _tokenRootAddr
             auctionDuration = _auctionDuration;
             auctionStartTime = _auctionStartTime;
             auctionEndTime = _auctionStartTime + _auctionDuration;
@@ -184,52 +183,12 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         nftOwner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    function onGetInfo(
-        uint256 _id,
-        address _owner,
-        address _manager,
-        address _collection
-    ) external {
-        require(msg.sender.value != 0 && msg.sender == discountNft, BaseErrors.operation_not_permited);
-        if (_owner == nftOwner && _collection == discontOpt.get().collection && discontOpt.hasValue()) {
-            fee = MarketFee(discontOpt.get().feeInfo.numerator, discontOpt.get().feeInfo.denominator);
-            emit MarketFeeChanged(address(this), fee);
-        }
-    }
-
-    onBounce(TvmSlice body) external {
-        _reserve();
-        uint32 functionId = body.decode(uint32);
-        if (functionId == tvm.functionId(IRoyalty.royaltyInfo)) {
-            if (msg.sender == nftAddress) {
-                (royaltyNumerator, royaltyReceiver) = IRoyalty(collection).royaltyInfo(price);
-            }
-        }
-        owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
-    }
-
     function _reserve() internal override {
         tvm.rawReserve(Gas.AUCTION_INITIAL_BALANCE, 0);
     }
 
-    function calcValue(IGasValueStructure.GasValues value) internal pure returns(uint128) {
-        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
-    }
-
     function getTypeContract() external pure returns (string) {
         return "Auction";
-    }
-
-    function _resolveNft(uint256 _id) internal view returns (address) {
-        TvmCell data = tvm.buildDataInit({
-            contr: TIP4_1Nft,
-            varInit: {_id: _id},
-            pubkey: 0
-        });
-        uint256 dataHash = tvm.hash(data);
-        uint16 dataDepth = data.depth();
-        uint256 hash = tvm.stateInitHash(discontOpt.get().feeInfo.codeHash, dataHash, discontOpt.get().feeInfo.codeDepth, dataDepth);
-        return address.makeAddrStd(address(this).wid, hash);
     }
 
     function onAcceptTokensTransfer(
@@ -311,54 +270,6 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         }
     }
 
-    function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gasDeployTW, TvmCell payload) private {
-        TvmBuilder builder;
-        builder.store(remainingGasTo);
-        TvmCell emptyPayload;
-        if (paymentToken == weverRoot) {
-            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
-                amount,
-                weverVault,
-                uint128(0),
-                user,
-                true,
-                builder.toCell()
-            );
-        } else {
-            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
-                amount,
-                user,
-                gasDeployTW,
-                remainingGasTo,
-                false,
-                payload
-            );
-        }
-    }
-
-    function onAcceptTokensBurn(
-        uint128 amount,
-        address /*walletOwner*/,
-        address /*wallet*/,
-        address user,
-        TvmCell payload
-    )  external {
-        address remainingGasTo;
-        TvmSlice payloadSlice = payload.toSlice();
-        if (payloadSlice.bits() >= 267) {
-            remainingGasTo = payloadSlice.decode(address);
-        }
-        require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
-        _reserve();
-
-        if (user == remainingGasTo) {
-            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
-        } else {
-            user.transfer({ value: amount, flag: 1, bounce: false });
-            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
-        }
-   }
-
     function finishAuction(
         address sendGasTo,
         uint32 callbackId
@@ -411,24 +322,25 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                     Gas.ROYALTY_DEPLOY_WALLET_GRAMS,
                     originalGasTo,
                     false,
-                    emptyPayload
+                    empty
                 );
             }
 
             if (currentFee >  0) {
-                emit MarketFeeWithheld(currentFee, paymentToken);
-                ITokenWallet(tokenWallet).transfer{
-                    value: Gas.FEE_DEPLOY_WALLET_GRAMS + Gas.FEE_EXTRA_VALUE,
-                    flag: 0,
-                    bounce: false
-                }(
-                    currentFee,
-                    markerRootAddr,
-                    Gas.FEE_DEPLOY_WALLET_GRAMS,
-                    sendGasTo,
-                    false,
-                    empty
-                );
+//                emit MarketFeeWithheld(currentFee, paymentToken);
+//                ITokenWallet(tokenWallet).transfer{
+//                    value: Gas.FEE_DEPLOY_WALLET_GRAMS + Gas.FEE_EXTRA_VALUE,
+//                    flag: 0,
+//                    bounce: false
+//                }(
+//                    currentFee,
+//                    markerRootAddr,
+//                    Gas.FEE_DEPLOY_WALLET_GRAMS,
+//                    sendGasTo,
+//                    false,
+//                    empty
+//                );
+                _retentionMarketFee(tokenWallet, Gas.FEE_EXTRA_VALUE, Gas.FEE_DEPLOY_WALLET_GRAMS, currentFee, paymentToken, markerRootAddr, sendGasTo, empty);
             }
 
         } else {

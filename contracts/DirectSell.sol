@@ -35,7 +35,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     address static owner;
     address static paymentToken;
     address static nftAddress;
-    uint64 static timeTx;
+    uint64 static nonce_;
 
     DirectSellGasValues directSellGas;
 
@@ -63,7 +63,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         address creator;
         address token;
         address nft;
-        uint64 _timeTx;
+        uint64 nonce_;
         uint64 start;
         uint64 end;
         uint128 _price;
@@ -119,6 +119,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             (royaltyNumerator, royaltyReceiver) = IRoyalty(nftAddress).royaltyInfo{
                 value: 0.05 ever,
                 flag: 0,
+
             }(price);
 
             ITokenRoot(paymentToken).deployWallet{
@@ -165,7 +166,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         }
     }
 
-    function onBounce(TvmSlice body) external {
+    onBounce(TvmSlice body) external {
         _reserve();
         uint32 functionId = body.decode(uint32);
         if (functionId == tvm.functionId(IRoyalty.royaltyInfo)) {
@@ -173,6 +174,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 (royaltyNumerator, royaltyReceiver) = IRoyalty(collection).royaltyInfo(price);
             }
         }
+
         owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
@@ -420,7 +422,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             owner,
             paymentToken,
             nftAddress,
-            timeTx,
+            nonce_,
             startTime,
             endTime,
             price,
@@ -515,7 +517,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 owner,
                 paymentToken,
                 nftAddress,
-                timeTx,
+                nonce_,
                 startTime,
                 durationTime,
                 endTime,

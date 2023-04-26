@@ -16,5 +16,6 @@ library BaseErrors {
     uint8 constant message_sender_is_not_self        = 112;
     uint8 constant message_sender_is_not_collection  = 113;
     uint16 constant wrong_recipient                  = 114;
+    uint8 constant message_sender_is_not_my_root     = 115;
 
 }

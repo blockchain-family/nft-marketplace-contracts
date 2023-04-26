@@ -34,7 +34,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     address static owner;
     address static spentToken;
     address static nftAddress;
-    uint64 static timeTx;
+    uint64 static nonce_;
 
     uint128 price;
 
@@ -61,7 +61,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         address creator;
         address spentToken;
         address nft;
-        uint64 _timeTx;
+        uint64 nonce_;
         uint128 _price;
         address spentWallet;
         uint8 status;
@@ -388,7 +388,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
                 owner,
                 spentToken,
                 nftAddress,
-                timeTx,
+                nonce_,
                 price,
                 spentTokenWallet,
                 currentStatus,
@@ -513,7 +513,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
                 owner,
                 spentToken,
                 nftAddress,
-                timeTx,
+                nonce_,
                 price,
                 startTime,
                 durationTime,

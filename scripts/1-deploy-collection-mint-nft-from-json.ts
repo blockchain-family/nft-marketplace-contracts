@@ -22,7 +22,7 @@ async function main() {
         }
     ]);
 
-    const data = fs.readFileSync("nft_to_address_deploy.json", 'utf8');
+    const data = fs.readFileSync("nft_to_address.json", 'utf8');
     if (data) array_json = JSON.parse(data);
 
     const requiredGas = new BigNumber(array_json.length).times(3.4).plus(5).shiftedBy(9);
@@ -32,10 +32,11 @@ async function main() {
         throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
     }
 
-    const Nft = (await locklift.factory.getContractArtifacts("Nft"));
+    const Nft = (await locklift.factory.getContractArtifacts("NftRoyalty"));
     const Index = (await locklift.factory.getContractArtifacts("Index"));
     const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));
 
+    console.log('Start deploy collection');
 
     const { contract: collection, tx } = await locklift.factory.deployContract({
         contract: "Collection",

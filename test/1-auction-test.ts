@@ -111,8 +111,10 @@ describe("Test Auction contract", async function () {
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: Account[] = [];
         accForNft.push(account2);
-        const [, nftS] = await deployCollectionAndMintNft(account2, 1, "nft_to_address.json", accForNft);
+        const [collection, nftS] = await deployCollectionAndMintNft(account2, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
+        locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
+        locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
     });
     it('Deploy discount Collection and Mint Nft for Account3', async function () {
         let accForNft: Account[] = [];
@@ -153,7 +155,7 @@ describe("Test Auction contract", async function () {
         } as MarketFee;
         auctionRoot = await deployAuctionRoot(account2, fee, weverVault, weverRoot.address);
         const eventMFChanged = await auctionRoot.getEvent('MarketFeeDefaultChanged') as any;
-        expect(eventMFChanged.fee).to.eql((await auctionRoot.contract.methods.getMarketFee().call()).value0);
+        expect(eventMFChanged.fee).to.eql((await auctionRoot.contract.methods.marketFee().call()).value0);
     });
     it('Get address token wallet for AuctionRoot', async function () {
         auctionRootTWAddress = await tokenRoot.walletAddr(auctionRoot.address);
@@ -162,7 +164,7 @@ describe("Test Auction contract", async function () {
         // const tokenWallet = await locklift.factory.getDeployedContract('TokenWalletUpgradeable', tokenWalletAddress);
     });
     it( 'Get market fee',async function () {
-        fee = (await auctionRoot.contract.methods.getMarketFee().call()).value0;
+        fee = (await auctionRoot.contract.methods.marketFee().call()).value0;
     });
     it('Get bid delta', async function (){
         bidDelta = new BigNumber((await auctionRoot.contract.methods.auctionBidDelta().call()).auctionBidDelta);
@@ -179,8 +181,8 @@ describe("Test Auction contract", async function () {
             denominator: '100'
         }
         await auctionRoot.contract.methods.addCollectionsSpecialRules({
-            collection: discountCollection.address,
-            collectionFeeInfo: discountInfo
+            _collection: discountCollection.address,
+            _collectionFeeInfo: discountInfo
         }).send(
             {
                 from: account2.address,
@@ -263,7 +265,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(eventAuctionDeployed.offer, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            let discountFee = (await auction.contract.methods.getMarketFee().call()).value0;
+            let discountFee = (await auction.contract.methods.marketFee().call()).value0;
             expect(discountInfo.numerator).to.be.eq(discountFee.numerator);
             expect(discountInfo.denominator).to.be.eq(discountFee.denominator);
 
@@ -287,7 +289,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and several users stake', async function () {
             const spentToken: number = 4000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
 
@@ -295,9 +297,10 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            let discountFee = (await auction.contract.methods.getMarketFee().call()).value0;
+            let discountFee = (await auction.contract.methods.marketFee().call()).value0;
             expect(discountInfo.numerator).to.be.eq(discountFee.numerator);
             expect(discountInfo.denominator).to.be.eq(discountFee.denominator);
+
 
             //First bid placed
             await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
@@ -428,13 +431,13 @@ describe("Test Auction contract", async function () {
     describe("Delete discount Collection", async function () {
         it('Delete discount collection', async function () {
             await auctionRoot.contract.methods.removeCollectionsSpecialRules({
-            collection: discountCollection.address
-        }).send(
-            {
-                from: account2.address,
-                amount: toNano(1)
+                _collection: discountCollection.address
+            }).send(
+                {
+                    from: account2.address,
+                    amount: toNano(1)
+                });
             });
-        });
     });
     describe("Auction negative testing", async function () {
         it('Trying to stake less then auction bid', async function () {
@@ -449,7 +452,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            let discountFee = (await auction.contract.methods.getMarketFee().call()).value0;
+            let discountFee = (await auction.contract.methods.marketFee().call()).value0;
             expect(fee.numerator).to.be.eq(discountFee.numerator);
             expect(fee.denominator).to.be.eq(discountFee.denominator);
 
@@ -687,7 +690,7 @@ describe("Test Auction contract", async function () {
     });
     describe("Change market fee", async function () {
         it('Change market fee', async function () {
-            let oldFee = (await auctionRoot.contract.methods.getMarketFee().call()).value0;
+            let oldFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
             expect(oldFee).to.eql(fee);
 
             let setFee = {
@@ -700,13 +703,13 @@ describe("Test Auction contract", async function () {
                     amount: toNano(2)
             });
 
-            let newFee = (await auctionRoot.contract.methods.getMarketFee().call()).value0;
+            let newFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
             expect(setFee.numerator).to.eql(newFee.numerator);
             expect(setFee.denominator).to.eql(newFee.denominator);
             fee = newFee;
         });
         it('Change market fee with zero denominator', async function () {
-            let oldFee = (await auctionRoot.contract.methods.getMarketFee().call()).value0;
+            let oldFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
             expect(oldFee).to.eql(fee);
 
             let setFee = {
@@ -718,7 +721,7 @@ describe("Test Auction contract", async function () {
                     from: account2.address,
                     amount: toNano(2)
             });
-            let newFee = (await auctionRoot.contract.methods.getMarketFee().call()).value0;
+            let newFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
             expect(newFee).to.eql(oldFee);
         });
     });
@@ -730,14 +733,13 @@ describe("Test Auction contract", async function () {
             let spentTokenWallet1Balance = await tokenWallet1.balance();
             expect(spentTokenWallet1Balance.toString()).to.be.eq(startBalanceTW1.toString());
 
-            await auctionRoot.contract.methods.withdraw({
-                tokenWallet:auctionRootTW.address,
-                amount:withdrawAmount,
-                recipient:account1.address,
-                remainingGasTo:account1.address}).send({
-                    from: account2.address,
-                    amount: toNano(2)
-                });
+            await auctionRoot.withdraw(
+                auctionRootTW.address,
+                BigNumber(withdrawAmount).toNumber(),
+                account1.address,
+                account2.address,
+                account2.address
+            );
 
             const auctionRootTokenWalletBalance1 = await auctionRootTW.balance();
             expect(auctionRootTokenWalletBalance1.toString()).to.be.eq((startBalanceTWAuctionRoot.minus(new BigNumber(withdrawAmount))).toString());
@@ -754,14 +756,13 @@ describe("Test Auction contract", async function () {
             let spentTokenWallet1Balance = await tokenWallet1.balance();
             expect(spentTokenWallet1Balance.toString()).to.be.eq(startBalanceTW1.toString());
 
-            await auctionRoot.contract.methods.withdraw({
-                tokenWallet:auctionRootTW.address,
-                amount:withdrawAmount,
-                recipient:account1.address,
-                remainingGasTo:account1.address}).send({
-                    from: account2.address,
-                    amount: toNano(2)
-                });
+            await auctionRoot.withdraw(
+                auctionRootTW.address,
+                BigNumber(withdrawAmount).toNumber(),
+                account1.address,
+                account2.address,
+                account2.address
+            );
 
             const auctionRootTokenWalletBalance1 = await auctionRootTW.balance();
             expect(auctionRootTokenWalletBalance1.toString()).to.be.eq((startBalanceTWAuctionRoot).toString());
@@ -776,14 +777,13 @@ describe("Test Auction contract", async function () {
 
             const withdrawAmount = auctionRootTokenWalletBalance;
 
-            await auctionRoot.contract.methods.withdraw({
-                tokenWallet:auctionRootTW.address,
-                amount: withdrawAmount,
-                recipient:account1.address,
-                remainingGasTo:account1.address}).send({
-                    from: account2.address,
-                    amount: toNano(2)
-                });
+            await auctionRoot.withdraw(
+                auctionRootTW.address,
+                BigNumber(withdrawAmount).toNumber(),
+                account1.address,
+                account2.address,
+                account2.address
+            );
 
             const auctionRootTokenWalletBalance1 = await auctionRootTW.balance();
             expect(auctionRootTokenWalletBalance1.toString()).to.be.eq((0).toString());

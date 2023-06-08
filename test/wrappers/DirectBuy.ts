@@ -42,6 +42,24 @@ export class FactoryDirectBuy {
         }
         return null;
     }
+
+    async withdraw(
+        tokenWallet: Address,
+        amount: number,
+        recipient: Address,
+        remainingGasTo: Address,
+        initiator: Address
+    ) {
+        return (await this.contract.methods.withdraw({
+            _tokenWallet: tokenWallet,
+            _amount: amount,
+            _recipient: recipient,
+            _remainingGasTo: remainingGasTo
+        }).send({
+            from: initiator,
+            amount: toNano(2)
+        }))
+    }
 }
 
 export class DirectBuy {
@@ -78,8 +96,8 @@ export class DirectBuy {
 
     async finishBuy(initiator: Account, callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.finishBuy({
-                sendGasTo: initiator.address,
-                callbackId
+                _remainingGasTo: initiator.address,
+                _callbackId: callbackId
             }).send({
                 from: initiator.address,
                 amount: gasValue
@@ -88,7 +106,7 @@ export class DirectBuy {
 
     async closeBuy(callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.closeBuy({
-                callbackId
+                _callbackId: callbackId
             }).send({
             from: this.owner.address,
             amount: gasValue

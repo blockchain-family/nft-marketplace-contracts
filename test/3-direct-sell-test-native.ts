@@ -95,8 +95,10 @@ describe("Test DirectSell contract", async function () {
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: Account[] = [];
         accForNft.push(account1);
-        const [, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
+        const [collection, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
+        locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
+        locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
     });
     it('Deploy WeverRoot and WeverVault', async function () {
         let result = await deployWeverRoot('weverTest', 'WTest', account1);
@@ -165,7 +167,7 @@ describe("Test DirectSell contract", async function () {
         startBalanceTWfactoryDirectSell = new BigNumber(await factoryDirectSellTW.balanceSafe());
     });
     it('Get market fee', async function () {
-        fee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+        fee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
     });
     it( 'Get fas value',async function () {
         gasValue = (await factoryDirectSell.contract.methods.getGasValue().call()).value0;
@@ -747,7 +749,7 @@ describe("Test DirectSell contract", async function () {
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
-            let oldFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let oldFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(oldFee).to.eql(fee);
 
             let setFee = {
@@ -755,12 +757,15 @@ describe("Test DirectSell contract", async function () {
                 denominator: '100'
             } as MarketFee;
 
-            await factoryDirectSell.contract.methods.setMarketFeeForChildContract(){directSell: directSell.address, _fee: setFee}).send({
+            await factoryDirectSell.contract.methods.setMarketFeeForChildContract({
+                _offer: directSell.address,
+                _fee: setFee
+            }).send({
                 from: account1.address,
                 amount: toNano(2)
             });
 
-            let newFee = (await directSell.contract.methods.getMarketFee().call()).value0;
+            let newFee = (await directSell.contract.methods.marketFee().call()).value0;
             expect(setFee.numerator).to.be.eq(newFee.numerator);
             expect(setFee.denominator).to.be.eq(newFee.denominator);
 
@@ -802,7 +807,7 @@ describe("Test DirectSell contract", async function () {
     });
     describe("Change market fee for factory", async function () {
         it('Change market fee', async function () {
-            let oldFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let oldFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(oldFee).to.eql(fee);
 
             let setFee = {
@@ -815,13 +820,13 @@ describe("Test DirectSell contract", async function () {
                     amount: toNano(2)
             });
 
-            let newFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let newFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(setFee.numerator).to.eql(newFee.numerator);
             expect(setFee.denominator).to.eql(newFee.denominator);
             fee = newFee;
         });
         it('Change market fee with zero denominator', async function () {
-            let oldFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let oldFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(oldFee).to.eql(fee);
 
             let setFee = {
@@ -833,11 +838,11 @@ describe("Test DirectSell contract", async function () {
                     from: account1.address,
                     amount: toNano(2)
             });
-            let newFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let newFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(newFee).to.eql(oldFee);
         });
         it('Change market fee not owner', async function () {
-            let oldFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let oldFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(oldFee).to.eql(fee);
 
             let setFee = {
@@ -849,7 +854,7 @@ describe("Test DirectSell contract", async function () {
                     from: account2.address,
                     amount: toNano(2)
             });
-            let newFee = (await factoryDirectSell.contract.methods.getMarketFee().call()).value0;
+            let newFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(newFee).to.eql(oldFee);
         });
     });
@@ -857,14 +862,13 @@ describe("Test DirectSell contract", async function () {
         it('Trying withdraw not owner', async function () {
             const withdrawAmount = 1000000000;
 
-            await factoryDirectSell.contract.methods.withdraw({
-                tokenWallet:factoryDirectSellTW.address,
-                amount:withdrawAmount,
-                recipient:account2.address,
-                remainingGasTo:account2.address}).send({
-                    from: account2.address,
-                    amount: toNano(2)
-                });
+            await factoryDirectSell.withdraw(
+                factoryDirectSellTW.address,
+                withdrawAmount.toString(),
+                account2.address,
+                account2.address,
+                account2.address
+            );
 
             const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
             expect(factoryDSTokenWalletBalance.toString()).to.be.eq(startBalanceTWfactoryDirectSell.toString());
@@ -878,14 +882,13 @@ describe("Test DirectSell contract", async function () {
             let spentTokenWallet2Balance = await tokenWallet2.balance();
             expect(spentTokenWallet2Balance.toString()).to.be.eq(startBalanceTW2.toString());
 
-            await factoryDirectSell.contract.methods.withdraw({
-                tokenWallet:factoryDirectSellTW.address,
-                amount:withdrawAmount,
-                recipient:account2.address,
-                remainingGasTo:account1.address}).send({
-                    from: account1.address,
-                    amount: toNano(2)
-                });
+            await factoryDirectSell.withdraw(
+                factoryDirectSellTW.address,
+                withdrawAmount.toString(),
+                account2.address,
+                account1.address,
+                account1.address
+            );
 
             const factoryDSTokenWalletBalance1 = await factoryDirectSellTW.balance();
             expect(factoryDSTokenWalletBalance1.toString()).to.be.eq((startBalanceTWfactoryDirectSell.minus(new BigNumber(withdrawAmount))).toString());
@@ -902,14 +905,13 @@ describe("Test DirectSell contract", async function () {
             let spentTokenWallet2Balance = await tokenWallet2.balance();
             expect(spentTokenWallet2Balance.toString()).to.be.eq(startBalanceTW2.toString());
 
-            await factoryDirectSell.contract.methods.withdraw({
-                tokenWallet:factoryDirectSellTW.address,
-                amount:withdrawAmount,
-                recipient:account2.address,
-                remainingGasTo:account1.address}).send({
-                    from: account1.address,
-                    amount: toNano(2)
-                });
+            await factoryDirectSell.withdraw(
+                factoryDirectSellTW.address,
+                withdrawAmount.toString(),
+                account2.address,
+                account1.address,
+                account1.address
+            );
 
             const factoryDSTokenWalletBalance2 = await factoryDirectSellTW.balance();
             expect(factoryDSTokenWalletBalance2.toString()).to.be.eq((startBalanceTWfactoryDirectSell).toString());
@@ -924,15 +926,13 @@ describe("Test DirectSell contract", async function () {
 
             const withdrawAmount = factoryDSTokenWalletBalance;
 
-            await factoryDirectSell.contract.methods.withdraw({
-                tokenWallet:factoryDirectSellTW.address,
-                amount: withdrawAmount,
-                recipient:account2.address,
-                remainingGasTo:account1.address
-            }).send({
-                    from: account1.address,
-                    amount: toNano(2)
-                });
+            await factoryDirectSell.withdraw(
+                factoryDirectSellTW.address,
+                BigNumber(withdrawAmount).toNumber(),
+                account2.address,
+                account1.address,
+                account1.address
+            );
 
             const factoryDSTokenWalletBalance2 = await factoryDirectSellTW.balance();
             expect(factoryDSTokenWalletBalance2.toString()).to.be.eq((0).toString());

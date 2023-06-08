@@ -9,23 +9,26 @@
 				{"name":"_amount","type":"uint128"},
 				{"name":"_startTime","type":"uint64"},
 				{"name":"_durationTime","type":"uint64"},
-				{"name":"_spentTokenWallet","type":"address"},
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
 				{"name":"_weverVault","type":"address"},
 				{"name":"_weverRoot","type":"address"},
-				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"_directBuyGas","type":"tuple"},
-				{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"_discontOpt","type":"optional(tuple)"}
+				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"royalty","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"_directBuyGas","type":"tuple"},
+				{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"_discountOpt","type":"optional(tuple)"}
 			],
 			"outputs": [
 			]
 		},
 		{
-			"name": "onGetInfo",
+			"name": "onTokenWallet",
 			"inputs": [
-				{"name":"_id","type":"uint256"},
-				{"name":"_owner","type":"address"},
-				{"name":"_manager","type":"address"},
-				{"name":"_collection","type":"address"}
+				{"name":"_wallet","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "activate",
+			"inputs": [
 			],
 			"outputs": [
 			]
@@ -39,28 +42,11 @@
 			]
 		},
 		{
-			"name": "getMarketFee",
-			"inputs": [
-			],
-			"outputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "setMarketFee",
-			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
-				{"name":"sendGasTo","type":"address"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "getInfo",
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"paymentToken","type":"address"},{"name":"nft","type":"address"},{"name":"nonce","type":"uint64"},{"name":"price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"},{"name":"start","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"end","type":"uint64"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{
@@ -84,10 +70,90 @@
 				{"name":"value2","type":"address"},
 				{"name":"newManager","type":"address"},
 				{"name":"value4","type":"address"},
-				{"name":"sendGasTo","type":"address"},
+				{"name":"remainingGasTo","type":"address"},
 				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
+			]
+		},
+		{
+			"name": "finishBuy",
+			"inputs": [
+				{"name":"_remainingGasTo","type":"address"},
+				{"name":"_callbackId","type":"uint32"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "closeBuy",
+			"inputs": [
+				{"name":"_callbackId","type":"uint32"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "upgrade",
+			"inputs": [
+				{"name":"newCode","type":"cell"},
+				{"name":"newVersion","type":"uint32"},
+				{"name":"remainingGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "royalty",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint128"},{"name":"denominator","type":"uint128"},{"name":"receiver","type":"address"}],"name":"value0","type":"optional(tuple)"}
+			]
+		},
+		{
+			"name": "onGetInfoRoyalty",
+			"inputs": [
+				{"name":"value0","type":"uint256"},
+				{"name":"value1","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"_collection","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onRoyaltyCollectionInfo",
+			"inputs": [
+				{"name":"_receiver","type":"address"},
+				{"name":"_amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "onRoyaltyNFTInfo",
+			"inputs": [
+				{"name":"_receiver","type":"address"},
+				{"name":"_amount","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "weverRoot",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "weverVault",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
 			]
 		},
 		{
@@ -103,55 +169,49 @@
 			]
 		},
 		{
-			"name": "finishBuy",
+			"name": "marketFee",
 			"inputs": [
-				{"name":"sendGasTo","type":"address"},
-				{"name":"callbackId","type":"uint32"}
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"name":"_remainingGasTo","type":"address"}
 			],
 			"outputs": [
 			]
 		},
 		{
-			"name": "closeBuy",
+			"name": "onGetInfoDiscount",
 			"inputs": [
-				{"name":"callbackId","type":"uint32"}
+				{"name":"_id","type":"uint256"},
+				{"name":"_owner","type":"address"},
+				{"name":"_manager","type":"address"},
+				{"name":"_collection","type":"address"}
 			],
 			"outputs": [
 			]
 		},
 		{
-			"name": "upgrade",
+			"name": "getTargetBalance",
 			"inputs": [
-				{"name":"newCode","type":"cell"},
-				{"name":"newVersion","type":"uint32"},
-				{"name":"sendGasTo","type":"address"}
+				{"name":"answerId","type":"uint32"}
 			],
 			"outputs": [
-			]
-		},
-		{
-			"name": "weverVault",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"weverVault","type":"address"}
-			]
-		},
-		{
-			"name": "weverRoot",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"weverRoot","type":"address"}
+				{"name":"value0","type":"uint128"}
 			]
 		}
 	],
 	"data": [
-		{"key":1,"name":"factoryDirectBuy","type":"address"},
-		{"key":2,"name":"owner","type":"address"},
-		{"key":3,"name":"spentToken","type":"address"},
-		{"key":4,"name":"nftAddress","type":"address"},
-		{"key":5,"name":"timeTx","type":"uint64"}
+		{"key":1,"name":"markerRootAddress_","type":"address"},
+		{"key":2,"name":"owner_","type":"address"},
+		{"key":3,"name":"paymentToken_","type":"address"},
+		{"key":4,"name":"nftAddress_","type":"address"},
+		{"key":5,"name":"nonce_","type":"uint64"}
 	],
 	"events": [
 		{
@@ -159,7 +219,7 @@
 			"inputs": [
 				{"name":"from","type":"uint8"},
 				{"name":"to","type":"uint8"},
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"spentToken","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"spentWallet","type":"address"},{"name":"status","type":"uint8"},{"name":"startTimeBuy","type":"uint64"},{"name":"durationTimeBuy","type":"uint64"},{"name":"endTimeBuy","type":"uint64"}],"name":"value2","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"paymentToken","type":"address"},{"name":"nft","type":"address"},{"name":"nonce","type":"uint64"},{"name":"price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"},{"name":"start","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"end","type":"uint64"}],"name":"value2","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -172,10 +232,19 @@
 			]
 		},
 		{
-			"name": "MarketFeeWithheld",
+			"name": "RoyaltySet",
 			"inputs": [
+				{"components":[{"name":"numerator","type":"uint128"},{"name":"denominator","type":"uint128"},{"name":"receiver","type":"address"}],"name":"_royalty","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "RoyaltyWithdrawn",
+			"inputs": [
+				{"name":"recipient","type":"address"},
 				{"name":"amount","type":"uint128"},
-				{"name":"tokenRoot","type":"address"}
+				{"name":"paymentToken","type":"address"}
 			],
 			"outputs": [
 			]
@@ -188,29 +257,42 @@
 			],
 			"outputs": [
 			]
+		},
+		{
+			"name": "MarketFeeWithheld",
+			"inputs": [
+				{"name":"amount","type":"uint128"},
+				{"name":"tokenRoot","type":"address"}
+			],
+			"outputs": [
+			]
 		}
 	],
 	"fields": [
 		{"name":"_pubkey","type":"uint256"},
 		{"name":"_timestamp","type":"uint64"},
 		{"name":"_constructorFlag","type":"bool"},
-		{"name":"factoryDirectBuy","type":"address"},
-		{"name":"owner","type":"address"},
-		{"name":"spentToken","type":"address"},
-		{"name":"nftAddress","type":"address"},
-		{"name":"timeTx","type":"uint64"},
+		{"name":"markerRootAddress_","type":"address"},
+		{"name":"owner_","type":"address"},
+		{"name":"paymentToken_","type":"address"},
+		{"name":"nftAddress_","type":"address"},
+		{"name":"nonce_","type":"uint64"},
+		{"name":"collection_","type":"address"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee_","type":"tuple"},
+		{"name":"weverRoot_","type":"address"},
+		{"name":"weverVault_","type":"address"},
+		{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"discountOpt_","type":"optional(tuple)"},
+		{"name":"discountNft_","type":"optional(address)"},
+		{"components":[{"name":"numerator","type":"uint128"},{"name":"denominator","type":"uint128"},{"name":"receiver","type":"address"}],"name":"royalty_","type":"optional(tuple)"},
 		{"name":"price","type":"uint128"},
+		{"name":"tokensReceived","type":"bool"},
 		{"name":"startTime","type":"uint64"},
 		{"name":"durationTime","type":"uint64"},
 		{"name":"endTime","type":"uint64"},
-		{"name":"spentTokenWallet","type":"address"},
+		{"name":"tokenWallet","type":"address"},
 		{"name":"currentStatus","type":"uint8"},
 		{"name":"currentVersion","type":"uint32"},
-		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"},
-		{"name":"weverVault","type":"address"},
-		{"name":"weverRoot","type":"address"},
-		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directBuyGas","type":"tuple"},
-		{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"discontOpt","type":"optional(tuple)"},
-		{"name":"discountNft","type":"address"}
+		{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"royalty","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectBuy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"make","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"accept","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"directBuyGas","type":"tuple"},
+		{"name":"tmp_transactions","type":"map(address,uint128)"}
 	]
 }

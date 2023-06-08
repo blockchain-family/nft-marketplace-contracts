@@ -22,14 +22,14 @@ export class FactoryDirectSell {
 
     async buildPayload(callbackId:number, startTime: any, endTime:any, paymentToken: Token, price: any, recipient: Address, dCollection?: Address, dNftId?: number) {
         return (await this.contract.methods.buildDirectSellCreationPayload({
-            callbackId: callbackId,
+            _callbackId: callbackId,
             _startTime: startTime,
-            durationTime: endTime,
+            _durationTime: endTime,
             _paymentToken: paymentToken.address,
             _price: price,
-            recipient: recipient,
-            discountCollection: dCollection || null,
-            discountNftId: typeof(dNftId) === "undefined" ? null : dNftId
+            _recipient: recipient,
+            _discountCollection: dCollection || null,
+            _discountNftId: typeof(dNftId) === "undefined" ? null : dNftId
         }).call()).value0;
     }
 
@@ -43,6 +43,23 @@ export class FactoryDirectSell {
             return last_event.data;
         }
         return null;
+    }
+
+    async withdraw(
+        tokenWallet: Address,
+        amount: number,
+        recipient: Address,
+        remainingGasTo: Address,
+        initiator: Address) {
+        return (await this.contract.methods.withdraw({
+            _tokenWallet: tokenWallet,
+            _amount: amount,
+            _recipient: recipient,
+            _remainingGasTo: remainingGasTo
+        }).send({
+            from: initiator,
+            amount: toNano(2)
+        }));
     }
 }
 
@@ -80,7 +97,7 @@ export class DirectSell {
 
     async closeSell(callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.closeSell({
-                callbackId
+                _callbackId: callbackId
             }).send({
             from: this.owner.address,
             amount: gasValue
@@ -88,10 +105,10 @@ export class DirectSell {
     }
     async finishSell(initiator: Account, callbackId: number, gasValue: any) {
         return await this.contract.methods.finishSell({
-                sendGasTo: initiator.address,
-                callbackId
+                _remainingGasTo: initiator.address,
+                _callbackId: callbackId
             }).send({
-            from:initiator.address,
+            from: initiator.address,
             amount: gasValue
         })
     }

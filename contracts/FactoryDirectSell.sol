@@ -11,11 +11,9 @@ import "./libraries/Gas.sol";
 
 import "./interfaces/IDirectSellCallback.sol";
 import "./interfaces/IUpgradableByRequest.sol";
-import "./interfaces/IOffersRoot.sol";
 
 import "./structures/IDirectSellGasValuesStructure.sol";
 import "./structures/IGasValueStructure.sol";
-import './structures/IDiscountCollectionsStructure.sol';
 
 import "./modules/access/OwnableInternal.sol";
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
@@ -24,15 +22,17 @@ import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 
 import "./Nft.sol";
 import "./DirectSell.sol";
-import "./abstract/OffersRoot.sol";
 
-contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValuesStructure, ICallbackParamsStructure {
+import "./flow/fee/MarketFeeRoot.sol";
+import "./flow/native_token/SupportNativeTokenRoot.sol";
+import "./flow/discount/DiscountCollectionRoot.sol";
+import "./flow/OffersUpgradableRoot.sol";
+
+contract FactoryDirectSell is INftChangeManager, ICallbackParamsStructure, MarketFeeRoot,  SupportNativeTokenRoot, DiscountCollectionRoot, OffersUpgradableRoot, IDirectSellGasValuesStructure{
     uint64 static nonce_;
 
-    TvmCell directSellCode;
-
     uint32 currentVersion;
-    uint32 currectVersionDirectSell;
+    DirectSellGasValues directSellGas;
 
     event DirectSellDeployed(
         address directSell,
@@ -42,31 +42,26 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
         uint64  nonce,
         uint128 price
     );
-
-    address public weverVault;
-    address public weverRoot;
-    DirectSellGasValues directSellGas;
-
     event DirectSellDeclined(address sender, address nft);
     event FactoryDirectSellUpgrade();
 
     constructor(
         address _owner,
-        address sendGasTo,
+        address _remainingGasTo,
         MarketFee _fee,
         address _weverVault,
         address _weverRoot
-    ) OffersRoot(
-        _fee,
+    ) OwnableInternal(
         _owner
-    ) public
+    )  public reserve
     {
-        currentVersion++;
         tvm.accept();
-        _reserve();
-
-        weverVault = _weverVault;
-        weverRoot = _weverRoot;
+        _initialization(
+            _fee,
+            _weverRoot,
+            _weverVault
+        );
+        currentVersion++;
 
         directSellGas = DirectSellGasValues(
             //gasK
@@ -74,11 +69,37 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
             // deploy wallet
             GasValues(
                 // fixed
-                Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION,
                 //dynamic
                 valueToGas(Gas.DEPLOY_WALLET_EXTRA_GAS, address(this).wid)
+            ),
+            // royalty
+            GasValues(
+                // fixed
+                Gas.GET_INFO_VALUE +
+                Gas.GET_ROYALTY_INFO_VALUE +
+                Gas.GET_ROYALTY_INFO_VALUE,
+                //dynamic
+                valueToGas(Gas.GET_ROYALTY_INFO_EXTRA_VALUE, address(this).wid)
+            ),
+            // deploy direct sell
+            GasValues(
+                // fixed
+                Gas.DIRECT_SELL_INITIAL_BALANCE +
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS +
+                Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
+                Gas.GET_INFO_VALUE +
+                Gas.GET_INFO_VALUE +
+                Gas.GET_ROYALTY_INFO_VALUE +
+                Gas.GET_ROYALTY_INFO_VALUE,
+                //dynamic
+                valueToGas(
+                    Gas.DEPLOY_WALLET_EXTRA_GAS +
+                    Gas.DEPLOY_DIRECT_SELL_EXTRA_GAS_VALUE +
+                    Gas.GET_ROYALTY_INFO_EXTRA_VALUE,
+                    address(this).wid
+                )
             ),
             //sell
             GasValues(
@@ -87,9 +108,19 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
-                Gas.FRONTENT_CALLBACK_VALUE,
+                Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.GET_INFO_VALUE +
+                Gas.GET_INFO_VALUE +
+                Gas.GET_ROYALTY_INFO_VALUE +
+                Gas.GET_ROYALTY_INFO_EXTRA_VALUE,
                 //dynamic
-                valueToGas(Gas.SELL_EXTRA_GAS_VALUE + Gas.DEPLOY_WALLET_EXTRA_GAS, address(this).wid)
+                valueToGas(
+                    Gas.SELL_EXTRA_GAS_VALUE +
+                    Gas.DEPLOY_WALLET_EXTRA_GAS +
+                    Gas.DEPLOY_DIRECT_SELL_EXTRA_GAS_VALUE +
+                    Gas.GET_ROYALTY_INFO_EXTRA_VALUE,
+                    address(this).wid
+                )
             ),
             //buy
             GasValues(
@@ -115,58 +146,49 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
                 valueToGas(Gas.CANCEL_EXTRA_GAS_VALUE, address(this).wid)
             )
         );
-        _transferOwnership(_owner);
-        sendGasTo.transfer({ value: 0, flag: 128, bounce: false });
+        _remainingGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
-    function _reserve() internal  {
-        tvm.rawReserve(Gas.FACTORY_DIRECT_SELL_INITIAL_BALANCE, 0);
+    function _getTargetBalanceInternal() internal view virtual override returns (uint128) {
+        return Gas.FACTORY_DIRECT_SELL_INITIAL_BALANCE;
     }
 
     function getTypeContract() external pure returns (string) {
         return "FactoryDirectSell";
     }
 
+    function calcValue(GasValues value) internal pure returns(uint128) {
+        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
+    }
+
     function getGasValue() external view returns (DirectSellGasValues) {
         return directSellGas;
     }
 
-    function setCodeDirectSell(TvmCell _directSellCode) public onlyOwner {
-        _reserve();
-        directSellCode = _directSellCode;
-        currectVersionDirectSell++;
-
-        msg.sender.transfer(
-            0,
-                false,
-                128 + 2
-            );
-    }
-
     function buildDirectSellCreationPayload(
-        uint32 callbackId,
+        uint32 _callbackId,
         uint64 _startTime,
-        uint64 durationTime,
+        uint64 _durationTime,
         address _paymentToken,
         uint128 _price,
-        address recipient,
-        optional(address) discountCollection,
-        optional(uint256) discountNftId
+        address _recipient,
+        optional(address) _discountCollection,
+        optional(uint256) _discountNftId
     ) external pure returns (TvmCell) {
         TvmBuilder builder;
-        builder.store(callbackId);
+        builder.store(_callbackId);
         builder.store(_startTime);
-        builder.store(durationTime);
+        builder.store(_durationTime);
         builder.store(_paymentToken);
         builder.store(_price);
-        builder.store(recipient);
+        builder.store(_recipient);
 
         TvmBuilder discontBuilder;
-        if (discountCollection.hasValue()) {
-            discontBuilder.store(discountCollection.get());
+        if (_discountCollection.hasValue()) {
+            discontBuilder.store(_discountCollection.get());
         }
-        if (discountNftId.hasValue()) {
-            discontBuilder.store(discountNftId.get());
+        if (_discountNftId.hasValue()) {
+            discontBuilder.store(_discountNftId.get());
         }
         builder.storeRef(discontBuilder);
         return builder.toCell();
@@ -177,19 +199,17 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
         address nftOwner,
         address, /*oldManager*/
         address newManager,
-        address, /*collection*/
-        address sendGasTo,
+        address collection,
+        address remainingGasTo,
         TvmCell payload
-    ) external override {
+    ) external override reserve {
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
-        _reserve();
 
         uint32 callbackId = 0;
         TvmSlice payloadSlice = payload.toSlice();
         if (payloadSlice.bits() >= 32) {
             callbackId = payloadSlice.decode(uint32);
         }
-
         mapping(address => CallbackParams) callbacks;
         if (
             msg.sender.value != 0 &&
@@ -197,10 +217,10 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
             payloadSlice.bits() >= 523
         ) {
             (
-                uint64 _startAuction,
+                uint64 startTime,
                 uint64 durationTime,
-                address _paymentToken,
-                uint128 _price
+                address paymentToken,
+                uint128 price
             ) = payloadSlice.decode(
                 uint64,
                 uint64,
@@ -210,41 +230,50 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
             if (payloadSlice.bits() >= 267) {
                 nftOwner = payloadSlice.decode(address);
             }
-            optional(DiscontInfo) discontOpt;
+
+            optional(DiscountInfo) discountOpt;
             if (payloadSlice.refs() >= 1) {
                 TvmSlice discontSlice = payloadSlice.loadRefAsSlice();
                 if (discontSlice.bits() >= 523) {
                     address discountCollection = discontSlice.decode(address);
                     uint256 nftId = discontSlice.decode(uint256);
-                    if (collectionsSpecialRules.exists(discountCollection)) {
-                        discontOpt.set(DiscontInfo(discountCollection, nftId, collectionsSpecialRules.at(discountCollection)));
+                    if (_isDiscountCollectionExists(discountCollection)) {
+                        discountOpt.set(
+                            DiscountInfo(
+                                discountCollection,
+                                nftId,
+                                _getInfoFromCollectionsSpecialRules(discountCollection)
+                            )
+                        );
                     }
                 }
             }
-            uint64 _nonce = tx.timestamp;
+            uint64 nonce = tx.timestamp;
             address directSell = new DirectSell{
-                stateInit: _buildDirectSellStateInit(nftOwner, _paymentToken, msg.sender, _nonce),
-                value: calcValue(directSellGas.deployWallet),
+                stateInit: _buildOfferStateInit(nftOwner, paymentToken, msg.sender, nonce, address(this)),
+                value: calcValue(directSellGas.deployDirectSell),
                 flag: 1
             }(
-                _startAuction,
+                startTime,
                 durationTime,
-                _price,
-                fee,
-                weverVault,
-                weverRoot,
+                price,
+                _getMarketFee(),
+                _getWeverVault(),
+                _getWeverRoot(),
+                collection,
                 directSellGas,
-                discontOpt
+                discountOpt
             );
 
             emit DirectSellDeployed(
                 directSell,
                 msg.sender,
-                _paymentToken,
+                paymentToken,
                 msg.sender,
-                _nonce,
-                _price
+                nonce,
+                price
             );
+
             IDirectSellCallback(nftOwner).directSellDeployed{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
                 flag: 1,
@@ -253,10 +282,10 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
                 callbackId,
                 directSell,
                 msg.sender,
-                _paymentToken,
+                paymentToken,
                 msg.sender,
-                _nonce,
-                _price
+                nonce,
+                price
             );
 
             ITIP4_1NFT(msg.sender).changeManager{
@@ -264,7 +293,7 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
                 flag: 128
             }(
                 directSell,
-                sendGasTo,
+                remainingGasTo,
                 callbacks
             );
         } else {
@@ -288,92 +317,36 @@ contract FactoryDirectSell is INftChangeManager, OffersRoot, IDirectSellGasValue
                 bounce: false
             }(
                 nftOwner,
-                sendGasTo,
+                remainingGasTo,
                 callbacks
             );
         }
     }
 
-    function _buildDirectSellStateInit(
-        address _owner,
-        address _paymentToken,
-        address _nft,
-        uint64 _timeTx
-    ) private view returns (TvmCell) {
-        return
-        tvm.buildStateInit({
-        contr: DirectSell,
-        varInit: {
-            factoryDirectSell: address(this),
-            owner: _owner,
-            paymentToken: _paymentToken,
-            nftAddress: _nft,
-            timeTx: _timeTx
-        },
-            code: directSellCode
-        });
-    }
-
-    function expectedAddressDirectSell(
-        address _owner,
-        address _paymentToken,
-        address _nft,
-        uint64 _timeTx
-    ) internal view returns (address) {
-        return address(
-            tvm.hash((_buildDirectSellStateInit(_owner, _paymentToken, _nft, _timeTx)))
-        );
-    }
-
-    function RequestUpgradeDirectSell(
-        address _owner,
-        address _paymentToken,
-        address _nft,
-        uint64 _timeTx,
-        address sendGasTo
-    ) external view onlyOwner {
-        require(msg.value >= Gas.UPGRADE_DIRECT_SELL_MIN_VALUE, BaseErrors.low_gas);
-        tvm.rawReserve(math.max(
-          Gas.DIRECT_SELL_INITIAL_BALANCE,
-          address(this).balance - msg.value), 2
-        );
-
-        IUpgradableByRequest(expectedAddressDirectSell(_owner, _paymentToken, _nft, _timeTx)).upgrade{
-            value: 0,
-            flag: 128
-        }(
-            directSellCode,
-            currectVersionDirectSell,
-            sendGasTo
-        );
-    }
-
     function upgrade(
         TvmCell newCode,
         uint32 newVersion,
-        address sendGasTo
-    ) external onlyOwner {
+        address remainingGasTo
+    ) external onlyOwner reserve {
         if (currentVersion == newVersion) {
-            _reserve();
-            sendGasTo.transfer({
+            remainingGasTo.transfer({
                 value: 0,
                 flag: 128 + 2,
                 bounce: false
             });
         } else {
             emit FactoryDirectSellUpgrade();
-
             TvmCell cellParams = abi.encode(
                 nonce_,
                 owner(),
                 currentVersion,
-                currectVersionDirectSell,
-                directSellCode,
-                fee,
-                weverVault,
-                weverRoot,
+                _getCurrentVersionOffer(),
+                _getOfferCode(),
+                _getMarketFee(),
+                _getWeverVault(),
+                _getWeverRoot(),
                 directSellGas,
-                collectionsSpecialRules
+                _getCollectionsSpecialRules()
             );
 
             tvm.setcode(newCode);

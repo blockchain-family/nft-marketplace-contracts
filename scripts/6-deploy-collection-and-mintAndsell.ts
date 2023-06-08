@@ -20,14 +20,16 @@ async function main() {
 
     const savedFactoryDirectSell = await migration.loadContract('FactoryDirectSell', 'FactoryDirectSell');
 
+    const savedCollection = await migration.loadContract('CollectionSimilar', 'SimilarCollection');
+
     const response = await prompts([
-        {
-            type: 'text',
-            name: 'nftOwner',
-            message: 'Get NFT Owner Address - recipient (default ' + account.address + ')',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
-            initial: account.address
-        },
+        // {
+        //     type: 'text',
+        //     name: 'nftOwner',
+        //     message: 'Get NFT Owner Address - recipient (default ' + account.address + ')',
+        //     validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+        //     initial: account.address
+        // },
         {
             type: 'text',
             name: 'factoryDirectSell',
@@ -37,14 +39,21 @@ async function main() {
         },
         {
             type: 'text',
-            name: 'tokenRoot',
-            message: 'Get tokenRoot address',
+            name: 'collection',
+            message: 'Get Collection address (default ' + savedCollection.address + ')',
             validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+            initial: savedCollection.address
         }
+        // {
+        //     type: 'text',
+        //     name: 'tokenRoot',
+        //     message: 'Get tokenRoot address',
+        //     validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address',
+        // }
     ]);
 
-    const data = fs.readFileSync("collection4.json", 'utf8');
-    if (data) collection_json = JSON.parse(data);
+    // const data = fs.readFileSync("collection4.json", 'utf8');
+    // if (data) collection_json = JSON.parse(data);
 
     // deploy collection
     logger.log("Deploy collection");
@@ -100,14 +109,17 @@ async function main() {
 
     // build payload for directSell
     logger.log("Build payload");
-    const targetPayload = (await factoryDirectSell.methods.buildDirectSellCreationPayload({
+    const targetPayload = 'te6ccgEBAgEArgABzQAAAAAAAAAAZErH4AAAAAAAAAAAgAUEb0urV2ZIJ082vzCuYOmnZzbkJCYLs5OS8iX4DbCHgAAAAAAAAAAAAAAAB3NZQBACvzJmcKhrCAR1ZqNCY+f5BTbr+AsLAVzbOgGvk5rzfXYBAIOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA=';
+    /*(await factoryDirectSell.methods.buildDirectSellCreationPayload({
         callbackId: 0,
         _startTime: Math.round(Date.now() / 1000),
         durationTime: 0,
         _paymentToken: response.tokenRoot,
         _price: toNano(1),
-        recipient: response.nftOwner
-    }).call()).value0;
+        recipient: response.nftOwner,
+
+    }).call()).value0;*/
+
 
     //deploy mintAndSell
     logger.log("Deploy mintAndSell");
@@ -116,7 +128,7 @@ async function main() {
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: account.address,
-            _collection: collection.address,
+            _collection: response.collection,
             _targetManager: factoryDirectSell.address,
             _targetGas: targetGas,
             _targetPayload: targetPayload
@@ -130,14 +142,14 @@ async function main() {
 
     migration.store(mintAndSell, "MintAndSell");
 
-    // Transfer collection ownership to MintAndSell
-    logger.log("Transfer collection ownership to MintAndSell");
-    await locklift.tracing.trace(collection.methods.transferOwnership({
-        newOwner: mintAndSell.address
-    }).send({
-        from: account.address,
-        amount: toNano(1)
-    }));
+    // // Transfer collection ownership to MintAndSell
+    // logger.log("Transfer collection ownership to MintAndSell");
+    // await locklift.tracing.trace(collection.methods.transferOwnership({
+    //     newOwner: mintAndSell.address
+    // }).send({
+    //     from: account.address,
+    //     amount: toNano(1)
+    // }));
 
 }
 

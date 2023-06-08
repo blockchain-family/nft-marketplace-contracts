@@ -101,7 +101,7 @@ contract Callbacks is
     function auctionTip3DeployedCallback(
         uint32 callbackId,
         address offer,
-        AuctionRootTip3.MarketOffer offerInfo
+        FactoryAuction.MarketOffer offerInfo
     ) external override {
 
     }

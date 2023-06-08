@@ -29,25 +29,23 @@ async function main() {
     const signer = (await locklift.keystore.getSigner('0'));
     const account = await migration.loadAccount('Account1');
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
-    const AuctionTip3 = (await locklift.factory.getContractArtifacts("AuctionTip3"));
+    const Auction = (await locklift.factory.getContractArtifacts("Auction"));
 
     let fee = {
         numerator: 2,
         denominator: 100
     }
 
-    const contractName = "AuctionRootTip3";
+    const contractName = "FactoryAuction";
     const {contract: auctionRootTip3, tx} = await locklift.factory.deployContract({
         contract: contractName,
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
-            _codeNft: Nft.code,
             _owner: account.address,
-            _offerCode: AuctionTip3.code,
             _fee: fee,
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
-            _sendGasTo: account.address,
+            _remainingGasTo: account.address,
             _weverVault: response.weverVault,
             _weverRoot: response.weverRoot
         },
@@ -57,8 +55,16 @@ async function main() {
         value: locklift.utils.toNano(10)
     });
 
-    console.log(`AuctionRootTip3: ${auctionRootTip3.address.toString()}`)
+    console.log(`FactoryAuction: ${auctionRootTip3.address.toString()}`)
     migration.store(auctionRootTip3, contractName);
+
+    console.log(`Set code Auction`);
+    await auctionRootTip3.methods.setCodeOffer({
+        _newCode: Auction.code,
+    }).send({
+        from: account.address,
+        amount: locklift.utils.toNano(1)
+    })
 
     if (response.owner) {
         await auctionRootTip3.methods.transferOwnership({

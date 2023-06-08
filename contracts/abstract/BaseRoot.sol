@@ -1,0 +1,104 @@
+pragma ever-solidity >= 0.61.2;
+
+import '../errors/BaseErrors.sol';
+
+import "../structures/IGasValueStructure.sol";
+
+import "../structures/IMarketFeeStructure.sol";
+import "../structures/IDiscountCollectionsStructure.sol";
+import "../interfaces/IEventsCollectionsSpecialRules.sol";
+import "../modules/access/OwnableInternal.sol";
+import "../interfaces/IEventsMarketFee.sol";
+import "./TargetBalance.sol";
+
+
+abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure, IEventsMarketFee, IDiscountCollectionsStructure, IEventsCollectionsSpecialRules {
+
+    MarketFee private fee_;
+
+    address private weverRoot_;
+    address private weverVault_;
+
+    TvmCell private offerCode_;
+    uint32 private currentVersionOffer_;
+
+    mapping (address => CollectionFeeInfo) private collectionsSpecialRules_;
+
+    modifier reserve() {
+        tvm.rawReserve(_getTargetBalanceInternal(), 0);
+        _;
+    }
+
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128);
+
+
+    function _initialization(
+        MarketFee _fee,
+        address _weverRoot,
+        address _weverVault
+    ) internal virtual {
+        _setMarketFee(_fee);
+
+        weverVault_ = _weverVault;
+        weverRoot_ = _weverRoot;
+
+    }
+
+// market fee
+    function _setMarketFee(MarketFee _fee) internal virtual {
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        fee_ = _fee;
+        emit MarketFeeDefaultChanged(fee_);
+    }
+
+    function _getMarketFee() internal view virtual returns (MarketFee) {
+        return fee_;
+    }
+
+// support native token
+    function _getWeverRoot() internal view virtual returns (address) {
+        return weverRoot_;
+    }
+
+    function _getWeverVault() internal view virtual returns (address) {
+        return weverVault_;
+    }
+
+// discount
+    function _getCollectionsSpecialRules() internal view virtual returns (mapping (address => CollectionFeeInfo)) {
+        return collectionsSpecialRules_;
+    }
+
+    function _setCollectionsSpecialRules(
+        address _collection,
+        CollectionFeeInfo _collectionFeeInfo
+    ) internal virtual {
+        collectionsSpecialRules_[_collection] = _collectionFeeInfo;
+        emit AddCollectionRules(_collection, _collectionFeeInfo);
+    }
+
+    function _deleteCollectionsSpecialRules(address _collection) internal virtual  {
+        delete collectionsSpecialRules_[_collection];
+        emit RemoveCollectionRules(_collection);
+    }
+
+// upgradable
+    function _getOfferCode() internal view virtual returns (TvmCell) {
+        return offerCode_;
+    }
+
+    function _getCurrentVersionOffer() internal view virtual returns (uint32) {
+        return currentVersionOffer_;
+    }
+
+    function _setOfferCode(TvmCell _newCode) internal virtual {
+        offerCode_ = _newCode;
+        currentVersionOffer_++;
+    }
+
+}

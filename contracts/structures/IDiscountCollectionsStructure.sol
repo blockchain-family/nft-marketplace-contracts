@@ -2,7 +2,7 @@ pragma ton-solidity >= 0.61.2;
 
 interface IDiscountCollectionsStructure {
 
-    struct DiscontInfo {
+    struct DiscountInfo {
         address collection;
         uint256 nftId;
         CollectionFeeInfo feeInfo;

@@ -220,7 +220,7 @@ PUSHINT 300000000
 ADD
 UFITS 128
 GEQ
-THROWIFNOT 109
+THROWIFNOT 116
 .loc ../contracts/CollectionSimilar.sol, 51
 PUSHINT 1000000000
 PUSHINT 0
@@ -2802,7 +2802,7 @@ CALLREF {
 	CALL $concatenateStrings_macro$
 }
 OVER
-INDEX 4
+INDEX 5
 CALLREF {
 	CALL $concatenateStrings_macro$
 }
@@ -3046,7 +3046,7 @@ CALLREF {
 	CALL $concatenateStrings_macro$
 }
 OVER
-INDEX 4
+INDEX 5
 CALLREF {
 	CALL $concatenateStrings_macro$
 }

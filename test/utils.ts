@@ -298,19 +298,17 @@ export const deployAuctionRoot = async function (owner: Account, fee: MarketFee,
     const signer = await locklift.keystore.getSigner('0');
 
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
-    const AuctionTip3 = (await locklift.factory.getContractArtifacts("AuctionTip3"));
+    const Auction = (await locklift.factory.getContractArtifacts("Auction"));
 
-    const { contract: auctionRootTip3, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
-        contract: 'AuctionRootTip3',
+    const { contract: factoryAuction, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: 'FactoryAuction',
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
-            _codeNft: Nft.code,
             _owner: owner.address,
-            _offerCode: AuctionTip3.code,
             _fee: fee,
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
-            _sendGasTo: owner.address,
+            _remainingGasTo: owner.address,
             _weverVault: weverVault,
             _weverRoot: weverRoot
 
@@ -321,9 +319,18 @@ export const deployAuctionRoot = async function (owner: Account, fee: MarketFee,
         value: toNano(10)
     }));
 
-    logger.log(`Auction Root address ${auctionRootTip3.address.toString()}`);
+    logger.log(`Auction Root address ${factoryAuction.address.toString()}`);
 
-    return new AuctionRoot(auctionRootTip3, owner);
+    await factoryAuction.methods.setCodeOffer({
+        _newCode: Auction.code
+    }).send({
+        from: owner.address,
+        amount: toNano(1)
+    });
+
+    logger.log(`DirectBuy is set`);
+
+    return new AuctionRoot(factoryAuction, owner);
 }
 
 export const deployFactoryDirectBuy = async function (owner: Account, fee: MarketFee, weverVault: Address, weverRoot: Address) {
@@ -333,7 +340,7 @@ export const deployFactoryDirectBuy = async function (owner: Account, fee: Marke
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: owner.address,
-            sendGasTo: owner.address,
+            _remainingGasTo: owner.address,
             _fee: fee,
             _weverVault: weverVault,
             _weverRoot: weverRoot
@@ -348,17 +355,17 @@ export const deployFactoryDirectBuy = async function (owner: Account, fee: Marke
 
     const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
     const DirectBuy = await locklift.factory.getContractArtifacts('DirectBuy');
-    await factoryDirectBuy.methods.setCodeTokenPlatform({
-            _tokenPlatformCode: TokenWalletPlatform.code
-        }).send({
-            from: owner.address,
-            amount: toNano(1)
-        });
+    // await factoryDirectBuy.methods.setCodeTokenPlatform({
+    //         _tokenPlatformCode: TokenWalletPlatform.code
+    //     }).send({
+    //         from: owner.address,
+    //         amount: toNano(1)
+    //     });
 
-    logger.log(`TokenWalletPlatform is set`);
+    // logger.log(`TokenWalletPlatform is set`);
 
-    await factoryDirectBuy.methods.setCodeDirectBuy({
-            _directBuyCode: DirectBuy.code
+    await factoryDirectBuy.methods.setCodeOffer({
+            _newCode: DirectBuy.code
         }).send({
             from: owner.address,
             amount: toNano(1)
@@ -376,7 +383,7 @@ export const deployFactoryDirectSell = async function(owner: Account, fee: Marke
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: owner.address,
-            sendGasTo: owner.address,
+            _remainingGasTo: owner.address,
             _fee: fee,
             _weverVault: weverVault,
             _weverRoot: weverRoot
@@ -390,8 +397,8 @@ export const deployFactoryDirectSell = async function(owner: Account, fee: Marke
     logger.log(`FactoryDirectSell address ${factoryDirectSell.address.toString()}`);
 
     const DirectSell = locklift.factory.getContractArtifacts("DirectSell");
-    await factoryDirectSell.methods.setCodeDirectSell({
-            _directSellCode: DirectSell.code,
+    await factoryDirectSell.methods.setCodeOffer({
+            _newCode: DirectSell.code,
         }).send({
         from:owner.address,
         amount:toNano(1)

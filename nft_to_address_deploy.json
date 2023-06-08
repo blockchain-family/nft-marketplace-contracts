@@ -1,0 +1,84 @@
+  {
+    "collection": {
+            "type": "Basic NFT",
+            "name": "The Broxus Times",
+            "description": "The Broxus Times is a newsletter covering all the latest from the world of Broxus and beyond.",
+            "preview": {
+                "source": "https://ipfs.broxus.com/ipfs/QmQduApf2Up1oKRps2rjH9KMVVewM8qYf9wpgcMqtw6FRs",
+                "mimetype": "image/jpeg"
+            },
+            "files": [
+                {
+                    "source": "https://ipfs.broxus.com/ipfs/QmWtuFR5pptxqC4gxGhaZSbxv1WCfrYkkcgixTbeyiJ9b2",
+                    "mimetype": "image/jpeg"
+                }
+            ],
+            "external_url": "https://broxus.com"
+    },
+    "nfts":
+        [
+            {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/QmR5CV413srzKGgfaCr2UtZQkuLmKUQZ4kHcdYnkmrPbXn",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmUcF9hsY1gMscHx4iHPHeuf22KiQ65qbSUzcPiJjZUsWy",
+                "name": "The Broxus Times #1",
+                "description": "We've been busy lately, so it's only fitting that we now have a newsletter for you all to catch up on everything we've been up to. In the first edition of The Broxus Times, you’ll find all the latest on EVER getting listed on Bybit, RustCup payout progress, EVERPOINT preparations, and much more. This is an exclusive look at all things Broxus, and you won't find this information anywhere else.",
+                "mimetype": "application/pdf"
+            },
+           {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/QmZukXZR74WxBwApgZhq7uNuzAf2EYAMkGq88io16hPF1A",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmQKuwP8W1z4HTXvbAuQU7Ph2EjQYyWzrkht7RN74jUu3Y",
+                "name": "The Broxus Times #2",
+                "description": "We've been busy lately, so it's only fitting that we now have a newsletter for you all to catch up on everything we've been up to. In the second edition of The Broxus Times, you'll find all the latest on Everscale's partnership with MarsDAO, the hidden gem that is Bytie, a new internship opportunity with Broxus and much more. This is an exclusive look at all things Broxus, and you won't find this information anywhere else.",
+                "mimetype": "application/pdf"
+            },
+          {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/QmdVecuQaenzt7aU9hJxZ18eYWT1wKd2piYEQ9zwnD8Atg",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmYGMzZdC7JMBehdiawd6G9i7Caq2dGktPBYfoLMSy4HUK",
+                "name": "The Broxus Times #3",
+                "description": "We've been busy lately, so it's only fitting that we now have a newsletter for you all to catch up on everything we've been up to. In the third edition of The Broxus Times, you'll find all the latest on Broxus development, Broxie utilities, Everscale's partnership with MarsDAO and much more. Also, we’ve got you covered with a rundown of the current macroeconomic picture as a bonus. This is an exclusive look at all things Broxus, and you won't find this information anywhere else.",
+                "mimetype": "application/pdf"
+            },
+          {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/QmRCLHMDFUPAa2uS6xy9axxmd7WT1GS4PdytRY6iHaaiWj",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmT1iK9RqSYhfgP2LAD3P4ZrMgV86aj8CFpUy7hopeoPmu",
+                "name": "The Broxus Times #4",
+                "description": "We've been busy lately, so it's only fitting that we now have a newsletter for you all to catch up on everything we've been up to. In the fourth edition of The Broxus Times, you'll find all the latest on the T-Sol JetBrains plugin, RustCup payout progress and much more. Also, we’ve got you covered with a rundown of the current macroeconomic picture as a bonus. This is an exclusive look at all things Broxus, and you won't find this information anywhere else.",
+                "mimetype": "application/pdf"
+            },
+          {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/QmYd2cxhD3AocfU8UtmvybTbrRJUV6u5Mee5jNXazuRUAF",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmYyoH5pNNT25uwhPtuSLxW1kayg4G2XETeo8N9sZW9j5q",
+                "name": "The Broxus Times #5",
+                "description": "We've been busy lately, so it's only fitting that we now have a newsletter for you all to catch up on everything we've been up to. In the fifth edition of The Broxus Times, you'll find all the latest on Broxus' Locklift tool, the stEVER program and much more. Also, we’ve got you covered with a rundown of the current macroeconomic picture as a bonus. This is an exclusive look at all things Broxus, and you won't find this information anywhere else.",
+                "mimetype": "application/pdf"
+            },
+          {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/Qmetp83VxR9gfUYLZDChh4NC9KZHGTJPdFMzF44cJg4tkN",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmS5sZUeR4QqxTfnkG5ehHQViuQkaCCkLU8Lme7aPhSSNE",
+                "name": "The Broxus Times #6",
+                "description": "We've been busy lately, so it's only fitting that we now have a newsletter for you all to catch up on everything we've been up to. In the sixth edition of The Broxus Times, you'll find all the latest on EVERPOINT preparations, FlatQube's future, Broxie utilities and much more. Also, we’ve got you covered with a rundown of the current macroeconomic picture as a bonus. This is an exclusive look at all things Broxus, and you won't find this information anywhere else.",
+                "mimetype": "application/pdf"
+            },
+                {
+                "address": "0:7a638733759f2ddaba1c80b2e06d12adca7c62f6e48815de568608c641109c97",
+                "preview_url":	"https://ipfs.broxus.com/ipfs/QmSUFAzQgSkh5ybJX3dLtsFBcCDYiR3gSiDyimqhUsY3Kb",
+                "mimetype_preview": "image/png",
+                "url": "https://ipfs.broxus.com/ipfs/QmQkQYv2q1Ek8GiCZUBBAcLTpLKuyBYrDHhMBKUtAu5jgd",
+                "name": "The Broxus Times #7",
+                "description": "It's time for a fresh edition of The Broxus Times! Discover EVERPOINT's location, new StEVER Dashboard features, and Broxie's first in-app utility. Plus, stay ahead with a macroeconomic update. Don't miss this exclusive Broxus insight!",
+                "mimetype": "application/pdf"
+            }
+          ]
+}

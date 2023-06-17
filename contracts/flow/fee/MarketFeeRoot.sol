@@ -8,22 +8,28 @@ import "../../libraries/Gas.sol";
 
 abstract contract MarketFeeRoot is BaseRoot {
 
-    function marketFee() external view returns (MarketFee){
-        return _getMarketFee();
-    }
-
     function setMarketFeeForChildContract(
         address _offer,
         MarketFee _fee
-    ) external onlyOwner {
+    )
+        external
+        onlyOwner
+    {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         MarketFeeOffer(_offer).setMarketFee{value: 0, flag: 64, bounce: false}(_fee, msg.sender);
-        emit MarketFeeChanged(_offer, _fee);
+    }
+
+    function marketFee() external view returns (MarketFee) {
+        return _getMarketFee();
     }
 
     function setMarketFee(
         MarketFee _fee
-    ) external onlyOwner reserve() {
+    )
+        external
+        onlyOwner
+        reserve
+    {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         _setMarketFee(_fee);
         msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
@@ -34,7 +40,11 @@ abstract contract MarketFeeRoot is BaseRoot {
         uint128 _amount,
         address _recipient,
         address _remainingGasTo
-    ) external onlyOwner reserve {
+    )
+        external
+        onlyOwner
+        reserve
+    {
         require(_recipient.value != 0,  BaseErrors.wrong_recipient);
         require(msg.value >= Gas.WITHDRAW_VALUE, BaseErrors.low_gas);
         TvmCell emptyPayload;

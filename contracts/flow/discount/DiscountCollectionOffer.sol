@@ -1,15 +1,45 @@
 pragma ever-solidity >= 0.61.2;
 
-import "../../structures/IMarketFeeStructure.sol";
-import "../../modules/TIP4_1/TIP4_1Nft.sol";
-import "../../libraries/Gas.sol";
-import "../../errors/BaseErrors.sol";
-import "../../structures/IDiscountCollectionsStructure.sol";
 import "../../abstract/BaseOffer.sol";
+
+import "../../structures/IMarketFeeStructure.sol";
+import "../../structures/IDiscountCollectionsStructure.sol";
+
+import "../../modules/TIP4_1/TIP4_1Nft.sol";
+
+import "../../libraries/Gas.sol";
+
+import "../../errors/BaseErrors.sol";
 
 abstract contract DiscountCollectionOffer is BaseOffer {
 
-    function _discountAvailabilityCheck() internal {
+    function onGetInfoDiscount(
+        uint256 _id,
+        address _owner,
+        address _manager,
+        address _collection
+    )
+        external
+    {
+        require(msg.sender.value != 0 && msg.sender == _getDiscountNft(), BaseErrors.operation_not_permited);
+        DiscountInfo discountOpt = _getDiscountOpt().get();
+        if (
+            _owner == _getOwner() &&
+            _collection == discountOpt.collection &&
+            _getDiscountOpt().hasValue()
+        ) {
+            _setMarketFee(
+                MarketFee(
+                    discountOpt.feeInfo.numerator,
+                    discountOpt.feeInfo.denominator
+                )
+            );
+        }
+    }
+
+    function _discountAvailabilityCheck()
+        internal
+    {
         DiscountInfo discountOpt = _getDiscountOpt().get();
         TvmCell data = tvm.buildDataInit({
             contr: TIP4_1Nft,
@@ -38,30 +68,12 @@ abstract contract DiscountCollectionOffer is BaseOffer {
         uint16 codeDepth,
         uint256 dataHash,
         uint16 dataDepth
-    ) internal view returns (address) {
+    )
+        internal
+        pure
+        returns (address)
+    {
         uint256 hash = tvm.stateInitHash(codeHash, dataHash, codeDepth, dataDepth);
         return address.makeAddrStd(address(this).wid, hash);
-    }
-
-    function onGetInfoDiscount(
-        uint256 _id,
-        address _owner,
-        address _manager,
-        address _collection
-    ) external {
-        require(msg.sender.value != 0 && msg.sender == _getDiscountNft(), BaseErrors.operation_not_permited);
-        DiscountInfo discountOpt = _getDiscountOpt().get();
-        if (
-            _owner == _getOwner() &&
-            _collection == discountOpt.collection &&
-            _getDiscountOpt().hasValue()
-        ) {
-            _setMarketFee(
-                MarketFee(
-                    discountOpt.feeInfo.numerator,
-                    discountOpt.feeInfo.denominator
-                )
-            );
-        }
     }
 }

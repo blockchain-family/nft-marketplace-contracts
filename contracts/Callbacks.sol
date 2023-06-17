@@ -7,6 +7,7 @@ pragma AbiHeader time;
 import "./modules/TIP4_1/interfaces/INftChangeManager.sol";
 import "./modules/TIP4_1/interfaces/INftChangeOwner.sol";
 import "./modules/TIP4_1/interfaces/INftTransfer.sol";
+
 import "./interfaces/IAuctionBidPlacedCallback.sol";
 import "./interfaces/IAuctionRootCallback.sol";
 import "./interfaces/IDirectBuyCallback.sol";
@@ -30,7 +31,10 @@ contract Callbacks is
         address collection,
         address sendGasTo,
         TvmCell payload
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -42,7 +46,10 @@ contract Callbacks is
         address collection,
         address sendGasTo,
         TvmCell payload
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -55,7 +62,10 @@ contract Callbacks is
         address collection,
         address gasReceiver,
         TvmCell payload
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -63,14 +73,20 @@ contract Callbacks is
         uint32 callbackId,
         uint128 nextBidValue,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function bidNotPlacedCallback(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -79,21 +95,30 @@ contract Callbacks is
         address newBidAddr,
         uint128 newBidValue,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function auctionComplete(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function auctionCancelled(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -102,7 +127,10 @@ contract Callbacks is
         uint32 callbackId,
         address offer,
         FactoryAuction.MarketOffer offerInfo
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -110,7 +138,10 @@ contract Callbacks is
         uint32 callbackId,
         address nftOwner,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -122,7 +153,10 @@ contract Callbacks is
         address nft,
         uint64 nonce,
         uint128 amount
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -132,7 +166,10 @@ contract Callbacks is
         address token,
         uint128 amount,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -141,28 +178,40 @@ contract Callbacks is
         address oldOwner,
         address newOwner,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function directBuyNotSuccess(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function directBuyCancelledOnTime(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function directBuyClose(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -174,7 +223,10 @@ contract Callbacks is
         address nft,
         uint64 nonce,
         uint128 price
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -182,7 +234,10 @@ contract Callbacks is
         uint32 callbackId,
         address sender,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
@@ -191,28 +246,40 @@ contract Callbacks is
         address oldOwner,
         address newOwner,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function directSellNotSuccess(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function directSellCancelledOnTime(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 
     function directSellClose(
         uint32 callbackId,
         address nft
-    ) external override {
+    )
+        external
+        override
+    {
 
     }
 }

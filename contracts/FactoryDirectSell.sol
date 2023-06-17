@@ -28,7 +28,15 @@ import "./flow/native_token/SupportNativeTokenRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
 
-contract FactoryDirectSell is INftChangeManager, ICallbackParamsStructure, MarketFeeRoot,  SupportNativeTokenRoot, DiscountCollectionRoot, OffersUpgradableRoot, IDirectSellGasValuesStructure{
+contract FactoryDirectSell is
+    INftChangeManager,
+    ICallbackParamsStructure,
+    MarketFeeRoot,
+    SupportNativeTokenRoot,
+    DiscountCollectionRoot,
+    OffersUpgradableRoot,
+    IDirectSellGasValuesStructure
+{
     uint64 static nonce_;
 
     uint32 currentVersion;
@@ -51,9 +59,10 @@ contract FactoryDirectSell is INftChangeManager, ICallbackParamsStructure, Marke
         MarketFee _fee,
         address _weverVault,
         address _weverRoot
-    ) OwnableInternal(
-        _owner
-    )  public reserve
+    )
+        OwnableInternal(_owner)
+        public
+        reserve
     {
         tvm.accept();
         _initialization(
@@ -174,7 +183,11 @@ contract FactoryDirectSell is INftChangeManager, ICallbackParamsStructure, Marke
         address _recipient,
         optional(address) _discountCollection,
         optional(uint256) _discountNftId
-    ) external pure returns (TvmCell) {
+    )
+        external
+        pure
+        returns (TvmCell)
+    {
         TvmBuilder builder;
         builder.store(_callbackId);
         builder.store(_startTime);
@@ -202,7 +215,11 @@ contract FactoryDirectSell is INftChangeManager, ICallbackParamsStructure, Marke
         address collection,
         address remainingGasTo,
         TvmCell payload
-    ) external override reserve {
+    )
+        external
+        override
+        reserve
+    {
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
 
         uint32 callbackId = 0;
@@ -327,7 +344,11 @@ contract FactoryDirectSell is INftChangeManager, ICallbackParamsStructure, Marke
         TvmCell newCode,
         uint32 newVersion,
         address remainingGasTo
-    ) external onlyOwner reserve {
+    )
+        external
+        onlyOwner
+        reserve
+    {
         if (currentVersion == newVersion) {
             remainingGasTo.transfer({
                 value: 0,

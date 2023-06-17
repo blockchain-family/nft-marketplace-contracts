@@ -30,7 +30,15 @@ import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
 
 
-contract FactoryAuction is INftChangeManager, ICallbackParamsStructure, IAuctionGasValuesStructure, SupportNativeTokenRoot, MarketFeeRoot, DiscountCollectionRoot,  OffersUpgradableRoot {
+contract FactoryAuction is
+    INftChangeManager,
+    ICallbackParamsStructure,
+    IAuctionGasValuesStructure,
+    SupportNativeTokenRoot,
+    MarketFeeRoot,
+    DiscountCollectionRoot,
+    OffersUpgradableRoot
+{
     uint64 static nonce_;
 
     struct MarketOffer {
@@ -62,9 +70,10 @@ contract FactoryAuction is INftChangeManager, ICallbackParamsStructure, IAuction
         address _remainingGasTo,
         address _weverVault,
         address _weverRoot
-    ) OwnableInternal(
-        _owner
-    ) reserve public
+    )
+        OwnableInternal(_owner)
+        reserve
+        public
     {
         tvm.accept();
         _initialization(_fee,_weverRoot,_weverVault);
@@ -186,7 +195,11 @@ contract FactoryAuction is INftChangeManager, ICallbackParamsStructure, IAuction
         address collection,
         address remainingGasTo,
         TvmCell payload
-    ) external override reserve {
+    )
+        external
+        override
+        reserve
+    {
         require(newManager == address(this));
         bool isDeclined = false;
         uint32 callbackId = 0;
@@ -310,7 +323,12 @@ contract FactoryAuction is INftChangeManager, ICallbackParamsStructure, IAuction
         uint64 _auctionDuration,
         optional(address) _discountCollection,
         optional(uint256) _discountNftId
-    ) external pure responsible returns(TvmCell) {
+    )
+        external
+        pure
+        responsible
+        returns(TvmCell)
+    {
         TvmBuilder builder;
         builder.store(_callbackId);
         builder.store(_paymentToken);
@@ -334,9 +352,12 @@ contract FactoryAuction is INftChangeManager, ICallbackParamsStructure, IAuction
         TvmCell newCode,
         uint32 newVersion,
         address remainingGasTo
-    ) external onlyOwner reserve {
+    )
+        external
+        onlyOwner
+        reserve
+    {
         if (currentVersion == newVersion) {
-//            _reserve(_getTargetBalanceInternal());
             remainingGasTo.transfer({
                 value: 0,
                 flag: 128 + 2,

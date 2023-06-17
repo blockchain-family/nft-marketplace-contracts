@@ -16,7 +16,55 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
         return _getRoyalty();
     }
 
-    function _checkRoyaltyFromNFT(uint128 gasValue) internal view {
+    function onGetInfoRoyalty(
+        uint256, /*id*/
+        address, /*owner*/
+        address, /*manager*/
+        address _collection
+    )
+        external
+    {
+        require(msg.sender.value != 0 && msg.sender == _getNftAddress(), BaseErrors.operation_not_permited);
+        _setCollection(_collection);
+        IRoyaltyInfo(_getCollection()).royaltyInfo{
+            value: Gas.GET_ROYALTY_INFO_VALUE,
+            flag: 0,
+            callback: RoyaltyOffer.onRoyaltyCollectionInfo
+        }(DENOMINATOR);
+    }
+
+    function onRoyaltyCollectionInfo(
+        address _receiver,
+        uint128 _amount
+    )
+        external
+    {
+        require(msg.sender.value != 0 && msg.sender == _getCollection(), BaseErrors.operation_not_permited);
+        if (_isAllowedSetRoyalty()) {
+            _setRoyalty(Royalty(_amount, DENOMINATOR, _receiver));
+            _afterSetRoyalty();
+        }
+    }
+
+    function onRoyaltyNFTInfo(
+        address _receiver,
+        uint128 _amount
+    )
+        external
+    {
+        require(msg.sender.value != 0 && msg.sender == _getNftAddress(), BaseErrors.operation_not_permited);
+        if (_isAllowedSetRoyalty()) {
+            _setRoyalty(Royalty(_amount, DENOMINATOR, _receiver));
+            _afterSetRoyalty();
+        }
+    }
+
+    function _checkRoyaltyFromNFT(
+        uint128 gasValue
+    )
+        internal
+        view
+    {
        IRoyaltyInfo(_getNftAddress()).royaltyInfo{
             value: gasValue,
             flag: 0,
@@ -26,7 +74,9 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
 
     function _fallbackRoyaltyFromCollection(
         uint32 _functionId
-    ) internal {
+    )
+        internal
+    {
         if (_functionId == tvm.functionId(IRoyaltyInfo.royaltyInfo)) {
             if (msg.sender == _getNftAddress()) {
                 if (_getCollection().value !=0) {
@@ -49,47 +99,16 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
         }
     }
 
-    function onGetInfoRoyalty(
-        uint256, /*id*/
-        address, /*owner*/
-        address, /*manager*/
-        address _collection
-    ) external {
-        require(msg.sender.value != 0 && msg.sender == _getNftAddress(), BaseErrors.operation_not_permited);
-        _setCollection(_collection);
-        IRoyaltyInfo(_getCollection()).royaltyInfo{
-            value: Gas.GET_ROYALTY_INFO_VALUE,
-            flag: 0,
-            callback: RoyaltyOffer.onRoyaltyCollectionInfo
-        }(DENOMINATOR);
-    }
-
     function _afterSetRoyalty() internal virtual;
     function _isAllowedSetRoyalty() internal virtual returns (bool);
 
-    function onRoyaltyCollectionInfo(
-        address _receiver,
-        uint128 _amount
-    ) external {
-        require(msg.sender.value != 0 && msg.sender == _getCollection(), BaseErrors.operation_not_permited);
-        if (_isAllowedSetRoyalty()) {
-            _setRoyalty(Royalty(_amount, DENOMINATOR, _receiver));
-            _afterSetRoyalty();
-        }
-    }
-
-    function onRoyaltyNFTInfo(
-        address _receiver,
-        uint128 _amount
-    ) external {
-        require(msg.sender.value != 0 && msg.sender == _getNftAddress(), BaseErrors.operation_not_permited);
-        if (_isAllowedSetRoyalty()) {
-            _setRoyalty(Royalty(_amount, DENOMINATOR, _receiver));
-            _afterSetRoyalty();
-        }
-    }
-
-    function _getRoyaltyAmount(uint128 _currentFee, uint128 _price) internal returns (uint128) {
+    function _getRoyaltyAmount(
+        uint128 _currentFee,
+        uint128 _price
+    )
+        internal
+        returns (uint128)
+    {
         return math.muldivc((_price - _currentFee), _getRoyalty().get().numerator, _getRoyalty().get().denominator);
     }
 
@@ -97,9 +116,11 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
         uint128 _amount,
         address _tokenWallet,
         address _remainingGasTo
-    ) internal view {
+    )
+        internal
+        view
+    {
         TvmCell emptyPayload;
-        emit RoyaltyWithdrawn(_getRoyalty().get().receiver, _amount, _getPaymentToken());
         ITokenWallet(_tokenWallet).transfer{
             value: Gas.ROYALTY_DEPLOY_WALLET_GRAMS + Gas.ROYALTY_EXTRA_VALUE,
             flag: 0,
@@ -112,5 +133,6 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
             false,
             emptyPayload
         );
+        emit RoyaltyWithdrawn(_getRoyalty().get().receiver, _amount, _getPaymentToken());
     }
 }

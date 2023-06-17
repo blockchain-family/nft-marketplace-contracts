@@ -4,6 +4,5 @@ import "../structures/IMarketFeeStructure.sol";
 
 interface IOffer is IMarketFeeStructure {
 
-
     function getTypeContract() external pure returns (string);
 }

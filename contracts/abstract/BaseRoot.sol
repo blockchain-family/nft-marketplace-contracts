@@ -22,7 +22,7 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
     TvmCell private offerCode_;
     uint32 private currentVersionOffer_;
 
-    mapping (address => CollectionFeeInfo) private collectionsSpecialRules_;
+    mapping(address => CollectionFeeInfo) private collectionsSpecialRules_;
 
     modifier reserve() {
         tvm.rawReserve(_getTargetBalanceInternal(), 0);
@@ -41,12 +41,13 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
         MarketFee _fee,
         address _weverRoot,
         address _weverVault
-    ) internal virtual {
+    )
+        internal
+        virtual
+    {
         _setMarketFee(_fee);
-
         weverVault_ = _weverVault;
         weverRoot_ = _weverRoot;
-
     }
 
 // market fee
@@ -70,19 +71,32 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
     }
 
 // discount
-    function _getCollectionsSpecialRules() internal view virtual returns (mapping (address => CollectionFeeInfo)) {
+    function _getCollectionsSpecialRules()
+        internal
+        view
+        virtual
+        returns (mapping(address => CollectionFeeInfo))
+    {
         return collectionsSpecialRules_;
     }
 
     function _setCollectionsSpecialRules(
         address _collection,
         CollectionFeeInfo _collectionFeeInfo
-    ) internal virtual {
+    )
+        internal
+        virtual
+    {
         collectionsSpecialRules_[_collection] = _collectionFeeInfo;
         emit AddCollectionRules(_collection, _collectionFeeInfo);
     }
 
-    function _deleteCollectionsSpecialRules(address _collection) internal virtual  {
+    function _deleteCollectionsSpecialRules(
+        address _collection
+    )
+        internal
+        virtual
+    {
         delete collectionsSpecialRules_[_collection];
         emit RemoveCollectionRules(_collection);
     }
@@ -96,7 +110,12 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
         return currentVersionOffer_;
     }
 
-    function _setOfferCode(TvmCell _newCode) internal virtual {
+    function _setOfferCode(
+        TvmCell _newCode
+    )
+        internal
+        virtual
+    {
         offerCode_ = _newCode;
         currentVersionOffer_++;
     }

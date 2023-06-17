@@ -39,7 +39,7 @@ async function main() {
     console.log('Start deploy collection');
 
     const { contract: collection, tx } = await locklift.factory.deployContract({
-        contract: "Collection",
+        contract: "CollectionRoyalty",
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             codeNft: Nft.code,
@@ -56,8 +56,8 @@ async function main() {
     });
 
     // const collection = (await locklift.factory.getDeployedContract('Collection', new Address('0:432da1db5a47e400ab62570938ec95310610fa483483b3fd7fa25db98cd144e0')));
-    console.log('Collection', collection.address);
-    migration.store(collection, "Collection");
+    console.log('CollectionRoyalty', collection.address);
+    migration.store(collection, "CollectionRoyalty");
 
     if (array_json.nfts) {
         for (const element of array_json.nfts) {

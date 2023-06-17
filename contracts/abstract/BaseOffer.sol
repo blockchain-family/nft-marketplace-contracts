@@ -3,13 +3,13 @@ pragma ever-solidity >= 0.61.2;
 import '../errors/BaseErrors.sol';
 
 import "../structures/IGasValueStructure.sol";
-
 import "../structures/IMarketFeeStructure.sol";
+import "../structures/IDiscountCollectionsStructure.sol";
+import "../structures/IRoyaltyStructure.sol";
 
 import "../interfaces/IEventsMarketFeeOffer.sol";
 import "../interfaces/IEventsRoyalty.sol";
-import "../structures/IDiscountCollectionsStructure.sol";
-import "../structures/IRoyaltyStructure.sol";
+
 import "./TargetBalance.sol";
 
 
@@ -18,7 +18,7 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
     address private static owner_;
     address private static paymentToken_;
     address private static nftAddress_;
-    uint64 static nonce_;
+    uint64 private static nonce_;
 
     address private collection_;
 
@@ -64,19 +64,15 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
         _;
     }
 
-    function _getTargetBalanceInternal()
-        internal
-        view
-        virtual
-        override
-        returns (uint128);
-
     function _initialization(
         MarketFee _fee,
         address _weverRoot,
         address _weverVault,
         optional(DiscountInfo) _discountOpt
-    ) internal virtual {
+    )
+        internal
+        virtual
+    {
         _setMarketFee(_fee);
 
         weverVault_ = _weverVault;
@@ -85,32 +81,39 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
         _setDiscountOpt(_discountOpt);
     }
 
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128);
+
 // static
-    function _getMarketRootAddress() internal view virtual returns(address){
+    function _getMarketRootAddress() internal view virtual returns (address) {
         return markerRootAddress_;
     }
 
-    function _getPaymentToken() internal view virtual returns(address){
+    function _getPaymentToken() internal view virtual returns (address) {
         return paymentToken_;
     }
 
-    function _getOwner() internal view virtual returns(address){
+    function _getOwner() internal view virtual returns (address) {
         return owner_;
     }
 
-    function _getNonce() internal view virtual returns(uint64){
+    function _getNonce() internal view virtual returns (uint64) {
         return nonce_;
     }
 
-    function _getNftAddress() internal view virtual returns(address){
+    function _getNftAddress() internal view virtual returns (address) {
         return nftAddress_;
     }
 
-    function _getCollection() internal view virtual returns(address){
+    function _getCollection() internal view virtual returns (address) {
         return collection_;
     }
 
-    function _setCollection(address _collection) internal virtual{
+    function _setCollection(address _collection) internal virtual {
         collection_ = _collection;
     }
 
@@ -161,8 +164,7 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
         emit RoyaltySet(royalty_.get());
     }
 
-    function calcValue(IGasValueStructure.GasValues value) internal pure returns(uint128) {
+    function calcValue(IGasValueStructure.GasValues value) internal pure returns (uint128) {
         return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
     }
-
 }

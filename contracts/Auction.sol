@@ -8,6 +8,7 @@ import "./errors/BaseErrors.sol";
 import "./errors/AuctionErrors.sol";
 
 import "./libraries/Gas.sol";
+import "./libraries/AuctionStatus.sol";
 
 import "./interfaces/IUpgradableByRequest.sol";
 import "./interfaces/IAuctionBidPlacedCallback.sol";
@@ -29,7 +30,16 @@ import "./flow/native_token/SupportNativeTokenOffer.sol";
 import "./flow/RoyaltyOffer.sol";
 import "./flow/discount/DiscountCollectionOffer.sol";
 
-contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallbackParamsStructure, IAuctionGasValuesStructure, DiscountCollectionOffer, MarketFeeOffer, SupportNativeTokenOffer, RoyaltyOffer {
+contract Auction is
+    IAcceptTokensTransferCallback,
+    IUpgradableByRequest,
+    ICallbackParamsStructure,
+    IAuctionGasValuesStructure,
+    DiscountCollectionOffer,
+    MarketFeeOffer,
+    SupportNativeTokenOffer,
+    RoyaltyOffer
+{
 
     uint128 public price;
     address tokenWallet;
@@ -48,7 +58,7 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
         uint64 endTime;
         uint128 price;
         uint64 nonce;
-        AuctionStatus status;
+        uint8 status;
     }
 
     struct Bid {
@@ -62,13 +72,7 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
     uint128 public maxBidValue;
     uint128 public nextBidValue;
 
-    enum AuctionStatus {
-        Created,
-        Active,
-        Complete,
-        Cancelled
-    }
-    AuctionStatus currentStatus;
+    uint8 currentStatus;
 
     uint32 currentVersion;
     AuctionGasValues auctionGas;
@@ -94,7 +98,10 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
         address _weverRoot,
         AuctionGasValues _auctionGas,
         optional(DiscountInfo) _discountOpt
-    ) public reserve {
+    )
+        public
+        reserve
+    {
         if (
            msg.sender.value != 0 &&
            msg.sender == _getMarketRootAddress() &&
@@ -116,13 +123,13 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
                 _weverVault,
                 _discountOpt
             );
-            if (_getDiscountOpt().hasValue()){
+            if (_getDiscountOpt().hasValue()) {
                 _discountAvailabilityCheck();
             }
             _setCollection(_collection);
             _checkRoyaltyFromNFT(calcValue(auctionGas.royalty));
 
-            emit AuctionCreated(buildInfo());
+            emit AuctionCreated(_buildInfo());
             currentStatus = AuctionStatus.Created;
             currentVersion++;
 
@@ -167,7 +174,7 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
             currentStatus == AuctionStatus.Created
         ) {
             currentStatus = AuctionStatus.Active;
-            emit AuctionActive(buildInfo());
+            emit AuctionActive(_buildInfo());
         }
     }
 
@@ -194,7 +201,11 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
         address /*sender_wallet*/,
         address originalGasTo,
         TvmCell payload
-    ) override external reserve {
+    )
+        override
+        external
+        reserve
+    {
         uint32 callbackId = 0;
         address buyer = sender;
         TvmSlice payloadSlice = payload.toSlice();
@@ -218,7 +229,7 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
             processBid(callbackId, buyer, amount, originalGasTo);
         } else {
             emit BidDeclined(buyer, amount);
-            sendBidResultCallback(callbackId, buyer, false, 0, _getNftAddress());
+            _sendBidResultCallback(callbackId, buyer, false, 0, _getNftAddress());
 
             TvmCell empty;
             _transfer(_getPaymentToken(), amount, buyer, originalGasTo, msg.sender, 0, 128, uint128(0), empty);
@@ -230,15 +241,17 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
         address _newBidSender,
         uint128 _bid,
         address _originalGasTo
-    ) private {
+    )
+        private
+    {
         Bid _currentBid = currentBid;
         Bid newBid = Bid(_newBidSender, _bid);
         maxBidValue = _bid;
         currentBid = newBid;
-        calculateAndSetNextBid();
+        _calculateAndSetNextBid();
 
         emit BidPlaced(_newBidSender, _bid, nextBidValue);
-        sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, _getNftAddress());
+        _sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, _getNftAddress());
 
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
@@ -267,10 +280,14 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
     function finishAuction(
         address _remainingGasTo,
         uint32 _callbackId
-    ) public reserve {
+    )
+        public
+        reserve
+    {
         require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
         require(currentStatus == AuctionStatus.Active, AuctionErrors.auction_not_active);
         require(msg.value >= calcValue(auctionGas.cancel), BaseErrors.not_enough_value);
+
         mapping(address => CallbackParams) callbacks;
         if (maxBidValue >= price) {
             uint128 currentFee = _getCurrentFee(maxBidValue);
@@ -301,10 +318,26 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
                 _remainingGasTo,
                 callbacks
             );
-            _transfer(_getPaymentToken(), balance, _getOwner(), _remainingGasTo, tokenWallet, Gas.TOKEN_TRANSFER_VALUE, 1, Gas.DEPLOY_EMPTY_WALLET_GRAMS, emptyPayload);
+            _transfer(
+                _getPaymentToken(),
+                balance,
+                _getOwner(),
+                _remainingGasTo,
+                tokenWallet,
+                Gas.TOKEN_TRANSFER_VALUE,
+                1,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                emptyPayload
+            );
 
             if (currentFee >  0) {
-                _retentionMarketFee(tokenWallet, Gas.FEE_EXTRA_VALUE, Gas.FEE_DEPLOY_WALLET_GRAMS, currentFee, _remainingGasTo);
+                _retentionMarketFee(
+                    tokenWallet,
+                    Gas.FEE_EXTRA_VALUE,
+                    Gas.FEE_DEPLOY_WALLET_GRAMS,
+                    currentFee,
+                    _remainingGasTo
+                );
             }
 
             if (royaltyAmount > 0) {
@@ -329,11 +362,11 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
         }
     }
 
-    function calculateAndSetNextBid() private {
+    function _calculateAndSetNextBid() private {
         nextBidValue = maxBidValue + math.muldivc(maxBidValue, uint128(bidDelta), uint128(bidDeltaDecimals));
     }
 
-    function sendBidResultCallback(
+    function _sendBidResultCallback(
         uint32 _callbackId,
         address _callbackTarget,
         bool _isBidPlaced,
@@ -367,7 +400,12 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
     function buildPlaceBidPayload(
         uint32 _callbackId,
         address _buyer
-    ) external pure responsible returns (TvmCell) {
+    )
+        external
+        pure
+        responsible
+        returns (TvmCell)
+    {
         TvmBuilder builder;
         builder.store(_callbackId);
         builder.store(_buyer);
@@ -375,10 +413,10 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
     }
 
     function getInfo() external view returns (AuctionDetails) {
-        return buildInfo();
+        return _buildInfo();
     }
 
-    function buildInfo() private view returns(AuctionDetails) {
+    function _buildInfo() private view returns(AuctionDetails) {
         return AuctionDetails(
             _getNftAddress(),
             _getOwner(),
@@ -397,7 +435,12 @@ contract Auction is IAcceptTokensTransferCallback, IUpgradableByRequest, ICallba
         TvmCell newCode,
         uint32 newVersion,
         address remainingGasTo
-    ) override external onlyMarketRoot reserve {
+    )
+        external
+        override
+        onlyMarketRoot
+        reserve
+    {
         if (currentVersion == newVersion) {
 			remainingGasTo.transfer({
 				value: 0,

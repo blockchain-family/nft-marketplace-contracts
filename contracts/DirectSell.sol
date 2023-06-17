@@ -31,8 +31,17 @@ import "./flow/native_token/SupportNativeTokenOffer.sol";
 import "./flow/RoyaltyOffer.sol";
 
 
-contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDirectSellGasValuesStructure, ICallbackParamsStructure, IGasValueStructure, DiscountCollectionOffer, MarketFeeOffer, SupportNativeTokenOffer, RoyaltyOffer {
-
+contract DirectSell is
+    IAcceptTokensTransferCallback,
+    IUpgradableByRequest,
+    IDirectSellGasValuesStructure,
+    ICallbackParamsStructure,
+    IGasValueStructure,
+    DiscountCollectionOffer,
+    MarketFeeOffer,
+    SupportNativeTokenOffer,
+    RoyaltyOffer
+{
     DirectSellGasValues directSellGas;
 
     uint64 startTime;
@@ -71,12 +80,15 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
         address _collection,
         DirectSellGasValues _directSellGas,
         optional(DiscountInfo) _discountOpt
-    )  public reserve {
+    )
+        public
+        reserve
+    {
         if (
             msg.sender.value != 0 &&
             msg.sender == _getMarketRootAddress() &&
             msg.sender.value >= calcValue(_directSellGas.deployDirectSell)
-        ){
+        ) {
             startTime = _startTime;
             durationTime = _durationTime;
             directSellGas = _directSellGas;
@@ -90,7 +102,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
                 _weverVault,
                 _discountOpt
             );
-            if (_getDiscountOpt().hasValue()){
+            if (_getDiscountOpt().hasValue()) {
                 _discountAvailabilityCheck();
             }
             _setCollection(_collection);
@@ -108,7 +120,13 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
         }
     }
 
-    function onTokenWallet(address _wallet) external onlyPaymentToken reserve {
+    function onTokenWallet(
+        address _wallet
+    )
+        external
+        onlyPaymentToken
+        reserve
+    {
         require(msg.sender.value != 0, BaseErrors.operation_not_permited);
         tokenWallet = _wallet;
         _checkAndActivate();
@@ -156,7 +174,11 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
     function buildBuyPayload(
         uint32 _callbackId,
         address _buyer
-    ) external pure returns (TvmCell) {
+    )
+        external
+        pure
+        returns (TvmCell)
+    {
         TvmBuilder builder;
         builder.store(_callbackId);
         builder.store(_buyer);
@@ -170,7 +192,11 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
         address, /*sender_wallet*/
         address originalGasTo,
         TvmCell payload
-    ) external override reserve {
+    )
+        external
+        override
+        reserve
+    {
         uint32 callbackId = 0;
         address buyer = sender;
         TvmSlice payloadSlice = payload.toSlice();
@@ -219,10 +245,26 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
                 callbacks
             );
 
-            _transfer(_getPaymentToken(), balance, _getOwner(), originalGasTo, tokenWallet, Gas.TOKEN_TRANSFER_VALUE, 1, Gas.DEPLOY_EMPTY_WALLET_GRAMS, emptyPayload);
+            _transfer(
+                _getPaymentToken(),
+                balance,
+                _getOwner(),
+                originalGasTo,
+                tokenWallet,
+                Gas.TOKEN_TRANSFER_VALUE,
+                1,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                emptyPayload
+            );
 
             if (currentFee > 0) {
-                _retentionMarketFee(tokenWallet, Gas.FEE_EXTRA_VALUE, Gas.FEE_DEPLOY_WALLET_GRAMS, currentFee, originalGasTo);
+                _retentionMarketFee(
+                    tokenWallet,
+                    Gas.FEE_EXTRA_VALUE,
+                    Gas.FEE_DEPLOY_WALLET_GRAMS,
+                    currentFee,
+                    originalGasTo
+                );
             }
 
             if (royaltyAmount > 0) {
@@ -242,7 +284,17 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
 
                 changeState(DirectSellStatus.Expired);
 
-                _transfer(_getPaymentToken(), amount, buyer, originalGasTo, msg.sender, Gas.TOKEN_TRANSFER_VALUE, 1, uint128(0), emptyPayload);
+                _transfer(
+                    _getPaymentToken(),
+                    amount,
+                    buyer,
+                    originalGasTo,
+                    msg.sender,
+                    Gas.TOKEN_TRANSFER_VALUE,
+                    1,
+                    uint128(0),
+                    emptyPayload
+                );
 
                 callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
@@ -264,7 +316,17 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
                     callbackId,
                     _getNftAddress()
                 );
-                _transfer(_getPaymentToken(), amount, buyer, originalGasTo, msg.sender, 0, 128, uint128(0), emptyPayload);
+                _transfer(
+                    _getPaymentToken(),
+                    amount,
+                    buyer,
+                    originalGasTo,
+                    msg.sender,
+                    0,
+                    128,
+                    uint128(0),
+                    emptyPayload
+                );
             }
         }
     }
@@ -294,10 +356,14 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
     function finishSell(
         address _remainingGasTo,
         uint32 _callbackId
-    ) public reserve {
+    )
+        public
+        reserve
+    {
         require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
         require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
         require(msg.value >= calcValue(directSellGas.cancel), BaseErrors.not_enough_value);
+
         IDirectSellCallback(msg.sender).directSellCancelledOnTime{
             value: Gas.FRONTENT_CALLBACK_VALUE,
             flag: 1,
@@ -356,7 +422,12 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
         TvmCell newCode,
         uint32 newVersion,
         address remainingGasTo
-    ) override external onlyMarketRoot reserve{
+    )
+        external
+        override
+        onlyMarketRoot
+        reserve
+    {
         require(msg.sender.value != 0, BaseErrors.operation_not_permited);
         if (currentVersion == newVersion) {
             remainingGasTo.transfer({
@@ -390,10 +461,10 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IDir
                 _getRoyalty()
             );
 
-              tvm.setcode(newCode);
-              tvm.setCurrentCode(newCode);
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
 
-              onCodeUpgrade(cellParams);
+            onCodeUpgrade(cellParams);
         }
     }
 

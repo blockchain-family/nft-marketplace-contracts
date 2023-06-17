@@ -30,8 +30,17 @@ import "./flow/RoyaltyOffer.sol";
 
 import "./structures/IDirectBuyGasValuesStructure.sol";
 
-contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, ICallbackParamsStructure, IDirectBuyGasValuesStructure, DiscountCollectionOffer, MarketFeeOffer, SupportNativeTokenOffer, RoyaltyOffer {
-
+contract DirectBuy is
+    IAcceptTokensTransferCallback,
+    INftChangeManager,
+    IUpgradableByRequest,
+    ICallbackParamsStructure,
+    IDirectBuyGasValuesStructure,
+    DiscountCollectionOffer,
+    MarketFeeOffer,
+    SupportNativeTokenOffer,
+    RoyaltyOffer
+{
     uint128 price;
     bool tokensReceived = false;
 
@@ -62,7 +71,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo);
     event DirectBuyUpgrade();
 
-    mapping (address => uint128) internal tmp_transactions;
+    mapping(address => uint128) internal tmp_transactions;
 
     constructor(
         uint128 _amount,
@@ -73,7 +82,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         address _weverRoot,
         DirectBuyGasValues _directBuyGas,
         optional(DiscountInfo) _discountOpt
-    ) public reserve {
+    )
+        public
+        reserve
+    {
         if (msg.sender.value != 0 && msg.sender == _getMarketRootAddress()) {
 
             price = _amount;
@@ -94,7 +106,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
 
             _checkRoyaltyFromNFT(calcValue(directBuyGas.royalty));
 
-            if (_getDiscountOpt().hasValue()){
+            if (_getDiscountOpt().hasValue()) {
                 _discountAvailabilityCheck();
             }
             currentVersion++;
@@ -110,7 +122,13 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         }
     }
 
-    function onTokenWallet(address _wallet) external onlyPaymentToken reserve {
+    function onTokenWallet(
+        address _wallet
+    )
+        external
+        onlyPaymentToken
+        reserve
+    {
         tokenWallet = _wallet;
         if (
             tmp_transactions.exists(tokenWallet) &&
@@ -168,7 +186,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     }
 
     function getInfo() external view returns (DirectBuyInfo) {
-        return buildInfo();
+        return _buildInfo();
     }
 
     function onAcceptTokensTransfer(
@@ -178,7 +196,11 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         address, /*senderWallet*/
         address originalGasTo,
         TvmCell /*payload*/
-    ) external override reserve {
+    )
+        external
+        override
+        reserve
+    {
         require(msg.sender.value != 0, BaseErrors.operation_not_permited);
         if (
             tokenRoot == _getPaymentToken() &&
@@ -222,7 +244,11 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         address, /*collection*/
         address remainingGasTo,
         TvmCell payload
-    ) external override reserve {
+    )
+        external
+        override
+        reserve
+    {
         require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
         uint32 callbackId = 0;
         TvmSlice payloadSlice = payload.toSlice();
@@ -268,7 +294,17 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
                 callbacks
             );
 
-            _transfer(_getPaymentToken(), balance, nftOwner, remainingGasTo, tokenWallet, Gas.TOKEN_TRANSFER_VALUE, 1, Gas.DEPLOY_EMPTY_WALLET_GRAMS, emptyPayload);
+            _transfer(
+                _getPaymentToken(),
+                balance,
+                nftOwner,
+                remainingGasTo,
+                tokenWallet,
+                Gas.TOKEN_TRANSFER_VALUE,
+                1,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                emptyPayload
+            );
 
             if (currentFee > 0) {
                 _retentionMarketFee(tokenWallet, Gas.FEE_EXTRA_VALUE, uint128(0), currentFee, remainingGasTo);
@@ -298,8 +334,18 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
                   remainingGasTo,
                   callbacks
                 );
-                _transfer(_getPaymentToken(), price, _getOwner(), remainingGasTo, tokenWallet,  Gas.TOKEN_TRANSFER_VALUE, 1, uint128(0), emptyPayload);
 
+                _transfer(
+                    _getPaymentToken(),
+                    price,
+                    _getOwner(),
+                    remainingGasTo,
+                    tokenWallet,
+                    Gas.TOKEN_TRANSFER_VALUE,
+                    1,
+                    uint128(0),
+                    emptyPayload
+                );
             } else {
                 IDirectBuyCallback(nftOwner).directBuyNotSuccess{
                     value: Gas.FRONTENT_CALLBACK_VALUE,
@@ -325,10 +371,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     function changeState(uint8 _newState) private {
         uint8 prevStateN = currentStatus;
         currentStatus = _newState;
-        emit DirectBuyStateChanged(prevStateN, _newState, buildInfo());
+        emit DirectBuyStateChanged(prevStateN, _newState, _buildInfo());
     }
 
-    function buildInfo() private view returns (DirectBuyInfo) {
+    function _buildInfo() private view returns (DirectBuyInfo) {
         return
             DirectBuyInfo(
                 _getMarketRootAddress(),
@@ -348,7 +394,10 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     function finishBuy(
         address _remainingGasTo,
         uint32 _callbackId
-    ) public reserve {
+    )
+        public
+        reserve
+    {
         require(
           currentStatus == DirectBuyStatus.Active,
           DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
@@ -364,14 +413,30 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
           _callbackId,
           _getNftAddress()
         );
+
         changeState(DirectBuyStatus.Expired);
+
         TvmCell emptyPayload;
-        _transfer(_getPaymentToken(), price, _getOwner(), _remainingGasTo, tokenWallet, 0, 128, uint128(0), emptyPayload);
+        _transfer(
+            _getPaymentToken(),
+            price,
+            _getOwner(),
+            _remainingGasTo,
+            tokenWallet,
+            0,
+            128,
+            uint128(0),
+            emptyPayload
+        );
     }
 
     function closeBuy(
         uint32 _callbackId
-    ) external onlyOwner reserve {
+    )
+        external
+        onlyOwner
+        reserve
+    {
         require(
             currentStatus == DirectBuyStatus.Active,
             DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
@@ -385,15 +450,30 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
             _getNftAddress()
         );
         changeState(DirectBuyStatus.Cancelled);
+
         TvmCell emptyPayload;
-        _transfer(_getPaymentToken(), price, _getOwner(), _getOwner(), tokenWallet, 0, 128, uint128(0), emptyPayload);
+        _transfer(
+            _getPaymentToken(),
+            price,
+            _getOwner(),
+            _getOwner(),
+            tokenWallet,
+            0,
+            128,
+            uint128(0),
+            emptyPayload
+        );
     }
 
     function upgrade(
         TvmCell newCode,
         uint32 newVersion,
         address remainingGasTo
-    ) override external reserve{
+    )
+        external
+        override
+        reserve
+    {
         require(
             msg.sender.value != 0 &&
             msg.sender == _getMarketRootAddress(),

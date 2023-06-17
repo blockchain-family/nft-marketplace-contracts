@@ -1,17 +1,10 @@
 pragma ever-solidity >= 0.61.2;
 
-import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "../../abstract/BaseOffer.sol";
 
+import "tip3/contracts/interfaces/ITokenWallet.sol";
+
 abstract contract SupportNativeTokenOffer is BaseOffer {
-
-    function weverRoot() external view returns (address) {
-        return _getWeverRoot();
-    }
-
-    function weverVault() external view returns (address) {
-        return _getWeverVault();
-    }
 
     function onAcceptTokensBurn(
         uint128 amount,
@@ -19,7 +12,10 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
         address /*wallet*/,
         address user,
         TvmCell payload
-    )  external reserve {
+    )
+        external
+        reserve
+    {
         address remainingGasTo;
         TvmSlice payloadSlice = payload.toSlice();
         if (payloadSlice.bits() >= 267) {
@@ -33,7 +29,15 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
             user.transfer({ value: amount, flag: 1, bounce: false });
             remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
         }
-   }
+    }
+
+    function weverRoot() external view returns (address) {
+        return _getWeverRoot();
+    }
+
+    function weverVault() external view returns (address) {
+        return _getWeverVault();
+    }
 
     function _transfer(
         address _paymentToken,
@@ -45,7 +49,10 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
         uint16 _flag,
         uint128 _deployWalletGrams,
         TvmCell _payload
-    ) internal virtual {
+    )
+        internal
+        virtual
+    {
         TvmBuilder builder;
         builder.store(_remainingGasTo);
         if (_paymentToken == _getWeverRoot()) {

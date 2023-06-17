@@ -15,5 +15,4 @@ interface IAuctionRootCallback {
         address nftOwner, 
         address nft
     ) external;
-    
 }

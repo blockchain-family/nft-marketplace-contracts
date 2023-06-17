@@ -27,7 +27,15 @@ import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
 import "./flow/native_token/SupportNativeTokenFDB.sol";
 
-contract FactoryDirectBuy is BaseRoot, IAcceptTokensTransferCallback, SupportNativeTokenFDB, MarketFeeRoot, DiscountCollectionRoot, OffersUpgradableRoot, IDirectBuyGasValuesStructure {
+contract FactoryDirectBuy is
+    BaseRoot,
+    IAcceptTokensTransferCallback,
+    SupportNativeTokenFDB,
+    MarketFeeRoot,
+    DiscountCollectionRoot,
+    OffersUpgradableRoot,
+    IDirectBuyGasValuesStructure
+{
     uint64 static nonce_;
 
     uint32 currentVersion;
@@ -52,9 +60,10 @@ contract FactoryDirectBuy is BaseRoot, IAcceptTokensTransferCallback, SupportNat
         MarketFee _fee,
         address _weverVault,
         address _weverRoot
-    ) OwnableInternal(
-        _owner
-    )  reserve public
+    )
+        OwnableInternal(_owner)
+        reserve
+        public
     {
         tvm.accept();
         _initialization(
@@ -173,7 +182,11 @@ contract FactoryDirectBuy is BaseRoot, IAcceptTokensTransferCallback, SupportNat
         uint64 durationTime,
         optional(address) discountCollection,
         optional(uint256) discountNftId
-    ) external pure returns (TvmCell) {
+    )
+        external
+        pure
+        returns (TvmCell)
+    {
         TvmBuilder builder;
         builder.store(callbackId);
         builder.store(buyer);
@@ -199,7 +212,11 @@ contract FactoryDirectBuy is BaseRoot, IAcceptTokensTransferCallback, SupportNat
         address, /*senderWallet*/
         address originalGasTo,
         TvmCell payload
-    ) override external reserve {
+    )
+        override
+        external
+        reserve
+    {
         uint32 callbackId = 0;
         address buyer = sender;
         address nftForBuy;
@@ -305,7 +322,11 @@ contract FactoryDirectBuy is BaseRoot, IAcceptTokensTransferCallback, SupportNat
         TvmCell newCode,
         uint32 newVersion,
         address remainingGasTo
-    ) external onlyOwner reserve {
+    )
+        external
+        onlyOwner
+        reserve
+    {
         if (currentVersion == newVersion) {
             remainingGasTo.transfer({
                 value: 0,

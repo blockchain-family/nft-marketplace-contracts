@@ -131,6 +131,18 @@
 			]
 		},
 		{
+			"name": "onAcceptTokensBurn",
+			"inputs": [
+				{"name":"amount","type":"uint128"},
+				{"name":"value1","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"user","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "weverRoot",
 			"inputs": [
 			],
@@ -147,13 +159,10 @@
 			]
 		},
 		{
-			"name": "onAcceptTokensBurn",
+			"name": "setMarketFee",
 			"inputs": [
-				{"name":"amount","type":"uint128"},
-				{"name":"value1","type":"address"},
-				{"name":"value2","type":"address"},
-				{"name":"user","type":"address"},
-				{"name":"payload","type":"cell"}
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"name":"_remainingGasTo","type":"address"}
 			],
 			"outputs": [
 			]
@@ -164,15 +173,6 @@
 			],
 			"outputs": [
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "setMarketFee",
-			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
-				{"name":"_remainingGasTo","type":"address"}
-			],
-			"outputs": [
 			]
 		},
 		{

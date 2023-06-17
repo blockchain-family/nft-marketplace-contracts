@@ -1,6 +1,7 @@
 pragma ever-solidity >= 0.61.2;
 
 interface INftInfoStructure {
+
     struct Attributes {
         string trait_type;
         string  value;

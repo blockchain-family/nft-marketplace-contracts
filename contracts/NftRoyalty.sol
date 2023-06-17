@@ -11,7 +11,7 @@ import './modules/TIP4_3/TIP4_3Nft.sol';
 import './modules/TIP4_2/TIP4_2Nft.sol';
 import "./interfaces/IRoyaltyInfo.sol";
 
-contract Nft is TIP4_1Nft, TIP4_2Nft, TIP4_3Nft, IRoyaltyInfo{
+contract Nft is TIP4_1Nft, TIP4_2Nft, TIP4_3Nft, IRoyaltyInfo {
 
     constructor(
         address owner,

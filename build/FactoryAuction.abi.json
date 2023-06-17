@@ -104,13 +104,6 @@
 			]
 		},
 		{
-			"name": "collectionsSpecialRules",
-			"inputs": [
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "addCollectionsSpecialRules",
 			"inputs": [
 				{"name":"_collection","type":"address"},
@@ -128,11 +121,11 @@
 			]
 		},
 		{
-			"name": "marketFee",
+			"name": "collectionsSpecialRules",
 			"inputs": [
 			],
 			"outputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
+				{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"map(address,tuple)"}
 			]
 		},
 		{
@@ -142,6 +135,14 @@
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
 			],
 			"outputs": [
+			]
+		},
+		{
+			"name": "marketFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
 			]
 		},
 		{

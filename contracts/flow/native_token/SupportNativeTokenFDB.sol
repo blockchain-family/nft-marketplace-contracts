@@ -1,23 +1,27 @@
 pragma ever-solidity >= 0.61.2;
 
 import "./SupportNativeTokenRoot.sol";
+
 import "tip3/contracts/interfaces/ITokenWallet.sol";
 
 abstract contract SupportNativeTokenFDB is SupportNativeTokenRoot {
 
- function onAcceptTokensBurn(
+    function onAcceptTokensBurn(
         uint128 amount,
         address /*walletOwner*/,
         address /*wallet*/,
         address user,
         TvmCell payload
-    )  external reserve {
+    )
+         external
+         reserve
+    {
+        require(msg.sender.value != 0 && msg.sender == _getWeverRoot(), BaseErrors.not_wever_root);
         address remainingGasTo;
         TvmSlice payloadSlice = payload.toSlice();
         if (payloadSlice.bits() >= 267) {
             remainingGasTo = payloadSlice.decode(address);
         }
-        require(msg.sender.value != 0 && msg.sender == _getWeverRoot(), BaseErrors.not_wever_root);
 
         if (user == remainingGasTo) {
             user.transfer({ value: 0, flag: 128 + 2, bounce: false });
@@ -25,7 +29,7 @@ abstract contract SupportNativeTokenFDB is SupportNativeTokenRoot {
             user.transfer({ value: amount, flag: 1, bounce: false });
             remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
         }
-   }
+    }
 
     function _transfer(
         address _paymentToken,
@@ -37,7 +41,10 @@ abstract contract SupportNativeTokenFDB is SupportNativeTokenRoot {
         uint16 _flag,
         uint128 _deployWalletGrams,
         TvmCell _payload
-    ) internal virtual {
+    )
+        internal
+        virtual
+    {
         TvmBuilder builder;
         builder.store(_remainingGasTo);
         if (_paymentToken == _getWeverRoot()) {

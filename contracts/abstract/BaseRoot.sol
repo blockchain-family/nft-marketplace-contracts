@@ -10,10 +10,17 @@ import "../interfaces/IEventsCollectionsSpecialRules.sol";
 import "../modules/access/OwnableInternal.sol";
 import "../interfaces/IEventsMarketFee.sol";
 import "./TargetBalance.sol";
+import "./BaseOffer.sol";
 
 
-abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure, IEventsMarketFee, IDiscountCollectionsStructure, IEventsCollectionsSpecialRules {
-
+abstract contract BaseRoot is
+    OwnableInternal,
+    TargetBalance,
+    IGasValueStructure,
+    IEventsMarketFee,
+    IDiscountCollectionsStructure,
+    IEventsCollectionsSpecialRules
+{
     MarketFee private fee_;
 
     address private weverRoot_;
@@ -50,23 +57,52 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
         weverRoot_ = _weverRoot;
     }
 
+    function activateChildContract(
+        address _offer
+    )
+        external
+        onlyOwner
+    {
+        BaseOffer(_offer).activate{value: 0, flag: 64, bounce: false}();
+    }
+
 // market fee
-    function _setMarketFee(MarketFee _fee) internal virtual {
+    function _setMarketFee(
+        MarketFee _fee
+    )
+        internal
+        virtual
+    {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee_ = _fee;
         emit MarketFeeDefaultChanged(fee_);
     }
 
-    function _getMarketFee() internal view virtual returns (MarketFee) {
+    function _getMarketFee()
+        internal
+        view
+        virtual
+        returns (MarketFee)
+    {
         return fee_;
     }
 
 // support native token
-    function _getWeverRoot() internal view virtual returns (address) {
+    function _getWeverRoot()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return weverRoot_;
     }
 
-    function _getWeverVault() internal view virtual returns (address) {
+    function _getWeverVault()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return weverVault_;
     }
 
@@ -102,11 +138,21 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
     }
 
 // upgradable
-    function _getOfferCode() internal view virtual returns (TvmCell) {
+    function _getOfferCode()
+        internal
+        view
+        virtual
+        returns (TvmCell)
+    {
         return offerCode_;
     }
 
-    function _getCurrentVersionOffer() internal view virtual returns (uint32) {
+    function _getCurrentVersionOffer()
+        internal
+        view
+        virtual
+        returns (uint32)
+    {
         return currentVersionOffer_;
     }
 
@@ -118,6 +164,16 @@ abstract contract BaseRoot is OwnableInternal, TargetBalance, IGasValueStructure
     {
         offerCode_ = _newCode;
         currentVersionOffer_++;
+    }
+
+    function calcValue(
+        GasValues value
+    )
+        internal
+        pure
+        returns(uint128)
+    {
+        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
     }
 
 }

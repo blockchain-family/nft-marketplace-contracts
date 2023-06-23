@@ -4,16 +4,17 @@ pragma AbiHeader expire;
 pragma AbiHeader time;
 pragma AbiHeader pubkey;
 
-import "./interfaces/IAcceptNftBurnCallback.tsol";
-import "./interfaces/IBurnableCollection.tsol";
+import "./interfaces/IAcceptNftBurnCallback.sol";
+import "./interfaces/IBurnableCollection.sol";
 
-import "./NftWithRoyalty.tsol";
+import "./NftWithRoyalty.sol";
+import "./modules/access/OwnableInternal.sol";
+import "./modules/TIP4_royalty/structures/IRoyaltyStructure.sol";
 import "./modules/TIP4_2/TIP4_2Collection.sol";
 import "./modules/TIP4_3/TIP4_3Collection.sol";
-import "./interfaces/IBurnableCollection.sol";
 import "./modules/access/OwnableInternal.sol";
 
-contract Collection is TIP4_2Collection, TIP4_3Collection, TIP4_royaltyCollection, IBurnableCollection, OwnableInternal {
+contract Collection is TIP4_2Collection, TIP4_3Collection, IBurnableCollection, OwnableInternal, IRoyaltyStructure {
 
 	uint64 static nonce_;
 
@@ -30,15 +31,13 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, TIP4_royaltyCollectio
 		TvmCell codeIndexBasis,
 		address owner,
 		uint128 remainOnNft,
-		string json,
-        Royalty royalty
+		string json
 	)
 		public
 		OwnableInternal(owner)
 		TIP4_1Collection(codeNft)
 		TIP4_2Collection(json)
 		TIP4_3Collection(codeIndex, codeIndexBasis)
-		TIP4_royaltyCollection(royalty)
 	{
 		tvm.accept();
 		tvm.rawReserve(1 ever, 0);
@@ -49,20 +48,20 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, TIP4_royaltyCollectio
         return (_buildNftCode(address(this)).depth());
 	}
 
-	function mintNft(address _owner, string _json) public virtual onlyOwner {
+	function mintNft(address _owner, string _json, Royalty _royalty) public virtual onlyOwner {
 		require(
 			msg.value > _remainOnNft + _indexDeployValue * 2 + 0.3 ever,
 			value_is_less_than_required
 		);
 		tvm.rawReserve(1 ever, 0);
-		_mintNft(_owner, _json, 0, 128);
+		_mintNft(_owner, _json, 0, 128, _royalty);
 	}
 
 	function totalMinted() external view responsible returns (uint256 count) {
 		return {value: 0, flag: 64, bounce: false} (_totalMinted);
 	}
 
-	function batchMintNft(address _owner, string[] _jsons) public virtual onlyOwner {
+	function batchMintNft(address _owner, string[] _jsons, Royalty _royalty) public virtual onlyOwner {
 		require(
 			msg.value > (_remainOnNft + 3 ever) * _jsons.length + 1 ever,
 			value_is_less_than_required
@@ -70,12 +69,11 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, TIP4_royaltyCollectio
 		tvm.rawReserve(1 ever, 0);
 
 		for ((string _json) : _jsons) {
-			_mintNft(_owner, _json, 3 ever, 0);
+			_mintNft(_owner, _json, 3 ever, 0, _royalty);
 		}
 	}
 
-
-	function _mintNft(address owner, string json, uint128 value, uint16 flag) internal virtual {
+	function _mintNft(address owner, string json, uint128 value, uint16 flag, Royalty royalty) internal virtual {
 
 		uint256 id = uint256(_totalMinted);
 		_totalMinted++;
@@ -105,7 +103,7 @@ contract Collection is TIP4_2Collection, TIP4_3Collection, TIP4_royaltyCollectio
 		internal
 		pure
 		virtual
-		override (TIP4_2Collection, TIP4_3Collection, TIP4_1Collection)
+		override (TIP4_2Collection, TIP4_3Collection)
 		returns (TvmCell)
 	{
 		return tvm.buildStateInit({contr: NftWithRoyalty, varInit: {_id: id}, code: code});

@@ -5,7 +5,6 @@ import '../errors/BaseErrors.sol';
 import "../structures/IGasValueStructure.sol";
 import "../structures/IMarketFeeStructure.sol";
 import "../structures/IDiscountCollectionsStructure.sol";
-import "../structures/IRoyaltyStructure.sol";
 
 import "../interfaces/IEventsMarketFeeOffer.sol";
 import "../interfaces/IEventsRoyalty.sol";
@@ -13,7 +12,13 @@ import "../interfaces/IEventsRoyalty.sol";
 import "./TargetBalance.sol";
 
 
-abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStructure, IRoyaltyStructure, TargetBalance, IEventsRoyalty {
+abstract contract BaseOffer is
+    IEventsMarketFeeOffer,
+    IDiscountCollectionsStructure,
+    IRoyaltyStructure,
+    TargetBalance,
+    IEventsRoyalty
+{
     address private static markerRootAddress_;
     address private static owner_;
     address private static paymentToken_;
@@ -31,6 +36,8 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
     optional(address) private discountNft_;
 
     optional(Royalty) private royalty_;
+
+    uint64 private deployTime_;
 
     modifier reserve() {
         tvm.rawReserve(_getTargetBalanceInternal(), 0);
@@ -73,11 +80,10 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
         internal
         virtual
     {
+        deployTime_ = now;
         _setMarketFee(_fee);
-
         weverVault_ = _weverVault;
         weverRoot_ = _weverRoot;
-
         _setDiscountOpt(_discountOpt);
     }
 
@@ -88,83 +94,196 @@ abstract contract BaseOffer is  IEventsMarketFeeOffer, IDiscountCollectionsStruc
         override
         returns (uint128);
 
+    function activate()
+        external
+        onlyMarketRoot
+        reserve
+    {
+        if (!_getRoyalty().hasValue() && now >= _getDeployTime() + 10 minutes) {
+            _setRoyalty(Royalty(0, 1000000000, address(0)));
+        }
+        _checkAndActivate();
+    }
+
+    function _checkAndActivate()
+        internal
+        virtual;
+
 // static
-    function _getMarketRootAddress() internal view virtual returns (address) {
+    function _getMarketRootAddress()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return markerRootAddress_;
     }
 
-    function _getPaymentToken() internal view virtual returns (address) {
+    function _getPaymentToken()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return paymentToken_;
     }
 
-    function _getOwner() internal view virtual returns (address) {
+    function _getOwner()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return owner_;
     }
 
-    function _getNonce() internal view virtual returns (uint64) {
+    function _getNonce()
+        internal
+        view
+        virtual
+        returns (uint64)
+    {
         return nonce_;
     }
 
-    function _getNftAddress() internal view virtual returns (address) {
+    function _getNftAddress()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return nftAddress_;
     }
 
-    function _getCollection() internal view virtual returns (address) {
+    function _getCollection()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return collection_;
     }
 
-    function _setCollection(address _collection) internal virtual {
+    function _setCollection(
+        address _collection
+    )
+        internal
+        virtual
+    {
         collection_ = _collection;
     }
 
 // market fee
-    function _setMarketFee(MarketFee _fee) internal virtual {
+    function _setMarketFee(
+        MarketFee _fee
+    )
+        internal
+        virtual
+    {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         fee_ = _fee;
         emit MarketFeeChanged(address(this), fee_);
     }
 
-    function _getMarketFee() internal view virtual returns (MarketFee) {
+    function _getMarketFee()
+        internal
+        view
+        virtual
+        returns (MarketFee)
+    {
         return fee_;
     }
 
 // support native token
-    function _getWeverRoot() internal view virtual returns (address) {
+    function _getWeverRoot()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return weverRoot_;
     }
 
-    function _getWeverVault() internal view virtual returns (address) {
+    function _getWeverVault()
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return weverVault_;
     }
 
 // discount collection
-    function _setDiscountOpt(optional(DiscountInfo) _discountOpt) internal virtual {
+    function _setDiscountOpt(
+        optional(DiscountInfo) _discountOpt
+    )
+        internal
+        virtual
+    {
         discountOpt_ = _discountOpt;
     }
 
-    function _getDiscountOpt() internal view virtual returns (optional(DiscountInfo)) {
+    function _getDiscountOpt()
+        internal
+        view
+        virtual
+        returns (optional(DiscountInfo))
+    {
         return discountOpt_;
     }
 
-    function _getDiscountNft() internal view virtual returns (optional(address)) {
+    function _getDiscountNft()
+        internal
+        view
+        virtual
+        returns (optional(address))
+    {
         return discountNft_;
     }
 
-    function _setDiscountNft(address _discountNft) internal virtual {
+    function _setDiscountNft(
+        address _discountNft
+    )
+        internal
+        virtual
+    {
         discountNft_ = _discountNft;
     }
 
 // royalty
-    function _getRoyalty() internal view virtual returns (optional(Royalty)) {
+    function _getRoyalty()
+        internal
+        view
+        virtual
+        returns (optional(Royalty))
+    {
         return royalty_;
     }
 
-    function _setRoyalty(Royalty _royalty) internal virtual {
+    function _setRoyalty(Royalty _royalty)
+        internal
+        virtual
+    {
         royalty_ = _royalty;
         emit RoyaltySet(royalty_.get());
     }
 
-    function calcValue(IGasValueStructure.GasValues value) internal pure returns (uint128) {
+    function calcValue(
+        IGasValueStructure.GasValues value
+    )
+        internal
+        pure
+        returns (uint128)
+    {
         return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
+    }
+
+    function _getDeployTime()
+        internal
+        view
+        virtual
+        returns (uint64)
+    {
+        return deployTime_;
     }
 }

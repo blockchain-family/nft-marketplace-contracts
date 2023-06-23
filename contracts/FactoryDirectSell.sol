@@ -158,55 +158,6 @@ contract FactoryDirectSell is
         _remainingGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
-    function _getTargetBalanceInternal() internal view virtual override returns (uint128) {
-        return Gas.FACTORY_DIRECT_SELL_INITIAL_BALANCE;
-    }
-
-    function getTypeContract() external pure returns (string) {
-        return "FactoryDirectSell";
-    }
-
-    function calcValue(GasValues value) internal pure returns(uint128) {
-        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
-    }
-
-    function getGasValue() external view returns (DirectSellGasValues) {
-        return directSellGas;
-    }
-
-    function buildDirectSellCreationPayload(
-        uint32 _callbackId,
-        uint64 _startTime,
-        uint64 _durationTime,
-        address _paymentToken,
-        uint128 _price,
-        address _recipient,
-        optional(address) _discountCollection,
-        optional(uint256) _discountNftId
-    )
-        external
-        pure
-        returns (TvmCell)
-    {
-        TvmBuilder builder;
-        builder.store(_callbackId);
-        builder.store(_startTime);
-        builder.store(_durationTime);
-        builder.store(_paymentToken);
-        builder.store(_price);
-        builder.store(_recipient);
-
-        TvmBuilder discontBuilder;
-        if (_discountCollection.hasValue()) {
-            discontBuilder.store(_discountCollection.get());
-        }
-        if (_discountNftId.hasValue()) {
-            discontBuilder.store(_discountNftId.get());
-        }
-        builder.storeRef(discontBuilder);
-        return builder.toCell();
-    }
-
     function onNftChangeManager(
         uint256, /*id*/
         address nftOwner,
@@ -338,6 +289,65 @@ contract FactoryDirectSell is
                 callbacks
             );
         }
+    }
+
+    function getGasValue()
+        external
+        view
+        returns (DirectSellGasValues)
+    {
+        return directSellGas;
+    }
+
+    function getTypeContract()
+        external
+        pure
+        returns (string)
+    {
+        return "FactoryDirectSell";
+    }
+
+    function buildDirectSellCreationPayload(
+        uint32 _callbackId,
+        uint64 _startTime,
+        uint64 _durationTime,
+        address _paymentToken,
+        uint128 _price,
+        address _recipient,
+        optional(address) _discountCollection,
+        optional(uint256) _discountNftId
+    )
+        external
+        pure
+        returns (TvmCell)
+    {
+        TvmBuilder builder;
+        builder.store(_callbackId);
+        builder.store(_startTime);
+        builder.store(_durationTime);
+        builder.store(_paymentToken);
+        builder.store(_price);
+        builder.store(_recipient);
+
+        TvmBuilder discontBuilder;
+        if (_discountCollection.hasValue()) {
+            discontBuilder.store(_discountCollection.get());
+        }
+        if (_discountNftId.hasValue()) {
+            discontBuilder.store(_discountNftId.get());
+        }
+        builder.storeRef(discontBuilder);
+        return builder.toCell();
+    }
+
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128)
+    {
+        return Gas.FACTORY_DIRECT_SELL_INITIAL_BALANCE;
     }
 
     function upgrade(

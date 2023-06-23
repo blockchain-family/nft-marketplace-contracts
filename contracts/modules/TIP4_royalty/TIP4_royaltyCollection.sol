@@ -30,7 +30,7 @@ abstract contract TIP4_royaltyCollection is TIP4_1Collection, IRoyaltyInfo, IRoy
         view
         responsible
         override
-        returns(address receiver, uint128 royaltyAmount)
+        returns(address receiver, uint128 currentRoyalty)
     {
         uint128 amount = math.muldivc(salePrice, _royalty.numerator, _royalty.denominator);
         return {value: 0, flag: 128, bounce: false} (_royalty.receiver, amount);

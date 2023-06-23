@@ -129,8 +129,8 @@ contract Auction is
             _setCollection(_collection);
             _checkRoyaltyFromNFT(calcValue(auctionGas.royalty));
 
-            emit AuctionCreated(_buildInfo());
             currentStatus = AuctionStatus.Created;
+            emit AuctionCreated(_buildInfo());
             currentVersion++;
 
             ITokenRoot(_getPaymentToken()).deployWallet {
@@ -148,7 +148,12 @@ contract Auction is
         }
     }
 
-    function onTokenWallet(address value) external reserve {
+    function onTokenWallet(
+        address value
+    )
+        external
+        reserve
+    {
         require(
             msg.sender.value != 0 &&
             msg.sender == _getPaymentToken(),
@@ -159,39 +164,17 @@ contract Auction is
         _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    onBounce(TvmSlice _body) external reserve {
+    onBounce(
+        TvmSlice _body
+    )
+        external
+        reserve
+    {
         uint32 functionId = _body.decode(uint32);
         if (currentStatus == AuctionStatus.Created) {
             _fallbackRoyaltyFromCollection(functionId);
         }
         _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
-    }
-
-    function _checkAndActivate() internal virtual {
-        if (
-            _getRoyalty().hasValue() &&
-            tokenWallet.value != 0 &&
-            currentStatus == AuctionStatus.Created
-        ) {
-            currentStatus = AuctionStatus.Active;
-            emit AuctionActive(_buildInfo());
-        }
-    }
-
-    function _afterSetRoyalty() internal virtual override {
-        _checkAndActivate();
-    }
-
-    function _isAllowedSetRoyalty() internal virtual override returns (bool) {
-        return (currentStatus == AuctionStatus.Created);
-    }
-
-    function _getTargetBalanceInternal() internal view virtual override returns (uint128) {
-        return Gas.AUCTION_INITIAL_BALANCE;
-    }
-
-    function getTypeContract() external pure returns (string) {
-        return "Auction";
     }
 
     function onAcceptTokensTransfer(
@@ -202,8 +185,8 @@ contract Auction is
         address originalGasTo,
         TvmCell payload
     )
-        override
         external
+        override
         reserve
     {
         uint32 callbackId = 0;
@@ -226,7 +209,7 @@ contract Auction is
             currentStatus == AuctionStatus.Active &&
             sender != _getOwner()
         ) {
-            processBid(callbackId, buyer, amount, originalGasTo);
+            _processBid(callbackId, buyer, amount, originalGasTo);
         } else {
             emit BidDeclined(buyer, amount);
             _sendBidResultCallback(callbackId, buyer, false, 0, _getNftAddress());
@@ -236,7 +219,200 @@ contract Auction is
         }
     }
 
-    function processBid(
+    function getTypeContract()
+        external
+        pure
+        returns (string)
+    {
+        return "Auction";
+    }
+
+    function buildPlaceBidPayload(
+        uint32 _callbackId,
+        address _buyer
+    )
+        external
+        pure
+        responsible
+        returns (TvmCell)
+    {
+        TvmBuilder builder;
+        builder.store(_callbackId);
+        builder.store(_buyer);
+        return { value: 0, bounce: false, flag: 64 } builder.toCell();
+    }
+
+    function getInfo()
+        external
+        view
+        returns (AuctionDetails)
+    {
+        return _buildInfo();
+    }
+
+    function finishAuction(
+        address _remainingGasTo,
+        uint32 _callbackId
+    )
+        public
+        reserve
+    {
+        require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
+        require(currentStatus == AuctionStatus.Active, AuctionErrors.auction_not_active);
+        require(msg.value >= calcValue(auctionGas.cancel), BaseErrors.not_enough_value);
+
+        mapping(address => CallbackParams) callbacks;
+        if (maxBidValue >= price) {
+            uint128 currentFee = _getCurrentFee(maxBidValue);
+            uint128 currentRoyalty = _getCurrentRoyalty(maxBidValue);
+            uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, maxBidValue);
+
+            currentStatus = AuctionStatus.Complete;
+            emit AuctionComplete(_getOwner(), currentBid.addr, maxBidValue);
+
+            IAuctionBidPlacedCallback(msg.sender).auctionComplete{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+            }(
+                _callbackId,
+                _getNftAddress()
+            );
+
+            TvmCell emptyPayload;
+            callbacks[currentBid.addr] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
+
+            ITIP4_1NFT(_getNftAddress()).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                currentBid.addr,
+                _remainingGasTo,
+                callbacks
+            );
+            _transfer(
+                _getPaymentToken(),
+                balance,
+                _getOwner(),
+                _remainingGasTo,
+                tokenWallet,
+                Gas.TOKEN_TRANSFER_VALUE,
+                1,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                emptyPayload
+            );
+            if (currentFee >  0) {
+                _retentionMarketFee(
+                    tokenWallet,
+                    Gas.FEE_EXTRA_VALUE,
+                    Gas.FEE_DEPLOY_WALLET_GRAMS,
+                    currentFee,
+                    _remainingGasTo
+                );
+            }
+            if (currentRoyalty > 0) {
+                _retentionRoyalty(currentRoyalty, tokenWallet, _remainingGasTo);
+            }
+        } else {
+            emit AuctionCancelled();
+            currentStatus = AuctionStatus.Cancelled;
+            IAuctionBidPlacedCallback(msg.sender).auctionCancelled{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _callbackId,
+                _getNftAddress()
+            );
+            ITIP4_1NFT(_getNftAddress()).changeManager{ value: 0, flag: 128 }(
+                _getOwner(),
+                _remainingGasTo,
+                callbacks
+            );
+        }
+    }
+
+    function _countCorrectFinalPrice(
+        uint128 _feeAmount,
+        uint128 _royaltyAmount,
+        uint128 _price
+    )
+        internal
+        virtual
+        returns (uint128)
+    {
+        uint128 balance = _price;
+        if (_price >= _royaltyAmount + _feeAmount) {
+            balance = _price - _feeAmount - _royaltyAmount;
+        } else {
+            balance = _price - _feeAmount;
+        }
+        return balance;
+    }
+
+    function _checkAndActivate()
+        internal
+        virtual
+        override
+    {
+        if (
+            _getRoyalty().hasValue() &&
+            tokenWallet.value != 0 &&
+            currentStatus == AuctionStatus.Created
+            ) {
+            currentStatus = AuctionStatus.Active;
+            emit AuctionActive(_buildInfo());
+        }
+    }
+
+    function _afterSetRoyalty()
+        internal
+        virtual
+        override
+    {
+        _checkAndActivate();
+    }
+
+    function _isAllowedSetRoyalty()
+        internal
+        virtual
+        override
+        returns (bool)
+    {
+        return (currentStatus == AuctionStatus.Created);
+    }
+
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128)
+    {
+        return Gas.AUCTION_INITIAL_BALANCE;
+    }
+
+    function _buildInfo()
+        private
+        view
+        returns(AuctionDetails)
+    {
+        return AuctionDetails({
+            auctionSubject: _getNftAddress(),
+            subjectOwner: _getOwner(),
+            paymentToken: _getPaymentToken(),
+            walletForBids: tokenWallet,
+            startTime: auctionStartTime,
+            duration: auctionDuration,
+            endTime: auctionEndTime,
+            price: price,
+            nonce: _getNonce(),
+            status: currentStatus
+        });
+    }
+
+    function _processBid(
         uint32 _callbackId,
         address _newBidSender,
         uint128 _bid,
@@ -277,92 +453,9 @@ contract Auction is
         }
     }
 
-    function finishAuction(
-        address _remainingGasTo,
-        uint32 _callbackId
-    )
-        public
-        reserve
+    function _calculateAndSetNextBid()
+        private
     {
-        require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
-        require(currentStatus == AuctionStatus.Active, AuctionErrors.auction_not_active);
-        require(msg.value >= calcValue(auctionGas.cancel), BaseErrors.not_enough_value);
-
-        mapping(address => CallbackParams) callbacks;
-        if (maxBidValue >= price) {
-            uint128 currentFee = _getCurrentFee(maxBidValue);
-            uint128 royaltyAmount = _getRoyaltyAmount(currentFee, maxBidValue);
-            uint128 balance = maxBidValue - currentFee - royaltyAmount;
-
-            emit AuctionComplete(_getOwner(), currentBid.addr, maxBidValue);
-            currentStatus = AuctionStatus.Complete;
-
-            IAuctionBidPlacedCallback(msg.sender).auctionComplete{
-                value: Gas.FRONTENT_CALLBACK_VALUE,
-                    flag: 1,
-                    bounce: false
-            }(
-                _callbackId,
-                _getNftAddress()
-            );
-
-            TvmCell emptyPayload;
-            callbacks[currentBid.addr] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
-
-            ITIP4_1NFT(_getNftAddress()).transfer{
-                value: 0,
-                flag: 128,
-                bounce: false
-            }(
-                currentBid.addr,
-                _remainingGasTo,
-                callbacks
-            );
-            _transfer(
-                _getPaymentToken(),
-                balance,
-                _getOwner(),
-                _remainingGasTo,
-                tokenWallet,
-                Gas.TOKEN_TRANSFER_VALUE,
-                1,
-                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
-                emptyPayload
-            );
-
-            if (currentFee >  0) {
-                _retentionMarketFee(
-                    tokenWallet,
-                    Gas.FEE_EXTRA_VALUE,
-                    Gas.FEE_DEPLOY_WALLET_GRAMS,
-                    currentFee,
-                    _remainingGasTo
-                );
-            }
-
-            if (royaltyAmount > 0) {
-                _retentionRoyalty(royaltyAmount, tokenWallet, _remainingGasTo);
-            }
-        } else {
-            emit AuctionCancelled();
-            currentStatus = AuctionStatus.Cancelled;
-            IAuctionBidPlacedCallback(msg.sender).auctionCancelled{
-                value: Gas.FRONTENT_CALLBACK_VALUE,
-                flag: 1,
-                bounce: false
-            }(
-                _callbackId,
-                _getNftAddress()
-            );
-            ITIP4_1NFT(_getNftAddress()).changeManager{ value: 0, flag: 128 }(
-                _getOwner(),
-                _remainingGasTo,
-                callbacks
-            );
-        }
-    }
-
-    function _calculateAndSetNextBid() private {
         nextBidValue = maxBidValue + math.muldivc(maxBidValue, uint128(bidDelta), uint128(bidDeltaDecimals));
     }
 
@@ -372,7 +465,10 @@ contract Auction is
         bool _isBidPlaced,
         uint128 _nextBidValue,
         address _nft
-    ) private pure {
+    )
+        private
+        pure
+    {
         if(_callbackTarget.value != 0) {
             if (_isBidPlaced) {
                 IAuctionBidPlacedCallback(_callbackTarget).bidPlacedCallback{
@@ -395,40 +491,6 @@ contract Auction is
                 );
             }
         }
-    }
-
-    function buildPlaceBidPayload(
-        uint32 _callbackId,
-        address _buyer
-    )
-        external
-        pure
-        responsible
-        returns (TvmCell)
-    {
-        TvmBuilder builder;
-        builder.store(_callbackId);
-        builder.store(_buyer);
-        return { value: 0, bounce: false, flag: 64 } builder.toCell();
-    }
-
-    function getInfo() external view returns (AuctionDetails) {
-        return _buildInfo();
-    }
-
-    function _buildInfo() private view returns(AuctionDetails) {
-        return AuctionDetails(
-            _getNftAddress(),
-            _getOwner(),
-            _getPaymentToken(),
-            tokenWallet,
-            auctionStartTime,
-            auctionDuration,
-            auctionEndTime,
-            price,
-            _getNonce(),
-            currentStatus
-        );
     }
 
     function upgrade(

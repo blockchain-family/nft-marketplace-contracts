@@ -1,5 +1,5 @@
-import { Migration } from "./migration";
-import { isValidEverAddress} from "../test/utils";
+import {Migration} from "./migration";
+import {isValidEverAddress} from "../test/utils";
 
 const prompts = require('prompts')
 const migration = new Migration();
@@ -10,19 +10,19 @@ async function main() {
             type: 'text',
             name: 'owner',
             message: 'AuctionRootTip3 owner',
-            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
             type: 'text',
             name: 'weverRoot',
             message: 'Wever root address',
-            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         },
         {
             type: 'text',
             name: 'weverVault',
             message: 'Wever vault address',
-            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
+            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
 
@@ -50,7 +50,7 @@ async function main() {
             _weverRoot: response.weverRoot
         },
         initParams: {
-           nonce_: locklift.utils.getRandomNonce(),
+            nonce_: locklift.utils.getRandomNonce(),
         },
         value: locklift.utils.toNano(10)
     });
@@ -70,15 +70,15 @@ async function main() {
         await auctionRootTip3.methods.transferOwnership({
             newOwner: response.owner
         }).send({
-          from: account.address,
-          amount: locklift.utils.toNano(1)
+            from: account.address,
+            amount: locklift.utils.toNano(1)
         });
     }
 }
 
 main()
-.then(() => process.exit(0))
-.catch(e => {
-    console.log(e);
-    process.exit(1);
-});
+    .then(() => process.exit(0))
+    .catch(e => {
+        console.log(e);
+        process.exit(1);
+    });

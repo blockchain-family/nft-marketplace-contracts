@@ -16,11 +16,17 @@
 			]
 		},
 		{
-			"name": "getTypeContract",
+			"name": "onNftChangeManager",
 			"inputs": [
+				{"name":"value0","type":"uint256"},
+				{"name":"nftOwner","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"newManager","type":"address"},
+				{"name":"collection","type":"address"},
+				{"name":"remainingGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
-				{"name":"value0","type":"string"}
 			]
 		},
 		{
@@ -29,6 +35,14 @@
 			],
 			"outputs": [
 				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"royalty","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployDirectSell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"sell","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"buy","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
 			]
 		},
 		{
@@ -45,20 +59,6 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
-			]
-		},
-		{
-			"name": "onNftChangeManager",
-			"inputs": [
-				{"name":"value0","type":"uint256"},
-				{"name":"nftOwner","type":"address"},
-				{"name":"value2","type":"address"},
-				{"name":"newManager","type":"address"},
-				{"name":"collection","type":"address"},
-				{"name":"remainingGasTo","type":"address"},
-				{"name":"payload","type":"cell"}
-			],
-			"outputs": [
 			]
 		},
 		{
@@ -134,6 +134,14 @@
 			]
 		},
 		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "setMarketFeeForChildContract",
 			"inputs": [
 				{"name":"_offer","type":"address"},
@@ -151,20 +159,20 @@
 			]
 		},
 		{
-			"name": "setMarketFee",
-			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "withdraw",
 			"inputs": [
 				{"name":"_tokenWallet","type":"address"},
 				{"name":"_amount","type":"uint128"},
 				{"name":"_recipient","type":"address"},
 				{"name":"_remainingGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "activateChildContract",
+			"inputs": [
+				{"name":"_offer","type":"address"}
 			],
 			"outputs": [
 			]

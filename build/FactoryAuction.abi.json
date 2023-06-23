@@ -18,22 +18,6 @@
 			]
 		},
 		{
-			"name": "getGasValue",
-			"inputs": [
-			],
-			"outputs": [
-				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"royalty","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployAuction","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"start","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"bid","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "getTypeContract",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"value0","type":"string"}
-			]
-		},
-		{
 			"name": "changeBidDelta",
 			"inputs": [
 				{"name":"_auctionBidDelta","type":"uint16"},
@@ -54,6 +38,22 @@
 				{"name":"payload","type":"cell"}
 			],
 			"outputs": [
+			]
+		},
+		{
+			"name": "getGasValue",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"gasK","type":"uint128"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployWallet","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"royalty","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"deployAuction","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"start","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"bid","type":"tuple"},{"components":[{"name":"fixedValue","type":"uint128"},{"name":"dynamicGas","type":"uint128"}],"name":"cancel","type":"tuple"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "getTypeContract",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"string"}
 			]
 		},
 		{
@@ -129,6 +129,14 @@
 			]
 		},
 		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "setMarketFeeForChildContract",
 			"inputs": [
 				{"name":"_offer","type":"address"},
@@ -143,14 +151,6 @@
 			],
 			"outputs": [
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "setMarketFee",
-			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
-			],
-			"outputs": [
 			]
 		},
 		{
@@ -178,6 +178,14 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "activateChildContract",
+			"inputs": [
+				{"name":"_offer","type":"address"}
+			],
+			"outputs": [
 			]
 		},
 		{

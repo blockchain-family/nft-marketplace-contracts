@@ -31,14 +31,6 @@
 			]
 		},
 		{
-			"name": "getTypeContract",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"value0","type":"string"}
-			]
-		},
-		{
 			"name": "onAcceptTokensTransfer",
 			"inputs": [
 				{"name":"tokenRoot","type":"address"},
@@ -52,12 +44,11 @@
 			]
 		},
 		{
-			"name": "finishAuction",
+			"name": "getTypeContract",
 			"inputs": [
-				{"name":"_remainingGasTo","type":"address"},
-				{"name":"_callbackId","type":"uint32"}
 			],
 			"outputs": [
+				{"name":"value0","type":"string"}
 			]
 		},
 		{
@@ -77,6 +68,15 @@
 			],
 			"outputs": [
 				{"components":[{"name":"auctionSubject","type":"address"},{"name":"subjectOwner","type":"address"},{"name":"paymentToken","type":"address"},{"name":"walletForBids","type":"address"},{"name":"startTime","type":"uint64"},{"name":"duration","type":"uint64"},{"name":"endTime","type":"uint64"},{"name":"price","type":"uint128"},{"name":"nonce","type":"uint64"},{"name":"status","type":"uint8"}],"name":"value0","type":"tuple"}
+			]
+		},
+		{
+			"name": "finishAuction",
+			"inputs": [
+				{"name":"_remainingGasTo","type":"address"},
+				{"name":"_callbackId","type":"uint32"}
+			],
+			"outputs": [
 			]
 		},
 		{
@@ -178,6 +178,13 @@
 				{"name":"_owner","type":"address"},
 				{"name":"_manager","type":"address"},
 				{"name":"_collection","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "activate",
+			"inputs": [
 			],
 			"outputs": [
 			]
@@ -360,6 +367,7 @@
 		{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"discountOpt_","type":"optional(tuple)"},
 		{"name":"discountNft_","type":"optional(address)"},
 		{"components":[{"name":"numerator","type":"uint128"},{"name":"denominator","type":"uint128"},{"name":"receiver","type":"address"}],"name":"royalty_","type":"optional(tuple)"},
+		{"name":"deployTime_","type":"uint64"},
 		{"name":"price","type":"uint128"},
 		{"name":"tokenWallet","type":"address"},
 		{"name":"auctionStartTime","type":"uint64"},

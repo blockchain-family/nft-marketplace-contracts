@@ -4,10 +4,10 @@ pragma AbiHeader expire;
 pragma AbiHeader time;
 pragma AbiHeader pubkey;
 
-import "./interfaces/IRoyaltyInfo.tsol";
-import "./structures/IRoyaltyStructure.tsol";
+import "./interfaces/IRoyaltyInfo.sol";
+import "./structures/IRoyaltyStructure.sol";
 
-import "../TIP4_1/TIP4_1Nft.tsol";
+import "../TIP4_1/TIP4_1Nft.sol";
 
 abstract contract TIP4_royaltyNft is TIP4_1Nft, IRoyaltyInfo, IRoyaltyStructure {
 
@@ -30,7 +30,7 @@ abstract contract TIP4_royaltyNft is TIP4_1Nft, IRoyaltyInfo, IRoyaltyStructure 
         view
         responsible
         override
-        returns(address receiver, uint128 royaltyAmount)
+        returns(address receiver, uint128 currentRoyalty)
     {
         uint128 amount = math.muldivc(salePrice, _royalty.numerator, _royalty.denominator);
         return {value: 0, flag: 128, bounce: false} (_royalty.receiver, amount);

@@ -292,6 +292,7 @@ describe("Test Auction contract", async function () {
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
+            console.log('balanse3:', await tokenWallet3.balance());
 
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
@@ -300,7 +301,6 @@ describe("Test Auction contract", async function () {
             let discountFee = (await auction.contract.methods.marketFee().call()).value0;
             expect(discountInfo.numerator).to.be.eq(discountFee.numerator);
             expect(discountInfo.denominator).to.be.eq(discountFee.denominator);
-
 
             //First bid placed
             await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
@@ -345,12 +345,16 @@ describe("Test Auction contract", async function () {
             expect(status.toString()).to.be.eq('2');
 
             let currentFee = nextBid.div(discountInfo.denominator).times(discountInfo.numerator);
+            console.log('currentFee', currentFee.toNumber());
+            console.log('startBalanceTW3', startBalanceTW3);
             const expectedBalance3 = new BigNumber(startBalanceTW3).plus(nextBid).minus(currentFee);
-
+            console.log('expectedBalance3', expectedBalance3.toNumber());
+            console.log('nextBid', nextBid.toNumber());
             spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
 
             let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+            console.log('spentTokenWallet3Balance', spentTokenWallet3Balance);
             expect(spentTokenWallet3Balance.toString()).to.be.eq(expectedBalance3.toString());
 
             spentTokenWallet4Balance = await tokenWallet4.balance() as any;

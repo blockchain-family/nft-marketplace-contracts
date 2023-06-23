@@ -72,11 +72,15 @@ contract FactoryAuction is
         address _weverRoot
     )
         OwnableInternal(_owner)
-        reserve
         public
+        reserve
     {
         tvm.accept();
-        _initialization(_fee,_weverRoot,_weverVault);
+        _initialization(
+            _fee,
+            _weverRoot,
+            _weverVault
+        );
         currentVersion++;
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
@@ -165,24 +169,13 @@ contract FactoryAuction is
         _remainingGasTo.transfer({ value: 0, flag: 128, bounce: false });
     }
 
-
-    function _getTargetBalanceInternal() internal view virtual override returns (uint128) {
-        return Gas.AUCTION_ROOT_INITIAL_BALANCE;
-    }
-
-    function calcValue(GasValues value) internal pure returns(uint128) {
-        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
-    }
-
-    function getGasValue() external view returns (AuctionGasValues) {
-        return auctionGas;
-    }
-
-    function getTypeContract() external pure returns (string) {
-        return "AuctionRoot";
-    }
-
-    function changeBidDelta(uint16 _auctionBidDelta, uint16 _auctionBidDeltaDecimals) external onlyOwner {
+    function changeBidDelta(
+        uint16 _auctionBidDelta,
+        uint16 _auctionBidDeltaDecimals
+    )
+        external
+        onlyOwner
+    {
         auctionBidDelta = _auctionBidDelta;
         auctionBidDeltaDecimals = _auctionBidDeltaDecimals;
     }
@@ -315,6 +308,22 @@ contract FactoryAuction is
         }
     }
 
+    function getGasValue()
+        external
+        view
+        returns (AuctionGasValues)
+    {
+        return auctionGas;
+    }
+
+    function getTypeContract()
+        external
+        pure
+        returns (string)
+    {
+        return "AuctionRoot";
+    }
+
     function buildAuctionCreationPayload(
         uint32 _callbackId,
         address _paymentToken,
@@ -347,6 +356,15 @@ contract FactoryAuction is
         return { value: 0, bounce: false, flag: 64 } builder.toCell();
     }
 
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128)
+    {
+        return Gas.AUCTION_ROOT_INITIAL_BALANCE;
+    }
 
     function upgrade(
         TvmCell newCode,

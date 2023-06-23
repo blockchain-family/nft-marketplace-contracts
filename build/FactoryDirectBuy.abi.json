@@ -16,6 +16,19 @@
 			]
 		},
 		{
+			"name": "onAcceptTokensTransfer",
+			"inputs": [
+				{"name":"tokenRoot","type":"address"},
+				{"name":"amount","type":"uint128"},
+				{"name":"sender","type":"address"},
+				{"name":"value3","type":"address"},
+				{"name":"originalGasTo","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "getGasValue",
 			"inputs": [
 			],
@@ -44,19 +57,6 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"cell"}
-			]
-		},
-		{
-			"name": "onAcceptTokensTransfer",
-			"inputs": [
-				{"name":"tokenRoot","type":"address"},
-				{"name":"amount","type":"uint128"},
-				{"name":"sender","type":"address"},
-				{"name":"value3","type":"address"},
-				{"name":"originalGasTo","type":"address"},
-				{"name":"payload","type":"cell"}
-			],
-			"outputs": [
 			]
 		},
 		{
@@ -116,6 +116,14 @@
 			]
 		},
 		{
+			"name": "setMarketFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "setMarketFeeForChildContract",
 			"inputs": [
 				{"name":"_offer","type":"address"},
@@ -130,14 +138,6 @@
 			],
 			"outputs": [
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"value0","type":"tuple"}
-			]
-		},
-		{
-			"name": "setMarketFee",
-			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
-			],
-			"outputs": [
 			]
 		},
 		{
@@ -177,6 +177,14 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "activateChildContract",
+			"inputs": [
+				{"name":"_offer","type":"address"}
+			],
+			"outputs": [
 			]
 		},
 		{

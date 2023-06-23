@@ -8,21 +8,6 @@ import "../../libraries/Gas.sol";
 
 abstract contract MarketFeeRoot is BaseRoot {
 
-    function setMarketFeeForChildContract(
-        address _offer,
-        MarketFee _fee
-    )
-        external
-        onlyOwner
-    {
-        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
-        MarketFeeOffer(_offer).setMarketFee{value: 0, flag: 64, bounce: false}(_fee, msg.sender);
-    }
-
-    function marketFee() external view returns (MarketFee) {
-        return _getMarketFee();
-    }
-
     function setMarketFee(
         MarketFee _fee
     )
@@ -33,6 +18,26 @@ abstract contract MarketFeeRoot is BaseRoot {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         _setMarketFee(_fee);
         msg.sender.transfer({ value: 0, flag: 128 + 2, bounce: false });
+    }
+
+    function setMarketFeeForChildContract(
+        address _offer,
+        MarketFee _fee
+    )
+        external
+        onlyOwner
+    {
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        MarketFeeOffer(_offer).setMarketFee{value: 0, flag: 64, bounce: false}(_fee, msg.sender);
+        emit MarketFeeChanged(_offer, _fee);
+    }
+
+    function marketFee()
+        external
+        view
+        returns (MarketFee)
+    {
+        return _getMarketFee();
     }
 
     function withdraw(

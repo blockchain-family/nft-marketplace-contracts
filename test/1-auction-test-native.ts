@@ -910,6 +910,7 @@ describe("Test Auction contract", async function () {
             expect(setFee.denominator.toString()).to.be.eq(newFee.denominator);
 
             const dBMFChanged = await auctionRoot.getEvent('MarketFeeChanged') as any;
+            console.log(dBMFChanged);
             expect(dBMFChanged.fee).to.be.not.null;
 
             startBalance2 = await balance(account2);

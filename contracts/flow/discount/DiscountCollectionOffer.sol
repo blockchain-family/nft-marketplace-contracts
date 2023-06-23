@@ -21,7 +21,11 @@ abstract contract DiscountCollectionOffer is BaseOffer {
     )
         external
     {
-        require(msg.sender.value != 0 && msg.sender == _getDiscountNft(), BaseErrors.operation_not_permited);
+        require(
+            msg.sender.value != 0 &&
+            msg.sender == _getDiscountNft(),
+            BaseErrors.operation_not_permited
+        );
         DiscountInfo discountOpt = _getDiscountOpt().get();
         if (
             _owner == _getOwner() &&

@@ -12,7 +12,18 @@
 				{"name":"json","type":"string"},
 				{"name":"indexDeployValue","type":"uint128"},
 				{"name":"indexDestroyValue","type":"uint128"},
-				{"name":"codeIndex","type":"cell"}
+				{"name":"codeIndex","type":"cell"},
+				{"components":[{"name":"numerator","type":"uint128"},{"name":"denominator","type":"uint128"},{"name":"receiver","type":"address"}],"name":"royalty","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "burn",
+			"inputs": [
+				{"name":"sendGasTo","type":"address"},
+				{"name":"callbackTo","type":"address"},
+				{"name":"callbackPayload","type":"cell"}
 			],
 			"outputs": [
 			]
@@ -26,16 +37,6 @@
 			"outputs": [
 				{"name":"receiver","type":"address"},
 				{"name":"currentRoyalty","type":"uint128"}
-			]
-		},
-		{
-			"name": "burn",
-			"inputs": [
-				{"name":"sendGasTo","type":"address"},
-				{"name":"callbackTo","type":"address"},
-				{"name":"callbackPayload","type":"cell"}
-			],
-			"outputs": [
 			]
 		},
 		{
@@ -186,6 +187,7 @@
 		{"name":"_json","type":"string"},
 		{"name":"_indexDeployValue","type":"uint128"},
 		{"name":"_indexDestroyValue","type":"uint128"},
-		{"name":"_codeIndex","type":"cell"}
+		{"name":"_codeIndex","type":"cell"},
+		{"components":[{"name":"numerator","type":"uint128"},{"name":"denominator","type":"uint128"},{"name":"receiver","type":"address"}],"name":"_royalty","type":"tuple"}
 	]
 }

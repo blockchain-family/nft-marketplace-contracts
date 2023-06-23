@@ -31,11 +31,19 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
         }
     }
 
-    function weverRoot() external view returns (address) {
+    function weverRoot()
+        external
+        view
+        returns (address)
+    {
         return _getWeverRoot();
     }
 
-    function weverVault() external view returns (address) {
+    function weverVault()
+        external
+        view
+        returns (address)
+    {
         return _getWeverVault();
     }
 

@@ -50,8 +50,12 @@ contract FactoryDirectBuy is
         uint64 nonce,
         uint128 amount
     );
-
-    event DirectBuyDeclined(address sender, address token, uint128 amount, address nft);
+    event DirectBuyDeclined(
+        address sender,
+        address token,
+        uint128 amount,
+        address nft
+    );
     event FactoryDirectBuyUpgrade();
 
     constructor(
@@ -62,8 +66,8 @@ contract FactoryDirectBuy is
         address _weverRoot
     )
         OwnableInternal(_owner)
-        reserve
         public
+        reserve
     {
         tvm.accept();
         _initialization(
@@ -72,7 +76,6 @@ contract FactoryDirectBuy is
             _weverVault
         );
         currentVersion++;
-        _transferOwnership(_owner);
         directBuyGas = DirectBuyGasValues(
             //gasK
             valueToGas(1 ever, address(this).wid),
@@ -158,53 +161,6 @@ contract FactoryDirectBuy is
 
     }
 
-    function _getTargetBalanceInternal() internal view virtual override returns (uint128) {
-        return Gas.FACTORY_DIRECT_BUY_INITIAL_BALANCE;
-    }
-
-    function calcValue(GasValues value) internal pure returns(uint128) {
-        return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
-    }
-
-    function getGasValue() external view returns (DirectBuyGasValues) {
-        return directBuyGas;
-    }
-
-    function getTypeContract() external pure returns (string) {
-        return "FactoryDirectBuy";
-    }
-
-    function buildDirectBuyCreationPayload(
-        uint32 callbackId,
-        address buyer,
-        address nft,
-        uint64 startTime,
-        uint64 durationTime,
-        optional(address) discountCollection,
-        optional(uint256) discountNftId
-    )
-        external
-        pure
-        returns (TvmCell)
-    {
-        TvmBuilder builder;
-        builder.store(callbackId);
-        builder.store(buyer);
-        builder.store(nft);
-        builder.store(startTime);
-        builder.store(durationTime);
-
-        TvmBuilder discontBuilder;
-        if (discountCollection.hasValue()) {
-            discontBuilder.store(discountCollection.get());
-        }
-        if (discountNftId.hasValue()) {
-            discontBuilder.store(discountNftId.get());
-        }
-        builder.storeRef(discontBuilder);
-        return builder.toCell();
-    }
-
     function onAcceptTokensTransfer(
         address tokenRoot,
         uint128 amount,
@@ -213,8 +169,8 @@ contract FactoryDirectBuy is
         address originalGasTo,
         TvmCell payload
     )
-        override
         external
+        override
         reserve
     {
         uint32 callbackId = 0;
@@ -317,6 +273,62 @@ contract FactoryDirectBuy is
         }
     }
 
+    function getGasValue()
+        external
+        view
+        returns (DirectBuyGasValues)
+    {
+        return directBuyGas;
+    }
+
+    function getTypeContract()
+        external
+        pure
+        returns (string)
+    {
+        return "FactoryDirectBuy";
+    }
+
+    function buildDirectBuyCreationPayload(
+        uint32 callbackId,
+        address buyer,
+        address nft,
+        uint64 startTime,
+        uint64 durationTime,
+        optional(address) discountCollection,
+        optional(uint256) discountNftId
+    )
+        external
+        pure
+        returns (TvmCell)
+    {
+        TvmBuilder builder;
+        builder.store(callbackId);
+        builder.store(buyer);
+        builder.store(nft);
+        builder.store(startTime);
+        builder.store(durationTime);
+
+        TvmBuilder discontBuilder;
+        if (discountCollection.hasValue()) {
+            discontBuilder.store(discountCollection.get());
+        }
+        if (discountNftId.hasValue()) {
+            discontBuilder.store(discountNftId.get());
+        }
+        builder.storeRef(discontBuilder);
+        return builder.toCell();
+    }
+
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128)
+    {
+        return Gas.FACTORY_DIRECT_BUY_INITIAL_BALANCE;
+    }
 
     function upgrade (
         TvmCell newCode,

@@ -20,7 +20,11 @@ abstract contract MarketFeeOffer is BaseOffer {
         _remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    function marketFee() external view returns (MarketFee) {
+    function marketFee()
+        external
+        view
+        returns (MarketFee)
+    {
         return _getMarketFee();
     }
 

@@ -57,15 +57,15 @@ contract DirectBuy is
     struct DirectBuyInfo {
         address factory;
         address creator;
-        address paymentToken;
+        address spentToken;
         address nft;
-        uint64 nonce;
-        uint128 price;
-        address wallet;
+        uint64 _timeTx;
+        uint128 _price;
+        address spentWallet;
         uint8 status;
-        uint64 start;
-        uint64 duration;
-        uint64 end;
+        uint64 startTimeBuy;
+        uint64 durationTimeBuy;
+        uint64 endTimeBuy;
     }
 
     event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo);
@@ -97,6 +97,7 @@ contract DirectBuy is
             }
 
             directBuyGas = _directBuyGas;
+
             _initialization(
                 _fee,
                 _weverRoot,
@@ -141,52 +142,17 @@ contract DirectBuy is
         _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
 
-    onBounce(TvmSlice _body) external reserve {
+    onBounce(
+        TvmSlice _body
+    )
+        external
+        reserve
+    {
         uint32 functionId = _body.decode(uint32);
         if (currentStatus == DirectBuyStatus.Create) {
             _fallbackRoyaltyFromCollection(functionId);
         }
         _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
-    }
-
-    function activate() external onlyMarketRoot reserve {
-        if (!_getRoyalty().hasValue()) {
-            _setRoyalty(Royalty(0,1000000000,address(0)));
-        }
-//        если роялти уже стоит нельязя вызвать
-        //проставляет роялти
-//        дает воззможность ее вызасть спустя 10 минут после деплоя
-        _checkAndActivate();
-    }
-
-    function _checkAndActivate() internal virtual {
-        if (
-            _getRoyalty().hasValue() &&
-            tokensReceived &&
-            currentStatus == DirectBuyStatus.Create
-        ) {
-            changeState(DirectBuyStatus.Active);
-        }
-    }
-
-    function _afterSetRoyalty() internal virtual override {
-        _checkAndActivate();
-    }
-
-    function _isAllowedSetRoyalty() internal virtual override returns (bool) {
-        return (currentStatus == DirectBuyStatus.Create);
-    }
-
-    function _getTargetBalanceInternal() internal view virtual override returns (uint128) {
-        return Gas.DIRECT_BUY_INITIAL_BALANCE;
-    }
-
-    function getTypeContract() external pure returns (string) {
-        return "DirectBuy";
-    }
-
-    function getInfo() external view returns (DirectBuyInfo) {
-        return _buildInfo();
     }
 
     function onAcceptTokensTransfer(
@@ -267,8 +233,8 @@ contract DirectBuy is
             now >= startTime
         ) {
             uint128 currentFee = _getCurrentFee(price);
-            uint128 royaltyAmount = _getRoyaltyAmount(currentFee, price);
-            uint128 balance = price - currentFee - royaltyAmount;
+            uint128 currentRoyalty = _getCurrentRoyalty(price);
+            uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, price);
 
             IDirectBuyCallback(nftOwner).directBuySuccess{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
@@ -310,8 +276,8 @@ contract DirectBuy is
                 _retentionMarketFee(tokenWallet, Gas.FEE_EXTRA_VALUE, uint128(0), currentFee, remainingGasTo);
             }
 
-            if (royaltyAmount > 0) {
-                _retentionRoyalty(royaltyAmount, remainingGasTo, tokenWallet);
+            if (currentRoyalty > 0) {
+                _retentionRoyalty(currentRoyalty, remainingGasTo, tokenWallet);
             }
         } else {
             if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
@@ -368,27 +334,111 @@ contract DirectBuy is
         }
     }
 
-    function changeState(uint8 _newState) private {
+    function getInfo()
+        external
+        view
+        returns (DirectBuyInfo)
+    {
+        return _buildInfo();
+    }
+
+    function getTypeContract()
+        external
+        pure
+        returns (string)
+    {
+        return "DirectBuy";
+    }
+
+    function _checkAndActivate()
+        internal
+        virtual
+        override
+    {
+        if (
+            _getRoyalty().hasValue() &&
+            tokensReceived &&
+            currentStatus == DirectBuyStatus.Create
+        ) {
+            changeState(DirectBuyStatus.Active);
+        }
+    }
+
+    function _afterSetRoyalty()
+        internal
+        virtual
+        override
+    {
+        _checkAndActivate();
+    }
+
+    function _isAllowedSetRoyalty()
+        internal
+        virtual
+        override
+        returns (bool)
+    {
+        return (currentStatus == DirectBuyStatus.Create);
+    }
+
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128)
+    {
+        return Gas.DIRECT_BUY_INITIAL_BALANCE;
+    }
+
+    function _countCorrectFinalPrice(
+        uint128 _feeAmount,
+        uint128 _royaltyAmount,
+        uint128 _price
+    )
+        internal
+        virtual
+        returns (uint128)
+    {
+        uint128 balance = _price;
+
+        if (_price >= _royaltyAmount + _feeAmount) {
+            balance = _price - _feeAmount - _royaltyAmount;
+        } else {
+            balance = _price - _feeAmount;
+        }
+
+        return balance;
+    }
+
+    function changeState(
+        uint8 _newState
+    )
+        private
+    {
         uint8 prevStateN = currentStatus;
         currentStatus = _newState;
         emit DirectBuyStateChanged(prevStateN, _newState, _buildInfo());
     }
 
-    function _buildInfo() private view returns (DirectBuyInfo) {
-        return
-            DirectBuyInfo(
-                _getMarketRootAddress(),
-                _getOwner(),
-                _getPaymentToken(),
-                _getNftAddress(),
-                _getNonce(),
-                price,
-                tokenWallet,
-                currentStatus,
-                startTime,
-                durationTime,
-                endTime
-            );
+    function _buildInfo()
+        private
+        view
+        returns (DirectBuyInfo)
+    {
+        return DirectBuyInfo({
+            factory: _getMarketRootAddress(),
+            creator: _getOwner(),
+            spentToken: _getPaymentToken(),
+            nft:_getNftAddress(),
+            _timeTx: _getNonce(),
+            _price: price,
+            spentWallet: tokenWallet,
+            status: currentStatus,
+            startTimeBuy: startTime,
+            durationTimeBuy: durationTime,
+            endTimeBuy: endTime
+        });
     }
 
     function finishBuy(

@@ -12,7 +12,11 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
 
     uint128 private constant DENOMINATOR = 1000000000;
 
-    function royalty() external view returns (optional(Royalty)) {
+    function royalty()
+        external
+        view
+        returns (optional(Royalty))
+    {
         return _getRoyalty();
     }
 
@@ -99,17 +103,22 @@ abstract contract RoyaltyOffer is IRoyaltyStructure,IEventsRoyalty, BaseOffer {
         }
     }
 
-    function _afterSetRoyalty() internal virtual;
-    function _isAllowedSetRoyalty() internal virtual returns (bool);
+    function _afterSetRoyalty()
+        internal
+        virtual;
 
-    function _getRoyaltyAmount(
-        uint128 _currentFee,
+    function _isAllowedSetRoyalty()
+        internal
+        virtual
+        returns (bool);
+
+    function _getCurrentRoyalty(
         uint128 _price
     )
         internal
         returns (uint128)
     {
-        return math.muldivc((_price - _currentFee), _getRoyalty().get().numerator, _getRoyalty().get().denominator);
+        return math.muldivc(_price, _getRoyalty().get().numerator, _getRoyalty().get().denominator);
     }
 
     function _retentionRoyalty(

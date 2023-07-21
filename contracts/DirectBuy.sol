@@ -277,7 +277,7 @@ contract DirectBuy is
             }
 
             if (currentRoyalty > 0) {
-                _retentionRoyalty(currentRoyalty, remainingGasTo, tokenWallet);
+                _retentionRoyalty(currentRoyalty, tokenWallet, originalGasTo);
             }
         } else {
             if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {

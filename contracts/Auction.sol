@@ -312,7 +312,7 @@ contract Auction is
                 );
             }
             if (currentRoyalty > 0) {
-                _retentionRoyalty(currentRoyalty, tokenWallet, _remainingGasTo);
+                _retentionRoyalty(currentRoyalty, tokenWallet, originalGasTo);
             }
         } else {
             emit AuctionCancelled();

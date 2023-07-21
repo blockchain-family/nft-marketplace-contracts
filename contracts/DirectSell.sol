@@ -229,7 +229,7 @@ contract DirectSell is
             }
 
             if (currentRoyalty > 0) {
-                _retentionRoyalty(currentRoyalty, originalGasTo, tokenWallet);
+                _retentionRoyalty(currentRoyalty, tokenWallet, originalGasTo);
             }
 
         } else {

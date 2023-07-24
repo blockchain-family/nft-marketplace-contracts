@@ -905,8 +905,9 @@ PUSHCONT {
 	GTINT 0
 	PUSHCONT {
 		.loc ../contracts/DirectBuy.sol, 280
-		PUSH2 S0, S5
+		DUP
 		GETGLOB 28
+		PUSH S7
 		CALLREF {
 			CALL $_retentionRoyalty_internal_macro$
 		}

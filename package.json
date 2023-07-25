@@ -16,7 +16,7 @@
     "chai": "^4.3.6",
     "everscale-standalone-client": "^2.1.14",
     "ipfs-core": "^0.14.2",
-    "locklift": "^2.4.8",
+    "locklift": "2.4.8",
     "mocha-logger": "^1.0.8",
     "ora": "^3.4.0",
     "prettier": "^2.7.1",

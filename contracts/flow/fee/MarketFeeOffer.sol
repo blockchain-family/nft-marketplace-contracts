@@ -45,6 +45,7 @@ abstract contract MarketFeeOffer is BaseOffer {
         uint128 _feeAmount,
         address _remainingGasTo
     )
+        virtual
         internal
         view
     {

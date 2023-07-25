@@ -170,7 +170,7 @@ describe("Test DirectBuy contract", async function () {
         gasValue = (await factoryDirectBuy.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
         changeManagerValue =  (calcValue(gasValue.accept, gasValue.gasK) + 200000000).toString();
-        transferValue = (calcValue(gasValue.make, gasValue.gasK) + 250000000).toString();
+        transferValue = (calcValue(gasValue.make, gasValue.gasK) + 300000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
         console.log('transferValue',transferValue);
         console.log('changeManagerValue',changeManagerValue);

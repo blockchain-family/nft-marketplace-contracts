@@ -16,8 +16,8 @@ library Gas {
     uint128 constant CHANGE_MANAGER_VALUE                   = 0.2 ever;
     uint128 constant ROYALTY_EXTRA_VALUE                    = 0.1 ever;
     uint128 constant ROYALTY_DEPLOY_WALLET_GRAMS            = 0.1 ever;
-    uint128 constant GET_INFO_VALUE                         = 0.05 ever;
-    uint128 constant GET_ROYALTY_INFO_VALUE                 = 0.1 ever;
+    uint128 constant GET_INFO_VALUE                         = 0.15 ever;
+    uint128 constant GET_ROYALTY_INFO_VALUE                 = 0.15 ever;
     uint128 constant GET_ROYALTY_INFO_EXTRA_VALUE           = 0.5 ever;
 
 

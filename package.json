@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "description": "",
   "main": "",
-  "scripts": {},
+  "scripts": {
+    "build": "npx locklift build",
+    "test": "npx locklift test --network local"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {

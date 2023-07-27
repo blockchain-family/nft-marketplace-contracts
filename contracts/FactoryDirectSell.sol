@@ -23,7 +23,7 @@ import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 import "./Nft.sol";
 import "./DirectSell.sol";
 
-import "./flow/fee/MarketFeeRoot.sol";
+import "./flow/fee/MarketBurnFeeRoot.sol";
 import "./flow/native_token/SupportNativeTokenRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
@@ -31,7 +31,7 @@ import "./flow/OffersUpgradableRoot.sol";
 contract FactoryDirectSell is
     INftChangeManager,
     ICallbackParamsStructure,
-    MarketFeeRoot,
+    MarketBurnFeeRoot,
     SupportNativeTokenRoot,
     DiscountCollectionRoot,
     OffersUpgradableRoot,

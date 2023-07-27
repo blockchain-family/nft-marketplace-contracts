@@ -1,6 +1,6 @@
 pragma ever-solidity >= 0.61.2;
 
-interface IBurnVenom {
+interface IBurnTip3 {
     
     function burn(
         address user,

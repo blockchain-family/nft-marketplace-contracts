@@ -24,7 +24,7 @@ import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 import "./flow/discount/DiscountCollectionOffer.sol";
-import "./flow/fee/MarketFeeOffer.sol";
+import "./flow/fee/MarketBurnFeeOffer.sol";
 import "./flow/native_token/SupportNativeTokenOffer.sol";
 import "./flow/RoyaltyOffer.sol";
 
@@ -37,7 +37,7 @@ contract DirectBuy is
     ICallbackParamsStructure,
     IDirectBuyGasValuesStructure,
     DiscountCollectionOffer,
-    MarketFeeOffer,
+    MarketBurnFeeOffer,
     SupportNativeTokenOffer,
     RoyaltyOffer
 {

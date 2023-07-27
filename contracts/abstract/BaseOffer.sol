@@ -28,6 +28,7 @@ abstract contract BaseOffer is
     address private collection_;
 
     MarketFee private fee_;
+    optional(MarketBurnFee) private burnFee_;
 
     address private weverRoot_;
     address private weverVault_;
@@ -192,6 +193,27 @@ abstract contract BaseOffer is
         returns (MarketFee)
     {
         return fee_;
+    }
+
+// market burn fee
+    function _setMarketBurnFee(
+        MarketBurnFee _fee
+    )
+        internal
+        virtual
+    {
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        burnFee_ = _fee;
+        emit MarketBurnFeeChanged(address(this), burnFee_);
+    }
+
+    function _getMarketBurnFee()
+        internal
+        view
+        virtual
+        returns (optional(MarketBurnFee))
+    {
+        return burnFee_;
     }
 
 // support native token

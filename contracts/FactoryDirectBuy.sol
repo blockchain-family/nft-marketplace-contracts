@@ -22,16 +22,16 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "tip3/contracts/TokenWalletPlatform.sol";
 import "./modules/access/OwnableInternal.sol";
 
-import "./flow/fee/MarketFeeRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
 import "./flow/native_token/SupportNativeTokenFDB.sol";
+import "./flow/fee/MarketBurnFeeRoot.sol";
 
 contract FactoryDirectBuy is
     BaseRoot,
     IAcceptTokensTransferCallback,
     SupportNativeTokenFDB,
-    MarketFeeRoot,
+    MarketBurnFeeRoot,
     DiscountCollectionRoot,
     OffersUpgradableRoot,
     IDirectBuyGasValuesStructure

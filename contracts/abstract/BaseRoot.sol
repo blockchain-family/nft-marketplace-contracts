@@ -5,6 +5,7 @@ import '../errors/BaseErrors.sol';
 import "../structures/IGasValueStructure.sol";
 
 import "../structures/IMarketFeeStructure.sol";
+import "../structures/IMarketBurnFeeStructure.sol";
 import "../structures/IDiscountCollectionsStructure.sol";
 import "../interfaces/IEventsCollectionsSpecialRules.sol";
 import "../modules/access/OwnableInternal.sol";
@@ -22,6 +23,8 @@ abstract contract BaseRoot is
     IEventsCollectionsSpecialRules
 {
     MarketFee private fee_;
+    optional(MarketBurnFee) private burnFee_;
+
 
     address private weverRoot_;
     address private weverVault_;
@@ -85,6 +88,27 @@ abstract contract BaseRoot is
         returns (MarketFee)
     {
         return fee_;
+    }
+
+// market burn fee
+
+    function _setMarketBurnFee(
+        MarketBurnFee _fee
+    )
+        internal
+        virtual
+    {
+        burnFee_ = _fee;
+        emit MarketBurnFeeDefaultChanged(burnFee_);
+    }
+
+    function _getMarketBurnFee()
+        internal
+        view
+        virtual
+        returns (optional(MarketBurnFee))
+    {
+        return burnFee_;
     }
 
 // support native token

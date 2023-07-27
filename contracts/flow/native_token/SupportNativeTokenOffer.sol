@@ -6,31 +6,6 @@ import "tip3/contracts/interfaces/ITokenWallet.sol";
 
 abstract contract SupportNativeTokenOffer is BaseOffer {
 
-    function onAcceptTokensBurn(
-        uint128 amount,
-        address /*walletOwner*/,
-        address /*wallet*/,
-        address user,
-        TvmCell payload
-    )
-        external
-        reserve
-    {
-        address remainingGasTo;
-        TvmSlice payloadSlice = payload.toSlice();
-        if (payloadSlice.bits() >= 267) {
-            remainingGasTo = payloadSlice.decode(address);
-        }
-        require(msg.sender.value != 0 && msg.sender == _getWeverRoot(), BaseErrors.not_wever_root);
-
-        if (user == remainingGasTo) {
-            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
-        } else {
-            user.transfer({ value: amount, flag: 1, bounce: false });
-            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
-        }
-    }
-
     function weverRoot()
         external
         view

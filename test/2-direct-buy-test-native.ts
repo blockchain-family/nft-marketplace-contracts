@@ -44,6 +44,14 @@ type MarketFee = {
     numerator: string;
     denominator: string;
 }
+
+type MarketBurnFee = {
+    numerator: string;
+    denominator: string;
+    project: Address;
+    burnRecipient: Address;
+}
+
 let fee: MarketFee;
 let factoryDirectBuyTWAddress: Address;
 let factoryDirectBuyTW: TokenWallet;

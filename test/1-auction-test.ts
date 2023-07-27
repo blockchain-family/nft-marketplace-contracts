@@ -370,7 +370,7 @@ describe("Test Auction contract", async function () {
         it('Two stake with first user rebid', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 20)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account4, auctionRoot.address, account4.address, callbacks, changeManagerValue);
@@ -398,7 +398,7 @@ describe("Test Auction contract", async function () {
             expect(rebidFirstBid.currentBid.value.toString()).to.be.eq((spentToken + 2000000000).toString());
 
             //Finish auction
-            await sleep(10000);
+            await sleep(20000);
             await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');

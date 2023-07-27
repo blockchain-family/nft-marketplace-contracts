@@ -493,6 +493,26 @@ MarketBurnFeeOffer,
         }
     }
 
+    function onAcceptTokensBurn(
+        uint128 amount,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    )
+         external
+         virtual
+         reserve
+    {
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+        require(msg.sender.value != 0 && msg.sender == _getWeverRoot(), BaseErrors.not_wever_root);
+        if (burnFee.hasValue()) {
+            _tokensBurn();
+        } else {
+            _weverBurn(amount, user, payload);
+        }
+    }
+
     function upgrade(
         TvmCell newCode,
         uint32 newVersion,

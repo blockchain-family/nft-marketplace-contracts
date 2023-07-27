@@ -3,6 +3,8 @@ pragma ever-solidity >= 0.61.2;
 import "./MarketFeeOffer.sol";
 import "../../structures/IMarketBurnFeeStructure.sol";
 import "../../interfaces/IBurnTip3.sol";
+import "../../libraries/Gas.sol";
+
 import "tip3/contracts/interfaces/IBurnableTokenWallet.sol";
 
 abstract contract MarketBurnFeeOffer is MarketFeeOffer {
@@ -58,7 +60,7 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
             );
 
             IBurnableTokenWallet(_tokenWallet).burn{
-                value: _deployWalletGrams + _extraGasValue,
+                value: Gas.TOKEN_BURN_VALUE + _extraGasValue,
                 flag: 0,
                 bounce: false
             }(
@@ -87,39 +89,34 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
 
     }
 
-    function onAcceptTokensBurn(
-        uint128 amount,
-        address /*walletOwner*/,
-        address /*wallet*/,
-        address user,
-        TvmCell payload
-    )
-         external
-         virtual
+    function _tokensBurn()
+         internal
          reserve
     {
         optional(MarketBurnFee) burnFee = _getMarketBurnFee();
-        require(msg.sender.value != 0 && msg.sender == _getWeverRoot(), BaseErrors.not_wever_root);
         if (burnFee.hasValue()) {
+            emit MarketFeeBurn(address(this), burnFee.get().burnRecipient, burnFee.get().project);
             IBurnTip3(burnFee.get().burnRecipient).burn{
                 value: 0,
                 flag: 128 + 2,
                 bounce: false
             }(_getOwner(), burnFee.get().project);
-        } else {
-            address remainingGasTo;
-            TvmSlice payloadSlice = payload.toSlice();
-            if (payloadSlice.bits() >= 267) {
-                remainingGasTo = payloadSlice.decode(address);
-            }
-
-            if (user == remainingGasTo) {
-                user.transfer({ value: 0, flag: 128 + 2, bounce: false });
-            } else {
-                user.transfer({ value: amount, flag: 1, bounce: false });
-                remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
-            }
-    }
+        }
     }
 
 }
+
+// else {
+//            address remainingGasTo;
+//            TvmSlice payloadSlice = payload.toSlice();
+//            if (payloadSlice.bits() >= 267) {
+//                remainingGasTo = payloadSlice.decode(address);
+//            }
+//
+//            if (user == remainingGasTo) {
+//                user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+//            } else {
+//                user.transfer({ value: amount, flag: 1, bounce: false });
+//                remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+//            }
+//        }

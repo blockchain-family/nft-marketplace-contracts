@@ -22,6 +22,28 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
         return _getWeverVault();
     }
 
+    function _weverBurn(
+        uint128 amount,
+        address user,
+        TvmCell payload
+    )
+        internal
+        reserve
+    {
+        address remainingGasTo;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 267) {
+            remainingGasTo = payloadSlice.decode(address);
+        }
+
+        if (user == remainingGasTo) {
+            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        } else {
+            user.transfer({ value: amount, flag: 1, bounce: false });
+            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        }
+    }
+
     function _transfer(
         address _paymentToken,
         uint128 _amount,

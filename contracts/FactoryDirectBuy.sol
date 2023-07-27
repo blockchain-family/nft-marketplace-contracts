@@ -101,6 +101,7 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
+                Gas.TOKEN_BURN_VALUE +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.GET_INFO_VALUE +
                 Gas.GET_INFO_VALUE +
@@ -119,6 +120,7 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.FACTORY_DIRECT_BUY_INITIAL_BALANCE +
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
+                Gas.TOKEN_BURN_VALUE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.FRONTENT_CALLBACK_VALUE +

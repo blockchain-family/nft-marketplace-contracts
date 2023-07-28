@@ -242,6 +242,7 @@ contract FactoryAuction is
                     price,
                     collection,
                     _getMarketFee(),
+                    _getMarketBurnFee(),
                     auctionStartTime,
                     auctionDuration,
                     auctionBidDelta,

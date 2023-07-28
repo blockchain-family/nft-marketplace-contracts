@@ -74,6 +74,7 @@ abstract contract BaseOffer is
 
     function _initialization(
         MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
         address _weverRoot,
         address _weverVault,
         optional(DiscountInfo) _discountOpt
@@ -83,6 +84,9 @@ abstract contract BaseOffer is
     {
         deployTime_ = now;
         _setMarketFee(_fee);
+        if (_burnFee.hasValue()){
+            _setMarketBurnFee(_burnFee.get());
+        }
         weverVault_ = _weverVault;
         weverRoot_ = _weverRoot;
         _setDiscountOpt(_discountOpt);

@@ -36,7 +36,7 @@ contract Auction is
     ICallbackParamsStructure,
     IAuctionGasValuesStructure,
     DiscountCollectionOffer,
-MarketBurnFeeOffer,
+    MarketBurnFeeOffer,
     SupportNativeTokenOffer,
     RoyaltyOffer
 {
@@ -89,6 +89,7 @@ MarketBurnFeeOffer,
         uint128 _price,
         address _collection,
         MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
         uint64 _auctionStartTime,
         uint64 _auctionDuration,
         uint16 _bidDelta,
@@ -119,6 +120,7 @@ MarketBurnFeeOffer,
 
             _initialization(
                 _fee,
+                _burnFee,
                 _weverRoot,
                 _weverVault,
                 _discountOpt
@@ -505,8 +507,8 @@ MarketBurnFeeOffer,
          reserve
     {
         optional(MarketBurnFee) burnFee = _getMarketBurnFee();
-        require(msg.sender.value != 0 && msg.sender == _getWeverRoot(), BaseErrors.not_wever_root);
-        if (burnFee.hasValue()) {
+        require(msg.sender.value != 0 && (msg.sender == _getWeverRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wever_root_or_payment_token);
+        if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
             _tokensBurn();
         } else {
             _weverBurn(amount, user, payload);

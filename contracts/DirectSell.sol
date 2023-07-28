@@ -75,6 +75,7 @@ MarketBurnFeeOffer,
         uint64 _durationTime,
         uint128 _price,
         MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
         address _weverVault,
         address _weverRoot,
         address _collection,
@@ -98,6 +99,7 @@ MarketBurnFeeOffer,
             price = _price;
             _initialization(
                 _fee,
+                _burnFee,
                 _weverRoot,
                 _weverVault,
                 _discountOpt
@@ -481,6 +483,26 @@ MarketBurnFeeOffer,
             wallet: tokenWallet,
             status: currentStatus
         });
+    }
+
+    function onAcceptTokensBurn(
+        uint128 amount,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    )
+         external
+         virtual
+         reserve
+    {
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+        require(msg.sender.value != 0 && (msg.sender == _getWeverRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wever_root_or_payment_token);
+        if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
+            _tokensBurn();
+        } else {
+            _weverBurn(amount, user, payload);
+        }
     }
 
     function upgrade(

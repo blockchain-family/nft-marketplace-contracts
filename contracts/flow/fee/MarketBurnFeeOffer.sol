@@ -44,7 +44,6 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
         optional(MarketBurnFee) burnFee = _getMarketBurnFee();
         if (burnFee.hasValue()) {
             uint128 burnFeeAmount = math.muldivc(_feeAmount, burnFee.get().numerator, burnFee.get().denominator);
-
             emit MarketFeeWithheld(_feeAmount - burnFeeAmount, _getPaymentToken());
             ITokenWallet(_tokenWallet).transfer{
                 value: _deployWalletGrams + _extraGasValue,
@@ -70,7 +69,6 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
                 emptyPayload
             );
          } else {
-
             emit MarketFeeWithheld(_feeAmount, _getPaymentToken());
             ITokenWallet(_tokenWallet).transfer{
                 value: _deployWalletGrams + _extraGasValue,
@@ -105,18 +103,3 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
     }
 
 }
-
-// else {
-//            address remainingGasTo;
-//            TvmSlice payloadSlice = payload.toSlice();
-//            if (payloadSlice.bits() >= 267) {
-//                remainingGasTo = payloadSlice.decode(address);
-//            }
-//
-//            if (user == remainingGasTo) {
-//                user.transfer({ value: 0, flag: 128 + 2, bounce: false });
-//            } else {
-//                user.transfer({ value: amount, flag: 1, bounce: false });
-//                remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
-//            }
-//        }

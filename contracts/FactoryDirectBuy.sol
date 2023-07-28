@@ -223,6 +223,7 @@ contract FactoryDirectBuy is
                 startTime,
                 durationTime,
                 _getMarketFee(),
+                _getMarketBurnFee(),
                 _getWeverVault(),
                 _getWeverRoot(),
                 directBuyGas,

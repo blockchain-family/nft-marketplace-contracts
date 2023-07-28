@@ -229,6 +229,7 @@ contract FactoryDirectSell is
                 durationTime,
                 price,
                 _getMarketFee(),
+                _getMarketBurnFee(),
                 _getWeverVault(),
                 _getWeverRoot(),
                 collection,

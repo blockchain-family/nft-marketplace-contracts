@@ -92,14 +92,13 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
          reserve
     {
         optional(MarketBurnFee) burnFee = _getMarketBurnFee();
-        if (burnFee.hasValue()) {
-            emit MarketFeeBurn(address(this), burnFee.get().burnRecipient, burnFee.get().project);
-            IBurnTip3(burnFee.get().burnRecipient).burn{
-                value: 0,
-                flag: 128 + 2,
-                bounce: false
-            }(_getOwner(), burnFee.get().project);
-        }
+        emit MarketFeeBurn(address(this), burnFee.get().burnRecipient, burnFee.get().project);
+        IBurnTip3(burnFee.get().burnRecipient).burn{
+            value: 0,
+            flag: 128 + 2,
+            bounce: false
+        }(_getOwner(), burnFee.get().project);
+
     }
 
 }

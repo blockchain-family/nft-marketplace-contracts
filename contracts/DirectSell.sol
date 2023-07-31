@@ -545,7 +545,8 @@ MarketBurnFeeOffer,
                 directSellGas,
                 _getDiscountOpt(),
                 _getDiscountNft(),
-                _getRoyalty()
+                _getRoyalty(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

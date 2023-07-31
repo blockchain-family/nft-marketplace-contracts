@@ -15,6 +15,7 @@ import { TokenWallet } from "./wrappers/token_wallet";
 import {Address, Contract, toNano} from "locklift";
 import {BigNumber} from "bignumber.js";
 import {FactorySource} from "../build/factorySource";
+import { DirectBuy } from "./wrappers/DirectBuy";
 
 const logger = require('mocha-logger');
 const { expect } = require('chai');
@@ -41,7 +42,17 @@ type MarketFee = {
     numerator: string;
     denominator: string;
 }
+
+type MarketBurnFee = {
+    numerator: string;
+    denominator: string;
+    project: Address;
+    burnRecipient: Address;
+}
+
+
 let fee: MarketFee;
+let burnFee: MarketBurnFee;
 let factoryDirectSellTWAddress: Address;
 let factoryDirectSellTW: TokenWallet;
 let startBalanceTWfactoryDirectSell: BigNumber;
@@ -872,6 +883,124 @@ describe("Test DirectSell contract", async function () {
 
             startBalanceTWfactoryDirectSell = startBalanceTWfactoryDirectSell.minus(new BigNumber(withdrawAmount));
             startBalanceTW2 = (new BigNumber(startBalanceTW2).plus(withdrawAmount)).toNumber();
+        });
+    });
+
+    describe("Integration with Venom Burn", async function () {
+        it('Change market fee', async function () {
+
+            burnFee = {
+                numerator: '20',
+                denominator: '100',
+                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
+                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+            } as MarketBurnFee
+
+            await factoryDirectSell.contract.methods.setMarketBurnFee({_fee: burnFee}).send({
+                    from: account1.address,
+                    amount: toNano(2)
+            });
+
+            let newFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
+            expect(burnFee.numerator).to.eql(newFee?.numerator);
+            expect(burnFee.denominator).to.eql(newFee?.denominator);
+
+        });
+        it('Change market fee with zero denominator', async function () {
+            let oldFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
+            expect(JSON.stringify(oldFee)).to.eql(JSON.stringify(burnFee));
+
+            let setFee = {
+                numerator: '20',
+                denominator: '0',
+                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
+                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+            } as MarketBurnFee
+
+            await factoryDirectSell.contract.methods.setMarketBurnFee({_fee: setFee}).send({
+                    from: account1.address,
+                    amount: toNano(2)
+            });
+            let newFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
+            expect(JSON.stringify(newFee)).to.eql(JSON.stringify(oldFee));
+        });
+        it('Change market fee not owner', async function () {
+            let oldFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
+            expect(JSON.stringify(oldFee)).to.eql(JSON.stringify(burnFee));
+
+            let setFee = {
+                numerator: '30',
+                denominator: '100',
+                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
+                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+            } as MarketBurnFee
+
+            await factoryDirectSell.contract.methods.setMarketBurnFee({_fee: setFee}).send({
+                    from: account2.address,
+                    amount: toNano(2)
+            });
+            let newFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
+            expect(JSON.stringify(newFee)).to.eql(JSON.stringify(oldFee));
+        });
+        it('Deploy limited DirectSell and success', async function () {
+            const spentToken: number = 5000000000;
+            let payload: string;
+            payload = (await factoryDirectSell.buildPayload(
+                0,
+                Math.round(Date.now() / 1000),
+                5,
+                tokenRoot,
+                spentToken,
+                account2.address,
+                discountCollection.address,
+                nftId
+            ));
+
+            let callbacks = await Callback(payload);
+
+            await nft.changeManager(account2, factoryDirectSell.address, account2.address, callbacks, changeManagerValue);
+            const dSCreate = await factoryDirectSell.getEvent('DirectSellDeployed') as any;
+            logger.log(`Address DirectSell ${dSCreate.directSell.toString()}`);
+
+            directSell = await DirectSell.from_addr(dSCreate.directSell, account2);
+            const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
+            expect(dSActive.to.toString()).to.be.eq('2');
+
+            let discountFee = (await directSell.contract.methods.marketFee().call()).value0;
+            expect(discountInfo.numerator).to.be.eq(discountFee.numerator);
+            expect(discountInfo.denominator).to.be.eq(discountFee.denominator);
+
+            await tokenWallet3.transfer(spentToken, directSell.address, 0, true, '', transferValue);
+            const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
+            expect(dSFilled.to.toString()).to.be.eq('3');
+
+            const ownerChanged = await nft.getEvent('OwnerChanged') as any;
+            expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
+
+            const managerChanged = await nft.getEvent('ManagerChanged') as any;
+            expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
+
+            let owner = (await nft.getInfo()).owner
+            expect(owner.toString()).to.be.eq(account3.address.toString());
+
+            let currentFee = new BigNumber(spentToken).div(discountInfo.denominator).times(discountInfo.numerator);
+            let currentBurnFee = new BigNumber(currentFee).div(burnFee.denominator).times(burnFee.numerator);
+
+            const expectedAccountBalance = new BigNumber(startBalanceTW2).plus(spentToken).minus(currentFee);
+            const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
+            const expectedTWFactoryDSBalance = startBalanceTWfactoryDirectSell.plus(currentFee);
+            expect(factoryDSTokenWalletBalance.toString()).to.be.eq(expectedTWFactoryDSBalance.minus(currentBurnFee).toString());
+
+            const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq(expectedAccountBalance.toString());
+
+            const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+            expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
+
+            startBalanceTW2 = startBalanceTW2 + spentToken - currentFee.toNumber();
+            startBalanceTW3 -= spentToken;
+            startBalanceTWfactoryDirectSell = startBalanceTWfactoryDirectSell.plus(currentFee).minus(currentBurnFee);
+
         });
     });
 });

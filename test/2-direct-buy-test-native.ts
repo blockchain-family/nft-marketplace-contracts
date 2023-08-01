@@ -413,7 +413,7 @@ describe("Test DirectBuy contract", async function () {
             const manager = (await nft.getInfo()).manager;
             expect(manager.toString()).to.be.eq((account2.address).toString());
 
-            await sleep(3000);
+            await sleep(6000);
             const {traceTree} = await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
             // console.log("balanceChangeInfo");

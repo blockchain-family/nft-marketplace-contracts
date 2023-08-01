@@ -25,9 +25,9 @@ import './Nft.sol';
 import './Auction.sol';
 
 import "./flow/native_token/SupportNativeTokenRoot.sol";
-import "./flow/fee/MarketFeeRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
+import "./flow/fee/MarketBurnFeeRoot.sol";
 
 
 contract FactoryAuction is
@@ -35,7 +35,7 @@ contract FactoryAuction is
     ICallbackParamsStructure,
     IAuctionGasValuesStructure,
     SupportNativeTokenRoot,
-    MarketFeeRoot,
+    MarketBurnFeeRoot,
     DiscountCollectionRoot,
     OffersUpgradableRoot
 {

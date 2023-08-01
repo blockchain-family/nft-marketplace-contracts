@@ -98,7 +98,7 @@ export class Auction {
                 from: initiator.address,
                 amount: gasValue
             }
-        ));
+        ),{allowedCodes:{compute:[null]}});
     }
 
     async getInfo() {

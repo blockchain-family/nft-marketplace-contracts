@@ -238,7 +238,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(3000);
+            await sleep(6000);
             const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -292,7 +292,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(eventAuctionDeployed.offer, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await sleep(3000);
+            await sleep(6000);
             const {traceTree} = await auction.finishAuction(account3, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -515,7 +515,7 @@ describe("Test Auction contract", async function () {
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
-            await sleep(3000);
+            await sleep(6000);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -549,7 +549,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await sleep(3000);
+            await sleep(6000);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -600,7 +600,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(3000);
+            await sleep(6000);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -634,7 +634,7 @@ describe("Test Auction contract", async function () {
 
             startBalance1 = await balance(account1);
 
-            await sleep(3000);
+            await sleep(6000);
             const {traceTree} = await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', transferValue);
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent).to.be.not.null;

@@ -887,7 +887,7 @@ describe("Test DirectSell contract", async function () {
     });
 
     describe("Integration with Venom Burn", async function () {
-        it('Change market fee', async function () {
+        it('Change market burn fee', async function () {
 
             burnFee = {
                 numerator: '20',
@@ -906,7 +906,7 @@ describe("Test DirectSell contract", async function () {
             expect(burnFee.denominator).to.eql(newFee?.denominator);
 
         });
-        it('Change market fee with zero denominator', async function () {
+        it('Change market burn fee with zero denominator', async function () {
             let oldFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
             expect(JSON.stringify(oldFee)).to.eql(JSON.stringify(burnFee));
 
@@ -924,7 +924,7 @@ describe("Test DirectSell contract", async function () {
             let newFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
             expect(JSON.stringify(newFee)).to.eql(JSON.stringify(oldFee));
         });
-        it('Change market fee not owner', async function () {
+        it('Change market burn fee not owner', async function () {
             let oldFee = (await factoryDirectSell.contract.methods.marketBurnFee().call()).value0;
             expect(JSON.stringify(oldFee)).to.eql(JSON.stringify(burnFee));
 

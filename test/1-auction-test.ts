@@ -849,7 +849,8 @@ describe("Test Auction contract", async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
-            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
+             console.log((await nft.getInfo()).manager);
+             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed');
 
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account2) as any;

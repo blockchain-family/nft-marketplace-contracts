@@ -361,7 +361,8 @@ contract FactoryDirectBuy is
                 _getWeverVault(),
                 _getWeverRoot(),
                 directBuyGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
             
             tvm.setcode(newCode);

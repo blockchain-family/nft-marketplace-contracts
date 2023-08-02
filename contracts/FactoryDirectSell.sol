@@ -381,7 +381,8 @@ contract FactoryDirectSell is
                 _getWeverVault(),
                 _getWeverRoot(),
                 directSellGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

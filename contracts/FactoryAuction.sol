@@ -397,7 +397,8 @@ contract FactoryAuction is
                 _getWeverVault(),
                 _getWeverRoot(),
                 auctionGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

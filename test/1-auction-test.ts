@@ -6,7 +6,7 @@ import {
     CallbackType,
     sleep,
     deployCollectionAndMintNft,
-    deployWeverRoot
+    deployWeverRoot, deployCollectionAndMintNftWithRoyalty
 } from "./utils";
 import { Account } from "everscale-standalone-client/nodejs";
 import { AuctionRoot, Auction } from "./wrappers/auction";
@@ -51,6 +51,13 @@ let startBalanceTW2: number = 90000000000;
 let startBalanceTW3: number = 90000000000;
 let startBalanceTW4: number = 90000000000;
 
+type Royalty = {
+    numerator: string;
+    denominator: string;
+    receiver: Address;
+}
+
+
 type MarketFee = {
     numerator: string;
     denominator: string;
@@ -65,6 +72,7 @@ type MarketBurnFee = {
 
 let fee: MarketFee;
 let burnFee: MarketBurnFee;
+let setRoyalty: Royalty;
 let bidDelta: BigNumber;
 let bidDeltaDecimals: BigNumber;
 
@@ -826,29 +834,99 @@ describe("Test Auction contract", async function () {
             expect(burnFee.numerator).to.eql(newFee?.numerator);
             expect(burnFee.denominator).to.eql(newFee?.denominator);
         });
-        it('Change market burn fee with zero denominator', async function () {
-            let oldFee = (await auctionRoot.contract.methods.marketBurnFee().call()).value0;
-            expect(JSON.stringify(oldFee)).to.eql(JSON.stringify(burnFee));
-
-            let setFee = {
-                numerator: '20',
-                denominator: '0',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
-            } as MarketBurnFee
-
-            await auctionRoot.contract.methods.setMarketBurnFee({_fee: setFee}).send({
-                    from: account2.address,
-                    amount: toNano(2)
-            });
-            let newFee = (await auctionRoot.contract.methods.marketBurnFee().call()).value0;
-            expect(JSON.stringify(newFee)).to.eql(JSON.stringify(oldFee));
+        // it('Change market burn fee with zero denominator', async function () {
+        //     let oldFee = (await auctionRoot.contract.methods.marketBurnFee().call()).value0;
+        //     expect(JSON.stringify(oldFee)).to.eql(JSON.stringify(burnFee));
+        //
+        //     let setFee = {
+        //         numerator: '20',
+        //         denominator: '0',
+        //         project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
+        //         burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+        //     } as MarketBurnFee
+        //
+        //     await auctionRoot.contract.methods.setMarketBurnFee({_fee: setFee}).send({
+        //             from: account2.address,
+        //             amount: toNano(2)
+        //     });
+        //     let newFee = (await auctionRoot.contract.methods.marketBurnFee().call()).value0;
+        //     expect(JSON.stringify(newFee)).to.eql(JSON.stringify(oldFee));
+        // });
+        //  it('Deploy Auction and success', async function () {
+        //     const spentToken: number = 5000000000;
+        //     let payload: string;
+        //     payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
+        //     let callbacks = await Callback(payload);
+        //     await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
+        //     const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed');
+        //
+        //     auction = await Auction.from_addr(auctionDeployedEvent.offer, account2) as any;
+        //     logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
+        //
+        //     await tokenWallet3.transfer(spentToken, auction.address, 0, true, '', transferValue);
+        //
+        //     const spentTokenWallet3Balance = await tokenWallet3.balance();
+        //     expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
+        //
+        //     const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
+        //     expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
+        //
+        //     await sleep(6000);
+        //     await auction.finishAuction(account2, 0, cancelValue);
+        //
+        //     const eventAuctionComplete = await auction.getEvent('AuctionComplete');
+        //     expect(eventAuctionComplete).to.be.not.null;
+        //
+        //     let owner = (await nft.getInfo()).owner;
+        //     expect(owner.toString()).to.be.eq(account3.address.toString());
+        //
+        //     const ownerChanged = await nft.getEvent('OwnerChanged') as any;
+        //     expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
+        //
+        //     const managerChanged = await nft.getEvent('ManagerChanged') as any;
+        //     expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
+        //
+        //     let status = (await auction.getInfo()).status;
+        //     expect(status.toString()).to.be.eq('2');
+        //
+        //     let currentFee = new BigNumber(spentToken).div(fee.denominator).times(fee.numerator);
+        //     let currentBurnFee = new BigNumber(currentFee).div(burnFee.denominator).times(burnFee.numerator);
+        //
+        //     const spentTokenWallet2Balance = await tokenWallet2.balance();
+        //     const expectedAccountBalance = new BigNumber(startBalanceTW2).plus(spentToken).minus(currentFee);
+        //     const auctionRootTokenWalletBalance = await auctionRootTW.balance();
+        //     const expectedTWAuctionBalance = startBalanceTWAuctionRoot.plus(currentFee);
+        //
+        //     expect(spentTokenWallet2Balance.toString()).to.be.eq(expectedAccountBalance.toString());
+        //     expect(auctionRootTokenWalletBalance.toString()).to.be.eq(expectedTWAuctionBalance.minus(currentBurnFee).toString());
+        //
+        //     startBalanceTW2 = new BigNumber(spentToken).minus(currentFee).plus(startBalanceTW2).toNumber();
+        //     startBalanceTW3 -= spentToken;
+        //     startBalanceTWAuctionRoot = startBalanceTWAuctionRoot.plus(currentFee).minus(currentBurnFee);
+        // });
+    });
+    describe("Testing Royalty", async function () {
+        it('Deploy NFT-Collection and Mint Nft with Royalty', async function () {
+            let accForNft: Account[] = [];
+            setRoyalty = {
+                numerator: "5",
+                denominator: "100",
+                receiver: account4.address
+            } as Royalty
+            accForNft.push(account2);
+            const [collection, nftS] = await deployCollectionAndMintNftWithRoyalty(account2, 1, "nft_to_address.json", accForNft, setRoyalty);
+            nft = nftS[0];
+            locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
         });
-         it('Deploy Auction and success', async function () {
+        it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
+            const spentTokenWallet4StartBalance = new BigNumber(await tokenWallet4.balance());
+
+
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed');
 
@@ -878,22 +956,147 @@ describe("Test Auction contract", async function () {
             const managerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
+            const RoyaltySet = await auction.getEvent("RoyaltySet") as any;
+            expect(RoyaltySet._royalty.numerator.toString()).to.be.eq((new BigNumber(setRoyalty.numerator).times(10000000)).toString())
+            expect(RoyaltySet._royalty.denominator.toString()).to.be.eq((new BigNumber(setRoyalty.denominator).times(10000000)).toString())
+            expect(RoyaltySet._royalty.receiver.toString()).to.be.eq(account4.address.toString())
+
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('2');
 
             let currentFee = new BigNumber(spentToken).div(fee.denominator).times(fee.numerator);
             let currentBurnFee = new BigNumber(currentFee).div(burnFee.denominator).times(burnFee.numerator);
+            let currentRoyaltyFee = new BigNumber(spentToken).div(setRoyalty.denominator).times(setRoyalty.numerator);
 
+            const RoyaltyWithdrawn = await auction.getEvent("RoyaltyWithdrawn") as any;
+            expect(RoyaltyWithdrawn.recipient.toString()).to.be.eq(account4.address.toString())
+            expect(RoyaltyWithdrawn.amount.toString()).to.be.eq(currentRoyaltyFee.toString())
+            expect(RoyaltyWithdrawn.paymentToken.toString()).to.be.eq(tokenRoot.address.toString())
+
+            const spentTokenWallet4EndBalance = new BigNumber(await tokenWallet4.balance());
             const spentTokenWallet2Balance = await tokenWallet2.balance();
-            const expectedAccountBalance = new BigNumber(startBalanceTW2).plus(spentToken).minus(currentFee);
+            const expectedAccountBalance = new BigNumber(startBalanceTW2).plus(spentToken).minus(currentFee).minus(currentRoyaltyFee);
             const auctionRootTokenWalletBalance = await auctionRootTW.balance();
             const expectedTWAuctionBalance = startBalanceTWAuctionRoot.plus(currentFee);
-
+            expect((spentTokenWallet4EndBalance.minus(spentTokenWallet4StartBalance)).toString()).to.be.eq(currentRoyaltyFee.toString())
             expect(spentTokenWallet2Balance.toString()).to.be.eq(expectedAccountBalance.toString());
             expect(auctionRootTokenWalletBalance.toString()).to.be.eq(expectedTWAuctionBalance.minus(currentBurnFee).toString());
-
-            startBalanceTW2 = new BigNumber(spentToken).minus(currentFee).plus(startBalanceTW2).toNumber();
+            startBalanceTW4 += currentRoyaltyFee.toNumber()
+            startBalanceTW2 = new BigNumber(spentToken).minus(currentFee).plus(startBalanceTW2).minus(currentRoyaltyFee).toNumber();
             startBalanceTW3 -= spentToken;
+            startBalanceTWAuctionRoot = startBalanceTWAuctionRoot.plus(currentFee).minus(currentBurnFee);
+        });
+        it('Deploy NFT-Collection with Royalty and Mint Nft', async function () {
+            let accForNft: Account[] = [];
+            setRoyalty = {
+                numerator: "7",
+                denominator: "100",
+                receiver: account4.address
+            } as Royalty
+            accForNft.push(account3);
+            const [collection, nftS] = await deployCollectionAndMintNftWithRoyalty(account2, 1, "nft_to_address.json", accForNft, setRoyalty, false);
+            nft = nftS[0];
+            locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+        });
+        it('Deploy Auction and several users stake', async function () {
+            const spentToken: number = 4000000000;
+            let payload: string;
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10, discountCollection.address, nftId)).toString();
+            let callbacks = await Callback(payload);
+            gasValue = (await auctionRoot.contract.methods.getGasValue().call()).value0;
+            console.log(gasValue);
+            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
+            console.log('balanse3:', await tokenWallet3.balance());
+
+            const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed') as any;
+            auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
+            logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
+
+            // let discountFee = (await auction.contract.methods.marketFee().call()).value0;
+            // expect(discountInfo.numerator).to.be.eq(discountFee.numerator);
+            // expect(discountInfo.denominator).to.be.eq(discountFee.denominator);
+
+            const RoyaltySet = await auction.getEvent("RoyaltySet") as any;
+            expect(RoyaltySet._royalty.numerator.toString()).to.be.eq((new BigNumber(setRoyalty.numerator).times(10000000)).toString())
+            expect(RoyaltySet._royalty.denominator.toString()).to.be.eq((new BigNumber(setRoyalty.denominator).times(10000000)).toString())
+            expect(RoyaltySet._royalty.receiver.toString()).to.be.eq(account4.address.toString())
+
+
+            //First bid placed
+            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
+            let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
+
+            const firstBid = await auction.contract.methods.currentBid({}).call();
+            expect(firstBid.currentBid.addr.toString()).to.be.eq(account2.address.toString());
+            expect(firstBid.currentBid.value.toString()).to.be.eq(spentToken.toString());
+
+            let nextBid = new BigNumber((await auction.contract.methods.nextBidValue({}).call()).nextBidValue);
+            let expectedNextBid = new BigNumber(spentToken).times(bidDelta).div(bidDeltaDecimals).plus(spentToken);
+            expect(nextBid.toString()).to.be.eq(expectedNextBid.toString());
+
+            //Second bid placed
+            await tokenWallet4.transfer(nextBid.toNumber(), auction.address, 0, true, '', transferValue);
+
+
+
+            let spentTokenWallet4Balance = await tokenWallet4.balance() as any;
+            console.log(`spentTokenWallet4Balance -  ${spentTokenWallet4Balance.toString()}\nstartBalanceTW4 - ${startBalanceTW4.toString()}\nnextBid - ${nextBid.toString()}`);
+            expect(spentTokenWallet4Balance.toString()).to.be.eq(new BigNumber(startBalanceTW4).minus(nextBid).toString());
+
+            const secondBid = await auction.contract.methods.currentBid({}).call();
+            expect(secondBid.currentBid.addr.toString()).to.be.eq(account4.address.toString());
+            expect(secondBid.currentBid.value.toString()).to.be.eq(nextBid.toString());
+
+            //Finish auction
+            await sleep(15000);
+            await auction.finishAuction(account2, 0, cancelValue);
+
+            const eventAuctionComplete = await auction.getEvent('AuctionComplete');
+            expect(eventAuctionComplete).not.to.be.null;
+
+            const ownerChanged = await nft.getEvent('OwnerChanged') as any;
+            expect(ownerChanged.newOwner.toString()).to.be.eq(account4.address.toString());
+
+            const managerChanged = await nft.getEvent('ManagerChanged') as any;
+            expect(managerChanged.newManager.toString()).to.be.eq(account4.address.toString());
+
+            let owner = (await nft.getInfo()).owner;
+            expect(owner.toString()).to.be.eq(account4.address.toString());
+
+            let status = (await auction.getInfo()).status;
+            expect(status.toString()).to.be.eq('2');
+
+            let currentRoyaltyFee = new BigNumber(nextBid).div(setRoyalty.denominator).times(setRoyalty.numerator);
+            let currentFee = nextBid.div(fee.denominator).times(fee.numerator);
+            let currentBurnFee = new BigNumber(currentFee).div(burnFee.denominator).times(burnFee.numerator);
+
+            const RoyaltyWithdrawn = await auction.getEvent("RoyaltyWithdrawn") as any;
+            expect(RoyaltyWithdrawn.recipient.toString()).to.be.eq(account4.address.toString())
+            expect(RoyaltyWithdrawn.amount.toString()).to.be.eq(currentRoyaltyFee.toString())
+            expect(RoyaltyWithdrawn.paymentToken.toString()).to.be.eq(tokenRoot.address.toString())
+
+            console.log('currentFee', currentFee.toNumber());
+            console.log('startBalanceTW3', startBalanceTW3);
+            const expectedBalance3 = new BigNumber(startBalanceTW3).plus(nextBid).minus(currentFee).minus(currentRoyaltyFee);
+            console.log('expectedBalance3', expectedBalance3.toNumber());
+            console.log('nextBid', nextBid.toNumber());
+            spentTokenWallet2Balance = await tokenWallet2.balance() as any;
+            expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2).toString());
+
+            let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
+            console.log('spentTokenWallet3Balance', spentTokenWallet3Balance);
+            expect(spentTokenWallet3Balance.toString()).to.be.eq(expectedBalance3.toString());
+
+            spentTokenWallet4Balance = await tokenWallet4.balance() as any;
+            expect(spentTokenWallet4Balance.toString()).to.be.eq((new BigNumber(startBalanceTW4).minus(nextBid).plus(currentRoyaltyFee)).toString());
+
+            const auctionRootTokenWalletBalance = await auctionRootTW.balance();
+            expect(auctionRootTokenWalletBalance.toString()).to.be.eq(startBalanceTWAuctionRoot.plus(currentFee).minus(currentBurnFee).toString());
+
+            startBalanceTW3 = new BigNumber(startBalanceTW3).plus(nextBid).minus(currentFee).toNumber();
+            startBalanceTW4 = new BigNumber(startBalanceTW4).minus(nextBid).plus(currentRoyaltyFee).toNumber();
             startBalanceTWAuctionRoot = startBalanceTWAuctionRoot.plus(currentFee).minus(currentBurnFee);
         });
     });

@@ -208,7 +208,7 @@ abstract contract BaseOffer is
     {
         require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
         burnFee_ = _fee;
-        emit MarketBurnFeeChanged(address(this), burnFee_);
+        emit MarketBurnFeeChanged(address(this), _fee);
     }
 
     function _getMarketBurnFee()

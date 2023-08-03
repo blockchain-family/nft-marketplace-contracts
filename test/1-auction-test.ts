@@ -29,6 +29,7 @@ let account1: Account;
 let account2: Account;
 let account3: Account;
 let account4: Account;
+let account5: Account;
 
 let nft: NftC;
 
@@ -124,6 +125,7 @@ describe("Test Auction contract", async function () {
         account2 = await deployAccount(1, 30);
         account3 = await deployAccount(2, 60);
         account4 = await deployAccount(3, 20);
+        account5 = await deployAccount(4, 10);
     });
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: Account[] = [];
@@ -821,8 +823,8 @@ describe("Test Auction contract", async function () {
             burnFee = {
                 numerator: '20',
                 denominator: '100',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: auctionRoot.address,
+                burnRecipient: account5.address,
             } as MarketBurnFee
 
             await auctionRoot.contract.methods.setMarketBurnFee({_fee: burnFee}).send({
@@ -841,8 +843,8 @@ describe("Test Auction contract", async function () {
             let setFee = {
                 numerator: '20',
                 denominator: '0',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: auctionRoot.address,
+                burnRecipient: account5.address,
             } as MarketBurnFee
 
             await auctionRoot.contract.methods.setMarketBurnFee({_fee: setFee}).send({
@@ -857,7 +859,8 @@ describe("Test Auction contract", async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
-            await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
+             console.log((await nft.getInfo()).manager);
+             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed');
 
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account2) as any;

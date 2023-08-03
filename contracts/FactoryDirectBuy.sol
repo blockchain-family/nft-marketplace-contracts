@@ -101,7 +101,6 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.GET_INFO_VALUE +
                 Gas.GET_INFO_VALUE +
@@ -120,7 +119,6 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.FACTORY_DIRECT_BUY_INITIAL_BALANCE +
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.FRONTENT_CALLBACK_VALUE +
@@ -142,6 +140,7 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.TOKEN_BURN_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE +
                 Gas.FEE_EXTRA_VALUE +
@@ -154,6 +153,7 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.TOKEN_BURN_VALUE +
                 Gas.TOKEN_TRANSFER_VALUE,
                 //dynamic
                 valueToGas(Gas.CANCEL_OFFER_EXTRA_GAS_VALUE, address(this).wid)
@@ -361,7 +361,8 @@ contract FactoryDirectBuy is
                 _getWeverVault(),
                 _getWeverRoot(),
                 directBuyGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
             
             tvm.setcode(newCode);

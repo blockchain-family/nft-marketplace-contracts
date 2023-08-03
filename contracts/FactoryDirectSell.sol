@@ -96,7 +96,6 @@ contract FactoryDirectSell is
             GasValues(
                 // fixed
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.GET_INFO_VALUE +
@@ -116,7 +115,6 @@ contract FactoryDirectSell is
                 // fixed
                 Gas.FACTORY_DIRECT_SELL_INITIAL_BALANCE +
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.DEPLOY_EMPTY_WALLET_GRAMS +
                 Gas.DEPLOY_WALLET_ROOT_COMPENSATION +
                 Gas.FRONTENT_CALLBACK_VALUE +
@@ -153,6 +151,7 @@ contract FactoryDirectSell is
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
+                Gas.TOKEN_BURN_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE,
                 //dynamic
                 valueToGas(Gas.CANCEL_EXTRA_GAS_VALUE, address(this).wid)
@@ -381,7 +380,8 @@ contract FactoryDirectSell is
                 _getWeverVault(),
                 _getWeverRoot(),
                 directSellGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

@@ -68,7 +68,7 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
                 address(this),
                 emptyPayload
             );
-         } else {
+        } else {
             emit MarketFeeWithheld(_feeAmount, _getPaymentToken());
             ITokenWallet(_tokenWallet).transfer{
                 value: _deployWalletGrams + _extraGasValue,

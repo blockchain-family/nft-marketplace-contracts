@@ -22,6 +22,7 @@ const { expect } = require('chai');
 let account1: Account;
 let account2: Account;
 let account3: Account;
+let account4: Account;
 
 let nft: NftC;
 
@@ -98,6 +99,8 @@ describe("Test DirectBuy contract", async function () {
         account1 = await deployAccount(0, 30);
         account2 = await deployAccount(1, 60);
         account3 = await deployAccount(2, 60);
+        account4 = await deployAccount(3, 10);
+
     });
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: Account[] = [];
@@ -729,8 +732,8 @@ describe("Test DirectBuy contract", async function () {
             let burnFee = {
                 numerator: '10',
                 denominator: '100',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectBuy.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
             const spentToken: number = 5000000000;
             let payload: string;
@@ -771,8 +774,8 @@ describe("Test DirectBuy contract", async function () {
             let setFee = {
                 numerator: '10',
                 denominator: '0',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectBuy.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
             let oldFee = (await directBuy.contract.methods.marketBurnFee().call()).value0;
 
@@ -794,8 +797,8 @@ describe("Test DirectBuy contract", async function () {
             let setFee = {
                 numerator: '20',
                 denominator: '100',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectBuy.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
             let oldFee = (await directBuy.contract.methods.marketBurnFee().call()).value0;
 
@@ -818,8 +821,8 @@ describe("Test DirectBuy contract", async function () {
             let setFee = {
                 numerator: '20',
                 denominator: '100',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectBuy.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
 
             burnFee = setFee;

@@ -148,6 +148,7 @@ contract FactoryAuction is
                 Gas.AUCTION_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.TOKEN_BURN_VALUE +
                 Gas.TOKEN_TRANSFER_VALUE,
                 //dynamic
                 valueToGas(Gas.BID_EXTRA_GAS_VALUE, address(this).wid)
@@ -397,7 +398,8 @@ contract FactoryAuction is
                 _getWeverVault(),
                 _getWeverRoot(),
                 auctionGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

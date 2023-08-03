@@ -23,6 +23,8 @@ const { expect } = require('chai');
 let account1: Account;
 let account2: Account;
 let account3: Account;
+let account4: Account;
+
 
 let nft: NftC;
 
@@ -103,6 +105,8 @@ describe("Test DirectSell contract", async function () {
         account1 = await deployAccount(0, 30);
         account2 = await deployAccount(1, 30);
         account3 = await deployAccount(2, 30);
+        account4 = await deployAccount(3, 10);
+
     });
     it('Deploy NFT-Collection and Mint Nft', async function () {
         let accForNft: Account[] = [];
@@ -892,8 +896,8 @@ describe("Test DirectSell contract", async function () {
             burnFee = {
                 numerator: '20',
                 denominator: '100',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectSell.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
 
             await factoryDirectSell.contract.methods.setMarketBurnFee({_fee: burnFee}).send({
@@ -913,8 +917,8 @@ describe("Test DirectSell contract", async function () {
             let setFee = {
                 numerator: '20',
                 denominator: '0',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectSell.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
 
             await factoryDirectSell.contract.methods.setMarketBurnFee({_fee: setFee}).send({
@@ -931,8 +935,8 @@ describe("Test DirectSell contract", async function () {
             let setFee = {
                 numerator: '30',
                 denominator: '100',
-                project: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81"),
-                burnRecipient: new Address("0:5b2d0dbcbe5caad0d4dc0bad049ea8d1565ae935ed4adc38b32758b7cdf33e81")
+                project: factoryDirectSell.address,
+                burnRecipient: account4.address
             } as MarketBurnFee
 
             await factoryDirectSell.contract.methods.setMarketBurnFee({_fee: setFee}).send({

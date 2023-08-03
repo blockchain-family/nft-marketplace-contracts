@@ -38,7 +38,7 @@ contract DirectSell is
     ICallbackParamsStructure,
     IGasValueStructure,
     DiscountCollectionOffer,
-MarketBurnFeeOffer,
+    MarketBurnFeeOffer,
     SupportNativeTokenOffer,
     RoyaltyOffer
 {
@@ -496,8 +496,9 @@ MarketBurnFeeOffer,
          virtual
          reserve
     {
-        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
         require(msg.sender.value != 0 && (msg.sender == _getWeverRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wever_root_or_payment_token);
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+
         if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
             _tokensBurn();
         } else {

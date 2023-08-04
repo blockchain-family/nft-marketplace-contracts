@@ -99,7 +99,7 @@ abstract contract BaseRoot is
         virtual
     {
         burnFee_ = _fee;
-        emit MarketBurnFeeDefaultChanged(burnFee_);
+        emit MarketBurnFeeDefaultChanged(_fee);
     }
 
     function _getMarketBurnFee()

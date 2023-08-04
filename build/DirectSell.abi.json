@@ -10,6 +10,7 @@
 				{"name":"_durationTime","type":"uint64"},
 				{"name":"_price","type":"uint128"},
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"_burnFee","type":"optional(tuple)"},
 				{"name":"_weverVault","type":"address"},
 				{"name":"_weverRoot","type":"address"},
 				{"name":"_collection","type":"address"},
@@ -84,6 +85,18 @@
 			]
 		},
 		{
+			"name": "onAcceptTokensBurn",
+			"inputs": [
+				{"name":"amount","type":"uint128"},
+				{"name":"value1","type":"address"},
+				{"name":"value2","type":"address"},
+				{"name":"user","type":"address"},
+				{"name":"payload","type":"cell"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "upgrade",
 			"inputs": [
 				{"name":"newCode","type":"cell"},
@@ -131,18 +144,6 @@
 			]
 		},
 		{
-			"name": "onAcceptTokensBurn",
-			"inputs": [
-				{"name":"amount","type":"uint128"},
-				{"name":"value1","type":"address"},
-				{"name":"value2","type":"address"},
-				{"name":"user","type":"address"},
-				{"name":"payload","type":"cell"}
-			],
-			"outputs": [
-			]
-		},
-		{
 			"name": "weverRoot",
 			"inputs": [
 			],
@@ -156,6 +157,23 @@
 			],
 			"outputs": [
 				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "setMarketBurnFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"_fee","type":"tuple"},
+				{"name":"_remainingGasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "marketBurnFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"value0","type":"optional(tuple)"}
 			]
 		},
 		{
@@ -256,10 +274,29 @@
 			]
 		},
 		{
+			"name": "MarketBurnFeeChanged",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "MarketFeeWithheld",
 			"inputs": [
 				{"name":"amount","type":"uint128"},
 				{"name":"tokenRoot","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "MarketFeeBurn",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"name":"burnRecipient","type":"address"},
+				{"name":"project","type":"address"}
 			],
 			"outputs": [
 			]
@@ -276,6 +313,7 @@
 		{"name":"nonce_","type":"uint64"},
 		{"name":"collection_","type":"address"},
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee_","type":"tuple"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"burnFee_","type":"optional(tuple)"},
 		{"name":"weverRoot_","type":"address"},
 		{"name":"weverVault_","type":"address"},
 		{"components":[{"name":"collection","type":"address"},{"name":"nftId","type":"uint256"},{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"feeInfo","type":"tuple"}],"name":"discountOpt_","type":"optional(tuple)"},

@@ -102,7 +102,7 @@ function calcValue(gas: GasValue, gasK: string){
 
 describe("Test DirectSell contract", async function () {
     it('Deploy account', async function () {
-        account1 = await deployAccount(0, 30);
+        account1 = await deployAccount(0, 50);
         account2 = await deployAccount(1, 30);
         account3 = await deployAccount(2, 30);
         account4 = await deployAccount(3, 10);
@@ -806,7 +806,7 @@ describe("Test DirectSell contract", async function () {
     });
     describe("Withdraw", async function () {
         it('Trying withdraw not owner', async function () {
-            const withdrawAmount = 1000000000;
+            const withdrawAmount = 100000000;
 
             await factoryDirectSell.withdraw(
                 factoryDirectSellTW.address,
@@ -822,8 +822,9 @@ describe("Test DirectSell contract", async function () {
             expect(spentTokenWallet2Balance.toString()).to.be.eq(startBalanceTW2.toString());
         });
         it('Trying withdraw part of token', async function () {
-            const withdrawAmount = 1000000000;
+            const withdrawAmount = 100000000;
             const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
+            console.log(factoryDSTokenWalletBalance);
             expect(factoryDSTokenWalletBalance.toString()).to.be.eq(startBalanceTWfactoryDirectSell.toString());
             let spentTokenWallet2Balance = await tokenWallet2.balance();
             expect(spentTokenWallet2Balance.toString()).to.be.eq(startBalanceTW2.toString());
@@ -845,7 +846,7 @@ describe("Test DirectSell contract", async function () {
             startBalanceTW2 = startBalanceTW2 + withdrawAmount;
         });
         it('Trying withdraw more then have', async function () {
-            const withdrawAmount = 2200000000;
+            const withdrawAmount = 3300000000;
             const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
             expect(factoryDSTokenWalletBalance.toString()).to.be.eq(startBalanceTWfactoryDirectSell.toString());
             let spentTokenWallet2Balance = await tokenWallet2.balance();
@@ -881,6 +882,7 @@ describe("Test DirectSell contract", async function () {
             );
 
             const factoryDSTokenWalletBalance2 = await factoryDirectSellTW.balance();
+            console.log(factoryDSTokenWalletBalance2);
             expect(factoryDSTokenWalletBalance2.toString()).to.be.eq((0).toString());
             let spentTokenWallet2Balance1 = await tokenWallet2.balance();
             expect(spentTokenWallet2Balance1.toString()).to.be.eq((new BigNumber(startBalanceTW2).plus(withdrawAmount)).toString());
@@ -1004,7 +1006,6 @@ describe("Test DirectSell contract", async function () {
             startBalanceTW2 = startBalanceTW2 + spentToken - currentFee.toNumber();
             startBalanceTW3 -= spentToken;
             startBalanceTWfactoryDirectSell = startBalanceTWfactoryDirectSell.plus(currentFee).minus(currentBurnFee);
-
         });
     });
 });

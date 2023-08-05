@@ -137,7 +137,6 @@ contract FactoryDirectSell is
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.FEE_DEPLOY_WALLET_GRAMS +
                 Gas.FEE_EXTRA_VALUE +
                 Gas.TOKEN_TRANSFER_VALUE +
@@ -151,7 +150,6 @@ contract FactoryDirectSell is
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE,
                 //dynamic
                 valueToGas(Gas.CANCEL_EXTRA_GAS_VALUE, address(this).wid)

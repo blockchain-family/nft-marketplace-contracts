@@ -134,6 +134,31 @@
 			]
 		},
 		{
+			"name": "setMarketBurnFee",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setMarketBurnFeeForChildContract",
+			"inputs": [
+				{"name":"_offer","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"_fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "marketBurnFee",
+			"inputs": [
+			],
+			"outputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"value0","type":"optional(tuple)"}
+			]
+		},
+		{
 			"name": "setMarketFee",
 			"inputs": [
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"_fee","type":"tuple"}
@@ -262,10 +287,27 @@
 			]
 		},
 		{
+			"name": "MarketBurnFeeDefaultChanged",
+			"inputs": [
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"fee","type":"optional(tuple)"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "MarketFeeChanged",
 			"inputs": [
 				{"name":"auction","type":"address"},
 				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee","type":"tuple"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "MarketBurnFeeChanged",
+			"inputs": [
+				{"name":"auction","type":"address"},
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"fee","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -296,6 +338,7 @@
 		{"name":"_constructorFlag","type":"bool"},
 		{"name":"owner_","type":"address"},
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee_","type":"tuple"},
+		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"burnFee_","type":"optional(tuple)"},
 		{"name":"weverRoot_","type":"address"},
 		{"name":"weverVault_","type":"address"},
 		{"name":"offerCode_","type":"cell"},

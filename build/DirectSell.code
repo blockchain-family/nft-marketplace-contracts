@@ -22,6 +22,23 @@ PUSHCONT {
 	ROTREV
 	PAIR
 	SWAP
+	LDI 1
+	SWAP
+	NULLSWAPIFNOT
+	PUSHCONT {
+		LDREFRTOS
+		LDU 32
+		LDU 32
+		LDMSGADDR
+		LDREF
+		ENDS
+		CTOS
+		LDMSGADDR
+		ENDS
+		TUPLE 4
+	}
+	IF
+	SWAP
 	LDMSGADDR
 	LDREF
 	ENDS
@@ -101,6 +118,23 @@ PUSHCONT {
 	LDU 32
 	ROTREV
 	PAIR
+	SWAP
+	LDI 1
+	SWAP
+	NULLSWAPIFNOT
+	PUSHCONT {
+		LDREFRTOS
+		LDU 32
+		LDU 32
+		LDMSGADDR
+		LDREF
+		ENDS
+		CTOS
+		LDMSGADDR
+		ENDS
+		TUPLE 4
+	}
+	IF
 	SWAP
 	LDMSGADDR
 	LDREF
@@ -176,13 +210,13 @@ PUSHCONT {
 IFELSE
 SWAP
 ENDS
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 87
+.loc ../contracts/DirectSell.sol, 88
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -214,41 +248,41 @@ PUSHCONT {
 }
 IF
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 92
-	PUSH S8
-	SETGLOB 24
 	.loc ../contracts/DirectSell.sol, 93
-	PUSH S7
+	PUSH S9
 	SETGLOB 25
 	.loc ../contracts/DirectSell.sol, 94
-	OVER
-	SETGLOB 23
+	PUSH S8
+	SETGLOB 26
 	.loc ../contracts/DirectSell.sol, 95
-	GETGLOB 24
-	GTINT 0
+	OVER
+	SETGLOB 24
+	.loc ../contracts/DirectSell.sol, 96
 	GETGLOB 25
+	GTINT 0
+	GETGLOB 26
 	GTINT 0
 	AND
 	PUSHCONT {
-		.loc ../contracts/DirectSell.sol, 96
-		GETGLOB 24
+		.loc ../contracts/DirectSell.sol, 97
 		GETGLOB 25
+		GETGLOB 26
 		ADD
 		UFITS 64
-		SETGLOB 26
+		SETGLOB 27
 		.loc ../contracts/DirectSell.sol, 0
 	}
 	IF
-	.loc ../contracts/DirectSell.sol, 98
-	PUSH S6
-	SETGLOB 27
 	.loc ../contracts/DirectSell.sol, 99
-	PUSH3 S5, S3, S4
-	PUSH S3
+	PUSH S7
+	SETGLOB 28
+	.loc ../contracts/DirectSell.sol, 100
+	BLKPUSH 2, 6
+	PUSH3 S5, S6, S2
 	CALLREF {
 		CALL $_initialization_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 105
+	.loc ../contracts/DirectSell.sol, 107
 	CALLREF {
 		CALL $_getDiscountOpt_internal_macro$
 	}
@@ -256,13 +290,13 @@ PUSHCONT {
 	IFNOTREF {
 		CALL $_discountAvailabilityCheck_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 108
+	.loc ../contracts/DirectSell.sol, 110
 	PUSH S2
 	CALLREF {
 		CALL $_setCollection_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 109
-	GETGLOB 23
+	.loc ../contracts/DirectSell.sol, 111
+	GETGLOB 24
 	THIRD
 	CALLREF {
 		CALL $calcValue_internal_macro$
@@ -270,17 +304,17 @@ PUSHCONT {
 	CALLREF {
 		CALL $_checkRoyaltyFromNFT_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 110
-	GETGLOB 30
+	.loc ../contracts/DirectSell.sol, 112
+	GETGLOB 31
 	INC
 	UFITS 32
-	SETGLOB 30
-	.loc ../contracts/DirectSell.sol, 111
+	SETGLOB 31
+	.loc ../contracts/DirectSell.sol, 113
 	PUSHINT 0
 	CALLREF {
 		CALL $_changeState_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 113
+	.loc ../contracts/DirectSell.sol, 115
 	PUSHINT 120000000
 	MYADDR
 	CALLREF {
@@ -302,7 +336,7 @@ PUSHCONT {
 	PUSHPOW2 7
 }
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 119
+	.loc ../contracts/DirectSell.sol, 121
 	GETGLOB 9
 	NEWC
 	STSLICECONST x42_
@@ -315,7 +349,7 @@ PUSHCONT {
 IFELSE
 SENDRAWMSG
 .loc ../contracts/DirectSell.sol, 0
-BLKDROP 9
+BLKDROP 10
 .loc ../contracts/abstract/BaseOffer.sol, 0
 CALLREF {
 	CALL $c7_to_c4$
@@ -331,7 +365,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectSell.sol, 123
+.loc ../contracts/DirectSell.sol, 125
 OVER
 PUSHCONT {
 	LDREF
@@ -352,7 +386,7 @@ CALLREF {
 THROW 0
 
 .macro onTokenWallet_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 66
+.loc ../contracts/abstract/BaseOffer.sol, 67
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -369,25 +403,25 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 108
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 130
+.loc ../contracts/DirectSell.sol, 132
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
 PLDU 256
 THROWIFNOT 108
-.loc ../contracts/DirectSell.sol, 131
-SETGLOB 28
-.loc ../contracts/DirectSell.sol, 132
+.loc ../contracts/DirectSell.sol, 133
+SETGLOB 29
+.loc ../contracts/DirectSell.sol, 134
 CALLREF {
 	CALL $_checkAndActivate_internal_macro$
 }
-.loc ../contracts/DirectSell.sol, 133
+.loc ../contracts/DirectSell.sol, 135
 CALLREF {
 	CALL $_getOwner_internal_macro$
 }
@@ -409,18 +443,18 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 142
+.loc ../contracts/DirectSell.sol, 144
 PLDU 32
-.loc ../contracts/DirectSell.sol, 143
-GETGLOB 29
+.loc ../contracts/DirectSell.sol, 145
+GETGLOB 30
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 144
+	.loc ../contracts/DirectSell.sol, 146
 	DUP
 	CALLREF {
 		CALL $_fallbackRoyaltyFromCollection_internal_macro$
@@ -428,7 +462,7 @@ PUSHCONT {
 	.loc ../contracts/DirectSell.sol, 0
 }
 IFNOT
-.loc ../contracts/DirectSell.sol, 146
+.loc ../contracts/DirectSell.sol, 148
 DROP
 CALLREF {
 	CALL $_getOwner_internal_macro$
@@ -455,7 +489,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectSell.sol, 149
+.loc ../contracts/DirectSell.sol, 151
 OVER
 PUSHCONT {
 	LDREF
@@ -490,25 +524,25 @@ CALLREF {
 THROW 0
 
 .macro onAcceptTokensTransfer_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 161
-PUSHINT 0
-.loc ../contracts/DirectSell.sol, 162
-ROLL 4
 .loc ../contracts/DirectSell.sol, 163
+PUSHINT 0
+.loc ../contracts/DirectSell.sol, 164
+ROLL 4
+.loc ../contracts/DirectSell.sol, 165
 ROT
 CTOS
-.loc ../contracts/DirectSell.sol, 164
+.loc ../contracts/DirectSell.sol, 166
 DUP
 SBITS
 GTINT 31
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 165
+	.loc ../contracts/DirectSell.sol, 167
 	DUP
 	LDU 32
 	POP S2
@@ -516,32 +550,32 @@ PUSHCONT {
 	.loc ../contracts/DirectSell.sol, 0
 }
 IF
-.loc ../contracts/DirectSell.sol, 167
+.loc ../contracts/DirectSell.sol, 169
 DUP
 SBITS
 PUSHINT 267
 GEQ
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 168
+	.loc ../contracts/DirectSell.sol, 170
 	LDMSGADDR
 	BLKDROP2 1, 2
 	.loc ../contracts/DirectSell.sol, 0
 }
 IF
-.loc ../contracts/DirectSell.sol, 170
+.loc ../contracts/DirectSell.sol, 172
 DROP
 PUSHREF {
 }
-.loc ../contracts/DirectSell.sol, 171
+.loc ../contracts/DirectSell.sol, 173
 NEWDICT
-.loc ../contracts/DirectSell.sol, 172
+.loc ../contracts/DirectSell.sol, 174
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
 PLDU 256
 NEQINT 0
 GETGLOB 9
-GETGLOB 28
+GETGLOB 29
 SDEQ
 AND
 DUP
@@ -550,28 +584,28 @@ PUSHCONT {
 	DEPTH
 	ADDCONST -2
 	PICK
-	GETGLOB 23
+	GETGLOB 24
 	INDEX 5
 	CALLREF {
 		CALL $calcValue_internal_macro$
 	}
 	GEQ
-	GETGLOB 29
+	GETGLOB 30
 	EQINT 2
 	PUSH S8
-	GETGLOB 27
+	GETGLOB 28
 	GEQ
-	GETGLOB 26
+	GETGLOB 27
 	GTINT 0
 	NOW
-	GETGLOB 26
+	GETGLOB 27
 	LESS
 	AND
-	GETGLOB 26
+	GETGLOB 27
 	EQINT 0
 	OR
 	NOW
-	GETGLOB 24
+	GETGLOB 25
 	GEQ
 	AND
 	AND
@@ -580,7 +614,7 @@ PUSHCONT {
 }
 IF
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 181
+	.loc ../contracts/DirectSell.sol, 183
 	CALLREF {
 		CALL $_getNftAddress_internal_macro$
 	}
@@ -614,28 +648,28 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/DirectSell.sol, 192
-	GETGLOB 27
+	.loc ../contracts/DirectSell.sol, 194
+	GETGLOB 28
 	CALLREF {
 		CALL $_getCurrentFee_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 193
-	GETGLOB 27
+	.loc ../contracts/DirectSell.sol, 195
+	GETGLOB 28
 	CALLREF {
 		CALL $_getCurrentRoyalty_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 194
+	.loc ../contracts/DirectSell.sol, 196
 	DUP2
-	GETGLOB 27
+	GETGLOB 28
 	CALLREF {
 		CALL $_countCorrectFinalPrice_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 196
+	.loc ../contracts/DirectSell.sol, 198
 	PUSHINT 3
 	CALLREF {
 		CALL $_changeState_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 197
+	.loc ../contracts/DirectSell.sol, 199
 	PUSHINT 10000000
 	PUSH S5
 	PAIR
@@ -652,7 +686,7 @@ PUSHCONT {
 	PUSHINT 267
 	DICTSETB
 	POP S4
-	.loc ../contracts/DirectSell.sol, 199
+	.loc ../contracts/DirectSell.sol, 201
 	PUSH3 S3, S7, S5
 	CALLREF {
 		CALL $_getNftAddress_internal_macro$
@@ -678,7 +712,7 @@ PUSHCONT {
 	ENDC
 	PUSHPOW2 7
 	SENDRAWMSG
-	.loc ../contracts/DirectSell.sol, 209
+	.loc ../contracts/DirectSell.sol, 211
 	CALLREF {
 		CALL $_getPaymentToken_internal_macro$
 	}
@@ -687,7 +721,7 @@ PUSHCONT {
 		CALL $_getOwner_internal_macro$
 	}
 	PUSH S9
-	GETGLOB 28
+	GETGLOB 29
 	PUSHINT 300000000
 	PUSHINT 1
 	PUSHINT 120000000
@@ -695,12 +729,12 @@ PUSHCONT {
 	CALLREF {
 		CALL $_transfer_internal_macro$
 	}
-	.loc ../contracts/DirectSell.sol, 221
+	.loc ../contracts/DirectSell.sol, 223
 	OVER
 	GTINT 0
 	PUSHCONT {
-		.loc ../contracts/DirectSell.sol, 222
-		GETGLOB 28
+		.loc ../contracts/DirectSell.sol, 224
+		GETGLOB 29
 		PUSHINT 100000000
 		PUSH3 S0, S3, S8
 		CALLREF {
@@ -709,13 +743,13 @@ PUSHCONT {
 		.loc ../contracts/DirectSell.sol, 0
 	}
 	IF
-	.loc ../contracts/DirectSell.sol, 231
+	.loc ../contracts/DirectSell.sol, 233
 	DUP
 	GTINT 0
 	PUSHCONT {
-		.loc ../contracts/DirectSell.sol, 232
+		.loc ../contracts/DirectSell.sol, 234
 		DUP
-		GETGLOB 28
+		GETGLOB 29
 		PUSH S8
 		CALLREF {
 			CALL $_retentionRoyalty_internal_macro$
@@ -727,18 +761,18 @@ PUSHCONT {
 	DROP2
 }
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 236
-	GETGLOB 26
+	.loc ../contracts/DirectSell.sol, 238
+	GETGLOB 27
 	GTINT 0
 	NOW
-	GETGLOB 26
+	GETGLOB 27
 	GEQ
-	GETGLOB 29
+	GETGLOB 30
 	EQINT 2
 	AND
 	AND
 	PUSHCONT {
-		.loc ../contracts/DirectSell.sol, 237
+		.loc ../contracts/DirectSell.sol, 239
 		CALLREF {
 			CALL $_getNftAddress_internal_macro$
 		}
@@ -760,12 +794,12 @@ PUSHCONT {
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/DirectSell.sol, 246
+		.loc ../contracts/DirectSell.sol, 248
 		PUSHINT 5
 		CALLREF {
 			CALL $_changeState_internal_macro$
 		}
-		.loc ../contracts/DirectSell.sol, 248
+		.loc ../contracts/DirectSell.sol, 250
 		CALLREF {
 			CALL $_getPaymentToken_internal_macro$
 		}
@@ -778,7 +812,7 @@ PUSHCONT {
 		CALLREF {
 			CALL $_transfer_internal_macro$
 		}
-		.loc ../contracts/DirectSell.sol, 260
+		.loc ../contracts/DirectSell.sol, 262
 		PUSHINT 10000000
 		PUSH S2
 		PAIR
@@ -797,7 +831,7 @@ PUSHCONT {
 		ROTREV
 		PUSHINT 267
 		DICTSETB
-		.loc ../contracts/DirectSell.sol, 262
+		.loc ../contracts/DirectSell.sol, 264
 		PUSH2 S0, S4
 		CALLREF {
 			CALL $_getOwner_internal_macro$
@@ -828,7 +862,7 @@ PUSHCONT {
 		SENDRAWMSG
 	}
 	PUSHCONT {
-		.loc ../contracts/DirectSell.sol, 272
+		.loc ../contracts/DirectSell.sol, 274
 		CALLREF {
 			CALL $_getNftAddress_internal_macro$
 		}
@@ -850,7 +884,7 @@ PUSHCONT {
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/DirectSell.sol, 280
+		.loc ../contracts/DirectSell.sol, 282
 		CALLREF {
 			CALL $_getPaymentToken_internal_macro$
 		}
@@ -880,7 +914,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectSell.sol, 295
+.loc ../contracts/DirectSell.sol, 297
 LDU 32
 ENDS
 .loc ../contracts/DirectSell.sol, 0
@@ -894,7 +928,7 @@ CALLREF {
 THROW 0
 
 .macro closeSell_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 48
+.loc ../contracts/abstract/BaseOffer.sol, 49
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -911,28 +945,28 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 100
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 302
-GETGLOB 29
+.loc ../contracts/DirectSell.sol, 304
+GETGLOB 30
 EQINT 2
 THROWIFNOT 303
-.loc ../contracts/DirectSell.sol, 303
+.loc ../contracts/DirectSell.sol, 305
 DEPTH
 ADDCONST -2
 PICK
-GETGLOB 23
+GETGLOB 24
 INDEX 6
 CALLREF {
 	CALL $calcValue_internal_macro$
 }
 GEQ
 THROWIFNOT 104
-.loc ../contracts/DirectSell.sol, 305
+.loc ../contracts/DirectSell.sol, 307
 CALLREF {
 	CALL $_getNftAddress_internal_macro$
 }
@@ -957,12 +991,12 @@ STBREFR
 ENDC
 PUSHINT 1
 SENDRAWMSG
-.loc ../contracts/DirectSell.sol, 313
+.loc ../contracts/DirectSell.sol, 315
 PUSHINT 4
 CALLREF {
 	CALL $_changeState_internal_macro$
 }
-.loc ../contracts/DirectSell.sol, 317
+.loc ../contracts/DirectSell.sol, 319
 PUSHINT 10000000
 PUSHREF {
 }
@@ -982,7 +1016,7 @@ CALLREF {
 ROTREV
 PUSHINT 267
 DICTSETB
-.loc ../contracts/DirectSell.sol, 319
+.loc ../contracts/DirectSell.sol, 321
 CALLREF {
 	CALL $_getOwner_internal_macro$
 }
@@ -1024,7 +1058,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectSell.sol, 330
+.loc ../contracts/DirectSell.sol, 332
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
@@ -1086,7 +1120,7 @@ IFREF {
 THROW 0
 
 .macro getInfo_internal_macro
-.loc ../contracts/DirectSell.sol, 335
+.loc ../contracts/DirectSell.sol, 337
 CALL $_buildInfo_internal_macro$
 .loc ../contracts/DirectSell.sol, 0
 
@@ -1094,7 +1128,7 @@ CALL $_buildInfo_internal_macro$
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/DirectSell.sol, 338
+.loc ../contracts/DirectSell.sol, 340
 ENDS
 .loc ../contracts/DirectSell.sol, 0
 CALLREF {
@@ -1128,7 +1162,7 @@ IFREF {
 THROW 0
 
 .macro getTypeContract_internal_macro
-.loc ../contracts/DirectSell.sol, 343
+.loc ../contracts/DirectSell.sol, 345
 PUSHREF {
 	.blob x44697265637453656c6c
 }
@@ -1138,7 +1172,7 @@ PUSHREF {
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/DirectSell.sol, 346
+.loc ../contracts/DirectSell.sol, 348
 OVER
 PUSHCONT {
 	LDU 32
@@ -1184,13 +1218,13 @@ IFREF {
 THROW 0
 
 .macro buildBuyPayload_internal_macro
-.loc ../contracts/DirectSell.sol, 355
+.loc ../contracts/DirectSell.sol, 357
 SWAP
 NEWC
 STU 32
-.loc ../contracts/DirectSell.sol, 356
+.loc ../contracts/DirectSell.sol, 358
 STSLICE
-.loc ../contracts/DirectSell.sol, 357
+.loc ../contracts/DirectSell.sol, 359
 ENDC
 .loc ../contracts/DirectSell.sol, 0
 
@@ -1203,7 +1237,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectSell.sol, 360
+.loc ../contracts/DirectSell.sol, 362
 OVER
 PUSHCONT {
 	LDREF
@@ -1229,33 +1263,33 @@ THROW 0
 CALL $finishSell_internal_macro$
 
 .macro finishSell_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 367
-GETGLOB 29
+.loc ../contracts/DirectSell.sol, 369
+GETGLOB 30
 EQINT 2
 THROWIFNOT 303
-.loc ../contracts/DirectSell.sol, 368
+.loc ../contracts/DirectSell.sol, 370
 NOW
-GETGLOB 26
+GETGLOB 27
 GEQ
 THROWIFNOT 304
-.loc ../contracts/DirectSell.sol, 369
+.loc ../contracts/DirectSell.sol, 371
 DEPTH
 ADDCONST -2
 PICK
-GETGLOB 23
+GETGLOB 24
 INDEX 6
 CALLREF {
 	CALL $calcValue_internal_macro$
 }
 GEQ
 THROWIFNOT 104
-.loc ../contracts/DirectSell.sol, 371
+.loc ../contracts/DirectSell.sol, 373
 CALLREF {
 	CALL $_getNftAddress_internal_macro$
 }
@@ -1278,12 +1312,12 @@ STBREFR
 ENDC
 PUSHINT 1
 SENDRAWMSG
-.loc ../contracts/DirectSell.sol, 379
+.loc ../contracts/DirectSell.sol, 381
 PUSHINT 5
 CALLREF {
 	CALL $_changeState_internal_macro$
 }
-.loc ../contracts/DirectSell.sol, 384
+.loc ../contracts/DirectSell.sol, 386
 PUSHINT 10000000
 PUSHREF {
 }
@@ -1303,7 +1337,7 @@ CALLREF {
 ROTREV
 PUSHINT 267
 DICTSETB
-.loc ../contracts/DirectSell.sol, 386
+.loc ../contracts/DirectSell.sol, 388
 SWAP
 CALLREF {
 	CALL $_getOwner_internal_macro$
@@ -1339,22 +1373,22 @@ SENDRAWMSG
 CALL $_countCorrectFinalPrice_internal_macro$
 
 .macro _countCorrectFinalPrice_internal_macro
-.loc ../contracts/DirectSell.sol, 406
+.loc ../contracts/DirectSell.sol, 408
 PUSH3 S0, S0, S1
-.loc ../contracts/DirectSell.sol, 407
+.loc ../contracts/DirectSell.sol, 409
 PUSH S5
 ADD
 UFITS 128
 GEQ
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 408
+	.loc ../contracts/DirectSell.sol, 410
 	PUSH2 S1, S3
 	SUB
 	UFITS 128
 	PUSH S3
 }
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 410
+	.loc ../contracts/DirectSell.sol, 412
 	PUSH2 S1, S3
 }
 IFELSE
@@ -1368,7 +1402,7 @@ BLKDROP2 4, 1
 CALL $_checkAndActivate_internal_macro$
 
 .macro _checkAndActivate_internal_macro
-.loc ../contracts/DirectSell.sol, 420
+.loc ../contracts/DirectSell.sol, 422
 CALLREF {
 	CALL $_getRoyalty_internal_macro$
 }
@@ -1377,18 +1411,18 @@ NOT
 DUP
 PUSHCONT {
 	DROP
-	GETGLOB 28
+	GETGLOB 29
 	PARSEMSGADDR
 	INDEX 3
 	PLDU 256
 	NEQINT 0
-	GETGLOB 29
+	GETGLOB 30
 	EQINT 0
 	AND
 }
 IF
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 425
+	.loc ../contracts/DirectSell.sol, 427
 	PUSHINT 2
 	CALLREF {
 		CALL $_changeState_internal_macro$
@@ -1403,7 +1437,7 @@ IF
 CALL $_afterSetRoyalty_internal_macro$
 
 .macro _afterSetRoyalty_internal_macro
-.loc ../contracts/DirectSell.sol, 434
+.loc ../contracts/DirectSell.sol, 436
 CALL $_checkAndActivate_internal_macro$
 .loc ../contracts/DirectSell.sol, 0
 
@@ -1412,8 +1446,8 @@ CALL $_checkAndActivate_internal_macro$
 CALL $_isAllowedSetRoyalty_internal_macro$
 
 .macro _isAllowedSetRoyalty_internal_macro
-.loc ../contracts/DirectSell.sol, 443
-GETGLOB 29
+.loc ../contracts/DirectSell.sol, 445
+GETGLOB 30
 EQINT 0
 .loc ../contracts/DirectSell.sol, 0
 
@@ -1422,7 +1456,7 @@ EQINT 0
 CALL $_getTargetBalanceInternal_internal_macro$
 
 .macro _getTargetBalanceInternal_internal_macro
-.loc ../contracts/DirectSell.sol, 453
+.loc ../contracts/DirectSell.sol, 455
 PUSHINT 150000000
 .loc ../contracts/DirectSell.sol, 0
 
@@ -1431,12 +1465,12 @@ PUSHINT 150000000
 CALL $_changeState_internal_macro$
 
 .macro _changeState_internal_macro
-.loc ../contracts/DirectSell.sol, 462
-GETGLOB 29
-.loc ../contracts/DirectSell.sol, 463
-OVER
-SETGLOB 29
 .loc ../contracts/DirectSell.sol, 464
+GETGLOB 30
+.loc ../contracts/DirectSell.sol, 465
+OVER
+SETGLOB 30
+.loc ../contracts/DirectSell.sol, 466
 CALLREF {
 	CALL $_buildInfo_internal_macro$
 }
@@ -1485,7 +1519,7 @@ SENDRAWMSG
 CALL $_buildInfo_internal_macro$
 
 .macro _buildInfo_internal_macro
-.loc ../contracts/DirectSell.sol, 472
+.loc ../contracts/DirectSell.sol, 474
 CALLREF {
 	CALL $_getMarketRootAddress_internal_macro$
 }
@@ -1501,12 +1535,116 @@ CALLREF {
 CALLREF {
 	CALL $_getNonce_internal_macro$
 }
-GETGLOB 24
-GETGLOB 26
+GETGLOB 25
 GETGLOB 27
 GETGLOB 28
 GETGLOB 29
+GETGLOB 30
 TUPLE 10
+.loc ../contracts/DirectSell.sol, 0
+
+.macro onAcceptTokensBurn
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/DirectSell.sol, 488
+OVER
+PUSHCONT {
+	LDREF
+	ENDS
+	CTOS
+}
+IF
+LDU 128
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+LDREF
+ENDS
+.loc ../contracts/DirectSell.sol, 0
+CALLREF {
+	CALL $onAcceptTokensBurn_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro onAcceptTokensBurn_internal_macro
+.loc ../contracts/abstract/BaseOffer.sol, 44
+CALLREF {
+	CALL $_getTargetBalanceInternal_internal_macro$
+}
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/DirectSell.sol, 499
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+DUP
+PUSHCONT {
+	DROP
+	GETGLOB 9
+	CALLREF {
+		CALL $_getWeverRoot_internal_macro$
+	}
+	SDEQ
+	DUP
+	PUSHCONT {
+		DROP
+		GETGLOB 9
+		CALLREF {
+			CALL $_getPaymentToken_internal_macro$
+		}
+		SDEQ
+	}
+	IFNOT
+}
+IF
+THROWIFNOT 117
+.loc ../contracts/DirectSell.sol, 500
+CALLREF {
+	CALL $_getMarketBurnFee_internal_macro$
+}
+.loc ../contracts/DirectSell.sol, 502
+ISNULL
+NOT
+DUP
+PUSHCONT {
+	DROP
+	GETGLOB 9
+	CALLREF {
+		CALL $_getPaymentToken_internal_macro$
+	}
+	SDEQ
+}
+IF
+PUSHCONT {
+	.loc ../contracts/DirectSell.sol, 505
+	PUSH3 S4, S1, S0
+	CALLREF {
+		CALL $_weverBurn_internal_macro$
+	}
+	.loc ../contracts/DirectSell.sol, 0
+}
+IFREFELSE {
+	CALL $_tokensBurn_internal_macro$
+}
+BLKDROP 5
 .loc ../contracts/DirectSell.sol, 0
 
 .macro upgrade
@@ -1518,7 +1656,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/DirectSell.sol, 486
+.loc ../contracts/DirectSell.sol, 509
 OVER
 PUSHCONT {
 	LDREF
@@ -1545,7 +1683,7 @@ CALLREF {
 THROW 0
 
 .macro upgrade_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 57
+.loc ../contracts/abstract/BaseOffer.sol, 58
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -1562,24 +1700,24 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 115
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/DirectSell.sol, 496
+.loc ../contracts/DirectSell.sol, 519
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
 PLDU 256
 THROWIFNOT 108
-.loc ../contracts/DirectSell.sol, 497
-GETGLOB 30
+.loc ../contracts/DirectSell.sol, 520
+GETGLOB 31
 ROT
 EQUAL
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 498
+	.loc ../contracts/DirectSell.sol, 521
 	DUP
 	NEWC
 	STSLICECONST x42_
@@ -1591,13 +1729,16 @@ PUSHCONT {
 	SENDRAWMSG
 }
 PUSHCONT {
-	.loc ../contracts/DirectSell.sol, 504
+	.loc ../contracts/DirectSell.sol, 527
 	PUSHREF {
 		.blob xc000000000000000000000000051834c10
 	}
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/DirectSell.sol, 506
+	.loc ../contracts/DirectSell.sol, 529
+	CALLREF {
+		CALL $_getMarketBurnFee_internal_macro$
+	}
 	CALLREF {
 		CALL $_getRoyalty_internal_macro$
 	}
@@ -1607,7 +1748,7 @@ PUSHCONT {
 	CALLREF {
 		CALL $_getDiscountOpt_internal_macro$
 	}
-	GETGLOB 23
+	GETGLOB 24
 	CALLREF {
 		CALL $_getWeverRoot_internal_macro$
 	}
@@ -1617,13 +1758,13 @@ PUSHCONT {
 	CALLREF {
 		CALL $_getMarketFee_internal_macro$
 	}
+	GETGLOB 31
 	GETGLOB 30
 	GETGLOB 29
 	GETGLOB 28
 	GETGLOB 27
 	GETGLOB 26
 	GETGLOB 25
-	GETGLOB 24
 	CALLREF {
 		CALL $_getCollection_internal_macro$
 	}
@@ -1644,6 +1785,10 @@ PUSHCONT {
 	}
 	NEWC
 	STSLICE
+	PUSHINT 20
+	ROLLREVX
+	NEWC
+	STSLICE
 	PUSHINT 19
 	ROLLREVX
 	NEWC
@@ -1652,19 +1797,15 @@ PUSHCONT {
 	ROLLREVX
 	NEWC
 	STSLICE
-	PUSHINT 17
-	ROLLREVX
-	NEWC
-	STSLICE
 	STU 64
-	ROLLREV 15
+	ROLLREV 16
 	NEWC
 	STSLICE
 	STU 64
 	STU 64
 	STU 64
 	STU 128
-	ROLLREV 10
+	ROLLREV 11
 	NEWC
 	STSLICE
 	STU 8
@@ -1674,10 +1815,10 @@ PUSHCONT {
 	XCHG S2
 	STU 32
 	STU 32
-	ROLLREV 6
+	ROLLREV 7
 	NEWC
 	STSLICE
-	ROLLREV 5
+	ROLLREV 6
 	NEWC
 	STSLICE
 	SWAP
@@ -1692,7 +1833,7 @@ PUSHCONT {
 	SWAP
 	UNPAIR
 	XCHG S2
-	ROLLREV 9
+	ROLLREV 10
 	NEWC
 	STU 128
 	STU 128
@@ -1710,7 +1851,7 @@ PUSHCONT {
 	UNPAIR
 	XCHG S2
 	STU 128
-	ROLLREV 5
+	ROLLREV 6
 	NEWC
 	STU 128
 	SWAP
@@ -1759,8 +1900,9 @@ PUSHCONT {
 		STSLICE
 	}
 	IFELSE
+	ROTREV
 	NEWC
-	ROT
+	SWAP
 	DUP
 	ISNULL
 	PUSHCONT {
@@ -1778,6 +1920,30 @@ PUSHCONT {
 		STSLICE
 	}
 	IFELSE
+	SWAP
+	DUP
+	ISNULL
+	PUSHCONT {
+		DROP
+		STSLICECONST 0
+	}
+	PUSHCONT {
+		CALLREF {
+			UNTUPLE 4
+			REVERSE 4, 0
+			NEWC
+			STU 32
+			STU 32
+			STSLICE
+			SWAP
+			NEWC
+			STSLICE
+			STBREFR
+		}
+		STBREFR
+		STSLICECONST 1
+	}
+	IFELSE
 	STBREFR
 	STBREFR
 	STBREFR
@@ -1789,10 +1955,10 @@ PUSHCONT {
 	STBREFR
 	STBREFR
 	ENDC
-	.loc ../contracts/DirectSell.sol, 529
+	.loc ../contracts/DirectSell.sol, 553
 	PUSH S2
 	SETCODE
-	.loc ../contracts/DirectSell.sol, 530
+	.loc ../contracts/DirectSell.sol, 554
 	PUSH S2
 	CTOS
 	DUP
@@ -1807,7 +1973,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/DirectSell.sol, 532
+	.loc ../contracts/DirectSell.sol, 556
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}
@@ -2328,124 +2494,6 @@ PUSHINT 0
 SENDRAWMSG
 .loc ../contracts/flow/RoyaltyOffer.sol, 0
 
-.macro onAcceptTokensBurn
-DROP
-GETGLOB 6
-THROWIFNOT 76
-GETGLOB 2
-ISNULL
-IFREF {
-	CALL $c4_to_c7$
-}
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 9
-OVER
-PUSHCONT {
-	LDREF
-	ENDS
-	CTOS
-}
-IF
-LDU 128
-LDMSGADDR
-LDREF
-ENDS
-CTOS
-LDMSGADDR
-LDREF
-ENDS
-CTOS
-LDMSGADDR
-LDREF
-ENDS
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
-CALLREF {
-	CALL $onAcceptTokensBurn_internal_macro$
-}
-DROP
-CALLREF {
-	CALL $c7_to_c4$
-}
-THROW 0
-
-.macro onAcceptTokensBurn_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 43
-CALLREF {
-	CALL $_getTargetBalanceInternal_internal_macro$
-}
-PUSHINT 0
-RAWRESERVE
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 19
-PUSHREFSLICE {
-	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
-}
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 20
-SWAP
-CTOS
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 21
-DUP
-SBITS
-PUSHINT 267
-GEQ
-PUSHCONT {
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 22
-	LDMSGADDR
-	BLKDROP2 1, 2
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
-}
-IF
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 24
-DROP
-GETGLOB 9
-PARSEMSGADDR
-INDEX 3
-PLDU 256
-NEQINT 0
-DUP
-PUSHCONT {
-	DROP
-	GETGLOB 9
-	CALLREF {
-		CALL $_getWeverRoot_internal_macro$
-	}
-	SDEQ
-}
-IF
-THROWIFNOT 111
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 26
-DUP2
-SDEQ
-PUSHCONT {
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 27
-	OVER
-}
-PUSHCONT {
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 29
-	PUSH2 S4, S1
-	NEWC
-	STSLICECONST x42_
-	STSLICE
-	SWAP
-	STGRAMS
-	PUSHINT 107
-	STZEROES
-	ENDC
-	PUSHINT 1
-	SENDRAWMSG
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 30
-	DUP
-}
-IFELSE
-NEWC
-STSLICECONST x42_
-STSLICE
-PUSHINT 111
-STZEROES
-ENDC
-PUSHINT 130
-SENDRAWMSG
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
-BLKDROP 5
-
 .macro weverRoot
 DROP
 GETGLOB 6
@@ -2455,7 +2503,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 34
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 9
 ENDS
 .loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
 CALLREF {
@@ -2493,7 +2541,7 @@ IFREF {
 THROW 0
 
 .macro weverRoot_internal_macro
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 39
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 14
 CALL $_getWeverRoot_internal_macro$
 .loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
 
@@ -2506,7 +2554,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 42
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 17
 ENDS
 .loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
 CALLREF {
@@ -2544,27 +2592,93 @@ IFREF {
 THROW 0
 
 .macro weverVault_internal_macro
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 47
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 22
 CALL $_getWeverVault_internal_macro$
 .loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
+
+.globl	_weverBurn_internal
+.type	_weverBurn_internal, @function
+CALL $_weverBurn_internal_macro$
+
+.macro _weverBurn_internal_macro
+.loc ../contracts/abstract/BaseOffer.sol, 44
+CALLREF {
+	CALL $_getTargetBalanceInternal_internal_macro$
+}
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 33
+PUSHREFSLICE {
+	.blob x8000000000000000000000000000000000000000000000000000000000000000001_
+}
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 34
+SWAP
+CTOS
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 35
+DUP
+SBITS
+PUSHINT 267
+GEQ
+PUSHCONT {
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 36
+	LDMSGADDR
+	BLKDROP2 1, 2
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
+}
+IF
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 39
+DROP
+DUP2
+SDEQ
+PUSHCONT {
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 40
+	OVER
+}
+PUSHCONT {
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 42
+	BLKPUSH 2, 2
+	NEWC
+	STSLICECONST x42_
+	STSLICE
+	SWAP
+	STGRAMS
+	PUSHINT 107
+	STZEROES
+	ENDC
+	PUSHINT 1
+	SENDRAWMSG
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 43
+	DUP
+}
+IFELSE
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 111
+STZEROES
+ENDC
+PUSHINT 130
+SENDRAWMSG
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
+BLKDROP 3
 
 .globl	_transfer_internal
 .type	_transfer_internal, @function
 CALL $_transfer_internal_macro$
 
 .macro _transfer_internal_macro
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 65
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 62
 PUSH S5
 NEWC
 STSLICE
-.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 66
+.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 63
 ROLL 9
 CALLREF {
 	CALL $_getWeverRoot_internal_macro$
 }
 SDEQ
 PUSHCONT {
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 67
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 64
 	DUP
 	ENDC
 	TRUE
@@ -2575,7 +2689,7 @@ PUSHCONT {
 	}
 }
 PUSHCONT {
-	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 76
+	.loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 73
 	OVER
 	FALSE
 	PUSH3 S8, S4, S9
@@ -2610,6 +2724,412 @@ PUSH S4
 SENDRAWMSG
 .loc ../contracts/flow/native_token/SupportNativeTokenOffer.sol, 0
 BLKDROP 9
+
+.macro setMarketBurnFee
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 12
+OVER
+PUSHCONT {
+	LDU 32
+	LDU 32
+	LDREF
+	ENDS
+	CTOS
+}
+PUSHCONT {
+	LDU 32
+	LDU 32
+}
+IFELSE
+LDMSGADDR
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+ROLLREV 4
+TUPLE 4
+SWAP
+LDREF
+ENDS
+CTOS
+LDMSGADDR
+ENDS
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 0
+CALLREF {
+	CALL $setMarketBurnFee_internal_macro$
+}
+DROP
+CALLREF {
+	CALL $c7_to_c4$
+}
+THROW 0
+
+.macro setMarketBurnFee_internal_macro
+.loc ../contracts/abstract/BaseOffer.sol, 58
+GETGLOB 9
+PARSEMSGADDR
+INDEX 3
+PLDU 256
+NEQINT 0
+DUP
+PUSHCONT {
+	DROP
+	GETGLOB 9
+	CALLREF {
+		CALL $_getMarketRootAddress_internal_macro$
+	}
+	SDEQ
+}
+IF
+THROWIFNOT 115
+.loc ../contracts/abstract/BaseOffer.sol, 44
+CALLREF {
+	CALL $_getTargetBalanceInternal_internal_macro$
+}
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 20
+SWAP
+CALLREF {
+	CALL $_setMarketBurnFee_internal_macro$
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 21
+NEWC
+STSLICECONST x42_
+STSLICE
+PUSHINT 111
+STZEROES
+ENDC
+PUSHINT 130
+SENDRAWMSG
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 0
+
+.macro marketBurnFee
+DROP
+GETGLOB 6
+THROWIFNOT 76
+GETGLOB 2
+ISNULL
+IFREF {
+	CALL $c4_to_c7$
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 24
+ENDS
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 0
+CALLREF {
+	CALL $marketBurnFee_internal_macro$
+}
+OVER
+PUSHCONT {
+	PUSH S3
+	CTOS
+	LDU 2
+	LDMSGADDR
+	DROP
+	NIP
+	NEWC
+	STSLICECONST xc
+	STSLICE
+	PUSHINT 3370493514
+	STUR 130
+	SWAP
+	DUP
+	ISNULL
+	PUSHCONT {
+		DROP
+		STSLICECONST 0
+	}
+	PUSHCONT {
+		CALLREF {
+			UNTUPLE 4
+			REVERSE 4, 0
+			NEWC
+			STU 32
+			STU 32
+			STSLICE
+			SWAP
+			NEWC
+			STSLICE
+			STBREFR
+		}
+		STBREFR
+		STSLICECONST 1
+	}
+	IFELSE
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+}
+PUSHCONT {
+	DROP
+}
+IFELSE
+IFREF {
+	CALL $upd_only_time_in_c4$
+}
+THROW 0
+
+.macro marketBurnFee_internal_macro
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 29
+CALLREF {
+	CALL $_getMarketBurnFee_internal_macro$
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 0
+
+.globl	_retentionMarketFee_internal
+.type	_retentionMarketFee_internal, @function
+CALL $_retentionMarketFee_internal_macro$
+
+.macro _retentionMarketFee_internal_macro
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 43
+PUSHREF {
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 44
+CALLREF {
+	CALL $_getMarketBurnFee_internal_macro$
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 45
+DUP
+ISNULL
+PUSHCONT {
+	.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 72
+	CALLREF {
+		CALL $_getPaymentToken_internal_macro$
+	}
+	PUSH S4
+	PUSHSLICE xc0000000000000000000000000677bf5e3
+	NEWC
+	STSLICE
+	STU 128
+	STSLICE
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+	.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 73
+	OVER
+	FALSE
+	PUSH2 S4, S6
+	CALLREF {
+		CALL $_getMarketRootAddress_internal_macro$
+	}
+	PUSH3 S8, S9, S10
+	ADD
+	UFITS 128
+	PUSH S13
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	SWAP
+	STGRAMS
+	PUSHINT 1
+	STUR 107
+	ROLLREV 6
+	NEWC
+	STSLICECONST x73e22143
+	STU 128
+	STSLICE
+	STU 128
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STI 1
+}
+PUSHCONT {
+	.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 46
+	PUSH3 S3, S0, S0
+	ISNULL
+	THROWIF 63
+	FIRST
+	PUSH2 S2, S2
+	ISNULL
+	THROWIF 63
+	SECOND
+	MULDIVC
+	UFITS 128
+	.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 47
+	CALLREF {
+		CALL $_getPaymentToken_internal_macro$
+	}
+	PUSH2 S5, S1
+	SUB
+	UFITS 128
+	PUSHSLICE xc0000000000000000000000000677bf5e3
+	NEWC
+	STSLICE
+	STU 128
+	STSLICE
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+	.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 48
+	PUSH S2
+	FALSE
+	PUSH2 S5, S7
+	CALLREF {
+		CALL $_getMarketRootAddress_internal_macro$
+	}
+	PUSH2 S9, S5
+	SUB
+	UFITS 128
+	PUSH2 S11, S12
+	ADD
+	UFITS 128
+	PUSH S14
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	SWAP
+	STGRAMS
+	PUSHINT 1
+	STUR 107
+	ROLLREV 6
+	NEWC
+	STSLICECONST x73e22143
+	STU 128
+	STSLICE
+	STU 128
+	ROLLREV 3
+	NEWC
+	STSLICE
+	STI 1
+	STREF
+	STBREFR
+	STBREFR
+	ENDC
+	PUSHINT 0
+	SENDRAWMSG
+	.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 61
+	PUSH S2
+	MYADDR
+	CALLREF {
+		CALL $_getMarketRootAddress_internal_macro$
+	}
+	ROLL 3
+	PUSHINT 300000000
+	PUSH S10
+	ADD
+	UFITS 128
+	PUSH S11
+	FALSE
+	NEWC
+	STSLICECONST x6_
+	STI 1
+	STSLICECONST x1_
+	STSLICE
+	SWAP
+	STGRAMS
+	PUSHINT 1
+	STUR 107
+	ROLLREV 4
+	NEWC
+	STSLICECONST x562548ad
+	STU 128
+	STSLICE
+	ROTREV
+	NEWC
+	STSLICE
+}
+IFELSE
+STREF
+STBREFR
+STBREFR
+ENDC
+PUSHINT 0
+SENDRAWMSG
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 0
+BLKDROP 7
+
+.globl	_tokensBurn_internal
+.type	_tokensBurn_internal, @function
+CALL $_tokensBurn_internal_macro$
+
+.macro _tokensBurn_internal_macro
+.loc ../contracts/abstract/BaseOffer.sol, 44
+CALLREF {
+	CALL $_getTargetBalanceInternal_internal_macro$
+}
+PUSHINT 0
+RAWRESERVE
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 94
+CALLREF {
+	CALL $_getMarketBurnFee_internal_macro$
+}
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 95
+BLKPUSH 2, 0
+ISNULL
+THROWIF 63
+THIRD
+PUSH2 S1, S1
+ISNULL
+THROWIF 63
+INDEX 3
+MYADDR
+PUSHSLICE xc0000000000000000000000001
+NEWC
+STSLICE
+ROLLREV 3
+NEWC
+STSLICECONST x7cced78d
+STSLICE
+ROTREV
+NEWC
+STSLICE
+SWAP
+NEWC
+STSLICE
+STBREFR
+STBREFR
+STBREFR
+ENDC
+PUSHINT 0
+SENDRAWMSG
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 96
+BLKPUSH 2, 0
+ISNULL
+THROWIF 63
+THIRD
+CALLREF {
+	CALL $_getOwner_internal_macro$
+}
+ROT
+DUP
+ISNULL
+THROWIF 63
+INDEX 3
+FALSE
+NEWC
+STSLICECONST x6_
+STI 1
+STSLICECONST x1_
+STSLICE
+PUSHINT 1
+STUR 111
+ROTREV
+NEWC
+STSLICECONST x5c2ba98a
+STSLICE
+SWAP
+NEWC
+STSLICE
+STBREFR
+STBREFR
+ENDC
+PUSHINT 130
+SENDRAWMSG
+.loc ../contracts/flow/fee/MarketBurnFeeOffer.sol, 0
 
 .macro setMarketFee
 DROP
@@ -2653,7 +3173,7 @@ CALLREF {
 THROW 0
 
 .macro setMarketFee_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 57
+.loc ../contracts/abstract/BaseOffer.sol, 58
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -2670,7 +3190,7 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 115
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
@@ -2761,15 +3281,15 @@ MULDIVC
 UFITS 128
 .loc ../contracts/flow/fee/MarketFeeOffer.sol, 0
 
-.globl	_retentionMarketFee_internal
-.type	_retentionMarketFee_internal, @function
-CALL $_retentionMarketFee_internal_macro$
+.globl	MarketFeeOffer__retentionMarketFee
+.type	MarketFeeOffer__retentionMarketFee, @function
+CALL $MarketFeeOffer__retentionMarketFee_macro$
 
-.macro _retentionMarketFee_internal_macro
-.loc ../contracts/flow/fee/MarketFeeOffer.sol, 51
+.macro MarketFeeOffer__retentionMarketFee_macro
+.loc ../contracts/flow/fee/MarketFeeOffer.sol, 52
 PUSHREF {
 }
-.loc ../contracts/flow/fee/MarketFeeOffer.sol, 52
+.loc ../contracts/flow/fee/MarketFeeOffer.sol, 53
 CALLREF {
 	CALL $_getPaymentToken_internal_macro$
 }
@@ -2782,7 +3302,7 @@ STSLICE
 ENDC
 PUSHINT 0
 SENDRAWMSG
-.loc ../contracts/flow/fee/MarketFeeOffer.sol, 53
+.loc ../contracts/flow/fee/MarketFeeOffer.sol, 54
 FALSE
 ROT
 PUSH S4
@@ -3015,25 +3535,40 @@ CTOS
 CALL $_initialization_internal_macro$
 
 .macro _initialization_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 83
+.loc ../contracts/abstract/BaseOffer.sol, 85
 NOW
-SETGLOB 22
-.loc ../contracts/abstract/BaseOffer.sol, 84
-ROLL 3
+SETGLOB 23
+.loc ../contracts/abstract/BaseOffer.sol, 86
+ROLL 4
 CALLREF {
 	CALL $_setMarketFee_internal_macro$
 }
-.loc ../contracts/abstract/BaseOffer.sol, 85
+.loc ../contracts/abstract/BaseOffer.sol, 87
+PUSH S3
+ISNULL
+PUSHCONT {
+	.loc ../contracts/abstract/BaseOffer.sol, 88
+	PUSH2 S3, S3
+	ISNULL
+	THROWIF 63
+	CALLREF {
+		CALL $_setMarketBurnFee_internal_macro$
+	}
+	.loc ../contracts/abstract/BaseOffer.sol, 0
+}
+IFNOT
+.loc ../contracts/abstract/BaseOffer.sol, 90
+SWAP
+SETGLOB 19
+.loc ../contracts/abstract/BaseOffer.sol, 91
 SWAP
 SETGLOB 18
-.loc ../contracts/abstract/BaseOffer.sol, 86
-SWAP
-SETGLOB 17
-.loc ../contracts/abstract/BaseOffer.sol, 87
+.loc ../contracts/abstract/BaseOffer.sol, 92
 CALLREF {
 	CALL $_setDiscountOpt_internal_macro$
 }
 .loc ../contracts/abstract/BaseOffer.sol, 0
+DROP
 
 .macro activate
 DROP
@@ -3044,7 +3579,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/abstract/BaseOffer.sol, 97
+.loc ../contracts/abstract/BaseOffer.sol, 102
 ENDS
 .loc ../contracts/abstract/BaseOffer.sol, 0
 CALLREF {
@@ -3057,7 +3592,7 @@ CALLREF {
 THROW 0
 
 .macro activate_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 57
+.loc ../contracts/abstract/BaseOffer.sol, 58
 GETGLOB 9
 PARSEMSGADDR
 INDEX 3
@@ -3074,13 +3609,13 @@ PUSHCONT {
 }
 IF
 THROWIFNOT 115
-.loc ../contracts/abstract/BaseOffer.sol, 43
+.loc ../contracts/abstract/BaseOffer.sol, 44
 CALLREF {
 	CALL $_getTargetBalanceInternal_internal_macro$
 }
 PUSHINT 0
 RAWRESERVE
-.loc ../contracts/abstract/BaseOffer.sol, 102
+.loc ../contracts/abstract/BaseOffer.sol, 107
 CALLREF {
 	CALL $_getRoyalty_internal_macro$
 }
@@ -3099,7 +3634,7 @@ PUSHCONT {
 }
 IF
 PUSHCONT {
-	.loc ../contracts/abstract/BaseOffer.sol, 103
+	.loc ../contracts/abstract/BaseOffer.sol, 108
 	PUSHINT 0
 	PUSHINT 1000000000
 	PUSHREFSLICE {
@@ -3112,7 +3647,7 @@ PUSHCONT {
 	.loc ../contracts/abstract/BaseOffer.sol, 0
 }
 IF
-.loc ../contracts/abstract/BaseOffer.sol, 105
+.loc ../contracts/abstract/BaseOffer.sol, 110
 CALLREF {
 	CALL $_checkAndActivate_internal_macro$
 }
@@ -3123,7 +3658,7 @@ CALLREF {
 CALL $_getMarketRootAddress_internal_macro$
 
 .macro _getMarketRootAddress_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 119
+.loc ../contracts/abstract/BaseOffer.sol, 124
 GETGLOB 10
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3132,7 +3667,7 @@ GETGLOB 10
 CALL $_getPaymentToken_internal_macro$
 
 .macro _getPaymentToken_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 128
+.loc ../contracts/abstract/BaseOffer.sol, 133
 GETGLOB 12
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3141,7 +3676,7 @@ GETGLOB 12
 CALL $_getOwner_internal_macro$
 
 .macro _getOwner_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 137
+.loc ../contracts/abstract/BaseOffer.sol, 142
 GETGLOB 11
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3150,7 +3685,7 @@ GETGLOB 11
 CALL $_getNonce_internal_macro$
 
 .macro _getNonce_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 146
+.loc ../contracts/abstract/BaseOffer.sol, 151
 GETGLOB 14
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3159,7 +3694,7 @@ GETGLOB 14
 CALL $_getNftAddress_internal_macro$
 
 .macro _getNftAddress_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 155
+.loc ../contracts/abstract/BaseOffer.sol, 160
 GETGLOB 13
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3168,7 +3703,7 @@ GETGLOB 13
 CALL $_getCollection_internal_macro$
 
 .macro _getCollection_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 164
+.loc ../contracts/abstract/BaseOffer.sol, 169
 GETGLOB 15
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3177,7 +3712,7 @@ GETGLOB 15
 CALL $_setCollection_internal_macro$
 
 .macro _setCollection_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 173
+.loc ../contracts/abstract/BaseOffer.sol, 178
 SETGLOB 15
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
@@ -3186,15 +3721,15 @@ SETGLOB 15
 CALL $_setMarketFee_internal_macro$
 
 .macro _setMarketFee_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 183
+.loc ../contracts/abstract/BaseOffer.sol, 188
 DUP
 SECOND
 GTINT 0
 THROWIFNOT 110
-.loc ../contracts/abstract/BaseOffer.sol, 184
+.loc ../contracts/abstract/BaseOffer.sol, 189
 DUP
 SETGLOB 16
-.loc ../contracts/abstract/BaseOffer.sol, 185
+.loc ../contracts/abstract/BaseOffer.sol, 190
 MYADDR
 PUSHSLICE xc0000000000000000000000000372b03f5
 NEWC
@@ -3215,8 +3750,58 @@ SENDRAWMSG
 CALL $_getMarketFee_internal_macro$
 
 .macro _getMarketFee_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 194
+.loc ../contracts/abstract/BaseOffer.sol, 199
 GETGLOB 16
+.loc ../contracts/abstract/BaseOffer.sol, 0
+
+.globl	_setMarketBurnFee_internal
+.type	_setMarketBurnFee_internal, @function
+CALL $_setMarketBurnFee_internal_macro$
+
+.macro _setMarketBurnFee_internal_macro
+.loc ../contracts/abstract/BaseOffer.sol, 209
+DUP
+SECOND
+GTINT 0
+THROWIFNOT 110
+.loc ../contracts/abstract/BaseOffer.sol, 210
+DUP
+SETGLOB 17
+.loc ../contracts/abstract/BaseOffer.sol, 211
+MYADDR
+PUSHSLICE xc0000000000000000000000001
+NEWC
+STSLICE
+ROTREV
+NEWC
+STSLICECONST x4f9c552a
+STSLICE
+SWAP
+UNTUPLE 4
+REVERSE 5, 0
+STU 32
+STU 32
+ROTREV
+NEWC
+STSLICE
+SWAP
+NEWC
+STSLICE
+STBREFR
+STBREFR
+STBREFR
+ENDC
+PUSHINT 0
+SENDRAWMSG
+.loc ../contracts/abstract/BaseOffer.sol, 0
+
+.globl	_getMarketBurnFee_internal
+.type	_getMarketBurnFee_internal, @function
+CALL $_getMarketBurnFee_internal_macro$
+
+.macro _getMarketBurnFee_internal_macro
+.loc ../contracts/abstract/BaseOffer.sol, 220
+GETGLOB 17
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_getWeverRoot_internal
@@ -3224,8 +3809,8 @@ GETGLOB 16
 CALL $_getWeverRoot_internal_macro$
 
 .macro _getWeverRoot_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 204
-GETGLOB 17
+.loc ../contracts/abstract/BaseOffer.sol, 230
+GETGLOB 18
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_getWeverVault_internal
@@ -3233,8 +3818,8 @@ GETGLOB 17
 CALL $_getWeverVault_internal_macro$
 
 .macro _getWeverVault_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 213
-GETGLOB 18
+.loc ../contracts/abstract/BaseOffer.sol, 239
+GETGLOB 19
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_setDiscountOpt_internal
@@ -3242,8 +3827,8 @@ GETGLOB 18
 CALL $_setDiscountOpt_internal_macro$
 
 .macro _setDiscountOpt_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 223
-SETGLOB 19
+.loc ../contracts/abstract/BaseOffer.sol, 249
+SETGLOB 20
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_getDiscountOpt_internal
@@ -3251,8 +3836,8 @@ SETGLOB 19
 CALL $_getDiscountOpt_internal_macro$
 
 .macro _getDiscountOpt_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 232
-GETGLOB 19
+.loc ../contracts/abstract/BaseOffer.sol, 258
+GETGLOB 20
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_getDiscountNft_internal
@@ -3260,8 +3845,8 @@ GETGLOB 19
 CALL $_getDiscountNft_internal_macro$
 
 .macro _getDiscountNft_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 241
-GETGLOB 20
+.loc ../contracts/abstract/BaseOffer.sol, 267
+GETGLOB 21
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_setDiscountNft_internal
@@ -3269,8 +3854,8 @@ GETGLOB 20
 CALL $_setDiscountNft_internal_macro$
 
 .macro _setDiscountNft_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 250
-SETGLOB 20
+.loc ../contracts/abstract/BaseOffer.sol, 276
+SETGLOB 21
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_getRoyalty_internal
@@ -3278,8 +3863,8 @@ SETGLOB 20
 CALL $_getRoyalty_internal_macro$
 
 .macro _getRoyalty_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 260
-GETGLOB 21
+.loc ../contracts/abstract/BaseOffer.sol, 286
+GETGLOB 22
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .globl	_setRoyalty_internal
@@ -3287,10 +3872,10 @@ GETGLOB 21
 CALL $_setRoyalty_internal_macro$
 
 .macro _setRoyalty_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 267
+.loc ../contracts/abstract/BaseOffer.sol, 293
 DUP
-SETGLOB 21
-.loc ../contracts/abstract/BaseOffer.sol, 268
+SETGLOB 22
+.loc ../contracts/abstract/BaseOffer.sol, 294
 DUP
 ISNULL
 THROWIF 63
@@ -3313,7 +3898,7 @@ SENDRAWMSG
 CALL $calcValue_internal_macro$
 
 .macro calcValue_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 278
+.loc ../contracts/abstract/BaseOffer.sol, 304
 DUP
 FIRST
 SWAP
@@ -3333,8 +3918,8 @@ UFITS 128
 CALL $_getDeployTime_internal_macro$
 
 .macro _getDeployTime_internal_macro
-.loc ../contracts/abstract/BaseOffer.sol, 287
-GETGLOB 22
+.loc ../contracts/abstract/BaseOffer.sol, 313
+GETGLOB 23
 .loc ../contracts/abstract/BaseOffer.sol, 0
 
 .macro getTargetBalance
@@ -3452,6 +4037,23 @@ LDU 32
 LDU 32
 ROTREV
 PAIR
+SWAP
+LDI 1
+SWAP
+NULLSWAPIFNOT
+PUSHCONT {
+	LDREFRTOS
+	LDU 32
+	LDU 32
+	LDMSGADDR
+	LDREF
+	ENDS
+	CTOS
+	LDMSGADDR
+	ENDS
+	TUPLE 4
+}
+IF
 SWAP
 LDREF
 ENDS
@@ -3571,10 +4173,10 @@ GETGLOB 6
 GETGLOB 7
 GETGLOB 8
 GETGLOB 9
-PUSHINT 21
+PUSHINT 22
 PUSHINT 10
 BLKSWX
-PUSHINT 31
+PUSHINT 32
 TUPLEVAR
 POP C7
 SETGLOB 3
@@ -3656,6 +4258,7 @@ PUSHCONT {
 	PUSHINT 0
 	DUP
 	PAIR
+	NULL
 	PUSHREFSLICE {
 		.blob x8000000000000000000000000000000000000000000000000000000000000000001_
 	}
@@ -3675,7 +4278,7 @@ PUSHCONT {
 	}
 	PUSHINT 0
 	DUP
-	PUSHINT 31
+	PUSHINT 32
 	TUPLEVAR
 	POP C7
 	PUSHINT 64
@@ -3693,12 +4296,12 @@ IFREFELSE {
 .macro c7_to_c4
 PUSH C7
 FALSE
-PUSHINT 31
-SETINDEXVARQ
 PUSHINT 32
+SETINDEXVARQ
+PUSHINT 33
 UNTUPLEVAR
 DROP
-PUSHINT 31
+PUSHINT 32
 PUSHINT 0
 REVX
 BLKDROP 10
@@ -3709,6 +4312,10 @@ STU 256
 STU 64
 STONE
 STSLICE
+PUSHINT 21
+ROLLREVX
+NEWC
+STSLICE
 PUSHINT 20
 ROLLREVX
 NEWC
@@ -3717,12 +4324,9 @@ PUSHINT 19
 ROLLREVX
 NEWC
 STSLICE
-PUSHINT 18
-ROLLREVX
-NEWC
-STSLICE
 STU 64
-ROLLREV 16
+PUSHINT 17
+ROLLREVX
 NEWC
 STSLICE
 SWAP
@@ -3730,6 +4334,30 @@ UNPAIR
 XCHG S2
 STU 32
 STU 32
+SWAP
+DUP
+ISNULL
+PUSHCONT {
+	DROP
+	STSLICECONST 0
+}
+PUSHCONT {
+	CALLREF {
+		UNTUPLE 4
+		REVERSE 4, 0
+		NEWC
+		STU 32
+		STU 32
+		STSLICE
+		SWAP
+		NEWC
+		STSLICE
+		STBREFR
+	}
+	STBREFR
+	STSLICECONST 1
+}
+IFELSE
 ROLLREV 14
 NEWC
 STSLICE
@@ -3987,13 +4615,19 @@ THROW 60
 
 .macro public_function_selector
 DUP
-PUSHINT 1745391003
+PUSHINT 1700490698
 LEQ
 IFJMPREF {
 	DUP
-	PUSHINT 658075731
+	PUSHINT 420993090
 	LEQ
 	IFJMPREF {
+		DUP
+		PUSHINT 116615518
+		EQUAL
+		IFJMPREF {
+			CALL $setMarketBurnFee$
+		}
 		DUP
 		PUSHINT 277125031
 		EQUAL
@@ -4012,17 +4646,17 @@ IFJMPREF {
 		IFJMPREF {
 			CALL $getTypeContract$
 		}
+	}
+	DUP
+	PUSHINT 1039308492
+	LEQ
+	IFJMPREF {
 		DUP
 		PUSHINT 658075731
 		EQUAL
 		IFJMPREF {
 			CALL $activate$
 		}
-	}
-	DUP
-	PUSHINT 1236465367
-	LEQ
-	IFJMPREF {
 		DUP
 		PUSHINT 858461480
 		EQUAL
@@ -4041,17 +4675,23 @@ IFJMPREF {
 		IFJMPREF {
 			CALL $onGetInfoDiscount$
 		}
+	}
+	DUP
+	PUSHINT 1408258708
+	LEQ
+	IFJMPREF {
+		DUP
+		PUSHINT 1223009866
+		EQUAL
+		IFJMPREF {
+			CALL $marketBurnFee$
+		}
 		DUP
 		PUSHINT 1236465367
 		EQUAL
 		IFJMPREF {
 			CALL $onTokenWallet$
 		}
-	}
-	DUP
-	PUSHINT 1581874239
-	LEQ
-	IFJMPREF {
 		DUP
 		PUSHINT 1312538297
 		EQUAL
@@ -4059,28 +4699,22 @@ IFJMPREF {
 			CALL $onRoyaltyCollectionInfo$
 		}
 		DUP
-		PUSHINT 1352852709
-		EQUAL
-		IFJMPREF {
-			CALL $constructor$
-		}
-		DUP
 		PUSHINT 1408258708
 		EQUAL
 		IFJMPREF {
 			CALL $marketFee$
 		}
+	}
+	DUP
+	PUSHINT 1700490698
+	LEQ
+	IFJMPREF {
 		DUP
 		PUSHINT 1581874239
 		EQUAL
 		IFJMPREF {
 			CALL $getInfo$
 		}
-	}
-	DUP
-	PUSHINT 1745391003
-	LEQ
-	IFJMPREF {
 		DUP
 		PUSHINT 1611811351
 		EQUAL
@@ -4099,12 +4733,6 @@ IFJMPREF {
 		IFJMPREF {
 			CALL $finishSell$
 		}
-		DUP
-		PUSHINT 1745391003
-		EQUAL
-		IFJMPREF {
-			CALL $onAcceptTokensBurn$
-		}
 	}
 }
 DUP
@@ -4112,9 +4740,15 @@ PUSHINT 2115009618
 LEQ
 IFJMPREF {
 	DUP
-	PUSHINT 2104712182
+	PUSHINT 1909434916
 	LEQ
 	IFJMPREF {
+		DUP
+		PUSHINT 1745391003
+		EQUAL
+		IFJMPREF {
+			CALL $onAcceptTokensBurn$
+		}
 		DUP
 		PUSHINT 1893244873
 		EQUAL
@@ -4122,11 +4756,22 @@ IFJMPREF {
 			CALL $onAcceptTokensTransfer$
 		}
 		DUP
+		PUSHINT 1907076161
+		EQUAL
+		IFJMPREF {
+			CALL $constructor$
+		}
+		DUP
 		PUSHINT 1909434916
 		EQUAL
 		IFJMPREF {
 			CALL $onGetInfoRoyalty$
 		}
+	}
+	DUP
+	PUSHINT 2115009618
+	LEQ
+	IFJMPREF {
 		DUP
 		PUSHINT 1980557325
 		EQUAL
@@ -4139,12 +4784,12 @@ IFJMPREF {
 		IFJMPREF {
 			CALL $getTargetBalance$
 		}
-	}
-	DUP
-	PUSHINT 2115009618
-	EQUAL
-	IFJMPREF {
-		CALL $weverRoot$
+		DUP
+		PUSHINT 2115009618
+		EQUAL
+		IFJMPREF {
+			CALL $weverRoot$
+		}
 	}
 }
 

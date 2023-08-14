@@ -189,6 +189,17 @@ contract DirectSell is
                 _getNftAddress()
             );
 
+            IDirectSellCallback(_getOwner()).ownedDirectSellSuccess{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                _getOwner(),
+                buyer,
+                _getNftAddress()
+            );
+
             uint128 currentFee = _getCurrentFee(price);
             uint128 currentRoyalty = _getCurrentRoyalty(price);
             uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, price);
@@ -240,6 +251,15 @@ contract DirectSell is
                     bounce: false
                 }(
                     callbackId,
+                    _getNftAddress()
+                );
+
+                IDirectSellCallback(_getOwner()).ownedDirectSellCancelledOnTime{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    _getCollection(),
                     _getNftAddress()
                 );
 
@@ -376,6 +396,16 @@ contract DirectSell is
             _callbackId,
             _getNftAddress()
         );
+
+        IDirectSellCallback(msg.sender).ownedDirectSellCancelledOnTime{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            _getCollection(),
+            _getNftAddress()
+        );
+
         _changeState(DirectSellStatus.Expired);
 
         mapping(address => CallbackParams) callbacks;

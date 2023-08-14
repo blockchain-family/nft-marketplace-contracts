@@ -228,7 +228,7 @@ contract FactoryDirectBuy is
             );
 
             emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
-                IDirectBuyCallback(buyer).directBuyDeployed{
+            IDirectBuyCallback(buyer).directBuyDeployed{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
                 flag: 1,
                 bounce: false

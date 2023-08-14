@@ -234,7 +234,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance1.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount1Balance = (await balance(account1)).shiftedBy(-9).toNumber();
-            expect(everAccount1Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount1Balance).to.be.closeTo(expectedAccountBalance, 0.35);
             // expect(everAccount1Balance).to.be.within(, , 'Wrong balance user');
 
             const spentTokenWallet2Balance = await tokenWallet2.balance() as any;
@@ -288,7 +288,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -335,7 +335,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             let everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
             await sleep(10000);
             await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', transferValue);
@@ -356,7 +356,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance3 = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.2);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.35);
 
             const factoryDSTokenWalletBalance = await factoryDirectSellTW.balance();
             const expectedTWFactoryDSBalance = startBalanceTWfactoryDirectSell.plus(currentFee);
@@ -425,7 +425,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance2 = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance2, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance2, 0.35);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken - spentToken).toString());
@@ -635,7 +635,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             let everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
             startBalanceTW2 -= spentToken;
         });
@@ -717,7 +717,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.55);
             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
 

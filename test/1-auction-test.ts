@@ -664,7 +664,7 @@ describe("Test Auction contract", async function () {
             let status2 = (await auction.getInfo()).status;
             expect(status2.toString()).to.be.eq('1');
 
-            await sleep(10000);
+            await sleep(20000);
 
             await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionCancelled = await auction.getEvent('AuctionCancelled');

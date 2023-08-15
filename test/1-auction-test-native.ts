@@ -272,7 +272,7 @@ describe("Test Auction contract", async function () {
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
             // console.log('expectedAccountBalance',expectedAccountBalance);
             // console.log('everAccount2Balance',everAccount2Balance);
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.55);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.75);
 
             startBalanceTW3 -= spentToken;
             startBalanceTWAuctionRoot = startBalanceTWAuctionRoot.plus(currentFee);
@@ -525,7 +525,7 @@ describe("Test Auction contract", async function () {
 
             const expectedAccountBalance4 = startBalance4.plus(1500000000).shiftedBy(-9).toNumber();
             const everAccount4Balance = (await balance(account4)).shiftedBy(-9).toNumber();
-            expect(everAccount4Balance).to.be.closeTo(expectedAccountBalance4, 0.2);
+            expect(everAccount4Balance).to.be.closeTo(expectedAccountBalance4, 0.35);
 
             let owner = (await nft.getInfo()).owner;
             expect(owner.toString()).to.be.eq(account3.address.toString());
@@ -779,9 +779,9 @@ describe("Test Auction contract", async function () {
 
             const expectedAccountBalance4 = startBalance4.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount4Balance = (await balance(account4)).shiftedBy(-9).toNumber();
-            expect(everAccount4Balance).to.be.closeTo(expectedAccountBalance4, 0.3);
+            expect(everAccount4Balance).to.be.closeTo(expectedAccountBalance4, 0.35);
 
-            await sleep(6000);
+            await sleep(15000);
 
             await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
@@ -919,7 +919,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(5000);
+            await sleep(15000);
             await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');

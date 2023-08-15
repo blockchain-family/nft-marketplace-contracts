@@ -140,7 +140,6 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE +
                 Gas.FEE_EXTRA_VALUE +
@@ -153,7 +152,6 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
-                Gas.TOKEN_BURN_VALUE +
                 Gas.TOKEN_TRANSFER_VALUE,
                 //dynamic
                 valueToGas(Gas.CANCEL_OFFER_EXTRA_GAS_VALUE, address(this).wid)

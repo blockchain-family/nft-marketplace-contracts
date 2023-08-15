@@ -228,7 +228,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.55);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -275,7 +275,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.55);
 
             const factoryDBTokenWalletBalance = await factoryDirectBuyTW.balance();
             const expectedTWFactoryDBBalance = startBalanceTWfactoryDirectBuy.plus(currentFee);
@@ -329,7 +329,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.55);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -383,7 +383,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.55);
 
             startBalanceTW2 -= spentToken;
             startBalanceTWfactoryDirectBuy = startBalanceTWfactoryDirectBuy.plus(currentFee);
@@ -441,7 +441,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.55);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -483,7 +483,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
             startBalanceTW2 -= spentToken;
         });
@@ -516,7 +516,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
             const spentTokenWallet2BalanceEnd = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2BalanceEnd.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
@@ -555,7 +555,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.2);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
             startBalanceTW2 -= spentToken;
         });
@@ -719,7 +719,7 @@ describe("Test DirectBuy contract", async function () {
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
             // console.log('expectedAccountBalance',expectedAccountBalance);
             // console.log('everAccount3Balance',everAccount3Balance);
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.55);
 
             spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());

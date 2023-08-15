@@ -59,7 +59,7 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
             );
 
             IBurnableTokenWallet(_tokenWallet).burn{
-                value: Gas.TOKEN_BURN_VALUE + _extraGasValue,
+                value: _extraGasValue,
                 flag: 0,
                 bounce: false
             }(

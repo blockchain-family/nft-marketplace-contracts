@@ -1226,7 +1226,9 @@ PUSHCONT {
 	CALLREF {
 		CALL $_getCollection_internal_macro$
 	}
-	GETGLOB 9
+	CALLREF {
+		CALL $_getOwner_internal_macro$
+	}
 	FALSE
 	NEWC
 	STSLICECONST x6_

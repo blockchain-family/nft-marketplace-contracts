@@ -484,7 +484,7 @@ contract DirectBuy is
           _getNftAddress()
         );
 
-        IDirectBuyCallback(msg.sender).ownedDirectBuyCancelledOnTime{
+        IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
           value: Gas.FRONTENT_CALLBACK_VALUE,
           flag: 1,
           bounce: false

@@ -397,7 +397,7 @@ contract DirectSell is
             _getNftAddress()
         );
 
-        IDirectSellCallback(msg.sender).ownedDirectSellCancelledOnTime{
+        IDirectSellCallback(_getOwner()).ownedDirectSellCancelledOnTime{
             value: Gas.FRONTENT_CALLBACK_VALUE,
             flag: 1,
             bounce: false

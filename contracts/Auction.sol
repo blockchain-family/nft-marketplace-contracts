@@ -336,7 +336,7 @@ contract Auction is
                 _getNftAddress()
             );
 
-            IAuctionBidPlacedCallback(msg.sender).ownedAuctionCancelled{
+            IAuctionBidPlacedCallback(_getOwner()).ownedAuctionCancelled{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
                 flag: 1,
                 bounce: false

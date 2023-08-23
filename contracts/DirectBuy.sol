@@ -249,6 +249,17 @@ contract DirectBuy is
                 _getNftAddress()
             );
 
+            IDirectBuyCallback(_getOwner()).ownedDirectBuySuccess{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                nftOwner,
+                _getOwner(),
+                _getNftAddress()
+            );
+
             changeState(DirectBuyStatus.Filled);
             callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
@@ -289,6 +300,15 @@ contract DirectBuy is
                     bounce: false
                 }(
                     callbackId,
+                    _getNftAddress()
+                );
+
+                IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    _getCollection(),
                     _getNftAddress()
                 );
 
@@ -463,6 +483,15 @@ contract DirectBuy is
           bounce: false
         }(
           _callbackId,
+          _getNftAddress()
+        );
+
+        IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
+          value: Gas.FRONTENT_CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
+        }(
+          _getCollection(),
           _getNftAddress()
         );
 

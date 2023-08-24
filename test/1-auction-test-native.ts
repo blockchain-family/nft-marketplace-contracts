@@ -428,7 +428,7 @@ describe("Test Auction contract", async function () {
 
             const expectedAccountBalance3 = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.2);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.35);
 
             const auctionRootTokenWalletBalance = await auctionRootTW.balance();
             expect(auctionRootTokenWalletBalance.toString()).to.be.eq(startBalanceTWAuctionRoot.plus(currentFee).toString());

@@ -59,6 +59,7 @@ contract Auction is
         uint128 price;
         uint64 nonce;
         uint8 status;
+        address collection;
     }
 
     struct Bid {
@@ -79,10 +80,10 @@ contract Auction is
 
     event AuctionCreated(AuctionDetails);
     event AuctionActive(AuctionDetails);
-    event BidPlaced(address buyer, uint128 value, uint128 nextBidValue);
-    event BidDeclined(address buyer, uint128 value);
-    event AuctionComplete(address seller, address buyer, uint128 value);
-    event AuctionCancelled();
+    event BidPlaced(address buyer, uint128 value, uint128 nextBidValue, AuctionDetails);
+    event BidDeclined(address buyer, uint128 value, AuctionDetails);
+    event AuctionComplete(address buyer, uint128 value, AuctionDetails);
+    event AuctionCancelled(AuctionDetails);
     event AuctionUpgrade();
 
     constructor(
@@ -211,7 +212,7 @@ contract Auction is
         ) {
             _processBid(callbackId, buyer, amount, originalGasTo);
         } else {
-            emit BidDeclined(buyer, amount);
+            emit BidDeclined(buyer, amount, _buildInfo());
             _sendBidResultCallback(callbackId, buyer, false, 0, _getNftAddress());
 
             TvmCell empty;
@@ -268,7 +269,7 @@ contract Auction is
             uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, maxBidValue);
 
             currentStatus = AuctionStatus.Complete;
-            emit AuctionComplete(_getOwner(), currentBid.addr, maxBidValue);
+            emit AuctionComplete(currentBid.addr, maxBidValue, _buildInfo());
 
             IAuctionBidPlacedCallback(msg.sender).auctionComplete{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
@@ -325,7 +326,7 @@ contract Auction is
                 _retentionRoyalty(currentRoyalty, tokenWallet, _remainingGasTo);
             }
         } else {
-            emit AuctionCancelled();
+            emit AuctionCancelled(_buildInfo());
             currentStatus = AuctionStatus.Cancelled;
             IAuctionBidPlacedCallback(msg.sender).auctionCancelled{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
@@ -428,7 +429,8 @@ contract Auction is
             endTime: auctionEndTime,
             price: price,
             nonce: _getNonce(),
-            status: currentStatus
+            status: currentStatus,
+            collection: _getCollection()
         });
     }
 
@@ -446,7 +448,7 @@ contract Auction is
         currentBid = newBid;
         _calculateAndSetNextBid();
 
-        emit BidPlaced(_newBidSender, _bid, nextBidValue);
+        emit BidPlaced(_newBidSender, _bid, nextBidValue, _buildInfo());
         _sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, _getNftAddress());
 
         IAuctionBidPlacedCallback(_getOwner()).ownedBidPlacedCallback{

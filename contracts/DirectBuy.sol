@@ -225,7 +225,7 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
     address nftOwner,
     address, /*oldManager*/
     address newManager,
-    address, /*collection*/
+    address collection,
     address sendGasTo,
     TvmCell payload
   ) external override {
@@ -249,16 +249,27 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
       uint128 currentFee = math.muldivc(price, fee.numerator, fee.denominator);
       uint128 balance = price - currentFee;
 
-      IDirectBuyCallback(nftOwner).directBuySuccess{
+    IDirectBuyCallback(nftOwner).directBuySuccess{
         value: Gas.FRONTENT_CALLBACK_VALUE,
         flag: 1,
         bounce: false
-      }(
+    }(
         callbackId,
         nftOwner,
         owner,
         nftAddress
-      );
+    );
+
+    IDirectBuyCallback(owner).ownedDirectBuySuccess{
+        value: Gas.FRONTENT_CALLBACK_VALUE,
+        flag: 1,
+        bounce: false
+    }(
+        collection,
+        nftOwner,
+        owner,
+        nftAddress
+    );
 
       changeState(DirectBuyStatus.Filled);
 
@@ -304,6 +315,15 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
           nftAddress
         );
 
+        IDirectBuyCallback(owner).ownedDirectBuyCancelledOnTime{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            collection,
+            nftAddress
+        );
+
         changeState(DirectBuyStatus.Expired);
 
         ITIP4_1NFT(msg.sender).changeManager{
@@ -324,6 +344,15 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
           bounce: false
         }(
           callbackId,
+          nftAddress
+        );
+
+        IDirectBuyCallback(owner).ownedDirectBuyCancelledOnTime{
+          value: Gas.FRONTENT_CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
+        }(
+          collection,
           nftAddress
         );
 

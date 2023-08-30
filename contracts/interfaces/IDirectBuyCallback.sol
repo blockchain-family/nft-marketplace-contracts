@@ -27,6 +27,14 @@ interface IDirectBuyCallback {
         address nft
     ) external;
 
+    function ownedDirectBuySuccess(
+        address collection,
+        address oldOwner,
+        address newOwner,
+        address nft
+    ) external;
+
+
     function directBuyNotSuccess(
         uint32 callbackId,
         address nft
@@ -36,6 +44,12 @@ interface IDirectBuyCallback {
         uint32 callbackId,
         address nft
     ) external;
+
+    function ownedDirectBuyCancelledOnTime(
+        address collection,
+        address nft
+    ) external;
+
 
     function directBuyClose(
         uint32 callbackId,

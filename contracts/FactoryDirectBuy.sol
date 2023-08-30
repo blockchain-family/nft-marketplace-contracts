@@ -109,6 +109,7 @@ contract FactoryDirectBuy is IAcceptTokensTransferCallback, OwnableInternal, IOf
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE +
                 Gas.FEE_EXTRA_VALUE +

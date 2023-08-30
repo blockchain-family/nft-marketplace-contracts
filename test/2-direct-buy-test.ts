@@ -178,7 +178,7 @@ describe("Test DirectBuy contract", async function () {
         it('Deploy limited DirectBuy and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(0, account3, nft, Math.round(Date.now() / 1000), 5, discountCollection.address, nftId));
+            payload = (await factoryDirectBuy.buildPayload(0, account3, nft, Math.round(Date.now() / 1000), 10, discountCollection.address, nftId));
             const {traceTree} = await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, toNano(0.1), true, payload, transferValue);
             // await traceTree.beautyPrint();
             // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -376,7 +376,7 @@ describe("Test DirectBuy contract", async function () {
         it('Deploy future DirectBuy and aborted then success', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(0, account3, nft, Math.round(Date.now() / 1000) + 5, 8, discountCollection.address, nftId));
+            payload = (await factoryDirectBuy.buildPayload(0, account3, nft, Math.round(Date.now() / 1000) + 10, 15, discountCollection.address, nftId));
             await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, toNano(0.1), true, payload, transferValue);
 
             let spentTokenWallet3Balance = await tokenWallet3.balance() as any;
@@ -393,7 +393,7 @@ describe("Test DirectBuy contract", async function () {
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             expect(dbActive.to.toString()).to.be.eq('2');
 
-            await sleep(5000);
+            await sleep(15000);
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
 
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;

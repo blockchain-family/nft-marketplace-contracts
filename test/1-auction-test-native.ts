@@ -212,7 +212,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 15)).toString();
             let callbacks = await Callback(payload);
 
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
@@ -236,7 +236,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(3000);
+            await sleep(15000);
             const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -395,7 +395,7 @@ describe("Test Auction contract", async function () {
 
             const expectedAccountBalance3 = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.2);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance3, 0.3);
 
             const auctionRootTokenWalletBalance = await auctionRootTW.balance();
             expect(auctionRootTokenWalletBalance.toString()).to.be.eq(startBalanceTWAuctionRoot.plus(currentFee).toString());
@@ -494,7 +494,7 @@ describe("Test Auction contract", async function () {
         it('Trying to stake less then auction bid', async function () {
             const spentToken: number = 3000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 5)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 15)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
@@ -513,7 +513,7 @@ describe("Test Auction contract", async function () {
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
-            await sleep(3000);
+            await sleep(15000);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -752,7 +752,7 @@ describe("Test Auction contract", async function () {
         it('Trying to stake before auction starts', async function () {
             const spentToken: number = 3000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)) + 3, 3)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)) + 10, 10)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
@@ -779,7 +779,7 @@ describe("Test Auction contract", async function () {
             const everAccount4Balance = (await balance(account4)).shiftedBy(-9).toNumber();
             expect(everAccount4Balance).to.be.closeTo(expectedAccountBalance4, 0.3);
 
-            await sleep(6000);
+            await sleep(15000);
 
             await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
@@ -796,7 +796,7 @@ describe("Test Auction contract", async function () {
         it('Trying finish auction before its start', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(((Date.now() / 1000)) + 2), 3)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(((Date.now() / 1000)) + 15), 15)).toString();
 
             let callbacks = await Callback(payload);
 
@@ -816,7 +816,7 @@ describe("Test Auction contract", async function () {
             expect(owner.toString()).to.be.eq(account2.address.toString());
             expect(status.toString()).to.be.eq('1');
 
-            await sleep(5000);
+            await sleep(25000);
             await auction.finishAuction(account2, 0, cancelValue);
             await auction.getEvent('AuctionCancelled');
         });
@@ -879,7 +879,7 @@ describe("Test Auction contract", async function () {
         it('Change market fee and success buy', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 5)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 15)).toString();
             let callbacks = await Callback(payload);
 
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
@@ -916,7 +916,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(5000);
+            await sleep(15000);
             await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');

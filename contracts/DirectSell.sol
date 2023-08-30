@@ -54,6 +54,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
     address public weverRoot;
     optional(DiscontInfo) discontOpt;
     address discountNft;
+    address collection;
 
     struct DirectSellInfo {
         address factory;
@@ -79,7 +80,8 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
         address _weverVault,
         address _weverRoot,
         DirectSellGasValues _directSellGas,
-        optional(DiscontInfo) _discontOpt
+        optional(DiscontInfo) _discontOpt,
+        address _collection
     ) public
     {
         if (
@@ -100,6 +102,7 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             }
             price = _price;
             discontOpt = _discontOpt;
+            collection = _collection;
             currentVersion++;
 
             emit MarketFeeChanged(address(this), fee);
@@ -251,6 +254,18 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                 nftAddress
             );
 
+            IDirectSellCallback(owner).ownedDirectSellSuccess{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                collection,
+                owner,
+                buyer,
+                nftAddress
+            );
+
+
             uint128 currentFee = math.muldivc(price, fee.numerator, fee.denominator);
             uint128 balance = price - currentFee;
 
@@ -292,6 +307,15 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
                     bounce: false
                 }(
                     callbackId,
+                    nftAddress
+                );
+
+                IDirectSellCallback(owner).ownedDirectSellCancelledOnTime{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    collection,
                     nftAddress
                 );
 
@@ -406,6 +430,16 @@ contract DirectSell is IAcceptTokensTransferCallback, IUpgradableByRequest, IMar
             callbackId,
             nftAddress
         );
+
+        IDirectSellCallback(owner).ownedDirectSellCancelledOnTime{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            collection,
+            nftAddress
+        );
+
         changeState(DirectSellStatus.Expired);
 
         mapping(address => CallbackParams) callbacks;

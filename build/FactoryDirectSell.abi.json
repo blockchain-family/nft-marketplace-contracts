@@ -104,7 +104,7 @@
 				{"name":"nftOwner","type":"address"},
 				{"name":"value2","type":"address"},
 				{"name":"newManager","type":"address"},
-				{"name":"value4","type":"address"},
+				{"name":"collection","type":"address"},
 				{"name":"sendGasTo","type":"address"},
 				{"name":"payload","type":"cell"}
 			],

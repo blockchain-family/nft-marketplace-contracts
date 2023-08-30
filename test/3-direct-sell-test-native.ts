@@ -715,7 +715,7 @@ describe("Test DirectSell contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.5);
             const spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3).toString());
 

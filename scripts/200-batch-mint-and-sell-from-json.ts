@@ -12,7 +12,7 @@ const prompts = require('prompts');
 const logger = require("mocha-logger");
 const request = require('request');
 
-const STEP = 2000;
+const STEP = 1000;
 const FACTORY_DIRECT_SELL = new Address('0:d1f0569cb203e11a701b2e8bba65c3c79635367ce12c2ee563cf3281c72841e6');
 const COLLECTIONS_DATA = [{
     name: 'Aquatech',
@@ -119,6 +119,7 @@ async function main() {
     let current = response.from;
 
     while(current < response.to ) {
+        console.log('fdnvjv')
         const to = Math.min(current + STEP, response.to);
 
         for( let i = 0; i < COLLECTIONS_DATA.length; i++ ) {

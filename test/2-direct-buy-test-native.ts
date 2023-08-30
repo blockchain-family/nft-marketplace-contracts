@@ -167,7 +167,7 @@ describe("Test DirectBuy contract", async function () {
         it('Deploy limited DirectBuy and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(0, account3, nft, Math.round(Date.now() / 1000), 5));
+            payload = (await factoryDirectBuy.buildPayload(0, account3, nft, Math.round(Date.now() / 1000), 10));
             await tokenWallet3.transfer(spentToken, factoryDirectBuy.address, toNano(0.1), true, payload, transferValue);
             // await traceTree.beautyPrint();
             // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -218,7 +218,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.5);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -229,7 +229,7 @@ describe("Test DirectBuy contract", async function () {
         it('Deploy future limited DirectBuy and success', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await factoryDirectBuy.buildPayload(0, account2, nft, Math.round(Date.now() / 1000) + 5, 8));
+            payload = (await factoryDirectBuy.buildPayload(0, account2, nft, Math.round(Date.now() / 1000) + 10, 15));
             await tokenWallet2.transfer(spentToken, factoryDirectBuy.address, toNano(0.1), true, payload, transferValue);
 
             let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
@@ -245,7 +245,7 @@ describe("Test DirectBuy contract", async function () {
             startBalance2 = await balance(account2);
             startBalance3 = await balance(account3);
 
-            await sleep(5000);
+            await sleep(15000);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -265,7 +265,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.5);
 
             const factoryDBTokenWalletBalance = await factoryDirectBuyTW.balance();
             const expectedTWFactoryDBBalance = startBalanceTWfactoryDirectBuy.plus(currentFee);
@@ -319,7 +319,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.5);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -373,7 +373,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance3.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.5);
 
             startBalanceTW2 -= spentToken;
             startBalanceTWfactoryDirectBuy = startBalanceTWfactoryDirectBuy.plus(currentFee);
@@ -431,7 +431,7 @@ describe("Test DirectBuy contract", async function () {
 
             const expectedAccountBalance = startBalance2.plus(spentToken).minus(currentFee).shiftedBy(-9).toNumber();
             const everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
-            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.5);
 
             spentTokenWallet3Balance = await tokenWallet3.balance() as any;
             expect(spentTokenWallet3Balance.toString()).to.be.eq((startBalanceTW3 - spentToken).toString());
@@ -709,7 +709,7 @@ describe("Test DirectBuy contract", async function () {
             const everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
             // console.log('expectedAccountBalance',expectedAccountBalance);
             // console.log('everAccount3Balance',everAccount3Balance);
-            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.4);
+            expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.5);
 
             spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());

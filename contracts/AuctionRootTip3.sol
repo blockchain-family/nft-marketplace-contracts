@@ -125,6 +125,8 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
             Gas.AUCTION_INITIAL_BALANCE +
             Gas.FRONTENT_CALLBACK_VALUE +
             Gas.FRONTENT_CALLBACK_VALUE +
+            Gas.FRONTENT_CALLBACK_VALUE +
+            Gas.FRONTENT_CALLBACK_VALUE +
             Gas.TOKEN_TRANSFER_VALUE,
             //dynamic
             valueToGas(Gas.BID_EXTRA_GAS_VALUE, address(this).wid)
@@ -133,6 +135,7 @@ contract AuctionRootTip3 is OffersRoot, INftChangeManager, ICallbackParamsStruct
         GasValues(
             // fixed
             Gas.AUCTION_INITIAL_BALANCE +
+            Gas.FRONTENT_CALLBACK_VALUE +
             Gas.FRONTENT_CALLBACK_VALUE +
             Gas.NFT_CALLBACK_VALUE +
             Gas.FEE_DEPLOY_WALLET_GRAMS +

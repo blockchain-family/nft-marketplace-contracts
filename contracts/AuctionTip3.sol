@@ -260,6 +260,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
         emit BidPlaced(_newBidSender, _bid, nextBidValue);
         sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, nft);
 
+        IAuctionBidPlacedCallback(nftOwner).ownedBidPlacedCallback{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            tokenRootAddr,
+            markerRootAddr,
+            _bid,
+            nft
+        );
+
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
@@ -268,6 +279,17 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 bounce: false
             }(
                 _callbackId,
+                currentBid.addr,
+                currentBid.value,
+                nft
+            );
+
+            IAuctionBidPlacedCallback(nftOwner).ownedBidRaisedCallback{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                tokenRootAddr,
                 currentBid.addr,
                 currentBid.value,
                 nft
@@ -357,6 +379,16 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 nft
             );
 
+            IAuctionBidPlacedCallback(nftOwner).ownedAuctionComplete{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+            }(
+                tokenRootAddr,
+                nft,
+                maxBidValue
+            );
+
             TvmCell empty;
             callbacks[currentBid.addr] = CallbackParams(Gas.NFT_CALLBACK_VALUE, empty);
 
@@ -398,6 +430,16 @@ contract AuctionTip3 is Offer, IAcceptTokensTransferCallback, IUpgradableByReque
                 callbackId,
                 nft
             );
+
+            IAuctionBidPlacedCallback(nftOwner).ownedAuctionCancelled{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                tokenRootAddr,
+                nft
+            );
+
             ITIP4_1NFT(nft).changeManager{ value: 0, flag: 128 }(
                 nftOwner,
                 sendGasTo,

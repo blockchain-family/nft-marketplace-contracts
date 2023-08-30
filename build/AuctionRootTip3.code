@@ -165,6 +165,12 @@ UFITS 128
 PUSHINT 100000000
 ADD
 UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
+PUSHINT 100000000
+ADD
+UFITS 128
 PUSHINT 300000000
 ADD
 UFITS 128
@@ -177,6 +183,9 @@ CALLREF {
 }
 PAIR
 PUSHINT 150000000
+PUSHINT 100000000
+ADD
+UFITS 128
 PUSHINT 100000000
 ADD
 UFITS 128
@@ -205,7 +214,7 @@ CALLREF {
 PAIR
 TUPLE 6
 SETGLOB 19
-.loc ../contracts/AuctionRootTip3.sol, 147
+.loc ../contracts/AuctionRootTip3.sol, 150
 NEWC
 STSLICECONST x42_
 STSLICE
@@ -225,7 +234,7 @@ THROW 0
 CALL $_reserve_internal_macro$
 
 .macro _reserve_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 151
+.loc ../contracts/AuctionRootTip3.sol, 154
 PUSHINT 500000000
 PUSHINT 0
 RAWRESERVE
@@ -240,7 +249,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 154
+.loc ../contracts/AuctionRootTip3.sol, 157
 ENDS
 .loc ../contracts/AuctionRootTip3.sol, 0
 CALLREF {
@@ -309,7 +318,7 @@ IFREF {
 THROW 0
 
 .macro getGasValue_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 155
+.loc ../contracts/AuctionRootTip3.sol, 158
 GETGLOB 19
 .loc ../contracts/AuctionRootTip3.sol, 0
 
@@ -318,7 +327,7 @@ GETGLOB 19
 CALL $calcValue_internal_macro$
 
 .macro calcValue_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 159
+.loc ../contracts/AuctionRootTip3.sol, 162
 DUP
 FIRST
 SWAP
@@ -337,7 +346,7 @@ UFITS 128
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/AuctionRootTip3.sol, 162
+.loc ../contracts/AuctionRootTip3.sol, 165
 ENDS
 .loc ../contracts/AuctionRootTip3.sol, 0
 CALLREF {
@@ -371,7 +380,7 @@ IFREF {
 THROW 0
 
 .macro getTypeContract_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 163
+.loc ../contracts/AuctionRootTip3.sol, 166
 PUSHREF {
 	.blob x41756374696f6e526f6f74
 }
@@ -386,7 +395,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 166
+.loc ../contracts/AuctionRootTip3.sol, 169
 OVER
 PUSHCONT {
 	LDREF
@@ -436,16 +445,16 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/AuctionRootTip3.sol, 167
+.loc ../contracts/AuctionRootTip3.sol, 170
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 168
+.loc ../contracts/AuctionRootTip3.sol, 171
 DUP
 INDEX 3
 GTINT 0
 THROWIFNOT 110
-.loc ../contracts/AuctionRootTip3.sol, 169
+.loc ../contracts/AuctionRootTip3.sol, 172
 OVER
 GETGLOB 22
 PUSH S2
@@ -462,7 +471,7 @@ ROTREV
 PUSHINT 267
 DICTSETB
 SETGLOB 22
-.loc ../contracts/AuctionRootTip3.sol, 170
+.loc ../contracts/AuctionRootTip3.sol, 173
 SWAP
 PUSHREFSLICE {
 	.blob xc0000000000000000000000001
@@ -484,7 +493,7 @@ STBREFR
 ENDC
 PUSHINT 0
 SENDRAWMSG
-.loc ../contracts/AuctionRootTip3.sol, 171
+.loc ../contracts/AuctionRootTip3.sol, 174
 GETGLOB 9
 NEWC
 STSLICECONST x42_
@@ -505,7 +514,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 174
+.loc ../contracts/AuctionRootTip3.sol, 177
 OVER
 PUSHCONT {
 	LDREF
@@ -548,11 +557,11 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/AuctionRootTip3.sol, 175
+.loc ../contracts/AuctionRootTip3.sol, 178
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 176
+.loc ../contracts/AuctionRootTip3.sol, 179
 DUP
 GETGLOB 22
 PUSHINT 267
@@ -560,14 +569,14 @@ DICTGET
 NULLSWAPIFNOT
 NIP
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 177
+	.loc ../contracts/AuctionRootTip3.sol, 180
 	DUP
 	GETGLOB 22
 	PUSHINT 267
 	DICTDEL
 	DROP
 	SETGLOB 22
-	.loc ../contracts/AuctionRootTip3.sol, 178
+	.loc ../contracts/AuctionRootTip3.sol, 181
 	DUP
 	PUSHSLICE xc0000000000000000000000000678fa39b
 	NEWC
@@ -579,7 +588,7 @@ PUSHCONT {
 	.loc ../contracts/AuctionRootTip3.sol, 0
 }
 IF
-.loc ../contracts/AuctionRootTip3.sol, 180
+.loc ../contracts/AuctionRootTip3.sol, 183
 DROP
 GETGLOB 9
 NEWC
@@ -601,7 +610,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 183
+.loc ../contracts/AuctionRootTip3.sol, 186
 OVER
 PUSHCONT {
 	LDREF
@@ -640,46 +649,46 @@ CALLREF {
 THROW 0
 
 .macro onNftChangeManager_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 192
+.loc ../contracts/AuctionRootTip3.sol, 195
 ROLL 3
 MYADDR
 SDEQ
 THROWIFNOT 100
-.loc ../contracts/AuctionRootTip3.sol, 193
+.loc ../contracts/AuctionRootTip3.sol, 196
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 194
+.loc ../contracts/AuctionRootTip3.sol, 197
 FALSE
 DUP
-.loc ../contracts/AuctionRootTip3.sol, 197
+.loc ../contracts/AuctionRootTip3.sol, 200
 ROT
 CTOS
-.loc ../contracts/AuctionRootTip3.sol, 198
+.loc ../contracts/AuctionRootTip3.sol, 201
 DUP
 SBITS
 GTINT 31
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 199
+	.loc ../contracts/AuctionRootTip3.sol, 202
 	LDU 32
 	BLKDROP2 1, 2
 	.loc ../contracts/AuctionRootTip3.sol, 0
 }
 IF
-.loc ../contracts/AuctionRootTip3.sol, 201
+.loc ../contracts/AuctionRootTip3.sol, 204
 DUP
 SBITS
 PUSHINT 523
 GEQ
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 202
+	.loc ../contracts/AuctionRootTip3.sol, 205
 	DUP
 	LDMSGADDR
 	LDU 128
 	LDU 64
 	LDU 64
 	POP S5
-	.loc ../contracts/AuctionRootTip3.sol, 208
+	.loc ../contracts/AuctionRootTip3.sol, 211
 	PUSH S3
 	PARSEMSGADDR
 	INDEX 3
@@ -719,33 +728,33 @@ PUSHCONT {
 	}
 	IF
 	PUSHCONT {
-		.loc ../contracts/AuctionRootTip3.sol, 216
+		.loc ../contracts/AuctionRootTip3.sol, 219
 		NULL
-		.loc ../contracts/AuctionRootTip3.sol, 217
+		.loc ../contracts/AuctionRootTip3.sol, 220
 		PUSH S5
 		SREFS
 		GTINT 0
 		PUSHCONT {
-			.loc ../contracts/AuctionRootTip3.sol, 218
+			.loc ../contracts/AuctionRootTip3.sol, 221
 			PUSH S5
 			LDREFRTOS
 			SWAP
 			POP S7
-			.loc ../contracts/AuctionRootTip3.sol, 219
+			.loc ../contracts/AuctionRootTip3.sol, 222
 			DUP
 			SBITS
 			PUSHINT 523
 			GEQ
 			PUSHCONT {
-				.loc ../contracts/AuctionRootTip3.sol, 220
+				.loc ../contracts/AuctionRootTip3.sol, 223
 				DUP
 				LDMSGADDR
 				POP S2
-				.loc ../contracts/AuctionRootTip3.sol, 221
+				.loc ../contracts/AuctionRootTip3.sol, 224
 				OVER
 				LDU 256
 				POP S3
-				.loc ../contracts/AuctionRootTip3.sol, 222
+				.loc ../contracts/AuctionRootTip3.sol, 225
 				OVER
 				GETGLOB 22
 				PUSHINT 267
@@ -753,7 +762,7 @@ PUSHCONT {
 				NULLSWAPIFNOT
 				NIP
 				PUSHCONT {
-					.loc ../contracts/AuctionRootTip3.sol, 223
+					.loc ../contracts/AuctionRootTip3.sol, 226
 					DUP2
 					PUSH S3
 					GETGLOB 22
@@ -781,7 +790,7 @@ PUSHCONT {
 			DROP
 		}
 		IF
-		.loc ../contracts/AuctionRootTip3.sol, 228
+		.loc ../contracts/AuctionRootTip3.sol, 231
 		GETGLOB 19
 		GETGLOB 21
 		GETGLOB 20
@@ -978,13 +987,13 @@ PUSHCONT {
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/AuctionRootTip3.sol, 255
+		.loc ../contracts/AuctionRootTip3.sol, 258
 		PUSH2 S9, S11
 		GETGLOB 9
 		PUSH3 S3, S6, S4
 		LTIME
 		TUPLE 7
-		.loc ../contracts/AuctionRootTip3.sol, 265
+		.loc ../contracts/AuctionRootTip3.sol, 268
 		PUSH2 S0, S1
 		PUSHREFSLICE {
 			.blob xc0000000000000000000000001
@@ -1020,7 +1029,7 @@ PUSHCONT {
 		ENDC
 		PUSHINT 0
 		SENDRAWMSG
-		.loc ../contracts/AuctionRootTip3.sol, 266
+		.loc ../contracts/AuctionRootTip3.sol, 269
 		PUSH3 S1, S7, S12
 		FALSE
 		NEWC
@@ -1060,9 +1069,9 @@ PUSHCONT {
 		ENDC
 		PUSHINT 1
 		SENDRAWMSG
-		.loc ../contracts/AuctionRootTip3.sol, 276
+		.loc ../contracts/AuctionRootTip3.sol, 279
 		NEWDICT
-		.loc ../contracts/AuctionRootTip3.sol, 277
+		.loc ../contracts/AuctionRootTip3.sol, 280
 		PUSH S9
 		ROT
 		GETGLOB 9
@@ -1086,7 +1095,7 @@ PUSHCONT {
 		SENDRAWMSG
 	}
 	PUSHCONT {
-		.loc ../contracts/AuctionRootTip3.sol, 283
+		.loc ../contracts/AuctionRootTip3.sol, 286
 		TRUE
 		POP S7
 	}
@@ -1095,16 +1104,16 @@ PUSHCONT {
 	BLKDROP 4
 }
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 286
+	.loc ../contracts/AuctionRootTip3.sol, 289
 	TRUE
 	POP S3
 }
 IFELSE
-.loc ../contracts/AuctionRootTip3.sol, 289
+.loc ../contracts/AuctionRootTip3.sol, 292
 DROP
 SWAP
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 290
+	.loc ../contracts/AuctionRootTip3.sol, 293
 	GETGLOB 9
 	PUSH S5
 	PUSHREFSLICE {
@@ -1124,7 +1133,7 @@ PUSHCONT {
 	ENDC
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/AuctionRootTip3.sol, 291
+	.loc ../contracts/AuctionRootTip3.sol, 294
 	GETGLOB 9
 	PUSH3 S5, S1, S5
 	FALSE
@@ -1148,9 +1157,9 @@ PUSHCONT {
 	ENDC
 	PUSHINT 1
 	SENDRAWMSG
-	.loc ../contracts/AuctionRootTip3.sol, 301
+	.loc ../contracts/AuctionRootTip3.sol, 304
 	NEWDICT
-	.loc ../contracts/AuctionRootTip3.sol, 302
+	.loc ../contracts/AuctionRootTip3.sol, 305
 	PUSH2 S2, S5
 	GETGLOB 9
 	NEWC
@@ -1182,7 +1191,7 @@ BLKDROP 6
 CALL $getOfferAddress_internal_macro$
 
 .macro getOfferAddress_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 318
+.loc ../contracts/AuctionRootTip3.sol, 321
 PUSHINT 0
 NEWC
 STU 256
@@ -1212,7 +1221,7 @@ STOPTREF
 STOPTREF
 STZERO
 ENDC
-.loc ../contracts/AuctionRootTip3.sol, 327
+.loc ../contracts/AuctionRootTip3.sol, 330
 HASHCU
 NEWC
 STSLICECONST x801_
@@ -1225,7 +1234,7 @@ CTOS
 DROP
 GETGLOB 6
 THROWIFNOT 76
-.loc ../contracts/AuctionRootTip3.sol, 330
+.loc ../contracts/AuctionRootTip3.sol, 333
 LDU 32
 GETGLOB 4
 ROT
@@ -1341,29 +1350,29 @@ IFREF {
 THROW 0
 
 .macro buildAuctionCreationPayload_internal_macro
-.loc ../contracts/AuctionRootTip3.sol, 340
+.loc ../contracts/AuctionRootTip3.sol, 343
 ROLL 6
 NEWC
 STU 32
-.loc ../contracts/AuctionRootTip3.sol, 341
+.loc ../contracts/AuctionRootTip3.sol, 344
 ROLL 6
 STSLICER
-.loc ../contracts/AuctionRootTip3.sol, 342
+.loc ../contracts/AuctionRootTip3.sol, 345
 ROLL 5
 STUR 128
-.loc ../contracts/AuctionRootTip3.sol, 343
+.loc ../contracts/AuctionRootTip3.sol, 346
 ROLL 4
 STUR 64
-.loc ../contracts/AuctionRootTip3.sol, 344
+.loc ../contracts/AuctionRootTip3.sol, 347
 ROLL 3
 STUR 64
-.loc ../contracts/AuctionRootTip3.sol, 346
+.loc ../contracts/AuctionRootTip3.sol, 349
 NEWC
-.loc ../contracts/AuctionRootTip3.sol, 347
+.loc ../contracts/AuctionRootTip3.sol, 350
 PUSH S3
 ISNULL
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 348
+	.loc ../contracts/AuctionRootTip3.sol, 351
 	PUSH2 S3, S3
 	ISNULL
 	THROWIF 63
@@ -1371,11 +1380,11 @@ PUSHCONT {
 	.loc ../contracts/AuctionRootTip3.sol, 0
 }
 IFNOT
-.loc ../contracts/AuctionRootTip3.sol, 350
+.loc ../contracts/AuctionRootTip3.sol, 353
 PUSH S2
 ISNULL
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 351
+	.loc ../contracts/AuctionRootTip3.sol, 354
 	PUSH2 S2, S2
 	ISNULL
 	THROWIF 63
@@ -1383,9 +1392,9 @@ PUSHCONT {
 	.loc ../contracts/AuctionRootTip3.sol, 0
 }
 IFNOT
-.loc ../contracts/AuctionRootTip3.sol, 353
+.loc ../contracts/AuctionRootTip3.sol, 356
 STBREFR
-.loc ../contracts/AuctionRootTip3.sol, 354
+.loc ../contracts/AuctionRootTip3.sol, 357
 GETGLOB 4
 PUSHINT 0
 SETINDEXQ 2
@@ -1407,7 +1416,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 357
+.loc ../contracts/AuctionRootTip3.sol, 360
 OVER
 PUSHCONT {
 	LDREF
@@ -1459,27 +1468,27 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/AuctionRootTip3.sol, 358
+.loc ../contracts/AuctionRootTip3.sol, 361
 OVER
 PARSEMSGADDR
 INDEX 3
 PLDU 256
 THROWIFNOT 254
-.loc ../contracts/AuctionRootTip3.sol, 359
+.loc ../contracts/AuctionRootTip3.sol, 362
 DEPTH
 ADDCONST -2
 PICK
 PUSHINT 500000000
 GEQ
 THROWIFNOT 256
-.loc ../contracts/AuctionRootTip3.sol, 360
+.loc ../contracts/AuctionRootTip3.sol, 363
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 361
+.loc ../contracts/AuctionRootTip3.sol, 364
 PUSHREF {
 }
-.loc ../contracts/AuctionRootTip3.sol, 362
+.loc ../contracts/AuctionRootTip3.sol, 365
 FALSE
 ROT
 PUSHINT 120000000
@@ -1508,7 +1517,7 @@ STBREFR
 ENDC
 PUSHPOW2 7
 SENDRAWMSG
-.loc ../contracts/AuctionRootTip3.sol, 364
+.loc ../contracts/AuctionRootTip3.sol, 367
 PUSHREFSLICE {
 	.blob xc0000000000000000000000001
 }
@@ -1538,7 +1547,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 367
+.loc ../contracts/AuctionRootTip3.sol, 370
 OVER
 PUSHCONT {
 	LDREF
@@ -1585,14 +1594,14 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/AuctionRootTip3.sol, 372
+.loc ../contracts/AuctionRootTip3.sol, 375
 DEPTH
 ADDCONST -2
 PICK
 PUSHINT 5000000000
 GEQ
 THROWIFNOT 109
-.loc ../contracts/AuctionRootTip3.sol, 373
+.loc ../contracts/AuctionRootTip3.sol, 376
 PUSHINT 500000000
 GETPARAM 7
 FIRST
@@ -1604,7 +1613,7 @@ UFITS 128
 MAX
 PUSHINT 2
 RAWRESERVE
-.loc ../contracts/AuctionRootTip3.sol, 378
+.loc ../contracts/AuctionRootTip3.sol, 381
 GETGLOB 18
 GETGLOB 14
 BLKSWAP 2, 3
@@ -1637,7 +1646,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 384
+.loc ../contracts/AuctionRootTip3.sol, 387
 LDREF
 ENDS
 .loc ../contracts/AuctionRootTip3.sol, 0
@@ -1677,18 +1686,18 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/AuctionRootTip3.sol, 385
+.loc ../contracts/AuctionRootTip3.sol, 388
 CALLREF {
 	CALL $_reserve_internal_macro$
 }
-.loc ../contracts/AuctionRootTip3.sol, 386
+.loc ../contracts/AuctionRootTip3.sol, 389
 SETGLOB 14
-.loc ../contracts/AuctionRootTip3.sol, 387
+.loc ../contracts/AuctionRootTip3.sol, 390
 GETGLOB 18
 INC
 UFITS 32
 SETGLOB 18
-.loc ../contracts/AuctionRootTip3.sol, 389
+.loc ../contracts/AuctionRootTip3.sol, 392
 GETGLOB 9
 NEWC
 STSLICECONST x42_
@@ -1709,7 +1718,7 @@ ISNULL
 IFREF {
 	CALL $c4_to_c7$
 }
-.loc ../contracts/AuctionRootTip3.sol, 396
+.loc ../contracts/AuctionRootTip3.sol, 399
 OVER
 PUSHCONT {
 	LDREF
@@ -1758,16 +1767,16 @@ DEPTH
 ADDCONST -2
 PICK
 THROWIFNOT 101
-.loc ../contracts/AuctionRootTip3.sol, 401
+.loc ../contracts/AuctionRootTip3.sol, 404
 GETGLOB 17
 ROT
 EQUAL
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 402
+	.loc ../contracts/AuctionRootTip3.sol, 405
 	CALLREF {
 		CALL $_reserve_internal_macro$
 	}
-	.loc ../contracts/AuctionRootTip3.sol, 403
+	.loc ../contracts/AuctionRootTip3.sol, 406
 	DUP
 	NEWC
 	STSLICECONST x42_
@@ -1779,13 +1788,13 @@ PUSHCONT {
 	SENDRAWMSG
 }
 PUSHCONT {
-	.loc ../contracts/AuctionRootTip3.sol, 409
+	.loc ../contracts/AuctionRootTip3.sol, 412
 	PUSHREF {
 		.blob xc000000000000000000000000021ddfa5f
 	}
 	PUSHINT 0
 	SENDRAWMSG
-	.loc ../contracts/AuctionRootTip3.sol, 411
+	.loc ../contracts/AuctionRootTip3.sol, 414
 	GETGLOB 22
 	GETGLOB 19
 	GETGLOB 21
@@ -1860,10 +1869,10 @@ PUSHCONT {
 	STBREFR
 	STBREFR
 	ENDC
-	.loc ../contracts/AuctionRootTip3.sol, 427
+	.loc ../contracts/AuctionRootTip3.sol, 430
 	PUSH S2
 	SETCODE
-	.loc ../contracts/AuctionRootTip3.sol, 428
+	.loc ../contracts/AuctionRootTip3.sol, 431
 	PUSH S2
 	CTOS
 	DUP
@@ -1878,7 +1887,7 @@ PUSHCONT {
 	CTOS
 	BLESS
 	POP C3
-	.loc ../contracts/AuctionRootTip3.sol, 430
+	.loc ../contracts/AuctionRootTip3.sol, 433
 	CALLREF {
 		CALL $:onCodeUpgrade$
 	}

@@ -102,6 +102,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, I
                 // fixed
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.FEE_DEPLOY_WALLET_GRAMS +
                 Gas.FEE_EXTRA_VALUE +
@@ -114,6 +115,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, I
             GasValues(
                 // fixed
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE,
@@ -220,7 +222,7 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, I
         address nftOwner,
         address, /*oldManager*/
         address newManager,
-        address, /*collection*/
+        address collection,
         address sendGasTo,
         TvmCell payload
     ) external override {
@@ -277,7 +279,8 @@ contract FactoryDirectSell is OwnableInternal, INftChangeManager, IOffersRoot, I
                 weverVault,
                 weverRoot,
                 directSellGas,
-                discontOpt
+                discontOpt,
+                collection
             );
 
             emit DirectSellDeployed(

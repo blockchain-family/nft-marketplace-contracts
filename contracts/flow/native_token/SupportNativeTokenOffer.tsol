@@ -3,6 +3,7 @@ pragma ever-solidity >= 0.62.0;
 import "../../abstract/BaseOffer.tsol";
 
 import "tip3/contracts/interfaces/ITokenWallet.tsol";
+import "tip3/contracts/interfaces/IBurnableTokenWallet.tsol";
 
 abstract contract SupportNativeTokenOffer is BaseOffer {
 
@@ -41,7 +42,7 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
         uint128 _amount,
         address _user,
         address _remainingGasTo,
-        address _sender,
+        address _tokenWallet,
         uint128 _value,
         uint16 _flag,
         uint128 _deployWalletGrams,
@@ -53,16 +54,15 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
         TvmBuilder builder;
         builder.store(_remainingGasTo);
         if (_paymentToken == _getWnativeRoot()) {
-            ITokenWallet(_sender).transfer{ value: _value, flag: _flag, bounce: false }(
-                _amount,
-                _getWnativeRoot(),
-                uint128(0),
-                _user,
-                true,
-                builder.toCell()
-            );
+            IBurnableTokenWallet(_tokenWallet)
+                .burn{ value: _value, flag: _flag, bounce: false }(
+                    _amount,
+                    _user,
+                    address(this),
+                    _payload
+                );
         } else {
-            ITokenWallet(_sender).transfer{ value: _value, flag: _flag, bounce: false }(
+            ITokenWallet(_tokenWallet).transfer{ value: _value, flag: _flag, bounce: false }(
                 _amount,
                 _user,
                 _deployWalletGrams,

@@ -276,7 +276,8 @@ describe("Test Auction contract", async function () {
             let payload: string;
             payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 3, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
-            await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
+            (await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue))
+                .traceTree?.beautyPrint();
 
             let eventAuctionDeployed = await auctionRoot.getEvent('AuctionDeployed') as any;
             auction = await Auction.from_addr(eventAuctionDeployed.offer, account2);
@@ -287,7 +288,8 @@ describe("Test Auction contract", async function () {
             expect(discountInfo.denominator).to.be.eq(discountFee.denominator);
 
             await tryIncreaseTime(6);
-            await auction.finishAuction(account3, 0, cancelValue);
+            (await auction.finishAuction(account3, 0, cancelValue))
+                .traceTree?.beautyPrint();
 
             let eventManagerChanged = await nft.getEvent('ManagerChanged') as any;
             expect(eventManagerChanged.newManager.toString()).to.be.eq(account3.address.toString());

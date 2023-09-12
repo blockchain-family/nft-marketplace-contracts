@@ -11,7 +11,7 @@ library Gas {
 
     uint128 constant TOKEN_TRANSFER_VALUE                   = 0.3 ever;
     uint128 constant FEE_DEPLOY_WALLET_GRAMS                = 0.1 ever;
-    uint128 constant FEE_EXTRA_VALUE                        = 0.1 ever;
+    uint128 constant FEE_EXTRA_VALUE                        = 0.3 ever;
     uint128 constant TRANSFER_OWNERSHIP_VALUE               = 1.01 ever;
     uint128 constant CHANGE_MANAGER_VALUE                   = 0.2 ever;
     uint128 constant ROYALTY_EXTRA_VALUE                    = 0.1 ever;

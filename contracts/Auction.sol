@@ -25,7 +25,7 @@ import "tip3/contracts/interfaces/ITokenRoot.sol";
 import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
-import "./flow/fee/MarketFeeOffer.sol";
+import "./flow/fee/MarketBurnFeeOffer.sol";
 import "./flow/native_token/SupportNativeTokenOffer.sol";
 import "./flow/RoyaltyOffer.sol";
 import "./flow/discount/DiscountCollectionOffer.sol";
@@ -36,7 +36,7 @@ contract Auction is
     ICallbackParamsStructure,
     IAuctionGasValuesStructure,
     DiscountCollectionOffer,
-    MarketFeeOffer,
+    MarketBurnFeeOffer,
     SupportNativeTokenOffer,
     RoyaltyOffer
 {
@@ -89,6 +89,7 @@ contract Auction is
         uint128 _price,
         address _collection,
         MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
         uint64 _auctionStartTime,
         uint64 _auctionDuration,
         uint16 _bidDelta,
@@ -119,6 +120,7 @@ contract Auction is
 
             _initialization(
                 _fee,
+                _burnFee,
                 _weverRoot,
                 _weverVault,
                 _discountOpt
@@ -279,6 +281,16 @@ contract Auction is
                 _getNftAddress()
             );
 
+            IAuctionBidPlacedCallback(_getOwner()).ownedAuctionComplete{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+            }(
+                _getCollection(),
+                _getNftAddress(),
+                maxBidValue
+            );
+
             TvmCell emptyPayload;
             callbacks[currentBid.addr] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
@@ -325,6 +337,16 @@ contract Auction is
                 _callbackId,
                 _getNftAddress()
             );
+
+            IAuctionBidPlacedCallback(_getOwner()).ownedAuctionCancelled{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                _getNftAddress()
+            );
+
             ITIP4_1NFT(_getNftAddress()).changeManager{ value: 0, flag: 128 }(
                 _getOwner(),
                 _remainingGasTo,
@@ -429,6 +451,17 @@ contract Auction is
         emit BidPlaced(_newBidSender, _bid, nextBidValue);
         _sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, _getNftAddress());
 
+        IAuctionBidPlacedCallback(_getOwner()).ownedBidPlacedCallback{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            _getCollection(),
+            _getPaymentToken(),
+            _bid,
+            _getNftAddress()
+        );
+
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
@@ -437,6 +470,17 @@ contract Auction is
                 bounce: false
             }(
                 _callbackId,
+                currentBid.addr,
+                currentBid.value,
+                _getNftAddress()
+            );
+
+            IAuctionBidPlacedCallback(_getOwner()).ownedBidRaisedCallback{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
                 currentBid.addr,
                 currentBid.value,
                 _getNftAddress()
@@ -493,6 +537,27 @@ contract Auction is
         }
     }
 
+    function onAcceptTokensBurn(
+        uint128 amount,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    )
+         external
+         virtual
+         reserve
+    {
+        require(msg.sender.value != 0 && (msg.sender == _getWeverRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wever_root_or_payment_token);
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+
+        if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
+            _tokensBurn();
+        } else {
+            _weverBurn(amount, user, payload);
+        }
+    }
+
     function upgrade(
         TvmCell newCode,
         uint32 newVersion,
@@ -537,7 +602,8 @@ contract Auction is
                 auctionGas,
                 _getDiscountOpt(),
                 _getDiscountNft(),
-                _getRoyalty()
+                _getRoyalty(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

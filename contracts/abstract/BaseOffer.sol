@@ -28,6 +28,7 @@ abstract contract BaseOffer is
     address private collection_;
 
     MarketFee private fee_;
+    optional(MarketBurnFee) private burnFee_;
 
     address private weverRoot_;
     address private weverVault_;
@@ -73,6 +74,7 @@ abstract contract BaseOffer is
 
     function _initialization(
         MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
         address _weverRoot,
         address _weverVault,
         optional(DiscountInfo) _discountOpt
@@ -82,6 +84,9 @@ abstract contract BaseOffer is
     {
         deployTime_ = now;
         _setMarketFee(_fee);
+        if (_burnFee.hasValue()){
+            _setMarketBurnFee(_burnFee.get());
+        }
         weverVault_ = _weverVault;
         weverRoot_ = _weverRoot;
         _setDiscountOpt(_discountOpt);
@@ -192,6 +197,27 @@ abstract contract BaseOffer is
         returns (MarketFee)
     {
         return fee_;
+    }
+
+// market burn fee
+    function _setMarketBurnFee(
+        MarketBurnFee _fee
+    )
+        internal
+        virtual
+    {
+        require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
+        burnFee_ = _fee;
+        emit MarketBurnFeeChanged(address(this), _fee);
+    }
+
+    function _getMarketBurnFee()
+        internal
+        view
+        virtual
+        returns (optional(MarketBurnFee))
+    {
+        return burnFee_;
     }
 
 // support native token

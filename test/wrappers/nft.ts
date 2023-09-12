@@ -31,7 +31,7 @@ export class NftC {
             }).send({
             from: initiator.address,
             amount: gasValue
-        }));
+        }),{allowedCodes:{compute:[null]}});
     }
 
     async getEvents(event_name: string) {

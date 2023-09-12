@@ -18,5 +18,7 @@ library BaseErrors {
     uint16 constant wrong_recipient                  = 114;
     uint16 constant message_sender_is_not_my_root    = 115;
     uint16 constant value_too_low                    = 116;
+    uint8 constant not_wever_root_or_payment_token   = 117;
+
 
 }

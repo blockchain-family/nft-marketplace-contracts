@@ -22,16 +22,16 @@ import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 import "tip3/contracts/TokenWalletPlatform.sol";
 import "./modules/access/OwnableInternal.sol";
 
-import "./flow/fee/MarketFeeRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
 import "./flow/native_token/SupportNativeTokenFDB.sol";
+import "./flow/fee/MarketBurnFeeRoot.sol";
 
 contract FactoryDirectBuy is
     BaseRoot,
     IAcceptTokensTransferCallback,
     SupportNativeTokenFDB,
-    MarketFeeRoot,
+    MarketBurnFeeRoot,
     DiscountCollectionRoot,
     OffersUpgradableRoot,
     IDirectBuyGasValuesStructure
@@ -140,6 +140,7 @@ contract FactoryDirectBuy is
                 // fixed
                 Gas.DIRECT_BUY_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE +
                 Gas.FEE_EXTRA_VALUE +
@@ -221,6 +222,7 @@ contract FactoryDirectBuy is
                 startTime,
                 durationTime,
                 _getMarketFee(),
+                _getMarketBurnFee(),
                 _getWeverVault(),
                 _getWeverRoot(),
                 directBuyGas,
@@ -228,7 +230,7 @@ contract FactoryDirectBuy is
             );
 
             emit DirectBuyDeployed(directBuyAddress, buyer, tokenRoot, nftForBuy, nonce, amount);
-                IDirectBuyCallback(buyer).directBuyDeployed{
+            IDirectBuyCallback(buyer).directBuyDeployed{
                 value: Gas.FRONTENT_CALLBACK_VALUE,
                 flag: 1,
                 bounce: false
@@ -358,7 +360,8 @@ contract FactoryDirectBuy is
                 _getWeverVault(),
                 _getWeverRoot(),
                 directBuyGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
             
             tvm.setcode(newCode);

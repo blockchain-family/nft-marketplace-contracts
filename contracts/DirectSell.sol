@@ -26,7 +26,7 @@ import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
 import "./flow/discount/DiscountCollectionOffer.sol";
-import "./flow/fee/MarketFeeOffer.sol";
+import "./flow/fee/MarketBurnFeeOffer.sol";
 import "./flow/native_token/SupportNativeTokenOffer.sol";
 import "./flow/RoyaltyOffer.sol";
 
@@ -38,7 +38,7 @@ contract DirectSell is
     ICallbackParamsStructure,
     IGasValueStructure,
     DiscountCollectionOffer,
-    MarketFeeOffer,
+    MarketBurnFeeOffer,
     SupportNativeTokenOffer,
     RoyaltyOffer
 {
@@ -75,6 +75,7 @@ contract DirectSell is
         uint64 _durationTime,
         uint128 _price,
         MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
         address _weverVault,
         address _weverRoot,
         address _collection,
@@ -98,6 +99,7 @@ contract DirectSell is
             price = _price;
             _initialization(
                 _fee,
+                _burnFee,
                 _weverRoot,
                 _weverVault,
                 _discountOpt
@@ -189,6 +191,17 @@ contract DirectSell is
                 _getNftAddress()
             );
 
+            IDirectSellCallback(_getOwner()).ownedDirectSellSuccess{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                _getOwner(),
+                buyer,
+                _getNftAddress()
+            );
+
             uint128 currentFee = _getCurrentFee(price);
             uint128 currentRoyalty = _getCurrentRoyalty(price);
             uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, price);
@@ -240,6 +253,15 @@ contract DirectSell is
                     bounce: false
                 }(
                     callbackId,
+                    _getNftAddress()
+                );
+
+                IDirectSellCallback(_getOwner()).ownedDirectSellCancelledOnTime{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    _getCollection(),
                     _getNftAddress()
                 );
 
@@ -376,6 +398,16 @@ contract DirectSell is
             _callbackId,
             _getNftAddress()
         );
+
+        IDirectSellCallback(_getOwner()).ownedDirectSellCancelledOnTime{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            _getCollection(),
+            _getNftAddress()
+        );
+
         _changeState(DirectSellStatus.Expired);
 
         mapping(address => CallbackParams) callbacks;
@@ -483,6 +515,27 @@ contract DirectSell is
         });
     }
 
+    function onAcceptTokensBurn(
+        uint128 amount,
+        address /*walletOwner*/,
+        address /*wallet*/,
+        address user,
+        TvmCell payload
+    )
+         external
+         virtual
+         reserve
+    {
+        require(msg.sender.value != 0 && (msg.sender == _getWeverRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wever_root_or_payment_token);
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+
+        if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
+            _tokensBurn();
+        } else {
+            _weverBurn(amount, user, payload);
+        }
+    }
+
     function upgrade(
         TvmCell newCode,
         uint32 newVersion,
@@ -523,7 +576,8 @@ contract DirectSell is
                 directSellGas,
                 _getDiscountOpt(),
                 _getDiscountNft(),
-                _getRoyalty()
+                _getRoyalty(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

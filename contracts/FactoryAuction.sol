@@ -25,9 +25,9 @@ import './Nft.sol';
 import './Auction.sol';
 
 import "./flow/native_token/SupportNativeTokenRoot.sol";
-import "./flow/fee/MarketFeeRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
+import "./flow/fee/MarketBurnFeeRoot.sol";
 
 
 contract FactoryAuction is
@@ -35,7 +35,7 @@ contract FactoryAuction is
     ICallbackParamsStructure,
     IAuctionGasValuesStructure,
     SupportNativeTokenRoot,
-    MarketFeeRoot,
+    MarketBurnFeeRoot,
     DiscountCollectionRoot,
     OffersUpgradableRoot
 {
@@ -148,6 +148,8 @@ contract FactoryAuction is
                 Gas.AUCTION_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.TOKEN_TRANSFER_VALUE,
                 //dynamic
                 valueToGas(Gas.BID_EXTRA_GAS_VALUE, address(this).wid)
@@ -156,6 +158,7 @@ contract FactoryAuction is
             GasValues(
                 // fixed
                 Gas.AUCTION_INITIAL_BALANCE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.FEE_DEPLOY_WALLET_GRAMS +
@@ -242,6 +245,7 @@ contract FactoryAuction is
                     price,
                     collection,
                     _getMarketFee(),
+                    _getMarketBurnFee(),
                     auctionStartTime,
                     auctionDuration,
                     auctionBidDelta,
@@ -396,7 +400,8 @@ contract FactoryAuction is
                 _getWeverVault(),
                 _getWeverRoot(),
                 auctionGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

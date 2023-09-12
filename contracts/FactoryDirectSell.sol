@@ -23,7 +23,7 @@ import "./modules/TIP4_1/structures/ICallbackParamsStructure.sol";
 import "./Nft.sol";
 import "./DirectSell.sol";
 
-import "./flow/fee/MarketFeeRoot.sol";
+import "./flow/fee/MarketBurnFeeRoot.sol";
 import "./flow/native_token/SupportNativeTokenRoot.sol";
 import "./flow/discount/DiscountCollectionRoot.sol";
 import "./flow/OffersUpgradableRoot.sol";
@@ -31,7 +31,7 @@ import "./flow/OffersUpgradableRoot.sol";
 contract FactoryDirectSell is
     INftChangeManager,
     ICallbackParamsStructure,
-    MarketFeeRoot,
+    MarketBurnFeeRoot,
     SupportNativeTokenRoot,
     DiscountCollectionRoot,
     OffersUpgradableRoot,
@@ -136,6 +136,7 @@ contract FactoryDirectSell is
                 // fixed
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
                 Gas.FRONTENT_CALLBACK_VALUE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.FEE_DEPLOY_WALLET_GRAMS +
                 Gas.FEE_EXTRA_VALUE +
@@ -148,6 +149,7 @@ contract FactoryDirectSell is
             GasValues(
                 // fixed
                 Gas.DIRECT_SELL_INITIAL_BALANCE +
+                Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.FRONTENT_CALLBACK_VALUE +
                 Gas.NFT_CALLBACK_VALUE +
                 Gas.TRANSFER_OWNERSHIP_VALUE,
@@ -226,6 +228,7 @@ contract FactoryDirectSell is
                 durationTime,
                 price,
                 _getMarketFee(),
+                _getMarketBurnFee(),
                 _getWeverVault(),
                 _getWeverRoot(),
                 collection,
@@ -377,7 +380,8 @@ contract FactoryDirectSell is
                 _getWeverVault(),
                 _getWeverRoot(),
                 directSellGas,
-                _getCollectionsSpecialRules()
+                _getCollectionsSpecialRules(),
+                _getMarketBurnFee()
             );
 
             tvm.setcode(newCode);

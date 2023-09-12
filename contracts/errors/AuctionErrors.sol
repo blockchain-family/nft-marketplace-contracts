@@ -7,6 +7,5 @@ library AuctionErrors {
     uint16 constant auction_not_active        = 253;
     uint16 constant wrong_recipient           = 254;
     uint16 constant wrong_amount              = 255;
-    uint16 constant low_gas                   = 256;
 
 }

@@ -19,8 +19,16 @@ export class FactoryDirectBuy {
         return new FactoryDirectBuy(contract, owner);
     }
 
-    async buildPayload(callbackId:number, buyer: Account, nft: NftC, startTime: any, durationTime: any) {
-        return (await this.contract.methods.buildDirectBuyCreationPayload({callbackId: callbackId,buyer: buyer.address,nft: nft.address, startTime: startTime, durationTime: durationTime}).call()).value0;
+    async buildPayload(callbackId: number, buyer: Account, nft: NftC, startTime: any, durationTime: any, dCollection?: Address, dNftId?: number ) {
+            return (await this.contract.methods.buildDirectBuyCreationPayload({
+                callbackId: callbackId,
+                buyer: buyer.address,
+                nft: nft.address,
+                startTime: startTime,
+                durationTime: durationTime,
+                discountCollection: dCollection || null,
+                discountNftId: typeof(dNftId) === "undefined" ? null : dNftId
+            }).call()).value0;
     }
 
     async getEvents(event_name: string) {
@@ -33,6 +41,24 @@ export class FactoryDirectBuy {
             return last_event.data;
         }
         return null;
+    }
+
+    async withdraw(
+        tokenWallet: Address,
+        amount: number,
+        recipient: Address,
+        remainingGasTo: Address,
+        initiator: Address
+    ) {
+        return (await this.contract.methods.withdraw({
+            _tokenWallet: tokenWallet,
+            _amount: amount,
+            _recipient: recipient,
+            _remainingGasTo: remainingGasTo
+        }).send({
+            from: initiator,
+            amount: toNano(2)
+        }))
     }
 }
 
@@ -70,8 +96,8 @@ export class DirectBuy {
 
     async finishBuy(initiator: Account, callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.finishBuy({
-                sendGasTo: initiator.address,
-                callbackId
+                _remainingGasTo: initiator.address,
+                _callbackId: callbackId
             }).send({
                 from: initiator.address,
                 amount: gasValue
@@ -80,7 +106,7 @@ export class DirectBuy {
 
     async closeBuy(callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.closeBuy({
-                callbackId
+                _callbackId: callbackId
             }).send({
             from: this.owner.address,
             amount: gasValue

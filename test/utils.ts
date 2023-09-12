@@ -16,6 +16,13 @@ type MarketFee = {
     denominator: string;
 }
 
+type Royalty = {
+    numerator: string;
+    denominator: string;
+    receiver: Address;
+}
+
+
 export type AddressN = `0:${string}`
 export const isValidEverAddress = (address: string): address is AddressN => /^(?:-1|0):[0-9a-fA-F]{64}$/.test(address);
 export declare type CollectionType = Contract<FactorySource["Collection"]>;
@@ -134,6 +141,124 @@ export const deployCollectionAndMintNft = async function (account: Account, rema
 
     return [collection, nftMinted] as const;
 }
+
+export const deployCollectionAndMintNftWithRoyalty = async function (account: Account, remainOnNft: 1, pathJsonFile: "nft_to_address.json", accForNft: Account[], royalty: Royalty, inNft: boolean = true) {
+    let Nft
+    if (inNft){
+        Nft = (await locklift.factory.getContractArtifacts("NftWithRoyalty"));
+    } else {
+        Nft = (await locklift.factory.getContractArtifacts("Nft"));
+    }
+
+    const Index = (await locklift.factory.getContractArtifacts("Index"));
+    const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));
+    const signer = await locklift.keystore.getSigner('0');
+
+    remainOnNft = remainOnNft || 0;
+    accForNft = accForNft || "";
+
+    let array_json: any;
+    const data = fs.readFileSync(pathJsonFile, 'utf8');
+    if (data) array_json = JSON.parse(data);
+    let collection;
+    if (inNft) {
+        const { contract: collectionContract } = await locklift.factory.deployContract({
+            contract: "CollectionRoyalty",
+            publicKey: (signer?.publicKey) as string,
+            constructorParams: {
+                codeNft: Nft.code,
+                codeIndex: Index.code,
+                codeIndexBasis: IndexBasis.code,
+                owner: account.address,
+                remainOnNft: toNano(remainOnNft),
+                json: JSON.stringify(array_json.collection)
+            },
+            initParams: {
+                nonce_: locklift.utils.getRandomNonce()
+            },
+            value: toNano(5)
+        });
+        collection = collectionContract
+    } else {
+         const { contract: collectionContract } = await locklift.factory.deployContract({
+            contract: "CollectionWithRoyalty",
+            publicKey: (signer?.publicKey) as string,
+            constructorParams: {
+                codeNft: Nft.code,
+                codeIndex: Index.code,
+                codeIndexBasis: IndexBasis.code,
+                owner: account.address,
+                remainOnNft: toNano(remainOnNft),
+                json: JSON.stringify(array_json.collection),
+                royalty: royalty
+            },
+            initParams: {
+                nonce_: locklift.utils.getRandomNonce()
+            },
+            value: toNano(5)
+        });
+        collection = collectionContract
+    }
+    logger.log(`Collection address: ${collection.address.toString()}`);
+
+    let nftMinted : NftC[] = [];
+
+    if (array_json.nfts) {
+        let ch = 0;
+        for (const element of array_json.nfts) {
+            let item = {
+                "type": "Basic NFT",
+                "name": element.name,
+                "description": element.description,
+                "preview": {
+                    "source": element.preview_url,
+                    "mimetype": "image/png"
+                },
+                "files": [
+                    {
+                        "source": element.url,
+                        "mimetype": "image/png"
+                    }
+                ],
+                "external_url": "https://"
+            }
+            let payload = JSON.stringify(item);
+            if (inNft) {
+                const tx = await locklift.transactions.waitFinalized(
+                  collection.methods.mintNft({
+                      _owner: accForNft[ch].address,
+                      _json: payload,
+                      _royalty: royalty
+                  }).send({
+                      from: account.address,
+                      amount: toNano(6),
+                  })
+                );
+            } else {
+                const tx = await locklift.transactions.waitFinalized(
+                  collection.methods.mintNft({
+                      _owner: accForNft[ch].address,
+                      _json: payload
+                  }).send({
+                      from: account.address,
+                      amount: toNano(6),
+                  })
+                );
+            }
+            // console.log('tx:' + tx.id.hash);
+
+            let totalMinted = await collection.methods.totalMinted({ answerId: 0 }).call();
+            let nftAddress = await collection.methods.nftAddress({ answerId: 0, id: (Number(totalMinted.count) - 1).toFixed() }).call();
+            let nftCN = await NftC.from_addr(nftAddress.nft, accForNft[ch]);
+            nftMinted.push(nftCN);
+            logger.log(`Nft address: ${nftAddress.nft.toString()}, owner: ${accForNft[ch].address.toString()}`);
+            ch++;
+        }
+    }
+
+    return [collection, nftMinted] as const;
+}
+
 export const deployNFT = async function (account: Account, collection: CollectionType, nft_name: string, nft_description: string, nft_url: string, externalUrl: string, ownerNFT = account) {
     let item = {
         "type": "Basic NFT",
@@ -298,20 +423,17 @@ export const deployAuctionRoot = async function (owner: Account, fee: MarketFee,
     const signer = await locklift.keystore.getSigner('0');
 
     const Nft = (await locklift.factory.getContractArtifacts("Nft"));
-    const AuctionTip3 = (await locklift.factory.getContractArtifacts("AuctionTip3"));
+    const Auction = (await locklift.factory.getContractArtifacts("Auction"));
 
-    const { contract: auctionRootTip3, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
-        contract: 'AuctionRootTip3',
+    const { contract: factoryAuction, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
+        contract: 'FactoryAuction',
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
-            _codeNft: Nft.code,
             _owner: owner.address,
-            _offerCode: AuctionTip3.code,
-            _deploymentFee: 0,
             _fee: fee,
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
-            _sendGasTo: owner.address,
+            _remainingGasTo: owner.address,
             _weverVault: weverVault,
             _weverRoot: weverRoot
 
@@ -322,9 +444,18 @@ export const deployAuctionRoot = async function (owner: Account, fee: MarketFee,
         value: toNano(10)
     }));
 
-    logger.log(`Auction Root address ${auctionRootTip3.address.toString()}`);
+    logger.log(`Auction Root address ${factoryAuction.address.toString()}`);
 
-    return new AuctionRoot(auctionRootTip3, owner);
+    await factoryAuction.methods.setCodeOffer({
+        _newCode: Auction.code
+    }).send({
+        from: owner.address,
+        amount: toNano(1)
+    });
+
+    logger.log(`DirectBuy is set`);
+
+    return new AuctionRoot(factoryAuction, owner);
 }
 
 export const deployFactoryDirectBuy = async function (owner: Account, fee: MarketFee, weverVault: Address, weverRoot: Address) {
@@ -334,7 +465,7 @@ export const deployFactoryDirectBuy = async function (owner: Account, fee: Marke
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: owner.address,
-            sendGasTo: owner.address,
+            _remainingGasTo: owner.address,
             _fee: fee,
             _weverVault: weverVault,
             _weverRoot: weverRoot
@@ -349,17 +480,17 @@ export const deployFactoryDirectBuy = async function (owner: Account, fee: Marke
 
     const TokenWalletPlatform = await locklift.factory.getContractArtifacts('TokenWalletPlatform');
     const DirectBuy = await locklift.factory.getContractArtifacts('DirectBuy');
-    await factoryDirectBuy.methods.setCodeTokenPlatform({
-            _tokenPlatformCode: TokenWalletPlatform.code
-        }).send({
-            from: owner.address,
-            amount: toNano(1)
-        });
+    // await factoryDirectBuy.methods.setCodeTokenPlatform({
+    //         _tokenPlatformCode: TokenWalletPlatform.code
+    //     }).send({
+    //         from: owner.address,
+    //         amount: toNano(1)
+    //     });
 
-    logger.log(`TokenWalletPlatform is set`);
+    // logger.log(`TokenWalletPlatform is set`);
 
-    await factoryDirectBuy.methods.setCodeDirectBuy({
-            _directBuyCode: DirectBuy.code
+    await factoryDirectBuy.methods.setCodeOffer({
+            _newCode: DirectBuy.code
         }).send({
             from: owner.address,
             amount: toNano(1)
@@ -377,7 +508,7 @@ export const deployFactoryDirectSell = async function(owner: Account, fee: Marke
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: owner.address,
-            sendGasTo: owner.address,
+            _remainingGasTo: owner.address,
             _fee: fee,
             _weverVault: weverVault,
             _weverRoot: weverRoot
@@ -391,8 +522,8 @@ export const deployFactoryDirectSell = async function(owner: Account, fee: Marke
     logger.log(`FactoryDirectSell address ${factoryDirectSell.address.toString()}`);
 
     const DirectSell = locklift.factory.getContractArtifacts("DirectSell");
-    await factoryDirectSell.methods.setCodeDirectSell({
-            _directSellCode: DirectSell.code,
+    await factoryDirectSell.methods.setCodeOffer({
+            _newCode: DirectSell.code,
         }).send({
         from:owner.address,
         amount:toNano(1)

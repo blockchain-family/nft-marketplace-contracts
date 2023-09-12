@@ -57,6 +57,17 @@
 			]
 		},
 		{
+			"name": "ownedBidPlacedCallback",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"name":"token","type":"address"},
+				{"name":"bidValue","type":"uint128"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "bidNotPlacedCallback",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
@@ -77,6 +88,17 @@
 			]
 		},
 		{
+			"name": "ownedBidRaisedCallback",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"name":"newBidAddr","type":"address"},
+				{"name":"newBidValue","type":"uint128"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "auctionComplete",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
@@ -86,9 +108,28 @@
 			]
 		},
 		{
+			"name": "ownedAuctionComplete",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"name":"nft","type":"address"},
+				{"name":"bidValue","type":"uint128"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "auctionCancelled",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ownedAuctionCancelled",
+			"inputs": [
+				{"name":"collection","type":"address"},
 				{"name":"nft","type":"address"}
 			],
 			"outputs": [
@@ -152,6 +193,17 @@
 			]
 		},
 		{
+			"name": "ownedDirectBuySuccess",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "directBuyNotSuccess",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
@@ -164,6 +216,15 @@
 			"name": "directBuyCancelledOnTime",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ownedDirectBuyCancelledOnTime",
+			"inputs": [
+				{"name":"collection","type":"address"},
 				{"name":"nft","type":"address"}
 			],
 			"outputs": [
@@ -214,6 +275,17 @@
 			]
 		},
 		{
+			"name": "ownedDirectSellSuccess",
+			"inputs": [
+				{"name":"collection","type":"address"},
+				{"name":"oldOwner","type":"address"},
+				{"name":"newOwner","type":"address"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "directSellNotSuccess",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
@@ -226,6 +298,15 @@
 			"name": "directSellCancelledOnTime",
 			"inputs": [
 				{"name":"callbackId","type":"uint32"},
+				{"name":"nft","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ownedDirectSellCancelledOnTime",
+			"inputs": [
+				{"name":"collection","type":"address"},
 				{"name":"nft","type":"address"}
 			],
 			"outputs": [

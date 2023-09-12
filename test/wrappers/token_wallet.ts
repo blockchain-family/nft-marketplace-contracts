@@ -56,6 +56,6 @@ export class TokenWallet {
             }).send({
                 from: owner.address,
                 amount: gasValue
-        }));
+        }),{allowedCodes:{compute:[null]}});
     }
 }

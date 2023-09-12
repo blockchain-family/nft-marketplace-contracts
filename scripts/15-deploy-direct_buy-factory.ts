@@ -39,7 +39,7 @@ async function main() {
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: account.address,
-            sendGasTo: account.address,
+            _remainingGasTo: account.address,
             _fee: fee,
             _weverVault: response.weverVault,
             _weverRoot: response.weverRoot
@@ -58,16 +58,16 @@ async function main() {
 
     console.log(`Set code TokenWalletPlatform`);
 
-    await factoryDirectBuy.methods.setCodeTokenPlatform({
-        _tokenPlatformCode: TokenWalletPlatform.code
-    }).send({
-        from: account.address,
-        amount: locklift.utils.toNano(1)
-    })
+    // await factoryDirectBuy.methods.setCodeTokenPlatform({
+    //     _tokenPlatformCode: TokenWalletPlatform.code
+    // }).send({
+    //     from: account.address,
+    //     amount: locklift.utils.toNano(1)
+    // })
 
     console.log(`Set code DirectBuy`)
-    await factoryDirectBuy.methods.setCodeDirectBuy({
-        _directBuyCode: DirectBuy.code
+    await factoryDirectBuy.methods.setCodeOffer({
+        _newCode: DirectBuy.code
     }).send({
         from: account.address,
         amount: locklift.utils.toNano(1)

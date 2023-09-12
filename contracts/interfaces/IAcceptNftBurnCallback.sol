@@ -11,5 +11,4 @@ interface IAcceptNftBurnCallback {
         address _remainingGasTo,
         TvmCell _payload
     ) external;
-    
 }

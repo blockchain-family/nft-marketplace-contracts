@@ -71,7 +71,7 @@ export class GiverWallet implements Giver {
   }
 
   public async sendTo(sendTo: Address, value: string): Promise<{ transaction: Transaction; output?: {} }> {
-    console.log(await this.ever.getBalance(this.giverContract.address))
+    console.log('Giver balance', await this.ever.getBalance(this.giverContract.address))
     return this.giverContract.methods
       .sendTransaction({
         value: value,
@@ -83,7 +83,7 @@ export class GiverWallet implements Giver {
       .sendExternal({ publicKey: this.keyPair.publicKey });
   }
 }
-
+//  everscale
 const giverWallet = {
   "ABI version": 2,
   header: ["pubkey", "time", "expire"],
@@ -102,6 +102,28 @@ const giverWallet = {
   ],
   events: [],
 } as const;
+
+//venom
+// const giverWallet = {
+//     "ABI version": 2,
+//     "version": "2.3",
+//     header: ["pubkey", "time", "expire"],
+//     functions: [
+//         {
+//             name: "sendTransaction",
+//             inputs: [
+//                 { name: "dest", type: "address" },
+//                 { name: "value", type: "uint128" },
+//                 { name: "bounce", type: "bool" },
+//                 { name: "flags", type: "uint8" },
+//                 { name: "payload", type: "cell" },
+//             ],
+//             outputs: [],
+//         },
+//     ],
+//     events: [],
+// } as const;
+
 export class TestnetGiver implements Giver {
   public giverContract: Contract<typeof testnetGiverAbi>;
 

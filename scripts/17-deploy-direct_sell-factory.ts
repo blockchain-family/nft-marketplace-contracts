@@ -39,7 +39,7 @@ async function main() {
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             _owner: account.address,
-            sendGasTo: account.address,
+            _remainingGasTo: account.address,
             _fee: fee,
             _weverVault: response.weverVault,
             _weverRoot: response.weverRoot
@@ -55,8 +55,8 @@ async function main() {
     const DirectSell = (await locklift.factory.getContractArtifacts('DirectSell'));
 
     console.log(`Set code DirectSell`);
-    await factoryDirectSell.methods.setCodeDirectSell({
-        _directSellCode: DirectSell.code,
+    await factoryDirectSell.methods.setCodeOffer({
+        _newCode: DirectSell.code,
     }).send({
         from: account.address,
         amount: locklift.utils.toNano(1)

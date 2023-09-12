@@ -7,6 +7,13 @@ interface IAuctionBidPlacedCallback {
         uint128 nextBidValue, 
         address nft
     ) external;
+
+    function ownedBidPlacedCallback(
+        address collection,
+        address token,
+        uint128 bidValue,
+        address nft
+    ) external;
     
     function bidNotPlacedCallback(
         uint32 callbackId, 
@@ -20,13 +27,31 @@ interface IAuctionBidPlacedCallback {
         address nft
     ) external;
 
+    function ownedBidRaisedCallback(
+        address collection,
+        address newBidAddr,
+        uint128 newBidValue,
+        address nft
+    ) external;
+
     function auctionComplete(
         uint32 callbackId, 
         address nft
     ) external;
 
+    function ownedAuctionComplete(
+        address collection,
+        address nft,
+        uint128 bidValue
+    ) external;
+
     function auctionCancelled(
         uint32 callbackId, 
+        address nft
+    ) external;
+
+    function ownedAuctionCancelled(
+        address collection,
         address nft
     ) external;
 }   

@@ -14,15 +14,15 @@ async function main() {
         }
     ])
     const account = await migration.loadAccount('Account1');
-    const collection = migration.loadContract("Collection", "Collection");
+    const collection = migration.loadContract("Collection", "SimilarCollection");
 
     if(response.owner) {
-        await collection.methods.transferOwnership({
+        await locklift.transactions.waitFinalized(collection.methods.transferOwnership({
                 newOwner: response.owner
             }).send({
                 from: account.address,
                 amount: locklift.utils.toNano(1)
-            });
+            }));
         console.log('Transfer ownership to: ' + response.owner)
     }
 }

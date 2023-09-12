@@ -17,7 +17,7 @@ library NftJson {
 			"\"files\": [" +
 				"{" +
 					"\"source\": \"" + _nftInfo.fileUrl + "\", " +
-					"\"mimetype\" : \"" + _nftInfo.fileUrl +  "\"" +
+					"\"mimetype\" : \"" + _nftInfo.fileMimeType +  "\"" +
 				"}" +
 			"], " +
 			"\"attributes\":" + buildAttributes(_nftInfo.attributes) + "," +

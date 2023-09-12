@@ -1,0 +1,36 @@
+{
+    "collection": {
+            "type": "Basic NFT",
+            "name": "Collection with fake dynamic royalty royalty",
+            "description": "Collection with fake dynamic royalty",
+            "preview": {
+                "source": "https://static.wikia.nocookie.net/edopedia/images/a/a3/%D0%AF%D0%B3%D0%BE%D0%B4%D1%8B.JPG/revision/latest?cb=20170607182656&path-prefix=ru",
+                "mimetype": "image/jpeg"
+            },
+            "files": [
+                {
+                    "source": "https://www.gastronom.ru/binfiles/images/20160220/bc4c13e5.jpg",
+                    "mimetype": "image/jpeg"
+                }
+            ],
+            "external_url": ""
+    },
+    "nfts":
+        [
+            {
+                "address": "",
+                "preview_url":	"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEW_EJa2QU9DiwpcWyizNAW-rRwu1Fc0QlF1U0AzQDRRHEsevWRMmmjdMzWTh8rNf_ndM&usqp=CAU",
+                "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEW_EJa2QU9DiwpcWyizNAW-rRwu1Fc0QlF1U0AzQDRRHEsevWRMmmjdMzWTh8rNf_ndM&usqp=CAU",
+                "name": "NFT with fake dynamic royalty 1",
+                "description": "NFT with fake dynamic royalty",
+                "mimetype": "image/jpeg",
+                "mimetype_preview": "image/jpeg",
+                "external_url": "",
+                "royalty": {
+                    "numerator": "10",
+                    "denominator": "100",
+                    "receiver": ""
+                }
+            }
+        ]
+}

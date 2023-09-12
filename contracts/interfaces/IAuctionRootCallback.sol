@@ -1,13 +1,13 @@
 pragma ever-solidity >= 0.61.2;
 
-import "../AuctionRootTip3.sol";
+import "../FactoryAuction.sol";
 
 interface IAuctionRootCallback {
     
     function auctionTip3DeployedCallback(
         uint32 callbackId,
         address offer, 
-        AuctionRootTip3.MarketOffer offerInfo
+        FactoryAuction.MarketOffer offerInfo
     ) external;    
     
     function auctionTip3DeployedDeclined(
@@ -15,5 +15,4 @@ interface IAuctionRootCallback {
         address nftOwner, 
         address nft
     ) external;
-    
 }

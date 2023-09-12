@@ -7,6 +7,8 @@ interface IDirectSellGasValuesStructure {
     struct DirectSellGasValues {
         uint128 gasK;
         IGasValueStructure.GasValues deployWallet;
+        IGasValueStructure.GasValues royalty;
+        IGasValueStructure.GasValues deployDirectSell;
         IGasValueStructure.GasValues sell;
         IGasValueStructure.GasValues buy;
         IGasValueStructure.GasValues cancel;

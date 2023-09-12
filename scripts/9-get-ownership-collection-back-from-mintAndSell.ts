@@ -39,17 +39,17 @@ async function main() {
 
     // get collection ownership back
     logger.log("get collection ownership back");
-    await locklift.tracing.trace(MintAndSell.methods.getCollectionOwnershipBack({newOwner: savedMintAndSell}).send({
+    await locklift.transactions.waitFinalized(MintAndSell.methods.getCollectionOwnershipBack({newOwner: response.owner}).send({
         from: account.address,
         amount: toNano(3)
     }));
 
     //drain gas
-    logger.log("Drain gas");
-    await locklift.tracing.trace(MintAndSell.methods.drainGas({}).send({
-        from: account.address,
-        amount: toNano(0.1)
-    }));
+    // logger.log("Drain gas");
+    // await locklift.transactions.waitFinalized(MintAndSell.methods.drainGas({}).send({
+    //     from: account.address,
+    //     amount: toNano(0.1)
+    // }));
 }
 
 main()

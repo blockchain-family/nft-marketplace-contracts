@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "description": "",
   "main": "",
-  "scripts": {},
+  "scripts": {
+    "build": "npx locklift build",
+    "test": "npx locklift test --network local",
+    "test:auction": "npx locklift build && npx locklift test --disable-build --network local --tests test/1-auction-test.ts && npx locklift test --disable-build --network local --tests test/1-auction-test-native.ts && npx locklift test --disable-build --network local --tests test/2-direct-buy-test.ts && npx locklift test --disable-build --network local --tests test/2-direct-buy-test-native.ts && npx locklift test --disable-build --network local --tests test/3-direct-sell-test.ts && npx locklift test --disable-build --network local --tests test/3-direct-sell-test-native.ts"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -16,7 +20,7 @@
     "chai": "^4.3.6",
     "everscale-standalone-client": "^2.1.14",
     "ipfs-core": "^0.14.2",
-    "locklift": "^2.4.8",
+    "locklift": "2.4.8",
     "mocha-logger": "^1.0.8",
     "ora": "^3.4.0",
     "prettier": "^2.7.1",
@@ -25,6 +29,12 @@
     "ton-wton": "git://github.com/broxus/ton-wton#42a5aaf95b51b8a365d40ef3e95c1a6931f0a90c",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "@broxus/locklift-verifier": "1.0.5"
+  },
+  "dependencies": {
+    "https": "^1.0.0",
+    "locklift-verifier": "^1.0.3",
+    "request": "^2.88.2"
   }
 }

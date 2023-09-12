@@ -23,323 +23,527 @@ import "tip3/contracts/interfaces/ITokenRoot.sol";
 import "tip3/contracts/interfaces/ITokenWallet.sol";
 import "tip3/contracts/interfaces/IAcceptTokensTransferCallback.sol";
 
-import "./structures/IMarketFeeStructure.sol";
+import "./flow/discount/DiscountCollectionOffer.sol";
+import "./flow/fee/MarketBurnFeeOffer.sol";
+import "./flow/native_token/SupportNativeTokenOffer.sol";
+import "./flow/RoyaltyOffer.sol";
+
 import "./structures/IDirectBuyGasValuesStructure.sol";
 
-contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgradableByRequest, IMarketFeeStructure, ICallbackParamsStructure, IDirectBuyGasValuesStructure {
-  address static factoryDirectBuy;
-  address static owner;
-  address static spentToken;
-  address static nftAddress;
-  uint64 static timeTx;
+contract DirectBuy is
+    IAcceptTokensTransferCallback,
+    INftChangeManager,
+    IUpgradableByRequest,
+    ICallbackParamsStructure,
+    IDirectBuyGasValuesStructure,
+    DiscountCollectionOffer,
+    MarketBurnFeeOffer,
+    SupportNativeTokenOffer,
+    RoyaltyOffer
+{
+    uint128 price;
+    bool tokensReceived = false;
 
-  uint128 price;
+    uint64 startTime;
+    uint64 durationTime;
+    uint64 endTime;
 
-  uint64 startTime;
-  uint64 durationTime;
-  uint64 endTime;
+    address tokenWallet;
+    uint8 currentStatus;
+    uint32 currentVersion;
 
-  address spentTokenWallet;
-  uint8 currentStatus;
-  uint32 currentVersion;
+    DirectBuyGasValues directBuyGas;
 
-  MarketFee fee;
-  address public weverVault;
-  address public weverRoot;
-  DirectBuyGasValues directBuyGas;
-
-  struct DirectBuyInfo {
-    address factory;
-    address creator;
-    address spentToken;
-    address nft;
-    uint64 _timeTx;
-    uint128 _price;
-    address spentWallet;
-    uint8 status;
-    uint64 startTimeBuy;
-    uint64 durationTimeBuy;
-    uint64 endTimeBuy;
-  }
-
-  event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo);
-  event DirectBuyUpgrade();
-  event MarketFeeWithheld(uint128 amount, address tokenRoot);
-
-  constructor(
-    uint128 _amount,
-    uint64 _startTime,
-    uint64 _durationTime,
-    address _spentTokenWallet,
-    MarketFee _fee,
-    address _weverVault,
-    address _weverRoot,
-    DirectBuyGasValues _directBuyGas
-  ) public {
-    if (msg.sender.value != 0 &&
-        msg.sender == factoryDirectBuy) {
-      _reserve();
-      changeState(DirectBuyStatus.Create);
-      price = _amount;
-      startTime = _startTime;
-      durationTime = _durationTime;
-      weverVault = _weverVault;
-      weverRoot = _weverRoot;
-
-      if (_startTime > 0 && _durationTime > 0) {
-        endTime = _startTime + _durationTime;
-      }
-      spentTokenWallet = _spentTokenWallet;
-      fee = _fee;
-      directBuyGas = _directBuyGas;
-      currentVersion++;
-      owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
-    } else {
-      msg.sender.transfer(0, false, 128 + 32);
+    struct DirectBuyInfo {
+        address factory;
+        address creator;
+        address spentToken;
+        address nft;
+        uint64 _timeTx;
+        uint128 _price;
+        address spentWallet;
+        uint8 status;
+        uint64 startTimeBuy;
+        uint64 durationTimeBuy;
+        uint64 endTimeBuy;
     }
-  }
 
-  modifier onlyOwner() {
-    require(
-      msg.sender.value != 0 &&
-      msg.sender == owner,
-      DirectBuySellErrors.NOT_OWNER_DIRECT_BUY_SELL
-    );
-    _;
-  }
+    event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo);
+    event DirectBuyUpgrade();
 
-  function _reserve() internal  {
-      tvm.rawReserve(Gas.DIRECT_BUY_INITIAL_BALANCE, 0);
-  }
+    mapping(address => uint128) internal tmp_transactions;
 
-  function calcValue(IGasValueStructure.GasValues value) internal pure returns(uint128) {
-      return value.fixedValue + gasToValue(value.dynamicGas, address(this).wid);
-  }
+    constructor(
+        uint128 _amount,
+        uint64 _startTime,
+        uint64 _durationTime,
+        MarketFee _fee,
+        optional(MarketBurnFee) _burnFee,
+        address _weverVault,
+        address _weverRoot,
+        DirectBuyGasValues _directBuyGas,
+        optional(DiscountInfo) _discountOpt
+    )
+        public
+        reserve
+    {
+        if (msg.sender.value != 0 && msg.sender == _getMarketRootAddress()) {
 
-  function getTypeContract() external pure returns (string) {
-    return "DirectBuy";
-  }
+            price = _amount;
+            startTime = _startTime;
+            durationTime = _durationTime;
 
-  function getMarketFee() external view returns (MarketFee) {
-    return fee;
-  }
+            if (_startTime > 0 && _durationTime > 0) {
+                endTime = _startTime + _durationTime;
+            }
 
-  function setMarketFee(MarketFee _fee, address sendGasTo) external onlyFactory {
-      _reserve();
-      require(_fee.denominator > 0, BaseErrors.denominator_not_be_zero);
-      fee= _fee;
-      sendGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
-  }
+            directBuyGas = _directBuyGas;
 
-  modifier onlyFactory() virtual {
-      require(msg.sender.value != 0 && msg.sender == factoryDirectBuy, 100);
-      _;
-  }
+            _initialization(
+                _fee,
+                _burnFee,
+                _weverRoot,
+                _weverVault,
+                _discountOpt
+            );
 
-  function getInfo() external view returns (DirectBuyInfo) {
-    return buildInfo();
-  }
+            _checkRoyaltyFromNFT(calcValue(directBuyGas.royalty));
 
-  function onAcceptTokensTransfer(
-    address tokenRoot,
-    uint128 amount,
-    address sender,
-    address, /*senderWallet*/
-    address originalGasTo,
-    TvmCell /*payload*/
-  ) external override {
-    _reserve();
-    if (
-        tokenRoot == spentToken &&
-        msg.sender.value != 0 &&
-        msg.sender == spentTokenWallet &&
-        amount >= price &&
-        sender == factoryDirectBuy
-    ) {
-      changeState(DirectBuyStatus.Active);
-      owner.transfer({ value: 0, flag: 128 + 2, bounce: false });
-    } else {
-      TvmCell emptyPayload;
-      ITokenWallet(msg.sender).transfer{
-        value: 0,
-        flag: 128,
-        bounce: false
-      }(
-        amount,
-        sender,
-        uint128(0),
-        originalGasTo,
-        true,
-        emptyPayload
-      );
+            if (_getDiscountOpt().hasValue()) {
+                _discountAvailabilityCheck();
+            }
+            currentVersion++;
+            changeState(DirectBuyStatus.Create);
+
+            ITokenRoot(_getPaymentToken()).deployWallet{
+                value: 0,
+                flag: 128,
+                callback: DirectBuy.onTokenWallet
+            }(address(this), Gas.DEPLOY_EMPTY_WALLET_GRAMS);
+        } else {
+           msg.sender.transfer(0, false, 128 + 32);
+        }
     }
-  }
 
-  function onNftChangeManager(
-    uint256, /*id*/
-    address nftOwner,
-    address, /*oldManager*/
-    address newManager,
-    address, /*collection*/
-    address sendGasTo,
-    TvmCell payload
-  ) external override {
-    require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
-    _reserve();
-
-    uint32 callbackId = 0;
-    TvmSlice payloadSlice = payload.toSlice();
-    if (payloadSlice.bits() >= 32) {
-        callbackId = payloadSlice.decode(uint32);
+    function onTokenWallet(
+        address _wallet
+    )
+        external
+        onlyPaymentToken
+        reserve
+    {
+        tokenWallet = _wallet;
+        if (
+            tmp_transactions.exists(tokenWallet) &&
+            tmp_transactions[tokenWallet] >= price
+        ) {
+            tokensReceived = true;
+            tmp_transactions.delMin();
+            _checkAndActivate();
+        }
+        _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
     }
-    mapping(address => CallbackParams) callbacks;
-    if (
-        msg.sender.value != 0 &&
-        msg.sender == nftAddress &&
-        msg.sender.value >= calcValue(directBuyGas.accept) &&
-        currentStatus == DirectBuyStatus.Active &&
-        ((endTime > 0 && now < endTime) || endTime == 0) &&
-        now >= startTime
-    ) {
-      uint128 currentFee = math.muldivc(price, fee.numerator, fee.denominator);
-      uint128 balance = price - currentFee;
 
-      IDirectBuyCallback(nftOwner).directBuySuccess{
-        value: Gas.FRONTENT_CALLBACK_VALUE,
-        flag: 1,
-        bounce: false
-      }(
-        callbackId,
-        nftOwner,
-        owner,
-        nftAddress
-      );
+    onBounce(
+        TvmSlice _body
+    )
+        external
+        reserve
+    {
+        uint32 functionId = _body.decode(uint32);
+        if (currentStatus == DirectBuyStatus.Create) {
+            _fallbackRoyaltyFromCollection(functionId);
+        }
+        _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
+    }
 
-      changeState(DirectBuyStatus.Filled);
+    function onAcceptTokensTransfer(
+        address tokenRoot,
+        uint128 amount,
+        address sender,
+        address, /*senderWallet*/
+        address originalGasTo,
+        TvmCell /*payload*/
+    )
+        external
+        override
+        reserve
+    {
+        require(msg.sender.value != 0, BaseErrors.operation_not_permited);
+        if (
+            tokenRoot == _getPaymentToken() &&
+            sender == _getMarketRootAddress() &&
+            amount >= price
+        ) {
+            if (
+                tokenWallet.value == 0 &&
+                currentStatus == DirectBuyStatus.Create
+            ){
+                tmp_transactions[msg.sender] += amount;
+            } else if (
+                msg.sender == tokenWallet
+            ){
+                tokensReceived = true;
+                _checkAndActivate();
+            }
+            _getOwner().transfer({ value: 0, flag: 128 + 2, bounce: false });
+        } else {
+            TvmCell emptyPayload;
+            ITokenWallet(msg.sender).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                amount,
+                sender,
+                uint128(0),
+                originalGasTo,
+                true,
+                emptyPayload
+            );
+        }
+    }
 
-      TvmCell empty;
-      callbacks[owner] = CallbackParams(Gas.NFT_CALLBACK_VALUE, empty);
+    function onNftChangeManager(
+        uint256, /*id*/
+        address nftOwner,
+        address, /*oldManager*/
+        address newManager,
+        address, /*collection*/
+        address remainingGasTo,
+        TvmCell payload
+    )
+        external
+        override
+        reserve
+    {
+        require(newManager == address(this), DirectBuySellErrors.NOT_NFT_MANAGER);
+        uint32 callbackId = 0;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 32) {
+            callbackId = payloadSlice.decode(uint32);
+        }
+        mapping(address => CallbackParams) callbacks;
+        TvmCell emptyPayload;
 
-      ITIP4_1NFT(nftAddress).transfer{
-        value: 0,
-        flag: 128,
-        bounce: false
-      }(
-        owner,
-        sendGasTo,
-        callbacks
-      );
+        if (
+            msg.sender.value != 0 &&
+            msg.sender == _getNftAddress() &&
+            msg.sender.value >= calcValue(directBuyGas.accept) &&
+            currentStatus == DirectBuyStatus.Active &&
+            ((endTime > 0 && now < endTime) || endTime == 0) &&
+            now >= startTime
+        ) {
+            uint128 currentFee = _getCurrentFee(price);
+            uint128 currentRoyalty = _getCurrentRoyalty(price);
+            uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, price);
 
-      _transfer(balance, nftOwner, sendGasTo, spentTokenWallet, Gas.TOKEN_TRANSFER_VALUE, 1, Gas.DEPLOY_EMPTY_WALLET_GRAMS);
+            IDirectBuyCallback(nftOwner).directBuySuccess{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                callbackId,
+                nftOwner,
+                _getOwner(),
+                _getNftAddress()
+            );
 
-      if (currentFee > 0) {
-        emit MarketFeeWithheld(currentFee, spentToken);
-        ITokenWallet(spentTokenWallet).transfer{
-          value: Gas.FEE_EXTRA_VALUE,
-          flag: 0,
-          bounce: false
-        }(
-          currentFee,
-          factoryDirectBuy,
-          uint128(0),
-          sendGasTo,
-          false,
-          empty
+            IDirectBuyCallback(_getOwner()).ownedDirectBuySuccess{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                nftOwner,
+                _getOwner(),
+                _getNftAddress()
+            );
+
+            changeState(DirectBuyStatus.Filled);
+            callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
+
+            ITIP4_1NFT(_getNftAddress()).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                _getOwner(),
+                remainingGasTo,
+                callbacks
+            );
+
+            _transfer(
+                _getPaymentToken(),
+                balance,
+                nftOwner,
+                remainingGasTo,
+                tokenWallet,
+                Gas.TOKEN_TRANSFER_VALUE,
+                1,
+                Gas.DEPLOY_EMPTY_WALLET_GRAMS,
+                emptyPayload
+            );
+
+            if (currentFee > 0) {
+                _retentionMarketFee(tokenWallet, Gas.FEE_EXTRA_VALUE, uint128(0), currentFee, remainingGasTo);
+            }
+
+            if (currentRoyalty > 0) {
+                _retentionRoyalty(currentRoyalty, tokenWallet, remainingGasTo);
+            }
+        } else {
+            if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
+                IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    callbackId,
+                    _getNftAddress()
+                );
+
+                IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    _getCollection(),
+                    _getNftAddress()
+                );
+
+                changeState(DirectBuyStatus.Expired);
+
+                ITIP4_1NFT(msg.sender).changeManager{
+                  value: 0,
+                  flag: 128
+                }(
+                  nftOwner,
+                  remainingGasTo,
+                  callbacks
+                );
+
+                _transfer(
+                    _getPaymentToken(),
+                    price,
+                    _getOwner(),
+                    remainingGasTo,
+                    tokenWallet,
+                    Gas.TOKEN_TRANSFER_VALUE,
+                    1,
+                    uint128(0),
+                    emptyPayload
+                );
+            } else {
+                IDirectBuyCallback(nftOwner).directBuyNotSuccess{
+                    value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+                }(
+                    callbackId,
+                    _getNftAddress()
+                );
+
+                ITIP4_1NFT(msg.sender).changeManager{
+                    value: 0,
+                    flag: 128
+                }(
+                    nftOwner,
+                    remainingGasTo,
+                    callbacks
+                );
+            }
+        }
+    }
+
+    function getInfo()
+        external
+        view
+        returns (DirectBuyInfo)
+    {
+        return _buildInfo();
+    }
+
+    function getTypeContract()
+        external
+        pure
+        returns (string)
+    {
+        return "DirectBuy";
+    }
+
+    function _checkAndActivate()
+        internal
+        virtual
+        override
+    {
+        if (
+            _getRoyalty().hasValue() &&
+            tokensReceived &&
+            currentStatus == DirectBuyStatus.Create
+        ) {
+            changeState(DirectBuyStatus.Active);
+        }
+    }
+
+    function _afterSetRoyalty()
+        internal
+        virtual
+        override
+    {
+        _checkAndActivate();
+    }
+
+    function _isAllowedSetRoyalty()
+        internal
+        virtual
+        override
+        returns (bool)
+    {
+        return (currentStatus == DirectBuyStatus.Create);
+    }
+
+    function _getTargetBalanceInternal()
+        internal
+        view
+        virtual
+        override
+        returns (uint128)
+    {
+        return Gas.DIRECT_BUY_INITIAL_BALANCE;
+    }
+
+    function _countCorrectFinalPrice(
+        uint128 _feeAmount,
+        uint128 _royaltyAmount,
+        uint128 _price
+    )
+        internal
+        virtual
+        returns (uint128)
+    {
+        uint128 balance = _price;
+
+        if (_price >= _royaltyAmount + _feeAmount) {
+            balance = _price - _feeAmount - _royaltyAmount;
+        } else {
+            balance = _price - _feeAmount;
+        }
+
+        return balance;
+    }
+
+    function changeState(
+        uint8 _newState
+    )
+        private
+    {
+        uint8 prevStateN = currentStatus;
+        currentStatus = _newState;
+        emit DirectBuyStateChanged(prevStateN, _newState, _buildInfo());
+    }
+
+    function _buildInfo()
+        private
+        view
+        returns (DirectBuyInfo)
+    {
+        return DirectBuyInfo({
+            factory: _getMarketRootAddress(),
+            creator: _getOwner(),
+            spentToken: _getPaymentToken(),
+            nft:_getNftAddress(),
+            _timeTx: _getNonce(),
+            _price: price,
+            spentWallet: tokenWallet,
+            status: currentStatus,
+            startTimeBuy: startTime,
+            durationTimeBuy: durationTime,
+            endTimeBuy: endTime
+        });
+    }
+
+    function finishBuy(
+        address _remainingGasTo,
+        uint32 _callbackId
+    )
+        public
+        reserve
+    {
+        require(
+          currentStatus == DirectBuyStatus.Active,
+          DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
         );
-      }
+        require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
+        require(msg.value >= calcValue(directBuyGas.cancel), BaseErrors.not_enough_value);
 
-    } else {
-      if (endTime > 0 && now >= endTime && currentStatus == DirectBuyStatus.Active) {
-        IDirectBuyCallback(nftOwner).directBuyCancelledOnTime{
+        IDirectBuyCallback(msg.sender).directBuyCancelledOnTime{
           value: Gas.FRONTENT_CALLBACK_VALUE,
           flag: 1,
           bounce: false
         }(
-          callbackId,
-          nftAddress
+          _callbackId,
+          _getNftAddress()
+        );
+
+        IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
+          value: Gas.FRONTENT_CALLBACK_VALUE,
+          flag: 1,
+          bounce: false
+        }(
+          _getCollection(),
+          _getNftAddress()
         );
 
         changeState(DirectBuyStatus.Expired);
 
-        ITIP4_1NFT(msg.sender).changeManager{
-          value: 0,
-          flag: 128
-        }(
-          nftOwner,
-          sendGasTo,
-          callbacks
-        );
-
-        _transfer(price, owner, sendGasTo, spentTokenWallet,  Gas.TOKEN_TRANSFER_VALUE, 1, uint128(0));
-
-      } else {
-        IDirectBuyCallback(nftOwner).directBuyNotSuccess{
-          value: Gas.FRONTENT_CALLBACK_VALUE,
-          flag: 1,
-          bounce: false
-        }(
-          callbackId,
-          nftAddress
-        );
-
-        ITIP4_1NFT(msg.sender).changeManager{
-          value: 0,
-          flag: 128
-        }(
-          nftOwner,
-          sendGasTo,
-          callbacks
-        );
-      }
-    }
-  }
-
-  function changeState(uint8 newState) private {
-    uint8 prevStateN = currentStatus;
-    currentStatus = newState;
-    emit DirectBuyStateChanged(prevStateN, newState, buildInfo());
-  }
-
-  function buildInfo() private view returns (DirectBuyInfo) {
-    return
-      DirectBuyInfo(
-        factoryDirectBuy,
-        owner,
-        spentToken,
-        nftAddress,
-        timeTx,
-        price,
-        spentTokenWallet,
-        currentStatus,
-        startTime,
-        durationTime,
-        endTime
-      );
-  }
-
-  function _transfer(uint128 amount, address user, address remainingGasTo, address sender, uint128 value, uint16 flag, uint128 gasDeployTW) private {
-        TvmBuilder builder;
-        builder.store(remainingGasTo);
         TvmCell emptyPayload;
-        if (spentToken == weverRoot) {
-            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
-                amount,
-                weverVault,
-                uint128(0),
-                user,
-                true,
-                builder.toCell()
-            );
-        } else {
-            ITokenWallet(sender).transfer{ value: value, flag: flag, bounce: false }(
-                amount,
-                user,
-                gasDeployTW,
-                remainingGasTo,
-                false,
-                emptyPayload
-            );
-        }
+        _transfer(
+            _getPaymentToken(),
+            price,
+            _getOwner(),
+            _remainingGasTo,
+            tokenWallet,
+            0,
+            128,
+            uint128(0),
+            emptyPayload
+        );
+    }
+
+    function closeBuy(
+        uint32 _callbackId
+    )
+        external
+        onlyOwner
+        reserve
+    {
+        require(
+            currentStatus == DirectBuyStatus.Active,
+            DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
+        );
+        IDirectBuyCallback(_getOwner()).directBuyClose{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            _callbackId,
+            _getNftAddress()
+        );
+        changeState(DirectBuyStatus.Cancelled);
+
+        TvmCell emptyPayload;
+        _transfer(
+            _getPaymentToken(),
+            price,
+            _getOwner(),
+            _getOwner(),
+            tokenWallet,
+            0,
+            128,
+            uint128(0),
+            emptyPayload
+        );
     }
 
     function onAcceptTokensBurn(
@@ -348,110 +552,74 @@ contract DirectBuy is IAcceptTokensTransferCallback, INftChangeManager, IUpgrada
         address /*wallet*/,
         address user,
         TvmCell payload
-    )  external {
-        address remainingGasTo;
-        TvmSlice payloadSlice = payload.toSlice();
-        if (payloadSlice.bits() >= 267) {
-            remainingGasTo = payloadSlice.decode(address);
-        }
-        require(msg.sender.value != 0 && msg.sender == weverRoot, BaseErrors.not_wever_root);
-        _reserve();
-
-        if (user == remainingGasTo) {
-            user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+    )
+         external
+         virtual
+         reserve
+    {
+        require(msg.sender.value != 0 && (msg.sender == _getWeverRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wever_root_or_payment_token);
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+        if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
+            _tokensBurn();
         } else {
-            user.transfer({ value: amount, flag: 1, bounce: false });
-            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+            _weverBurn(amount, user, payload);
         }
-   }
-
-  function finishBuy(address sendGasTo, uint32 callbackId) public {
-    require(
-      currentStatus == DirectBuyStatus.Active,
-      DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
-    );
-    require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
-    require(msg.value >= calcValue(directBuyGas.cancel), BaseErrors.not_enough_value);
-    _reserve();
-
-    IDirectBuyCallback(msg.sender).directBuyCancelledOnTime{
-      value: Gas.FRONTENT_CALLBACK_VALUE,
-      flag: 1,
-      bounce: false
-    }(
-      callbackId,
-      nftAddress
-    );
-    changeState(DirectBuyStatus.Expired);
-
-    _transfer(price, owner, sendGasTo, spentTokenWallet, 0, 128, uint128(0));
-  }
-
-  function closeBuy(uint32 callbackId) external onlyOwner {
-    require(
-      currentStatus == DirectBuyStatus.Active,
-      DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
-    );
-    _reserve();
-    IDirectBuyCallback(owner).directBuyClose{
-      value: Gas.FRONTENT_CALLBACK_VALUE,
-      flag: 1,
-      bounce: false
-    }(
-      callbackId,
-      nftAddress
-    );
-    changeState(DirectBuyStatus.Cancelled);
-
-    _transfer(price, owner, owner, spentTokenWallet, 0, 128, uint128(0));
-  }
-
-  function upgrade(
-    TvmCell newCode,
-    uint32 newVersion,
-    address sendGasTo
-  ) override external {
-    require(
-      msg.sender.value != 0 &&
-      msg.sender == factoryDirectBuy,
-      DirectBuySellErrors.NOT_FACTORY_DIRECT_BUY
-    );
-
-    if (currentVersion == newVersion) {
-			_reserve();
-			sendGasTo.transfer({
-				value: 0,
-				flag: 128 + 2,
-				bounce: false
-			});
-		} else {
-      emit DirectBuyUpgrade();
-
-      TvmCell cellParams = abi.encode(
-        factoryDirectBuy,
-        owner,
-        spentToken,
-        nftAddress,
-        timeTx,
-        price,
-        startTime,
-        durationTime,
-        endTime,
-        spentTokenWallet,
-        currentStatus,
-        currentVersion,
-        fee,
-        weverVault,
-        weverRoot,
-        directBuyGas
-      );
-
-      tvm.setcode(newCode);
-      tvm.setCurrentCode(newCode);
-
-      onCodeUpgrade(cellParams);
     }
-  }
 
-  function onCodeUpgrade(TvmCell data) private {}
+
+    function upgrade(
+        TvmCell newCode,
+        uint32 newVersion,
+        address remainingGasTo
+    )
+        external
+        override
+        reserve
+    {
+        require(
+            msg.sender.value != 0 &&
+            msg.sender == _getMarketRootAddress(),
+            DirectBuySellErrors.NOT_FACTORY_DIRECT_BUY
+        );
+
+        if (currentVersion == newVersion) {
+            remainingGasTo.transfer({
+                value: 0,
+                flag: 128 + 2,
+                bounce: false
+            });
+        } else {
+            emit DirectBuyUpgrade();
+
+            TvmCell cellParams = abi.encode(
+                _getMarketRootAddress(),
+                _getOwner(),
+                _getPaymentToken(),
+                _getNftAddress(),
+                _getNonce(),
+                price,
+                startTime,
+                durationTime,
+                endTime,
+                tokenWallet,
+                currentStatus,
+                currentVersion,
+                _getMarketFee(),
+                _getWeverVault(),
+                _getWeverRoot(),
+                directBuyGas,
+                _getDiscountOpt(),
+                _getDiscountNft(),
+                _getRoyalty(),
+                _getMarketBurnFee()
+            );
+
+            tvm.setcode(newCode);
+            tvm.setCurrentCode(newCode);
+
+            onCodeUpgrade(cellParams);
+        }
+    }
+
+    function onCodeUpgrade(TvmCell data) private {}
 }

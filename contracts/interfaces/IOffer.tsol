@@ -1,0 +1,8 @@
+pragma ever-solidity >= 0.62.0;
+
+import "../structures/IMarketFeeStructure.tsol";
+
+interface IOffer is IMarketFeeStructure {
+
+    function getTypeContract() external pure returns (string);
+}

@@ -14,14 +14,8 @@ async function main() {
         },
         {
             type: 'text',
-            name: 'weverRoot',
-            message: 'Wever root address',
-            validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
-        },
-        {
-            type: 'text',
-            name: 'weverVault',
-            message: 'Wever vault address',
+            name: 'wnativeRoot',
+            message: 'Wnative root address',
             validate: (value: any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
@@ -46,8 +40,7 @@ async function main() {
             _auctionBidDelta: 500,
             _auctionBidDeltaDecimals: 10000,
             _remainingGasTo: account.address,
-            _weverVault: response.weverVault,
-            _weverRoot: response.weverRoot
+            _wnativeRoot: response.wnativeRoot
         },
         initParams: {
             nonce_: locklift.utils.getRandomNonce(),

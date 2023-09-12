@@ -2,7 +2,7 @@ import { isValidEverAddress} from "../test/utils";
 import { Migration } from "./migration";
 import {Contract, toNano} from "locklift";
 import {Address} from "everscale-inpage-provider";
-import {FactoryDirectSell} from "../test/wrappers/DirectSell";
+import {FactoryDirectSell} from "../test/wrappers/directSell";
 import {CollectionSimilarAbi} from "../build/factorySource";
 
 const migration = new Migration();

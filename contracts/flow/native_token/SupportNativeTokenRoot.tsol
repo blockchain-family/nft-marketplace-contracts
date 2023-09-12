@@ -1,0 +1,14 @@
+pragma ever-solidity >= 0.62.0;
+
+import "../../abstract/BaseRoot.tsol";
+
+abstract contract SupportNativeTokenRoot is BaseRoot {
+
+    function wnativeRoot()
+        external
+        view
+        returns (address)
+    {
+        return _getWnativeRoot();
+    }
+}

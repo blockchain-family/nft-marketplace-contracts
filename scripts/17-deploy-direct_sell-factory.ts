@@ -14,14 +14,8 @@ async function main() {
         },
         {
             type: 'text',
-            name: 'weverRoot',
-            message: 'Wever root address',
-            validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
-        },
-        {
-            type: 'text',
-            name: 'weverVault',
-            message: 'Wever vault address',
+            name: 'wnativeRoot',
+            message: 'Wnative root address',
             validate: (value:any) => isValidEverAddress(value) || value === '' ? true : 'Invalid Everscale address'
         }
     ]);
@@ -41,8 +35,7 @@ async function main() {
             _owner: account.address,
             _remainingGasTo: account.address,
             _fee: fee,
-            _weverVault: response.weverVault,
-            _weverRoot: response.weverRoot
+            _wnativeRoot: response.wnativeRoot
         },
         initParams: {
             nonce_: Math.random() * 6400 | 0

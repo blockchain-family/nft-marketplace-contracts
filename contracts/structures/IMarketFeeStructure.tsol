@@ -1,0 +1,9 @@
+pragma ever-solidity >= 0.62.0;
+
+interface IMarketFeeStructure {
+
+    struct MarketFee {
+        uint32 numerator;
+        uint32 denominator;
+    }
+}

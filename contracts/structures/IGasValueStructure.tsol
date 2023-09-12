@@ -1,0 +1,9 @@
+pragma ever-solidity >= 0.62.0;
+
+interface IGasValueStructure {
+
+   struct GasValues {
+        uint128 fixedValue;
+        uint128 dynamicGas;
+    }
+}

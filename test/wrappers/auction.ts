@@ -1,7 +1,8 @@
-import {Address, Contract, toNano} from "locklift";
-import { FactorySource } from "../../build/factorySource";
-import { Token } from "./token";
-import { Account } from "everscale-standalone-client/nodejs";
+import {AbiEventName, Address, Contract, DecodedAbiEventData, DecodedEventWithTransaction, toNano} from "locklift";
+import {AuctionAbi, FactoryAuctionAbi, FactorySource} from "../../build/factorySource";
+import {Token} from "./token";
+import {Account} from "everscale-standalone-client/nodejs";
+import {DecodedEvent} from "everscale-inpage-provider/dist/contract";
 
 export class AuctionRoot {
     public contract: Contract<FactorySource["FactoryAuction"]>;
@@ -19,7 +20,7 @@ export class AuctionRoot {
         return new AuctionRoot(contract, owner);
     }
 
-    async buildPayload(callbackId: number, paymentToken: Token, price: any, auctionStartTime: any, auctionDuration: any, dCollection?: Address, dNftId?: number ) {
+    async buildPayload(callbackId: number, paymentToken: Token, price: any, auctionStartTime: any, auctionDuration: any, dCollection?: Address, dNftId?: number) {
         return (await this.contract.methods.buildAuctionCreationPayload({
             answerId: 0,
             _callbackId: callbackId,
@@ -28,7 +29,7 @@ export class AuctionRoot {
             _auctionStartTime: auctionStartTime,
             _auctionDuration: auctionDuration,
             _discountCollection: dCollection || null,
-            _discountNftId: typeof(dNftId) === "undefined" ? null : dNftId
+            _discountNftId: typeof (dNftId) === "undefined" ? null : dNftId
         }).call()).value0;
     }
 
@@ -36,9 +37,10 @@ export class AuctionRoot {
         return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }
 
-    async getEvent(event_name: string) {
+    async getEvent<T extends AbiEventName<FactoryAuctionAbi | AuctionAbi>>(event_name: T): Promise<DecodedAbiEventData<FactoryAuctionAbi | AuctionAbi, T> | null> {
         const last_event = (await this.getEvents(event_name)).shift();
         if (last_event) {
+            // @ts-ignore
             return last_event.data;
         }
         return null;
@@ -80,7 +82,7 @@ export class Auction {
     }
 
     async getEvents(event_name: string) {
-        return (await this.contract.getPastEvents({ filter: (event) => event.event === event_name })).events;
+        return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }
 
     async getEvent(event_name: string) {
@@ -93,12 +95,14 @@ export class Auction {
 
     async finishAuction(initiator: Account, callbackId: number, gasValue: any) {
         return await locklift.tracing.trace(this.contract.methods.finishAuction({
-                _remainingGasTo: initiator.address,
-                _callbackId: callbackId}).send({
+            _remainingGasTo: initiator.address,
+            _callbackId: callbackId
+        })
+        .send({
                 from: initiator.address,
                 amount: gasValue
             }
-        ),{allowedCodes:{compute:[null]}});
+        ), {allowedCodes: {compute: [null]}});
     }
 
     async getInfo() {
@@ -106,7 +110,11 @@ export class Auction {
     }
 
     async buildPayload(callbackId: number, buyer: Account) {
-        return (await this.contract.methods.buildPlaceBidPayload({answerId: 0, _callbackId: callbackId, _buyer: buyer.address}).call()).value0;
+        return (await this.contract.methods.buildPlaceBidPayload({
+            answerId: 0,
+            _callbackId: callbackId,
+            _buyer: buyer.address
+        }).call()).value0;
     }
 
 }

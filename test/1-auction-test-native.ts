@@ -2,26 +2,27 @@ import {
     deployAccount,
     deployAuctionRoot,
     CallbackType,
-    sleep,
     deployCollectionAndMintNft,
     deployCollectionAndMintNftWithRoyalty,
-    deployWeverRoot
+    deployWnativeRoot,
+    tryIncreaseTime
 } from "./utils";
-import { Account } from "everscale-standalone-client/nodejs";
-import { AuctionRoot, Auction } from "./wrappers/auction";
-import { NftC } from "./wrappers/nft";
-import { Token } from "./wrappers/token";
-import { TokenWallet } from "./wrappers/token_wallet";
-import {Address, Contract, toNano} from "locklift";
-import { BigNumber } from 'bignumber.js';
+import {Account} from "everscale-standalone-client/nodejs";
+import {AuctionRoot, Auction} from "./wrappers/auction";
+import {NftC} from "./wrappers/nft";
+import {Token} from "./wrappers/token";
+import {TokenWallet} from "./wrappers/token_wallet";
+import {Address, toNano} from "locklift";
+import {BigNumber} from 'bignumber.js';
+
 BigNumber.config({EXPONENTIAL_AT: 257});
 
 const logger = require('mocha-logger');
-const { expect } = require('chai');
+const {expect} = require('chai');
 
-import { lockliftChai } from "locklift";
+import {lockliftChai} from "locklift";
 import chai from "chai";
-import {FactorySource} from "../build/factorySource";
+
 chai.use(lockliftChai);
 
 let account1: Account;
@@ -82,8 +83,7 @@ let setRoyalty: Royalty;
 let bidDelta: BigNumber;
 let bidDeltaDecimals: BigNumber;
 
-let weverVault: Address;
-let weverRoot: Token;
+let wnativeRoot: Token;
 
 type GasValue = {
     fixedValue: string,
@@ -92,8 +92,7 @@ type GasValue = {
 let gasValue: any;
 let changeManagerValue: string;
 let transferValue: string;
-let cancelValue : string;
-
+let cancelValue: string;
 
 
 async function Callback(payload: string) {
@@ -101,7 +100,7 @@ async function Callback(payload: string) {
     callback = [
         auctionRoot.address,
         {
-            value: calcValue(gasValue.start, gasValue.gasK) .toString(),
+            value: calcValue(gasValue.start, gasValue.gasK).toString(),
             payload: payload,
         },
     ];
@@ -111,11 +110,11 @@ async function Callback(payload: string) {
     return (callbacks);
 }
 
-async function balance(account: Account){
+async function balance(account: Account) {
     return new BigNumber(await locklift.provider.getBalance(account.address));
 }
 
-function calcValue(gas: GasValue, gasK: string){
+function calcValue(gas: GasValue, gasK: string) {
     const gasPrice = new BigNumber(1).shiftedBy(9).div(gasK);
     return new BigNumber(gas.dynamicGas).times(gasPrice).plus(gas.fixedValue).toNumber();
 }
@@ -135,16 +134,15 @@ describe("Test Auction contract", async function () {
         accForNft.push(account2);
         const [collection, nftS] = await deployCollectionAndMintNft(account2, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
-        locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
-        locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+        locklift.tracing.setAllowedCodesForAddress(collection.address, {compute: [60]});
+        locklift.tracing.setAllowedCodesForAddress(nft.address, {compute: [60]});
     });
-    it('Deploy WeverRoot and WeverVault', async function () {
-        let result = await deployWeverRoot('weverTest', 'WTest', account1);
-        weverRoot = result['root'];
-        weverVault = result['vault'];
+    it('Deploy WnativeRoot and WnativeVault', async function () {
+        let result = await deployWnativeRoot('wnativeTest', 'WTest', account1);
+        wnativeRoot = result['root'];
     });
     it('Deploy TIP-3 token', async function () {
-        tokenRoot = weverRoot;
+        tokenRoot = wnativeRoot;
     });
     it('Mint TIP-3 token to account', async function () {
         let gasValue = 1000000000;
@@ -154,7 +152,7 @@ describe("Test Auction contract", async function () {
         let amount1 = new BigNumber(startBalanceTW1).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account1.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount1,
             bounce: false
         });
@@ -164,7 +162,7 @@ describe("Test Auction contract", async function () {
         let amount2 = new BigNumber(startBalanceTW2).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account2.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount2,
             bounce: false
         });
@@ -174,7 +172,7 @@ describe("Test Auction contract", async function () {
         let amount3 = new BigNumber(startBalanceTW3).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account3.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount3,
             bounce: false
         });
@@ -184,7 +182,7 @@ describe("Test Auction contract", async function () {
         let amount4 = new BigNumber(startBalanceTW4).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account4.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount4,
             bounce: false
         });
@@ -194,7 +192,7 @@ describe("Test Auction contract", async function () {
         let amount5 = new BigNumber(startBalanceTW5).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account5.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount5,
             bounce: false
         });
@@ -205,7 +203,7 @@ describe("Test Auction contract", async function () {
             denominator: '0'
         } as MarketFee;
         const auctionRootExitCode = await deployAuctionRoot(
-            account2, fee, weverVault, weverRoot.address
+            account2, fee, wnativeRoot.address
         ).catch(e => e.transaction.transaction.exitCode);
         expect(auctionRootExitCode.toString()).to.be.eq('110');
     });
@@ -214,7 +212,7 @@ describe("Test Auction contract", async function () {
             numerator: '10',
             denominator: '100'
         } as MarketFee;
-        auctionRoot = await deployAuctionRoot(account2, fee, weverVault, weverRoot.address);
+        auctionRoot = await deployAuctionRoot(account2, fee, wnativeRoot.address);
         const eventMFChanged = await auctionRoot.getEvent('MarketFeeDefaultChanged') as any;
         expect(eventMFChanged.fee).to.eql((await auctionRoot.contract.methods.marketFee().call()).value0);
     });
@@ -222,24 +220,24 @@ describe("Test Auction contract", async function () {
         auctionRootTWAddress = await tokenRoot.walletAddr(auctionRoot.address);
         auctionRootTW = await TokenWallet.from_addr(auctionRootTWAddress, null);
         startBalanceTWAuctionRoot = new BigNumber(await auctionRootTW.balanceSafe());
-        logger.success('auctionRootTWAddress',auctionRootTWAddress);
+        logger.success('auctionRootTWAddress', auctionRootTWAddress);
     });
-    it( 'Get market fee',async function () {
+    it('Get market fee', async function () {
         fee = (await auctionRoot.contract.methods.marketFee().call()).value0;
     });
-    it('Get bid delta', async function (){
+    it('Get bid delta', async function () {
         bidDelta = new BigNumber((await auctionRoot.contract.methods.auctionBidDelta().call()).auctionBidDelta);
         bidDeltaDecimals = new BigNumber((await auctionRoot.contract.methods.auctionBidDeltaDecimals().call()).auctionBidDeltaDecimals);
     });
-    it( 'Get fas value',async function () {
+    it('Get fas value', async function () {
         gasValue = (await auctionRoot.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
-        changeManagerValue =  (calcValue(gasValue.start, gasValue.gasK) + 250000000).toString();
+        changeManagerValue = (calcValue(gasValue.start, gasValue.gasK) + 250000000).toString();
         transferValue = (calcValue(gasValue.bid, gasValue.gasK) + 250000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
-        console.log('transferValue',transferValue);
-        console.log('changeManagerValue',changeManagerValue);
-        console.log('cancelValue',cancelValue);
+        console.log('transferValue', transferValue);
+        console.log('changeManagerValue', changeManagerValue);
+        console.log('cancelValue', cancelValue);
     });
     describe("Auction completed", async function () {
         it('Deploy Auction and success', async function () {
@@ -269,7 +267,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -323,7 +321,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(eventAuctionDeployed.offer, account2);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             const {traceTree} = await auction.finishAuction(account3, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -358,7 +356,7 @@ describe("Test Auction contract", async function () {
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             //First bid placed
-            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '',transferValue);
+            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
             let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
@@ -397,7 +395,7 @@ describe("Test Auction contract", async function () {
             startBalance3 = await balance(account3);
 
             //Finish auction
-            await sleep(10000);
+            await tryIncreaseTime(10);
             await auction.finishAuction(account2, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
@@ -478,7 +476,7 @@ describe("Test Auction contract", async function () {
             startBalance4 = await balance(account4);
 
             //Finish auction
-            await sleep(20000);
+            await tryIncreaseTime(20);
             await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
@@ -546,7 +544,7 @@ describe("Test Auction contract", async function () {
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -580,7 +578,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -631,7 +629,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             await auction.finishAuction(account3, 0, cancelValue);
             let eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
             expect(eventAuctionCancelled).to.eql({});
@@ -665,7 +663,7 @@ describe("Test Auction contract", async function () {
 
             startBalance1 = await balance(account1);
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             const {traceTree} = await tokenWallet1.transfer(spentToken, auction.address, 0, true, '', transferValue);
             const bidPlacedEvent = await auction.getEvent('BidDeclined') as any;
             expect(bidPlacedEvent).to.be.not.null;
@@ -726,7 +724,7 @@ describe("Test Auction contract", async function () {
             auction = await Auction.from_addr(auctionDeployedEvent.offer, account3);
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
-            locklift.tracing.setAllowedCodesForAddress(auction.address, { compute: [253]});
+            locklift.tracing.setAllowedCodesForAddress(auction.address, {compute: [253]});
 
             await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
 
@@ -738,7 +736,7 @@ describe("Test Auction contract", async function () {
 
             startBalance3 = await balance(account3);
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
             expect(eventAuctionComplete).to.be.not.null;
@@ -812,7 +810,7 @@ describe("Test Auction contract", async function () {
             const everAccount4Balance = (await balance(account4)).shiftedBy(-9).toNumber();
             expect(everAccount4Balance).to.be.closeTo(expectedAccountBalance4, 0.35);
 
-            await sleep(15000);
+            await tryIncreaseTime(15);
 
             await auction.finishAuction(account2, 0, cancelValue);
             const eventAuctionCancelled = await auction.getEvent('AuctionCancelled');
@@ -841,7 +839,7 @@ describe("Test Auction contract", async function () {
             let status = (await auction.getInfo()).status;
             expect(status.toString()).to.be.eq('1');
 
-            locklift.tracing.setAllowedCodesForAddress(auction.address, { compute: [250]});
+            locklift.tracing.setAllowedCodesForAddress(auction.address, {compute: [250]});
             const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             expect(traceTree).to.have.error(250);
 
@@ -849,7 +847,7 @@ describe("Test Auction contract", async function () {
             expect(owner.toString()).to.be.eq(account2.address.toString());
             expect(status.toString()).to.be.eq('1');
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             await auction.finishAuction(account2, 0, cancelValue);
             await auction.getEvent('AuctionCancelled');
         });
@@ -865,8 +863,8 @@ describe("Test Auction contract", async function () {
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFee({_fee: setFee}).send({
-                    from: account2.address,
-                    amount: toNano(2)
+                from: account2.address,
+                amount: toNano(2)
             });
 
             let newFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
@@ -884,8 +882,8 @@ describe("Test Auction contract", async function () {
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFee({_fee: setFee}).send({
-                    from: account2.address,
-                    amount: toNano(2)
+                from: account2.address,
+                amount: toNano(2)
             });
 
             let newFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
@@ -901,8 +899,8 @@ describe("Test Auction contract", async function () {
             } as MarketFee;
 
             await auctionRoot.contract.methods.setMarketFee({_fee: setFee}).send({
-                    from: account4.address,
-                    amount: toNano(2)
+                from: account4.address,
+                amount: toNano(2)
             });
             let newFee = (await auctionRoot.contract.methods.marketFee().call()).value0;
             expect(newFee).to.eql(oldFee);
@@ -931,9 +929,12 @@ describe("Test Auction contract", async function () {
                 denominator: '100'
             } as MarketFee;
 
-            await auctionRoot.contract.methods.setMarketFeeForChildContract({_offer: auction.address, _fee: setFee}).send({
-                    from: account2.address,
-                    amount: toNano(2)
+            await auctionRoot.contract.methods.setMarketFeeForChildContract({
+                _offer: auction.address,
+                _fee: setFee
+            }).send({
+                from: account2.address,
+                amount: toNano(2)
             });
 
             let newFee = (await auction.contract.methods.marketFee().call()).value0;
@@ -950,7 +951,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(15000);
+            await tryIncreaseTime(15);
             await auction.finishAuction(account3, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');
@@ -1061,8 +1062,8 @@ describe("Test Auction contract", async function () {
             accForNft.push(account2);
             const [collection, nftS] = await deployCollectionAndMintNftWithRoyalty(account2, 1, "nft_to_address.json", accForNft, setRoyalty);
             nft = nftS[0];
-            locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
-            locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(collection.address, {compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(nft.address, {compute: [60]});
         });
         it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
@@ -1093,7 +1094,7 @@ describe("Test Auction contract", async function () {
             const bidPlacedEvent = await auction.getEvent('BidPlaced') as any;
             expect(bidPlacedEvent.buyer.toString()).to.be.eq(account3.address.toString());
 
-            await sleep(6000);
+            await tryIncreaseTime(6);
             const {traceTree} = await auction.finishAuction(account2, 0, cancelValue);
             // await traceTree?.beautyPrint();
             // console.log('Gas',new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -1111,7 +1112,7 @@ describe("Test Auction contract", async function () {
             const ownerChanged = await nft.getEvent('OwnerChanged') as any;
             expect(ownerChanged.newOwner.toString()).to.be.eq(account3.address.toString());
 
-            const managerChanged = await nft.getEvent('ManagerChanged') as any;
+            const managerChanged = await nft.getEvent('ManagerChanged');
             expect(managerChanged.newManager.toString()).to.be.eq(account3.address.toString());
 
             let status = (await auction.getInfo()).status;
@@ -1153,8 +1154,8 @@ describe("Test Auction contract", async function () {
             accForNft.push(account3);
             const [collection, nftS] = await deployCollectionAndMintNftWithRoyalty(account2, 1, "nft_to_address.json", accForNft, setRoyalty, false);
             nft = nftS[0];
-            locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
-            locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(collection.address, {compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(nft.address, {compute: [60]});
         });
         it('Deploy Auction and several users stake', async function () {
             const spentToken: number = 4000000000;
@@ -1168,7 +1169,7 @@ describe("Test Auction contract", async function () {
             logger.log(`AuctionTip3 address: ${auction.address.toString()}`);
 
             //First bid placed
-            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '',transferValue);
+            await tokenWallet2.transfer(spentToken, auction.address, 0, true, '', transferValue);
             let spentTokenWallet2Balance = await tokenWallet2.balance() as any;
             expect(spentTokenWallet2Balance.toString()).to.be.eq((startBalanceTW2 - spentToken).toString());
 
@@ -1208,7 +1209,7 @@ describe("Test Auction contract", async function () {
             startBalance3 = await balance(account3);
 
             //Finish auction
-            await sleep(10000);
+            await tryIncreaseTime(10);
             await auction.finishAuction(account2, 0, cancelValue);
 
             const eventAuctionComplete = await auction.getEvent('AuctionComplete');

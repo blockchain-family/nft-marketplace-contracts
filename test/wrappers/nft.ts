@@ -1,7 +1,7 @@
 import { Account } from "everscale-standalone-client/nodejs";
 import { CallbackType } from "../utils";
-import {Address, Contract, toNano, zeroAddress} from "locklift";
-import { FactorySource } from "../../build/factorySource";
+import {AbiEventName, Address, Contract, DecodedAbiEventData, toNano, zeroAddress} from "locklift";
+import {AuctionAbi, FactoryAuctionAbi, FactorySource, NftWithRoyaltyAbi} from "../../build/factorySource";
 
 export class NftC {
     public contract: Contract<FactorySource["Nft"]>;
@@ -38,11 +38,9 @@ export class NftC {
         return (await this.contract.getPastEvents({filter: (event) => event.event === event_name})).events;
     }
 
-    async getEvent(event_name: string) {
+    async getEvent<T extends AbiEventName<NftWithRoyaltyAbi>>(event_name: T): Promise<DecodedAbiEventData<NftWithRoyaltyAbi, T>> {
         const last_event = (await this.getEvents(event_name)).shift();
-        if (last_event) {
-            return last_event.data;
-        }
-        return null;
+        // @ts-ignore
+        return last_event.data;
     }
 }

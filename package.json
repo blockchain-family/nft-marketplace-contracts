@@ -11,30 +11,33 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@broxus/contracts": "^1.1.0",
+    "@broxus/contracts": "^1.1.1",
+    "@broxus/locklift-deploy": "1.1.1",
+    "@broxus/locklift-verifier": "1.0.5",
+    "locklift": "2.8.1",
     "@types/chai": "^4.3.1",
     "@types/commander": "^2.12.2",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.6.2",
     "bignumber.js": "^9.0.2",
     "chai": "^4.3.6",
-    "everscale-standalone-client": "^2.1.14",
+    "everscale-standalone-client": "2.1.23",
     "ipfs-core": "^0.14.2",
-    "locklift": "2.4.8",
     "mocha-logger": "^1.0.8",
     "ora": "^3.4.0",
     "prettier": "^2.7.1",
     "prompts": "^2.4.1",
-    "tip3": "git://github.com/broxus/tip3#d3c1cd920c0320ffaab03b54c878dd0e06fed3c7",
-    "ton-wton": "git://github.com/broxus/ton-wton#42a5aaf95b51b8a365d40ef3e95c1a6931f0a90c",
+    "tip3": "git://github.com/broxus/tip3#83e69b99e287bc551672f9df170e39c25b93876d",
+    "ever-wever": "git+ssh://git@gitlab.broxus.com/tokens/ever-wever#e19da2e77de349e493a9daf86710c3a2256d20d1",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.7.4",
-    "@broxus/locklift-verifier": "1.0.5"
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "https": "^1.0.0",
-    "locklift-verifier": "^1.0.3",
     "request": "^2.88.2"
+  },
+  "overrides": {
+    "nekoton-wasm": "npm:nekoton-wasm-locklift@1.20.2"
   }
 }

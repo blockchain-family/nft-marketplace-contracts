@@ -1,0 +1,9 @@
+pragma ever-solidity >= 0.62.0;
+
+interface IBurnTip3 {
+
+    function burn(
+        address user,
+        address project
+    ) external;
+}

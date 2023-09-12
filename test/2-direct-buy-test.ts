@@ -4,12 +4,12 @@ import {
     deployCollectionAndMintNft,
     deployCollectionAndMintNftWithRoyalty,
     CallbackType,
-    sleep,
+    tryIncreaseTime,
     deployFactoryDirectBuy,
-    deployWeverRoot
+    deployWnativeRoot
 } from "./utils";
 import { Account } from "everscale-standalone-client/nodejs";
-import { FactoryDirectBuy, DirectBuy } from "./wrappers/DirectBuy";
+import { FactoryDirectBuy, DirectBuy } from "./wrappers/directBuy";
 import { NftC } from "./wrappers/nft";
 import { Token } from "./wrappers/token";
 import { TokenWallet } from "./wrappers/token_wallet";
@@ -65,8 +65,7 @@ let factoryDirectBuyTWAddress: Address;
 let factoryDirectBuyTW: TokenWallet;
 let startBalanceTWfactoryDirectBuy: BigNumber;
 
-let weverVault: Address;
-let weverRoot: Token;
+let wnativeRoot: Token;
 type GasValue = {
     fixedValue: string,
     dynamicGas: string;
@@ -93,13 +92,13 @@ async function Callback(payload: string) {
         directBuy.address,
         {
             value: calcValue(gasValue.accept, gasValue.gasK) .toString(),
-            payload: '',
+            payload: payload,
         },
     ];
     const callbacks: CallbackType[] = [];
     callbacks.push(callback);
     return callbacks;
-};
+}
 
 function calcValue(gas: GasValue, gasK: string){
     const gasPrice = new BigNumber(1).shiftedBy(9).div(gasK);
@@ -127,14 +126,13 @@ describe("Test DirectBuy contract", async function () {
         let accForNft: Account[] = [];
         accForNft.push(account3);
 
-        const [collection, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
+        const [collection, ] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
         // nft2 = nftS[nftId];
         discountCollection = collection;
     });
-    it('Deploy WeverRoot and WeverVault', async function () {
-        let result = await deployWeverRoot('weverTest', 'WTest', account1);
-        weverRoot = result['root'];
-        weverVault = result['vault'];
+    it('Deploy WnativeRoot and WnativeVault', async function () {
+        let result = await deployWnativeRoot('wnativeTest', 'WTest', account1);
+        wnativeRoot = result['root'];
     });
     it('Deploy TIP-3 token', async function () {
         tokenRoot = await deployTokenRoot('Test', 'Test', account1);
@@ -150,7 +148,7 @@ describe("Test DirectBuy contract", async function () {
             numerator: '10',
             denominator: '0'
         } as MarketFee;
-        const factoryDirectBuyExitCode = await deployFactoryDirectBuy(account1, fee, weverVault, weverRoot.address).catch(e => e.transaction.transaction.exitCode);
+        const factoryDirectBuyExitCode = await deployFactoryDirectBuy(account1, fee, wnativeRoot.address).catch(e => e.transaction.transaction.exitCode);
         expect(factoryDirectBuyExitCode.toString()).to.be.eq('110');
     });
     it('Deploy FactoryDirectBuy', async function () {
@@ -158,7 +156,7 @@ describe("Test DirectBuy contract", async function () {
             numerator: '10',
             denominator: '100'
         } as MarketFee;
-        factoryDirectBuy = await deployFactoryDirectBuy(account1, fee, weverVault, weverRoot.address);
+        factoryDirectBuy = await deployFactoryDirectBuy(account1, fee, wnativeRoot.address);
         const dBMFChanged = await factoryDirectBuy.getEvent('MarketFeeDefaultChanged') as any;
         expect(dBMFChanged.fee).to.be.not.null;
     });
@@ -274,7 +272,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -322,7 +320,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             const dBFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
@@ -369,7 +367,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -421,7 +419,7 @@ describe("Test DirectBuy contract", async function () {
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             expect(dbActive.to.toString()).to.be.eq('2');
 
-            await sleep(10000);
+            await tryIncreaseTime(10);
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
 
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
@@ -554,7 +552,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(1000);
+            await tryIncreaseTime(1);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -586,7 +584,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(1000);
+            await tryIncreaseTime(1);
             await directBuy.finishBuy(account3, 0, cancelValue);
 
             const owner = (await nft.getInfo()).owner;
@@ -874,7 +872,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -923,7 +921,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             const dBFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
@@ -972,7 +970,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -1026,7 +1024,7 @@ describe("Test DirectBuy contract", async function () {
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             expect(dbActive.to.toString()).to.be.eq('2');
 
-            await sleep(15000);
+            await tryIncreaseTime(15);
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
 
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
@@ -1092,7 +1090,7 @@ describe("Test DirectBuy contract", async function () {
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
             expect(dbFilled.to.toString()).to.be.eq('2');
 
-            await sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
 
@@ -1171,7 +1169,7 @@ describe("Test DirectBuy contract", async function () {
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
             expect(dbActive.to.toString()).to.be.eq('2');
 
-            await sleep(15000);
+            await tryIncreaseTime(15);
             await nft.changeManager(account2, directBuy.address, account2.address, callbacks, changeManagerValue);
 
             const dbFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;
@@ -1256,7 +1254,7 @@ describe("Test DirectBuy contract", async function () {
             const dBMFChanged = await factoryDirectBuy.getEvent('MarketFeeChanged') as any;
             expect(dBMFChanged.fee).to.be.not.null;
 
-            sleep(5000);
+            await tryIncreaseTime(5);
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, directBuy.address, account3.address, callbacks, changeManagerValue);
             const dBFilled = await directBuy.getEvent('DirectBuyStateChanged') as any;

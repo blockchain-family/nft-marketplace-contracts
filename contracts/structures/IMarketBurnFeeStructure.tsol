@@ -1,0 +1,11 @@
+pragma ever-solidity >= 0.62.0;
+
+interface IMarketBurnFeeStructure {
+
+    struct MarketBurnFee {
+        uint32 numerator;
+        uint32 denominator;
+        address project;
+        address burnRecipient;
+    }
+}

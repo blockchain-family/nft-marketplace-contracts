@@ -1,26 +1,25 @@
-
 import {
     deployAccount,
     deployCollectionAndMintNft,
     deployCollectionAndMintNftWithRoyalty,
     CallbackType,
     deployFactoryDirectSell,
-    deployWeverRoot,
-    sleep
+    deployWnativeRoot,
+    tryIncreaseTime
 } from "./utils";
 
-import { FactoryDirectSell, DirectSell } from "./wrappers/DirectSell";
-import { NftC } from "./wrappers/nft";
-import { Token } from "./wrappers/token";
-import { TokenWallet } from "./wrappers/token_wallet";
+import {FactoryDirectSell, DirectSell} from "./wrappers/directSell";
+import {NftC} from "./wrappers/nft";
+import {Token} from "./wrappers/token";
+import {TokenWallet} from "./wrappers/token_wallet";
 import {Address, toNano} from "locklift";
 import {BigNumber} from "bignumber.js";
+
 BigNumber.config({EXPONENTIAL_AT: 257});
-import { Account } from "everscale-standalone-client/nodejs";
-import { DirectBuy } from "./wrappers/DirectBuy";
+import {Account} from "everscale-standalone-client/nodejs";
 
 const logger = require('mocha-logger');
-const { expect } = require('chai');
+const {expect} = require('chai');
 
 let account1: Account;
 let account2: Account;
@@ -68,8 +67,7 @@ let factoryDirectSellTWAddress: Address;
 let factoryDirectSellTW: TokenWallet;
 let startBalanceTWfactoryDirectSell: BigNumber;
 
-let weverVault: Address;
-let weverRoot: Token;
+let wnativeRoot: Token;
 
 type GasValue = {
     fixedValue: string,
@@ -78,27 +76,27 @@ type GasValue = {
 let gasValue: any;
 let changeManagerValue: string;
 let transferValue: string;
-let cancelValue : string;
+let cancelValue: string;
 
 async function Callback(payload: string) {
     let callback: CallbackType;
     callback = [
         factoryDirectSell.address,
         {
-            value: calcValue(gasValue.sell, gasValue.gasK) .toString(),
+            value: calcValue(gasValue.sell, gasValue.gasK).toString(),
             payload: payload,
         },
     ];
     const callbacks: CallbackType[] = [];
     callbacks.push(callback);
     return callbacks;
-};
+}
 
-async function balance(account: Account){
+async function balance(account: Account) {
     return new BigNumber(await locklift.provider.getBalance(account.address));
 }
 
-function calcValue(gas: GasValue, gasK: string){
+function calcValue(gas: GasValue, gasK: string) {
     const gasPrice = new BigNumber(1).shiftedBy(9).div(gasK);
     return new BigNumber(gas.dynamicGas).times(gasPrice).plus(gas.fixedValue).toNumber();
 }
@@ -116,16 +114,15 @@ describe("Test DirectSell contract", async function () {
         accForNft.push(account1);
         const [collection, nftS] = await deployCollectionAndMintNft(account1, 1, "nft_to_address.json", accForNft);
         nft = nftS[0];
-        locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
-        locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+        locklift.tracing.setAllowedCodesForAddress(collection.address, {compute: [60]});
+        locklift.tracing.setAllowedCodesForAddress(nft.address, {compute: [60]});
     });
-    it('Deploy WeverRoot and WeverVault', async function () {
-        let result = await deployWeverRoot('weverTest', 'WTest', account1);
-        weverRoot = result['root'];
-        weverVault = result['vault'];
+    it('Deploy WnativeRoot and WnativeVault', async function () {
+        let result = await deployWnativeRoot('wnativeTest', 'WTest', account1);
+        wnativeRoot = result['root'];
     });
     it('Deploy TIP-3 token', async function () {
-        tokenRoot = weverRoot;
+        tokenRoot = wnativeRoot;
     });
     it('Mint TIP-3 token to account', async function () {
         let gasValue = 1000000000;
@@ -134,7 +131,7 @@ describe("Test DirectSell contract", async function () {
         let amount1 = new BigNumber(startBalanceTW1).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account1.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount1,
             bounce: false
         });
@@ -144,7 +141,7 @@ describe("Test DirectSell contract", async function () {
         let amount2 = new BigNumber(startBalanceTW2).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account2.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount2,
             bounce: false
         });
@@ -154,7 +151,7 @@ describe("Test DirectSell contract", async function () {
         let amount3 = new BigNumber(startBalanceTW3).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account3.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount3,
             bounce: false
         });
@@ -164,7 +161,7 @@ describe("Test DirectSell contract", async function () {
         let amount4 = new BigNumber(startBalanceTW4).plus(gasValue).toString();
         await locklift.provider.sendMessage({
             sender: account4.address,
-            recipient: weverVault,
+            recipient: wnativeRoot.address,
             amount: amount4,
             bounce: false
         });
@@ -176,7 +173,7 @@ describe("Test DirectSell contract", async function () {
         } as MarketFee;
 
         const factoryDirectSellExitCode = await deployFactoryDirectSell(
-            account1, fee, weverVault,  weverRoot.address
+            account1, fee, wnativeRoot.address
         ).catch(e => e.transaction.transaction.exitCode);
         expect(factoryDirectSellExitCode.toString()).to.be.eq('110');
     });
@@ -186,7 +183,7 @@ describe("Test DirectSell contract", async function () {
             denominator: '100'
         } as MarketFee;
 
-        factoryDirectSell = await deployFactoryDirectSell(account1, fee, weverVault, weverRoot.address);
+        factoryDirectSell = await deployFactoryDirectSell(account1, fee, wnativeRoot.address);
         const dSMFChanged = await factoryDirectSell.getEvent('MarketFeeDefaultChanged') as any;
         expect(dSMFChanged.fee).to.be.not.null;
     });
@@ -198,15 +195,15 @@ describe("Test DirectSell contract", async function () {
     it('Get market fee', async function () {
         fee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
     });
-    it( 'Get fas value',async function () {
+    it('Get fas value', async function () {
         gasValue = (await factoryDirectSell.contract.methods.getGasValue().call()).value0;
         console.log(gasValue);
-        changeManagerValue =  (calcValue(gasValue.sell, gasValue.gasK) + 200000000).toString();
+        changeManagerValue = (calcValue(gasValue.sell, gasValue.gasK) + 200000000).toString();
         transferValue = (calcValue(gasValue.buy, gasValue.gasK) + 250000000).toString();
         cancelValue = (calcValue(gasValue.cancel, gasValue.gasK) + 200000000).toString();
-        console.log('transferValue',transferValue);
-        console.log('changeManagerValue',changeManagerValue);
-        console.log('cancelValue',cancelValue);
+        console.log('transferValue', transferValue);
+        console.log('changeManagerValue', changeManagerValue);
+        console.log('cancelValue', cancelValue);
     });
     describe("DirectSell completed", async function () {
         it('Deploy unlimited DirectSell and success', async function () {
@@ -366,7 +363,7 @@ describe("Test DirectSell contract", async function () {
             let everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
             expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.35);
 
-            await sleep(10000);
+            await tryIncreaseTime(10);
             await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', transferValue);
             // directSell = await DirectSell.from_addr(dSCreate.directSell, account3);
             const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
@@ -431,7 +428,7 @@ describe("Test DirectSell contract", async function () {
             let everAccount3Balance = (await balance(account3)).shiftedBy(-9).toNumber();
             expect(everAccount3Balance).to.be.closeTo(expectedAccountBalance, 0.7);
 
-            await sleep(15000);
+            await tryIncreaseTime(15);
             await tokenWallet3.transfer(spentToken, directSell.address, 0, true, '', transferValue);
             // directSell = await DirectSell.from_addr(dSCreate.directSell, account3);
             const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;
@@ -485,7 +482,7 @@ describe("Test DirectSell contract", async function () {
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
-            const { traceTree } = await directSell.closeSell(0, cancelValue);
+            const {traceTree} = await directSell.closeSell(0, cancelValue);
             // await traceTree.beautyPrint();
             // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
             // console.log("balanceChangeInfo");
@@ -601,7 +598,7 @@ describe("Test DirectSell contract", async function () {
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
-            await sleep(10000);
+            await tryIncreaseTime(10);
             await directSell.closeSell(0, cancelValue);
             const dSClosed = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSClosed.to.toString()).to.be.eq('4');
@@ -639,7 +636,7 @@ describe("Test DirectSell contract", async function () {
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
-            const { traceTree } = await directSell.closeSell(0, cancelValue);
+            const {traceTree} = await directSell.closeSell(0, cancelValue);
             // await traceTree.beautyPrint();
             // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
             // console.log("balanceChangeInfo");
@@ -688,7 +685,7 @@ describe("Test DirectSell contract", async function () {
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
-            await sleep(10000);
+            await tryIncreaseTime(10);
             const {traceTree} = await directSell.finishSell(account3, 0, cancelValue);
             // await traceTree.beautyPrint();
             // console.log('Gas', new BigNumber(await traceTree?.totalGasUsed()).shiftedBy(-9).toNumber());
@@ -731,7 +728,7 @@ describe("Test DirectSell contract", async function () {
             const dSActive = await directSell.getEvent('DirectSellStateChanged') as any;
             expect(dSActive.to.toString()).to.be.eq('2');
 
-            await sleep(10000);
+            await tryIncreaseTime(10);
 
             startBalance2 = await balance(account2);
             await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', transferValue);
@@ -757,7 +754,7 @@ describe("Test DirectSell contract", async function () {
         });
     });
     describe("Change market fee for direct sell", async function () {
-         it('Change market fee and success buy', async function () {
+        it('Change market fee and success buy', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
@@ -801,7 +798,7 @@ describe("Test DirectSell contract", async function () {
             const dBMFChanged = await factoryDirectSell.getEvent('MarketFeeChanged') as any;
             expect(dBMFChanged.fee).to.be.not.null;
 
-            sleep(5000);
+            await tryIncreaseTime(5);
 
             startBalance2 = await balance(account2);
             startBalance3 = await balance(account3);
@@ -832,7 +829,7 @@ describe("Test DirectSell contract", async function () {
 
             startBalanceTW2 -= spentToken;
             startBalanceTWfactoryDirectSell = startBalanceTWfactoryDirectSell.plus(currentFee);
-         });
+        });
     });
     describe("Change market fee for factory", async function () {
         it('Change market fee', async function () {
@@ -845,8 +842,8 @@ describe("Test DirectSell contract", async function () {
             } as MarketFee;
 
             await factoryDirectSell.contract.methods.setMarketFee({_fee: setFee}).send({
-                    from: account1.address,
-                    amount: toNano(2)
+                from: account1.address,
+                amount: toNano(2)
             });
 
             let newFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
@@ -864,8 +861,8 @@ describe("Test DirectSell contract", async function () {
             } as MarketFee;
 
             await factoryDirectSell.contract.methods.setMarketFee({_fee: setFee}).send({
-                    from: account1.address,
-                    amount: toNano(2)
+                from: account1.address,
+                amount: toNano(2)
             });
             let newFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(newFee).to.eql(oldFee);
@@ -880,8 +877,8 @@ describe("Test DirectSell contract", async function () {
             } as MarketFee;
 
             await factoryDirectSell.contract.methods.setMarketFee({_fee: setFee}).send({
-                    from: account2.address,
-                    amount: toNano(2)
+                from: account2.address,
+                amount: toNano(2)
             });
             let newFee = (await factoryDirectSell.contract.methods.marketFee().call()).value0;
             expect(newFee).to.eql(oldFee);
@@ -893,7 +890,7 @@ describe("Test DirectSell contract", async function () {
 
             await factoryDirectSell.withdraw(
                 factoryDirectSellTW.address,
-                withdrawAmount.toString(),
+                withdrawAmount,
                 account2.address,
                 account2.address,
                 account2.address
@@ -913,7 +910,7 @@ describe("Test DirectSell contract", async function () {
 
             await factoryDirectSell.withdraw(
                 factoryDirectSellTW.address,
-                withdrawAmount.toString(),
+                withdrawAmount,
                 account2.address,
                 account1.address,
                 account1.address
@@ -936,7 +933,7 @@ describe("Test DirectSell contract", async function () {
 
             await factoryDirectSell.withdraw(
                 factoryDirectSellTW.address,
-                withdrawAmount.toString(),
+                withdrawAmount,
                 account2.address,
                 account1.address,
                 account1.address
@@ -983,8 +980,8 @@ describe("Test DirectSell contract", async function () {
             accForNft.push(account2);
             const [collection, nftS] = await deployCollectionAndMintNftWithRoyalty(account2, 1, "nft_to_address.json", accForNft, setRoyalty);
             nft = nftS[0];
-            locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
-            locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(collection.address, {compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(nft.address, {compute: [60]});
         });
         it('Deploy limited DirectSell and success', async function () {
             const spentToken: number = 5000000000;
@@ -1064,8 +1061,8 @@ describe("Test DirectSell contract", async function () {
             accForNft.push(account3);
             const [collection, nftS] = await deployCollectionAndMintNftWithRoyalty(account2, 1, "nft_to_address.json", accForNft, setRoyalty, false);
             nft = nftS[0];
-            locklift.tracing.setAllowedCodesForAddress(collection.address, { compute: [60]});
-            locklift.tracing.setAllowedCodesForAddress(nft.address, { compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(collection.address, {compute: [60]});
+            locklift.tracing.setAllowedCodesForAddress(nft.address, {compute: [60]});
         });
         it('Deploy limited DirectSell and try to buy before start', async function () {
             const spentToken: number = 5000000000;
@@ -1107,7 +1104,7 @@ describe("Test DirectSell contract", async function () {
             let everAccount2Balance = (await balance(account2)).shiftedBy(-9).toNumber();
             expect(everAccount2Balance).to.be.closeTo(expectedAccountBalance, 0.8);
 
-            await sleep(10000);
+            await tryIncreaseTime(10);
             await tokenWallet2.transfer(spentToken, directSell.address, 0, true, '', transferValue);
             // directSell = await DirectSell.from_addr(dSCreate.directSell, account3);
             const dSFilled = await directSell.getEvent('DirectSellStateChanged') as any;

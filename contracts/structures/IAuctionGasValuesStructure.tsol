@@ -1,0 +1,16 @@
+pragma ever-solidity >= 0.62.0;
+
+import "./IGasValueStructure.tsol";
+
+interface IAuctionGasValuesStructure {
+
+    struct AuctionGasValues {
+        uint128 gasK;
+        IGasValueStructure.GasValues deployWallet;
+        IGasValueStructure.GasValues royalty;
+        IGasValueStructure.GasValues deployAuction;
+        IGasValueStructure.GasValues start;
+        IGasValueStructure.GasValues bid;
+        IGasValueStructure.GasValues cancel;
+    }
+}

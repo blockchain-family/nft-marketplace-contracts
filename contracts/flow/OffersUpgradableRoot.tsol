@@ -1,0 +1,108 @@
+pragma ever-solidity >= 0.62.0;
+
+import "../abstract/BaseRoot.tsol";
+import "../abstract/BaseOffer.tsol";
+
+import "../libraries/Gas.tsol";
+
+import "../interfaces/IUpgradableByRequest.tsol";
+
+import '../errors/BaseErrors.tsol';
+import '../errors/OffersBaseErrors.tsol';
+
+abstract contract OffersUpgradableRoot is BaseRoot{
+
+    function setCodeOffer(
+        TvmCell _newCode
+    )
+        public
+        onlyOwner
+        reserve
+    {
+        _setOfferCode(_newCode);
+        msg.sender.transfer(0, false, 128 + 2);
+    }
+
+    function _buildOfferStateInit(
+        address _owner,
+        address _paymentToken,
+        address _nft,
+        uint64 _nonce,
+        address _markerRootAddress
+    )
+        internal
+        virtual
+        view
+        returns (TvmCell)
+    {
+        return
+            tvm.buildStateInit({
+                contr: BaseOffer,
+                varInit: {
+                    markerRootAddress_: _markerRootAddress,
+                    owner_: _owner,
+                    paymentToken_: _paymentToken,
+                    nftAddress_: _nft,
+                    nonce_: _nonce
+                },
+                code: _getOfferCode()
+            });
+    }
+
+    function _expectedOfferAddress(
+        address _owner,
+        address _paymentToken,
+        address _nft,
+        uint64 _timeTx,
+        address _markerRootAddress
+    )
+        internal
+        view
+        returns (address)
+    {
+        return
+            address(
+                tvm.hash(
+                    _buildOfferStateInit(
+                        _owner,
+                        _paymentToken,
+                        _nft,
+                        _timeTx,
+                        _markerRootAddress
+                    )
+                )
+            );
+    }
+
+    function requestUpgradeOffer(
+        address _owner,
+        address _paymentToken,
+        address _nft,
+        uint64 _timeTx,
+        address _markerRootAddress,
+        address _remainingGasTo
+    )
+        external
+        view
+        onlyOwner
+        reserve
+    {
+        require(msg.value >= Gas.UPGRADE_DIRECT_BUY_MIN_VALUE, BaseErrors.low_gas);
+        IUpgradableByRequest(
+            _expectedOfferAddress(
+                _owner,
+                _paymentToken,
+                _nft,
+                _timeTx,
+                _markerRootAddress
+            )
+        ).upgrade{
+            value: 0,
+            flag: 128
+        }(
+            _getOfferCode(),
+            _getCurrentVersionOffer(),
+            _remainingGasTo
+        );
+    }
+}

@@ -8,6 +8,14 @@ node_modules/
 /locklift.config.js
 migration-log.json
 
+.env
+.cache/*
+
+build/*.code
+build/*.base64
+build/*.map.json
+build/*.tvc
+
 build/Index*
 build/TokenWallet*
 build/TokenRoot*

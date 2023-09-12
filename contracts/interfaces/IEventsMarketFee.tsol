@@ -1,0 +1,15 @@
+pragma ever-solidity >= 0.62.0;
+
+import "../structures/IMarketFeeStructure.tsol";
+import "../structures/IMarketBurnFeeStructure.tsol";
+
+
+interface IEventsMarketFee is IMarketFeeStructure, IMarketBurnFeeStructure {
+
+    event MarketFeeDefaultChanged(MarketFee fee);
+    event MarketBurnFeeDefaultChanged(MarketBurnFee fee);
+    event MarketFeeChanged(address auction, MarketFee fee);
+    event MarketBurnFeeChanged(address auction, MarketBurnFee fee);
+    event MarketFeeWithdrawn(address recipient, uint128 amount, address tokenWallet);
+
+}

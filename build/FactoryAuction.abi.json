@@ -11,8 +11,7 @@
 				{"name":"_auctionBidDelta","type":"uint16"},
 				{"name":"_auctionBidDeltaDecimals","type":"uint16"},
 				{"name":"_remainingGasTo","type":"address"},
-				{"name":"_weverVault","type":"address"},
-				{"name":"_weverRoot","type":"address"}
+				{"name":"_wnativeRoot","type":"address"}
 			],
 			"outputs": [
 			]
@@ -190,15 +189,7 @@
 			]
 		},
 		{
-			"name": "weverRoot",
-			"inputs": [
-			],
-			"outputs": [
-				{"name":"value0","type":"address"}
-			]
-		},
-		{
-			"name": "weverVault",
+			"name": "wnativeRoot",
 			"inputs": [
 			],
 			"outputs": [
@@ -312,7 +303,7 @@
 		{
 			"name": "MarketBurnFeeDefaultChanged",
 			"inputs": [
-				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"fee","type":"optional(tuple)"}
+				{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"fee","type":"tuple"}
 			],
 			"outputs": [
 			]
@@ -362,8 +353,7 @@
 		{"name":"owner_","type":"address"},
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"fee_","type":"tuple"},
 		{"components":[{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"},{"name":"project","type":"address"},{"name":"burnRecipient","type":"address"}],"name":"burnFee_","type":"optional(tuple)"},
-		{"name":"weverRoot_","type":"address"},
-		{"name":"weverVault_","type":"address"},
+		{"name":"wnativeRoot_","type":"address"},
 		{"name":"offerCode_","type":"cell"},
 		{"name":"currentVersionOffer_","type":"uint32"},
 		{"components":[{"name":"codeHash","type":"uint256"},{"name":"codeDepth","type":"uint16"},{"name":"numerator","type":"uint32"},{"name":"denominator","type":"uint32"}],"name":"collectionsSpecialRules_","type":"map(address,tuple)"},

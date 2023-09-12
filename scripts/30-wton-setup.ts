@@ -21,7 +21,7 @@ async function main() {
     const account = await migration.loadAccount('Account1');
 
     const { contract: tunnel, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
-        contract: 'TestWeverTunnel',
+        contract: 'TestWnativeTunnel',
         initParams: {
             _randomNonce: locklift.utils.getRandomNonce(),
         },
@@ -70,10 +70,10 @@ async function main() {
         value: toNano(2)
     }));
 
-    logger.success(`Wever root address: ${_root.address.toString()}`);
+    logger.success(`Wnative root address: ${_root.address.toString()}`);
 
     const { contract: vault, tx } = await locklift.tracing.trace(locklift.factory.deployContract({
-        contract: 'TestWeverVault',
+        contract: 'TestWnativeVault',
         initParams: {
             _randomNonce: locklift.utils.getRandomNonce(),
         },

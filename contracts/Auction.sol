@@ -281,6 +281,16 @@ contract Auction is
                 _getNftAddress()
             );
 
+            IAuctionBidPlacedCallback(_getOwner()).ownedAuctionComplete{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                    flag: 1,
+                    bounce: false
+            }(
+                _getCollection(),
+                _getNftAddress(),
+                maxBidValue
+            );
+
             TvmCell emptyPayload;
             callbacks[currentBid.addr] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
@@ -327,6 +337,16 @@ contract Auction is
                 _callbackId,
                 _getNftAddress()
             );
+
+            IAuctionBidPlacedCallback(_getOwner()).ownedAuctionCancelled{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                _getNftAddress()
+            );
+
             ITIP4_1NFT(_getNftAddress()).changeManager{ value: 0, flag: 128 }(
                 _getOwner(),
                 _remainingGasTo,
@@ -431,6 +451,17 @@ contract Auction is
         emit BidPlaced(_newBidSender, _bid, nextBidValue);
         _sendBidResultCallback(_callbackId, _newBidSender, true, nextBidValue, _getNftAddress());
 
+        IAuctionBidPlacedCallback(_getOwner()).ownedBidPlacedCallback{
+            value: Gas.FRONTENT_CALLBACK_VALUE,
+            flag: 1,
+            bounce: false
+        }(
+            _getCollection(),
+            _getPaymentToken(),
+            _bid,
+            _getNftAddress()
+        );
+
         // Return lowest bid value to the bidder's address
         if (_currentBid.value > 0) {
             IAuctionBidPlacedCallback(_currentBid.addr).bidRaisedCallback{
@@ -439,6 +470,17 @@ contract Auction is
                 bounce: false
             }(
                 _callbackId,
+                currentBid.addr,
+                currentBid.value,
+                _getNftAddress()
+            );
+
+            IAuctionBidPlacedCallback(_getOwner()).ownedBidRaisedCallback{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
                 currentBid.addr,
                 currentBid.value,
                 _getNftAddress()

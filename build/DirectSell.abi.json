@@ -225,7 +225,9 @@
 			"inputs": [
 				{"name":"from","type":"uint8"},
 				{"name":"to","type":"uint8"},
-				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"token","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"start","type":"uint64"},{"name":"end","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"}],"name":"value2","type":"tuple"}
+				{"components":[{"name":"factory","type":"address"},{"name":"creator","type":"address"},{"name":"token","type":"address"},{"name":"nft","type":"address"},{"name":"_timeTx","type":"uint64"},{"name":"start","type":"uint64"},{"name":"end","type":"uint64"},{"name":"_price","type":"uint128"},{"name":"wallet","type":"address"},{"name":"status","type":"uint8"}],"name":"value2","type":"tuple"},
+				{"name":"old_owner","type":"address"},
+				{"name":"new_owner","type":"address"}
 			],
 			"outputs": [
 			]

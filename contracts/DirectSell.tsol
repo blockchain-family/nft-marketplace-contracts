@@ -67,7 +67,7 @@ contract DirectSell is
         uint8 status;
     }
 
-    event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo);
+    event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo, address old_owner, address new_owner); // old_owner = creator
     event DirectSellUpgrade();
 
     constructor(
@@ -108,7 +108,7 @@ contract DirectSell is
             _setCollection(_collection);
             _checkRoyaltyFromNFT(calcValue(directSellGas.royalty));
             currentVersion++;
-            _changeState(DirectSellStatus.Create);
+            _changeState(DirectSellStatus.Create, address(0));
 
             ITokenRoot(_getPaymentToken()).deployWallet{
                 value: 0,
@@ -204,7 +204,7 @@ contract DirectSell is
             uint128 currentRoyalty = _getCurrentRoyalty(price);
             uint128 balance = _countCorrectFinalPrice(currentFee, currentRoyalty, price);
 
-            _changeState(DirectSellStatus.Filled);
+            _changeState(DirectSellStatus.Filled, buyer);
             callbacks[buyer] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
             ITIP4_1NFT(_getNftAddress()).transfer{
@@ -263,7 +263,7 @@ contract DirectSell is
                     _getNftAddress()
                 );
 
-                _changeState(DirectSellStatus.Expired);
+                _changeState(DirectSellStatus.Expired, address(0));
 
                 _transfer(
                     _getPaymentToken(),
@@ -330,7 +330,7 @@ contract DirectSell is
             _callbackId,
             _getNftAddress()
         );
-        _changeState(DirectSellStatus.Cancelled);
+        _changeState(DirectSellStatus.Cancelled, address(0));
 
         mapping(address => CallbackParams) callbacks;
         TvmCell emptyPayload;
@@ -406,7 +406,7 @@ contract DirectSell is
             _getNftAddress()
         );
 
-        _changeState(DirectSellStatus.Expired);
+        _changeState(DirectSellStatus.Expired, address(0));
 
         mapping(address => CallbackParams) callbacks;
 
@@ -452,7 +452,7 @@ contract DirectSell is
             tokenWallet.value != 0 &&
             currentStatus == DirectSellStatus.Create
         ) {
-            _changeState(DirectSellStatus.Active);
+            _changeState(DirectSellStatus.Active, address(0));
         }
     }
 
@@ -485,13 +485,14 @@ contract DirectSell is
 
 
     function _changeState(
-        uint8 _newState
+        uint8 _newState,
+        address new_owner
     )
         private
     {
         uint8 prevStateN = currentStatus;
         currentStatus = _newState;
-        emit DirectSellStateChanged(prevStateN, _newState, _buildInfo());
+        emit DirectSellStateChanged(prevStateN, _newState, _buildInfo(), _getOwner(), new_owner);
     }
 
     function _buildInfo()

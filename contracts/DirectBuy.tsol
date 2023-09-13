@@ -68,7 +68,7 @@ contract DirectBuy is
         uint64 endTimeBuy;
     }
 
-    event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo);
+    event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo, address old_owner, address new_owner);
     event DirectBuyUpgrade();
 
     mapping(address => uint128) internal tmp_transactions;
@@ -111,7 +111,7 @@ contract DirectBuy is
                 _discountAvailabilityCheck();
             }
             currentVersion++;
-            changeState(DirectBuyStatus.Create);
+            changeState(DirectBuyStatus.Create, address(0));
 
             ITokenRoot(_getPaymentToken()).deployWallet{
                 value: 0,
@@ -258,7 +258,7 @@ contract DirectBuy is
                 _getNftAddress()
             );
 
-            changeState(DirectBuyStatus.Filled);
+            changeState(DirectBuyStatus.Filled, nftOwner);
             callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
             ITIP4_1NFT(_getNftAddress()).transfer{
@@ -310,7 +310,7 @@ contract DirectBuy is
                     _getNftAddress()
                 );
 
-                changeState(DirectBuyStatus.Expired);
+                changeState(DirectBuyStatus.Expired, address(0));
 
                 ITIP4_1NFT(msg.sender).changeManager{
                   value: 0,
@@ -380,7 +380,7 @@ contract DirectBuy is
             tokensReceived &&
             currentStatus == DirectBuyStatus.Create
         ) {
-            changeState(DirectBuyStatus.Active);
+            changeState(DirectBuyStatus.Active, address(0));
         }
     }
 
@@ -432,13 +432,14 @@ contract DirectBuy is
     }
 
     function changeState(
-        uint8 _newState
+        uint8 _newState,
+        address old_owner
     )
         private
     {
         uint8 prevStateN = currentStatus;
         currentStatus = _newState;
-        emit DirectBuyStateChanged(prevStateN, _newState, _buildInfo());
+        emit DirectBuyStateChanged(prevStateN, _newState, _buildInfo(), old_owner, _getOwner());
     }
 
     function _buildInfo()
@@ -493,7 +494,7 @@ contract DirectBuy is
           _getNftAddress()
         );
 
-        changeState(DirectBuyStatus.Expired);
+        changeState(DirectBuyStatus.Expired, address(0));
 
         TvmCell emptyPayload;
         _transfer(
@@ -528,7 +529,7 @@ contract DirectBuy is
             _callbackId,
             _getNftAddress()
         );
-        changeState(DirectBuyStatus.Cancelled);
+        changeState(DirectBuyStatus.Cancelled, address(0));
 
         TvmCell emptyPayload;
         _transfer(

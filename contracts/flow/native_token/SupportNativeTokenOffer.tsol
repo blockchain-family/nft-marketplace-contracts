@@ -59,7 +59,7 @@ abstract contract SupportNativeTokenOffer is BaseOffer {
                     _amount,
                     _user,
                     address(this),
-                    _payload
+                    builder.toCell()
                 );
         } else {
             ITokenWallet(_tokenWallet).transfer{ value: _value, flag: _flag, bounce: false }(

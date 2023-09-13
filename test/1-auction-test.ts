@@ -5,7 +5,7 @@ import {
     deployCollectionAndMintNft,
     deployCollectionAndMintNftWithRoyalty,
     deployTokenRoot,
-    deployWnativeRoot,
+    deployWnativeRoot, now,
     tryIncreaseTime
 } from "./utils";
 import {Account} from "everscale-standalone-client/nodejs";
@@ -97,6 +97,8 @@ let discountInfo: CollectionDiscountInfo;
 let discountCollection: Contract<FactorySource["Collection"]>;
 let codeDepth = '15';
 let nftId: number = 0;
+
+
 
 async function Callback(payload: string) {
     let callback: CallbackType;
@@ -222,7 +224,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
             const auctionDeployedEvent = await auctionRoot.getEvent('AuctionDeployed');
@@ -274,7 +276,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and cancel', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 3, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 3, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
             (await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue))
                 .traceTree?.beautyPrint();
@@ -308,7 +310,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and several users stake', async function () {
             const spentToken: number = 4000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 10, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
             console.log('balanse3:', await tokenWallet3.balance());
@@ -389,7 +391,7 @@ describe("Test Auction contract", async function () {
         it('Two stake with first user rebid', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 20)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 20)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account4, auctionRoot.address, account4.address, callbacks, changeManagerValue);
@@ -466,7 +468,7 @@ describe("Test Auction contract", async function () {
         it('Trying to stake less then auction bid', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 3, discountCollection.address, nftId)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
@@ -508,7 +510,7 @@ describe("Test Auction contract", async function () {
         it('Trying to stake after auction closed', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 3, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
 
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
@@ -541,7 +543,7 @@ describe("Test Auction contract", async function () {
         it('Trying to stake after auction finished, but not closed', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 3, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 3, discountCollection.address, nftId)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
@@ -572,7 +574,7 @@ describe("Test Auction contract", async function () {
         it('Trying to deploy zero duration auction', async function () {
             const spentToken: number = 1500000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 0, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 0, discountCollection.address, nftId)).toString();
 
             let callbacks = await Callback(payload);
             await nft.changeManager(account3, auctionRoot.address, account3.address, callbacks, changeManagerValue);
@@ -588,7 +590,7 @@ describe("Test Auction contract", async function () {
         it('Trying to finish auction afters its closed', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)), 5, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 5, discountCollection.address, nftId)).toString();
 
             let callbacks = await Callback(payload);
 
@@ -650,7 +652,7 @@ describe("Test Auction contract", async function () {
         it('Trying to stake before auction starts', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round((Date.now() / 1000)) + 5, 7)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000) + 5, 7)).toString();
 
             let callbacks = await Callback(payload);
 
@@ -686,7 +688,7 @@ describe("Test Auction contract", async function () {
         it('Trying finish auction before its start', async function () {
             const spentToken: number = 1000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(((Date.now() / 1000)) + 5), 7)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(((now() / 1000)) + 5), 7)).toString();
 
             let callbacks = await Callback(payload);
 
@@ -857,7 +859,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
             console.log((await nft.getInfo()).manager);
             await nft.changeManager(account2, auctionRoot.address, account2.address, callbacks, changeManagerValue);
@@ -925,7 +927,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and success', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 5)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 5)).toString();
             let callbacks = await Callback(payload);
             const spentTokenWallet4StartBalance = new BigNumber(await tokenWallet4.balance());
 
@@ -1005,7 +1007,7 @@ describe("Test Auction contract", async function () {
         it('Deploy Auction and several users stake', async function () {
             const spentToken: number = 4000000000;
             let payload: string;
-            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(Date.now() / 1000), 10, discountCollection.address, nftId)).toString();
+            payload = (await auctionRoot.buildPayload(0, tokenRoot, spentToken, Math.round(now() / 1000), 10, discountCollection.address, nftId)).toString();
             let callbacks = await Callback(payload);
             gasValue = (await auctionRoot.contract.methods.getGasValue().call()).value0;
             console.log(gasValue);

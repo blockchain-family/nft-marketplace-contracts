@@ -111,12 +111,12 @@ const config: LockliftConfig = {
         },
       },
       giver: {
-        address: process.env.VENOM_MAIN_GIVER_ADDRESS ?? "",
-        phrase: process.env.VENOM_MAIN_GIVER_SEED ?? "",
+        address: process.env.VENOM_TESTNET_GIVER_ADDRESS ?? "",
+        phrase: process.env.VENOM_TESTNET_GIVER_PHRASE ?? "",
         accountId: 0,
       },
       keys: {
-        phrase: process.env.VENOM_MAIN_SEED_PHRASE ?? "",
+        phrase: process.env.VENOM_TESTNET_PHRASE ?? "",
         amount: 20,
       },
     }

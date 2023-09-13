@@ -5,7 +5,7 @@ import {
     deployCollectionAndMintNftWithRoyalty,
     deployFactoryDirectSell,
     deployTokenRoot,
-    deployWnativeRoot,
+    deployWnativeRoot, now,
     tryIncreaseTime
 } from "./utils";
 import {Account} from "everscale-standalone-client/nodejs";
@@ -214,7 +214,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round(Date.now() / 1000),
+                Math.round(now() / 1000),
                 0,
                 tokenRoot,
                 spentToken,
@@ -263,7 +263,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round(Date.now() / 1000),
+                Math.round(now() / 1000),
                 5,
                 tokenRoot,
                 spentToken,
@@ -320,7 +320,7 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0,
-                Math.round(Date.now() / 1000) + 10,
+                Math.round(now() / 1000) + 10,
                 10,
                 tokenRoot,
                 spentToken,
@@ -377,7 +377,7 @@ describe("Test DirectSell contract", async function () {
         it('Deploy unlimited DirectSell and try to buy before start', async function () {
             const spentToken: number = 5000000000;
             let payload: string;
-            let startTime = Math.round(Date.now() / 1000) + 10
+            let startTime = Math.round(now() / 1000) + 10
             payload = (await factoryDirectSell.buildPayload(
                 0,
                 startTime,
@@ -443,7 +443,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round(Date.now() / 1000),
+                Math.round(now() / 1000),
                 0,
                 tokenRoot,
                 spentToken,
@@ -478,7 +478,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000) + 5000),
+                Math.round((now() / 1000) + 5000),
                 0,
                 tokenRoot,
                 spentToken,
@@ -513,7 +513,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000)),
+                Math.round((now() / 1000)),
                 50,
                 tokenRoot,
                 spentToken,
@@ -549,7 +549,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000)),
+                Math.round((now() / 1000)),
                 10,
                 tokenRoot,
                 spentToken,
@@ -588,7 +588,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000)),
+                Math.round((now() / 1000)),
                 5,
                 tokenRoot,
                 spentToken,
@@ -623,7 +623,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000)),
+                Math.round((now() / 1000)),
                 10,
                 tokenRoot,
                 spentToken,
@@ -659,7 +659,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000)),
+                Math.round((now() / 1000)),
                 10,
                 tokenRoot,
                 spentToken,
@@ -697,7 +697,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round((Date.now() / 1000)),
+                Math.round((now() / 1000)),
                 10,
                 tokenRoot,
                 spentToken,
@@ -967,7 +967,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round(Date.now() / 1000),
+                Math.round(now() / 1000),
                 5,
                 tokenRoot,
                 spentToken,
@@ -1041,7 +1041,7 @@ describe("Test DirectSell contract", async function () {
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(
                 0,
-                Math.round(Date.now() / 1000),
+                Math.round(now() / 1000),
                 5,
                 tokenRoot,
                 spentToken,
@@ -1122,7 +1122,7 @@ describe("Test DirectSell contract", async function () {
             const spentToken: number = 5000000000;
             let payload: string;
             payload = (await factoryDirectSell.buildPayload(0,
-                Math.round(Date.now() / 1000) + 10,
+                Math.round(now() / 1000) + 10,
                 10,
                 tokenRoot,
                 spentToken,

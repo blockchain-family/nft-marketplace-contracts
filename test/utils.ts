@@ -37,6 +37,15 @@ export async function sleep(ms = 1000) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export function now() {
+    // @ts-ignore
+    if (locklift.testing.isEnabled) {
+        return locklift.testing.getCurrentTime();
+    } else {
+        return Date.now()
+    }
+}
+
 export const deployAccount = async function (key_number = 0, initial_balance = 10) {
     const signer = (await locklift.keystore.getSigner(key_number.toString()))!;
     const { account } = (await locklift.factory.accounts.addNewAccount({
@@ -238,8 +247,7 @@ export const deployCollectionAndMintNftWithRoyalty = async function (account: Ac
                 const tx = await locklift.transactions.waitFinalized(
                   collection.methods.mintNft({
                       _owner: accForNft[ch].address,
-                      _json: payload,
-                      _royalty: royalty
+                      _json: payload
                   }).send({
                       from: account.address,
                       amount: toNano(6),

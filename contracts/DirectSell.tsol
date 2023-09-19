@@ -65,6 +65,7 @@ contract DirectSell is
         uint128 _price;
         address wallet;
         uint8 status;
+        address collection;
     }
 
     event DirectSellStateChanged(uint8 from, uint8 to, DirectSellInfo, address old_owner, address new_owner); // old_owner = creator
@@ -510,7 +511,8 @@ contract DirectSell is
             end: endTime,
             _price: price,
             wallet: tokenWallet,
-            status: currentStatus
+            status: currentStatus,
+            collection: _getCollection()
         });
     }
 

@@ -66,6 +66,7 @@ contract DirectBuy is
         uint64 startTimeBuy;
         uint64 durationTimeBuy;
         uint64 endTimeBuy;
+        address collection;
     }
 
     event DirectBuyStateChanged(uint8 from, uint8 to, DirectBuyInfo, address old_owner, address new_owner);
@@ -458,7 +459,8 @@ contract DirectBuy is
             status: currentStatus,
             startTimeBuy: startTime,
             durationTimeBuy: durationTime,
-            endTimeBuy: endTime
+            endTimeBuy: endTime,
+            collection: _getCollection()
         });
     }
 

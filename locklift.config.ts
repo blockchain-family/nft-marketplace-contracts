@@ -28,12 +28,11 @@ const config: LockliftConfig = {
   compiler: {
     version: "0.62.0",
     externalContracts: {
-      "node_modules/tip3": ['TokenRootUpgradeable', 'TokenWalletUpgradeable']
+      "node_modules/tip3/contracts": ['TokenRootUpgradeable', 'TokenWalletUpgradeable', 'TokenWalletPlatform']
     },
     externalContractsArtifacts: {
       "precompiled": ['Index', 'IndexBasis'],
-      "node_modules/ever-wever/build" : ['VaultTokenRoot_V1', 'VaultTokenWallet_V1'],
-      "node_modules/tip3/build": ['TokenWalletPlatform']
+      "node_modules/ever-wever/build" : ['VaultTokenRoot_V1', 'VaultTokenWallet_V1']
     }
   },
   linker: {

@@ -1,5 +1,11 @@
 import {Migration} from "./migration";
-import {isValidEverAddress} from "../test/utils";
+import { isValidEverAddress, now, tryIncreaseTime } from "../test/utils";
+import { expect } from "chai";
+import { Auction } from "../test/wrappers/auction";
+import { TokenWallet } from "../test/wrappers/token_wallet";
+import { Account } from "everscale-standalone-client/nodejs";
+import { toNano } from "locklift";
+import { BigNumber } from "bignumber.js";
 
 const prompts = require('prompts')
 const migration = new Migration();

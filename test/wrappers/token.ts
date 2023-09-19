@@ -31,13 +31,13 @@ export class Token {
         return await TokenWallet.from_addr(wallet_addr, user);
     }
 
-    async deployWallet(user: Account) {
+    async deployWallet(user: Account, from?: Address) {
         this.contract.methods.deployWallet({
             answerId: 0,
             walletOwner: user.address,
             deployWalletValue: toNano(1)
         }).send({
-            from:user.address,
+            from: from ? from : user.address,
             amount: toNano(2)
         });
 

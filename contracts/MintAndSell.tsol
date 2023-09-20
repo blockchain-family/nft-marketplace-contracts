@@ -62,7 +62,7 @@ contract MintAndSell is OwnableInternal, INftInfoStructure, ICallbackParamsStruc
     }
 
     function createItems(uint256 _fromId, uint256 _toId) external onlyOwner {
-        require(msg.value >= (_toId - _fromId) * 1.2 ever, BaseErrors.value_too_low);
+        require(msg.value >= (_toId - _fromId) * 1.6 ever, BaseErrors.value_too_low);
         this.createItemsInternal{
             value: 0,
             flag: 64
@@ -76,7 +76,7 @@ contract MintAndSell is OwnableInternal, INftInfoStructure, ICallbackParamsStruc
 
         while (_id  < _fromId + 100 && _id <= _toId) {
             CollectionSimilar(collection_).mintNft{
-                value: 1.1 ever,
+                value: 1.6 ever,
                 flag: 1
             }(address(this), _id, owner());
             _id++;

@@ -133,7 +133,7 @@ async function main() {
       );
       await mintAndSell.methods.createItems({ _fromId: from, _toId: to }).send({
         from: account.address,
-        amount: new BigNumber(to).minus(from).plus(1).times(1.2).plus(1).shiftedBy(9).toString(),
+        amount: new BigNumber(to).minus(from).plus(1).times(1.2).plus(6).shiftedBy(9).toString(),
       });
       await waitNftMinted(collection.collection, to);
       console.log(

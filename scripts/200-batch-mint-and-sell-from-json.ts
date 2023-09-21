@@ -13,9 +13,9 @@ const logger = require("mocha-logger");
 const request = require("request");
 
 const STEP = 2000;
-//const FACTORY_DIRECT_SELL = new Address("0:3158c265c052f093b0d9bd799b74dbc454ee35a79501bd599254997bc5e92b73");
-const loadDirectSell = migration.loadContract("FactoryDirectSell", "FactoryDirectSell");
-const FACTORY_DIRECT_SELL = loadDirectSell.address;
+const FACTORY_DIRECT_SELL = new Address("0:3158c265c052f093b0d9bd799b74dbc454ee35a79501bd599254997bc5e92b73");
+// const loadDirectSell = migration.loadContract("FactoryDirectSell", "FactoryDirectSell");
+// const FACTORY_DIRECT_SELL = loadDirectSell.address;
 // const collection = {
 //   name: "DiscoDance",
 //   collection: new Address("0:dc7523fa70eb5d83cb70b366b8e0d8bdf9cf4a8a9a2fdab00a9bcf9420874be4"),
@@ -133,7 +133,7 @@ async function main() {
       );
       await mintAndSell.methods.createItems({ _fromId: from, _toId: to }).send({
         from: account.address,
-        amount: new BigNumber(to).minus(from).plus(1).times(1.2).plus(6).shiftedBy(9).toString(),
+        amount: new BigNumber(to).minus(from).plus(1).times(1.6).plus(6).shiftedBy(9).toString(),
       });
       await waitNftMinted(collection.collection, to);
       console.log(

@@ -1,0 +1,6 @@
+pragma ever-solidity >= 0.62.0;
+
+library OperationType {
+        uint8 constant Burn     = 0;
+        uint8 constant Transfer = 1;
+}

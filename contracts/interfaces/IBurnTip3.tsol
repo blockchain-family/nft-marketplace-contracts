@@ -4,6 +4,6 @@ interface IBurnTip3 {
 
     function burn(
         address user,
-        address project
+        optional(address) project
     ) external;
 }

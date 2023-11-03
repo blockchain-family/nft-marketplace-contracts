@@ -215,8 +215,8 @@ contract Auction is
             emit BidDeclined(buyer, amount, _buildInfo());
             _sendBidResultCallback(callbackId, buyer, false, 0, _getNftAddress());
 
-            TvmCell empty;
-            _transfer(_getPaymentToken(), amount, buyer, originalGasTo, msg.sender, 0, 128, uint128(0), empty);
+            TvmCell emptyPayload;
+            _transfer(_getPaymentToken(), amount, buyer, originalGasTo, msg.sender, 0, 128, uint128(0), emptyPayload);
         }
     }
 
@@ -548,11 +548,15 @@ contract Auction is
          virtual
          reserve
     {
-        require(msg.sender.value != 0 && (msg.sender == _getWnativeRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wnative_root_or_payment_token);
-        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
+        require(
+            msg.sender.value != 0 &&
+            (msg.sender == _getWnativeRoot() || msg.sender == _getPaymentToken()),
+            BaseErrors.not_wnative_root_or_payment_token
+        );
 
+        optional(MarketBurnFee) burnFee = _getMarketBurnFee();
         if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
-            _tokensBurn();
+            _tokensBurn(amount, user, payload);
         } else {
             _wnativeBurn(amount, user, payload);
         }

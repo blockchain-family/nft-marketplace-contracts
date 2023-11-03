@@ -6,6 +6,8 @@ import "../../interfaces/IBurnTip3.tsol";
 import "../../libraries/Gas.tsol";
 
 import "tip3/contracts/interfaces/IBurnableTokenWallet.tsol";
+import "../../libraries/OperationType.tsol";
+import "../native_token/SupportNativeTokenOffer.tsol";
 
 abstract contract MarketBurnFeeOffer is MarketFeeOffer {
 
@@ -58,6 +60,10 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
                 emptyPayload
             );
 
+            TvmBuilder builder;
+            builder.store(OperationType.Burn);
+            builder.store(_remainingGasTo);
+
             IBurnableTokenWallet(_tokenWallet).burn{
                 value: _extraGasValue,
                 flag: 0,
@@ -66,7 +72,7 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
                 burnFeeAmount,
                 _getMarketRootAddress(),
                 address(this),
-                emptyPayload
+                builder.toCell()
             );
         } else {
             emit MarketFeeWithheld(_feeAmount, _getPaymentToken());
@@ -87,17 +93,43 @@ abstract contract MarketBurnFeeOffer is MarketFeeOffer {
 
     }
 
-    function _tokensBurn()
+    function _tokensBurn(
+        uint128 amount,
+        address user,
+        TvmCell payload
+    )
          internal
          reserve
     {
         optional(MarketBurnFee) burnFee = _getMarketBurnFee();
-        emit MarketFeeBurn(address(this), burnFee.get().burnRecipient, burnFee.get().project);
-        IBurnTip3(burnFee.get().burnRecipient).burn{
-            value: 0,
-            flag: 128 + 2,
-            bounce: false
-        }(_getOwner(), burnFee.get().project);
+
+        uint8 operationType;
+        address remainingGasTo;
+        TvmSlice payloadSlice = payload.toSlice();
+        if (payloadSlice.bits() >= 8) {
+            operationType = payloadSlice.decode(uint8);
+        }
+        if (payloadSlice.bits() >= 256) {
+            remainingGasTo = payloadSlice.decode(address);
+        }
+
+        if (operationType == OperationType.Transfer) {
+            if (user == remainingGasTo) {
+                user.transfer({ value: 0, flag: 128 + 2, bounce: false });
+            } else {
+                user.transfer({ value: amount, flag: 1, bounce: false });
+                remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+            }
+        } else if (operationType == OperationType.Burn) {
+            emit MarketFeeBurn(address(this), burnFee.get().burnRecipient, burnFee.get().project);
+            IBurnTip3(burnFee.get().burnRecipient).burn{
+                value: 0,
+                flag: 128 + 2,
+                bounce: false
+            }(_getOwner(), burnFee.get().project);
+        } else {
+            remainingGasTo.transfer({ value: 0, flag: 128 + 2, bounce: false });
+        }
 
     }
 

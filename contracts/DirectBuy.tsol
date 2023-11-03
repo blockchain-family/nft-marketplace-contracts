@@ -558,10 +558,16 @@ contract DirectBuy is
          virtual
          reserve
     {
-        require(msg.sender.value != 0 && (msg.sender == _getWnativeRoot() || msg.sender == _getPaymentToken()), BaseErrors.not_wnative_root_or_payment_token);
+        require(
+            msg.sender.value != 0 &&
+            (msg.sender == _getWnativeRoot() || msg.sender == _getPaymentToken()),
+            BaseErrors.not_wnative_root_or_payment_token
+        );
+
+
         optional(MarketBurnFee) burnFee = _getMarketBurnFee();
         if (burnFee.hasValue() && msg.sender == _getPaymentToken()) {
-            _tokensBurn();
+            _tokensBurn(amount, user, payload);
         } else {
             _wnativeBurn(amount, user, payload);
         }

@@ -464,52 +464,78 @@ contract DirectBuy is
         });
     }
 
-    function finishBuy(
+    function finishOffer(
         address _remainingGasTo,
         uint32 _callbackId
     )
-        public
+        external
         reserve
     {
-        require(
-          currentStatus == DirectBuyStatus.Active,
-          DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS
-        );
-        require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
+        require(currentStatus == DirectBuyStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
         require(msg.value >= calcValue(directBuyGas.cancel), BaseErrors.not_enough_value);
 
-        IDirectBuyCallback(msg.sender).directBuyCancelledOnTime{
-          value: Gas.FRONTENT_CALLBACK_VALUE,
-          flag: 1,
-          bounce: false
-        }(
-          _callbackId,
-          _getNftAddress()
-        );
+        if (now >= endTime && endTime != 0) {
 
-        IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
-          value: Gas.FRONTENT_CALLBACK_VALUE,
-          flag: 1,
-          bounce: false
-        }(
-          _getCollection(),
-          _getNftAddress()
-        );
+            IDirectBuyCallback(msg.sender).directBuyCancelledOnTime{
+              value: Gas.FRONTENT_CALLBACK_VALUE,
+              flag: 1,
+              bounce: false
+            }(
+              _callbackId,
+              _getNftAddress()
+            );
 
-        changeState(DirectBuyStatus.Expired, address(0));
+            IDirectBuyCallback(_getOwner()).ownedDirectBuyCancelledOnTime{
+              value: Gas.FRONTENT_CALLBACK_VALUE,
+              flag: 1,
+              bounce: false
+            }(
+              _getCollection(),
+              _getNftAddress()
+            );
 
-        TvmCell emptyPayload;
-        _transfer(
-            _getPaymentToken(),
-            price,
-            _getOwner(),
-            _remainingGasTo,
-            tokenWallet,
-            0,
-            128,
-            uint128(0),
-            emptyPayload
-        );
+            changeState(DirectBuyStatus.Expired, address(0));
+
+            TvmCell emptyPayload;
+            _transfer(
+                _getPaymentToken(),
+                price,
+                _getOwner(),
+                _remainingGasTo,
+                tokenWallet,
+                0,
+                128,
+                uint128(0),
+                emptyPayload
+            );
+        } else if (msg.sender == _getMarketRootAddress()) {
+
+            IDirectBuyCallback(_getOwner()).directBuyClose{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _callbackId,
+                _getNftAddress()
+            );
+
+            changeState(DirectBuyStatus.Cancelled, address(0));
+
+            TvmCell emptyPayload;
+            _transfer(
+                _getPaymentToken(),
+                price,
+                _getOwner(),
+                _remainingGasTo,
+                tokenWallet,
+                0,
+                128,
+                uint128(0),
+                emptyPayload
+            );
+        } else {
+            msg.sender.transfer(0, false, 128 + 32);
+        }
     }
 
     function closeBuy(

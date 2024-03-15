@@ -378,51 +378,83 @@ contract DirectSell is
         return builder.toCell();
     }
 
-    function finishSell(
+    function finishOffer(
         address _remainingGasTo,
         uint32 _callbackId
     )
-        public
+        external
         reserve
     {
         require(currentStatus == DirectSellStatus.Active, DirectBuySellErrors.NOT_ACTIVE_CURRENT_STATUS);
-        require(now >= endTime, DirectBuySellErrors.DIRECT_BUY_SELL_IN_STILL_PROGRESS);
         require(msg.value >= calcValue(directSellGas.cancel), BaseErrors.not_enough_value);
 
-        IDirectSellCallback(msg.sender).directSellCancelledOnTime{
-            value: Gas.FRONTENT_CALLBACK_VALUE,
-            flag: 1,
-            bounce: false
-        }(
-            _callbackId,
-            _getNftAddress()
-        );
+        if (now >= endTime && endTime != 0) {
 
-        IDirectSellCallback(_getOwner()).ownedDirectSellCancelledOnTime{
-            value: Gas.FRONTENT_CALLBACK_VALUE,
-            flag: 1,
-            bounce: false
-        }(
-            _getCollection(),
-            _getNftAddress()
-        );
+            IDirectSellCallback(msg.sender).directSellCancelledOnTime{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _callbackId,
+                _getNftAddress()
+            );
 
-        _changeState(DirectSellStatus.Expired, address(0));
+            IDirectSellCallback(_getOwner()).ownedDirectSellCancelledOnTime{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _getCollection(),
+                _getNftAddress()
+            );
 
-        mapping(address => CallbackParams) callbacks;
+            _changeState(DirectSellStatus.Expired, address(0));
 
-        TvmCell emptyPayload;
-        callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
+            mapping(address => CallbackParams) callbacks;
+            TvmCell emptyPayload;
+            callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
 
-        ITIP4_1NFT(_getNftAddress()).transfer{
-            value: 0,
-            flag: 128,
-            bounce: false
-        }(
-            _getOwner(),
-            _remainingGasTo,
-            callbacks
-        );
+            ITIP4_1NFT(_getNftAddress()).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                _getOwner(),
+                _remainingGasTo,
+                callbacks
+            );
+
+        } else if (msg.sender == _getMarketRootAddress()) {
+
+
+            IDirectSellCallback(_getOwner()).directSellClose{
+                value: Gas.FRONTENT_CALLBACK_VALUE,
+                flag: 1,
+                bounce: false
+            }(
+                _callbackId,
+                _getNftAddress()
+            );
+
+            _changeState(DirectSellStatus.Cancelled, address(0));
+
+            mapping(address => CallbackParams) callbacks;
+            TvmCell emptyPayload;
+            callbacks[_getOwner()] = CallbackParams(Gas.NFT_CALLBACK_VALUE, emptyPayload);
+
+            ITIP4_1NFT(_getNftAddress()).transfer{
+                value: 0,
+                flag: 128,
+                bounce: false
+            }(
+                _getOwner(),
+                _remainingGasTo,
+                callbacks
+            );
+
+        } else {
+            msg.sender.transfer(0, false, 128 + 32);
+        }
     }
 
     function _countCorrectFinalPrice(

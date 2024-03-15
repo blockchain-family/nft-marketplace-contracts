@@ -194,6 +194,15 @@
 			]
 		},
 		{
+			"name": "finishChildContract",
+			"inputs": [
+				{"name":"_offer","type":"address"},
+				{"name":"_callbackId","type":"uint32"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "getTargetBalance",
 			"inputs": [
 				{"name":"answerId","type":"uint32"}

@@ -95,7 +95,7 @@ export class DirectBuy {
     }
 
     async finishBuy(initiator: Account, callbackId: number, gasValue: any) {
-        return await locklift.tracing.trace(this.contract.methods.finishBuy({
+        return await locklift.tracing.trace(this.contract.methods.finishOffer({
                 _remainingGasTo: initiator.address,
                 _callbackId: callbackId
             }).send({

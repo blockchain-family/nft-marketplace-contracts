@@ -80,6 +80,15 @@
 			]
 		},
 		{
+			"name": "finishOffer",
+			"inputs": [
+				{"name":"_remainingGasTo","type":"address"},
+				{"name":"_callbackId","type":"uint32"}
+			],
+			"outputs": [
+			]
+		},
+		{
 			"name": "onAcceptTokensBurn",
 			"inputs": [
 				{"name":"amount","type":"uint128"},

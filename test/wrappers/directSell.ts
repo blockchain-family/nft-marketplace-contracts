@@ -105,7 +105,7 @@ export class DirectSell {
     }
 
     async finishSell(initiator: Account, callbackId: number, gasValue: any) {
-        return await locklift.tracing.trace(this.contract.methods.finishSell({
+        return await locklift.tracing.trace(this.contract.methods.finishOffer({
             _remainingGasTo: initiator.address,
             _callbackId: callbackId
         }).send({

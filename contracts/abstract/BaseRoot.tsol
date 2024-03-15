@@ -12,6 +12,7 @@ import "../modules/access/OwnableInternal.tsol";
 import "../interfaces/IEventsMarketFee.tsol";
 import "./TargetBalance.tsol";
 import "./BaseOffer.tsol";
+import "../interfaces/IOffer.tsol";
 
 
 abstract contract BaseRoot is
@@ -65,6 +66,17 @@ abstract contract BaseRoot is
     {
         BaseOffer(_offer).activate{value: 0, flag: 64, bounce: false}();
     }
+
+    function finishChildContract(
+        address _offer,
+        uint32 _callbackId
+    )
+        external
+        onlyOwner
+    {
+        IOffer(_offer).finishOffer{value: 0, flag: 64, bounce: false}(msg.sender, _callbackId);
+    }
+
 
 // market fee
     function _setMarketFee(

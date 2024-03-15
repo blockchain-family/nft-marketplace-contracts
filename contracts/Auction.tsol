@@ -255,8 +255,27 @@ contract Auction is
         address _remainingGasTo,
         uint32 _callbackId
     )
-        public
+        external
         reserve
+    {
+        _finishAuction(_remainingGasTo, _callbackId);
+    }
+
+    function finishOffer(
+        address _remainingGasTo,
+        uint32 _callbackId
+    )
+        external
+        reserve
+    {
+        _finishAuction(_remainingGasTo, _callbackId);
+    }
+
+    function _finishAuction(
+        address _remainingGasTo,
+        uint32 _callbackId
+    )
+        private
     {
         require(now >= auctionEndTime, AuctionErrors.auction_still_in_progress);
         require(currentStatus == AuctionStatus.Active, AuctionErrors.auction_not_active);

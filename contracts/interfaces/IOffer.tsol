@@ -1,8 +1,6 @@
 pragma ever-solidity >= 0.62.0;
 
-import "../structures/IMarketFeeStructure.tsol";
+interface IOffer {
 
-interface IOffer is IMarketFeeStructure {
-
-    function getTypeContract() external pure returns (string);
+    function finishOffer( address _remainingGasTo, uint32 _callbackId) external;
 }

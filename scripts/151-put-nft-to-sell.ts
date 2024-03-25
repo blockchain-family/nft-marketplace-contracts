@@ -117,7 +117,7 @@ async function main() {
       const Nft = await locklift.factory.getDeployedContract("NftWithRoyalty", nftAddress);
       const nftInfo = await Nft.methods.getInfo({answerId: 0}).call();
 
-      if (nftInfo.owner.toString() == nftInfo.manager.toString()) {
+      if (nftInfo.owner.toString() == nftInfo.manager.toString() && nftInfo.owner.toString() == account.address.toString()) {
 
           console.log('Start sell for nftId:', i);
 

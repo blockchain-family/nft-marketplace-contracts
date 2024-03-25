@@ -11,6 +11,11 @@ const BigNumber = require("bignumber.js");
 const prompts = require("prompts");
 const logger = require("mocha-logger");
 
+const PAYMENT_TOKEN = '0:1fd59df9c396130d81a14dad6df5272b9cd073d06516b2f97dd360e13866e589';
+const RECIPIENT = '0:fa9cf723c88796f269eb3d75e10e3035cce8f99840b137f320bd19e9e304a5c7'; //owner nft
+const FACTORY_DIRECT_SELL = '0:2c7a0452a76a717b226807a36f0e42387d92bae3949da4c6716f66e33558ab96';
+const START_TIME = 1710333200; //in sec
+const PRICE = 0.000001;
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -61,21 +66,9 @@ async function main() {
 
   console.log('CollectionRoyalty', response.collection.toString());
 
-  const savedFactoryDirectSell = await migration.loadContract("FactoryDirectSell", "FactoryDirectSell");
-
-  const response2 = await prompts([
-    {
-      type: "text",
-      name: "factoryDirectSell",
-      message: "Get FactoryDirectSell address (default " + savedFactoryDirectSell.address + ")",
-      validate: (value: any) => (isValidEverAddress(value) || value === "" ? true : "Invalid Everscale address"),
-      initial: savedFactoryDirectSell.address,
-    },
-  ]);
-
   const factoryDirectSell = await locklift.factory.getDeployedContract(
     "FactoryDirectSell",
-    new Address(response2.factoryDirectSell.toString()),
+    new Address(FACTORY_DIRECT_SELL.toString()),
   );
 
   const gas = (await factoryDirectSell.methods.getGasValue().call()).value0;
@@ -90,11 +83,11 @@ async function main() {
     await factoryDirectSell.methods
       .buildDirectSellCreationPayload({
         _callbackId: 0,
-        _startTime: 1710333200,
+        _startTime: START_TIME,
         _durationTime: 0,
-        _paymentToken: new Address("0:98b6964d0cd8f32850bf48fafe9007e22cc3dd90737a7f6b354fc9c7747e22e4"),
-        _price: toNano(0.000001),
-        _recipient: new Address("0:98b6964d0cd8f32850bf48fafe9007e22cc3dd90737a7f6b354fc9c7747e22e4"),
+        _paymentToken: new Address(PAYMENT_TOKEN.toString()),
+        _price: toNano(PRICE),
+        _recipient: new Address(RECIPIENT.toString()),
         _discountCollection: null,
         _discountNftId: null,
       })
@@ -160,7 +153,8 @@ async function main() {
           : "Invalid Everscale address",
     },
   ]);
- console.log("account balance", await locklift.provider.getBalance(account.address));
+
+  console.log("account balance", await locklift.provider.getBalance(account.address));
   if (response3.owner) {
     console.log(response3.owner);
     console.log(`Transfer ownership for collection`);
@@ -173,7 +167,7 @@ async function main() {
         amount: locklift.utils.toNano(1),
       });
   }
-   console.log("account balance", await locklift.provider.getBalance(account.address));
+  console.log("account balance", await locklift.provider.getBalance(account.address));
 }
 
 main()

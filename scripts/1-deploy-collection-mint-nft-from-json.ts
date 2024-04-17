@@ -25,21 +25,21 @@ async function main() {
     const data = fs.readFileSync("nft_to_address.json", 'utf8');
     if (data) array_json = JSON.parse(data);
 
-    const requiredGas = new BigNumber(array_json.length).times(3.4).plus(5).shiftedBy(9);
+    const requiredGas = new BigNumber(array_json.length).times(1.6).plus(2).shiftedBy(9);
     const balanceStart = await locklift.provider.getBalance(account.address);
 
     if (requiredGas.gt(balanceStart)) {
         throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
     }
 
-    const Nft = (await locklift.factory.getContractArtifacts("NftRoyalty"));
+    const Nft = (await locklift.factory.getContractArtifacts("Nft"));
     const Index = (await locklift.factory.getContractArtifacts("Index"));
     const IndexBasis = (await locklift.factory.getContractArtifacts("IndexBasis"));
 
     console.log('Start deploy collection');
 
     const { contract: collection, tx } = await locklift.factory.deployContract({
-        contract: "CollectionRoyalty",
+        contract: "Collection",
         publicKey: (signer?.publicKey) as string,
         constructorParams: {
             codeNft: Nft.code,
@@ -52,18 +52,18 @@ async function main() {
         initParams: {
             nonce_: locklift.utils.getRandomNonce()
         },
-        value: locklift.utils.toNano(4)
+        value: locklift.utils.toNano(3)
     });
 
     // const collection = (await locklift.factory.getDeployedContract('Collection', new Address('0:432da1db5a47e400ab62570938ec95310610fa483483b3fd7fa25db98cd144e0')));
-    console.log('CollectionRoyalty', collection.address);
-    migration.store(collection, "CollectionRoyalty");
+    console.log('Collection', collection.address);
+    migration.store(collection, "Collection");
 
     if (array_json.nfts) {
         for (const element of array_json.nfts) {
             console.log(`Mint ${element.name}`)
             let item = {
-                "type": "Basic NFT",
+                "type": element.type,
                 "name": element.name,
                 "description": element.description,
                 "preview": {
@@ -77,7 +77,7 @@ async function main() {
                         "mimetype": element.mimetype
                     }
                 ],
-                "external_url": ""
+                "external_url": element.external_url
             }
 
             await collection.methods.mintNft({
@@ -85,7 +85,7 @@ async function main() {
                 _json: JSON.stringify(item),
             }).send({
                 from: account.address,
-                amount:  locklift.utils.toNano(5)
+                amount:  locklift.utils.toNano(1.6)
             })
 
             //console.log(` Tx: ${tx.transaction.id}`)

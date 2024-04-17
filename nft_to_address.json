@@ -19,10 +19,14 @@
         [
             {
                 "address": "",
+                "type": "Basic NFT",
                 "preview_url":	"",
+                "mimetype_preview": "image/jpeg",
                 "url": "",
-                "name": "Winter 1",
-                "description": "Winter 1 nft"
+                "mimetype": "image/jpeg",
+                "name": "Nft Name",
+                "description": "Nft description",
+                "external_url": ""
             }
         ]
 }

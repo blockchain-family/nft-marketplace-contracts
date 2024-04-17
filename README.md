@@ -34,6 +34,7 @@ You need prepare json file with similar structure (file nft_to_address.json):
         [
             {
                 "address": "",
+                "type": "Basic NFT",
                 "preview_url":	"",
                 "mimetype_preview": "image/jpeg",
                 "url": "",
@@ -54,17 +55,34 @@ You need prepare json file with similar structure (file nft_to_address.json):
     Where `source` - link to Collection wallpaper.
 
 #### NFT
-`address` - owner's address  NFT,
+`address` - owner's address  NFT, if you would like put nft on sell this address have to equal account address
 
 `preview_url` - link to NFT logo. We recommend: recommended dimensions 512x512, ratio 1:1, jpeg, size no more than 200Kb 
 
 `url` - link to NFT main file. It may be pdf, docs, jpeg, gif, png, audio, video
 
+
+### Before use script
+Сonfigure `.env` and `locklift.config.ts`
+
+### Deploy account
+`npx locklift run --disable-build --network venom_mainet --script scripts/0-deploy-account.ts - b N`
+Where `N = (count of NFT * 1.6) + 2.5`
+
 ### Deploy Collection and mint NFT
 
-### Deploy Collection and mint NFT and put its on sale
+`npx locklift run --disable-build --network venom_mainet --script scripts/1-deploy-collection-mint-nft-from-json.ts`
 
-Use script `1-deploy-collection-mint-nft-from-json.ts`
+### Then put NFTs on sell after deploy
+
+`npx locklift run --disable-build --network venom_mainet --script scripts/151-put-nft-to-sell.ts`
+Set constant:
+`PAYMENT_TOKEN` - tip3 token, for Venom - wVenom
+`RECIPIENT` - Nft's owner
+`FACTORY_DIRECT_SELL` - address root contract for sale on marketplace
+`START_TIME` - start tile for sale
+`PRICE` - prise
+You also can set durationTime for sale.
 
 
 <p align="center">

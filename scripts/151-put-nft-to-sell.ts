@@ -3,7 +3,7 @@ import { Migration } from "./migration";
 import { Contract, toNano, zeroAddress } from "locklift";
 import { Address } from "everscale-inpage-provider";
 import { FactoryDirectSell } from "../test/wrappers/directSell";
-import { CollectionRoyaltyAbi } from "../build/factorySource";
+import {CollectionAbi, CollectionRoyaltyAbi} from "../build/factorySource";
 const fs = require('fs')
 
 const migration = new Migration();
@@ -21,20 +21,20 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function waitOfferCreated(collection: Address, nftId: number) {
-  const collectionRoyalty: Contract<CollectionRoyaltyAbi> = await locklift.factory.getDeployedContract(
-    "CollectionRoyalty",
-    collection,
+async function waitOfferCreated(collection_: Address, nftId: number) {
+  const collection: Contract<CollectionAbi> = await locklift.factory.getDeployedContract(
+    "Collection",
+    collection_,
   );
-  let { nft: nftAddress } = await collectionRoyalty.methods.nftAddress({ answerId: 0, id: nftId }).call();
-  const Nft = await locklift.factory.getDeployedContract("NftWithRoyalty", nftAddress);
+  let { nft: nftAddress } = await collection.methods.nftAddress({ answerId: 0, id: nftId }).call();
+  const Nft = await locklift.factory.getDeployedContract("Nft", nftAddress);
   let manager = (await Nft.methods.getInfo({ answerId: 0 }).call()).manager.toString();
   let owner = (await Nft.methods.getInfo({ answerId: 0 }).call()).owner.toString();
 
   if (owner == manager) {
     console.log(`Nft(${nftAddress}) not on sale.`);
     await sleep(30000);
-    await waitOfferCreated(collection, nftId);
+    await waitOfferCreated(collection.address, nftId);
   } else {
     console.log(`Nft(${nftAddress}) ON SALE. DirectSell/DirectSellFactory = ${manager}`);
   }
@@ -44,7 +44,7 @@ async function main() {
   const signer = await locklift.keystore.getSigner("0");
   const account = await migration.loadAccount("Account1");
 
-  const savedCollection = await migration.loadContract("CollectionRoyalty", "CollectionRoyalty");
+  const savedCollection = await migration.loadContract("Collection", "Collection");
 
   const response = await prompts([
     {
@@ -60,11 +60,11 @@ async function main() {
   ]);
 
   const collection = (await locklift.factory.getDeployedContract(
-      'CollectionRoyalty',
+      'Collection',
       new Address(response.collection.toString()))
   );
 
-  console.log('CollectionRoyalty', response.collection.toString());
+  console.log('Collection', response.collection.toString());
 
   const factoryDirectSell = await locklift.factory.getDeployedContract(
     "FactoryDirectSell",

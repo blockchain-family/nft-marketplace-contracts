@@ -93,6 +93,10 @@ Set constant:
 `PRICE` - prise
 You also can set durationTime for sale.
 
+### Royalty 
+For deploy NFT with royalty use next script
+`npx locklift run --disable-build --network venom_mainet --script scripts/3-deploy-collection-nft-from-json-with-royalty.ts`
+
 
 <p align="center">
   <a href="https://github.com/venom-blockchain/developer-program">

@@ -25,7 +25,7 @@ async function main() {
     const data = fs.readFileSync("nft_to_address.json", 'utf8');
     if (data) array_json = JSON.parse(data);
 
-    const requiredGas = new BigNumber(array_json.length).times(1.6).plus(2).shiftedBy(9);
+    const requiredGas = new BigNumber(array_json.length).times(1).plus(2).shiftedBy(9);
     const balanceStart = await locklift.provider.getBalance(account.address);
 
     if (requiredGas.gt(balanceStart)) {
@@ -85,7 +85,7 @@ async function main() {
                 _json: JSON.stringify(item),
             }).send({
                 from: account.address,
-                amount:  locklift.utils.toNano(1.6)
+                amount:  locklift.utils.toNano(1.05)
             })
 
             //console.log(` Tx: ${tx.transaction.id}`)

@@ -11,10 +11,10 @@ const BigNumber = require("bignumber.js");
 const prompts = require("prompts");
 const logger = require("mocha-logger");
 
-const PAYMENT_TOKEN = '0:1fd59df9c396130d81a14dad6df5272b9cd073d06516b2f97dd360e13866e589';
-const RECIPIENT = '0:fa9cf723c88796f269eb3d75e10e3035cce8f99840b137f320bd19e9e304a5c7'; //owner nft
-const FACTORY_DIRECT_SELL = '0:2c7a0452a76a717b226807a36f0e42387d92bae3949da4c6716f66e33558ab96';
-const START_TIME = 1710333200; //in sec
+const PAYMENT_TOKEN = '0:77d36848bb159fa485628bc38dc37eadb74befa514395e09910f601b841f749e';
+const RECIPIENT = ''; //owner nft
+const FACTORY_DIRECT_SELL = '0:4444a335e94794c6869c061c0f657c761011fa229b67ee7101538be18d01ecef';
+const START_TIME = 1713884603; //in sec
 const PRICE = 0.000001;
 
 function sleep(ms: number) {
@@ -74,7 +74,7 @@ async function main() {
   const gas = (await factoryDirectSell.methods.getGasValue().call()).value0;
   const gasPrice = new BigNumber(1).shiftedBy(9).div(gas.gasK);
   let targetGas = new BigNumber(gas.sell.dynamicGas).times(gasPrice).plus(gas.sell.fixedValue).toNumber();
-  let gasChangeManager = new BigNumber(targetGas).plus(500000000).toString();
+  let gasChangeManager = new BigNumber(targetGas).plus(200000000).toString();
 
 
   // build payload for directSell

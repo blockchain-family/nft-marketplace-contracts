@@ -27,8 +27,8 @@
     "ora": "^3.4.0",
     "prettier": "^2.7.1",
     "prompts": "^2.4.1",
-    "tip3": "git://github.com/broxus/tip3#83e69b99e287bc551672f9df170e39c25b93876d",
-    "ever-wever": "git+ssh://git@gitlab.broxus.com/tokens/ever-wever#e19da2e77de349e493a9daf86710c3a2256d20d1",
+    "tip3": "github:broxus/tip3#83e69b99e287bc551672f9df170e39c25b93876d",
+    "ever-wever": "github:broxus/ever-wever#e19da2e77de349e493a9daf86710c3a2256d20d1",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.7.0",
     "typescript": "^4.7.4"

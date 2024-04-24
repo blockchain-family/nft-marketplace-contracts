@@ -3,7 +3,8 @@ import { Migration } from "./migration";
 import { Contract, toNano, zeroAddress } from "locklift";
 import { Address } from "everscale-inpage-provider";
 import { FactoryDirectBuy } from "../test/wrappers/directBuy";
-import {CollectionAbi} from "../build/factorySource";
+import { FactoryDirectBuyAbi} from "../build/factorySource";
+import {TokenWallet} from "../test/wrappers/token_wallet";
 const fs = require('fs')
 
 const migration = new Migration();
@@ -13,37 +14,66 @@ const logger = require("mocha-logger");
 
 let nfts: any;
 
-const PAYMENT_TOKEN = '0:1fd59df9c396130d81a14dad6df5272b9cd073d06516b2f97dd360e13866e589';
-const FACTORY_DIRECT_BUY = '0:2c7a0452a76a717b226807a36f0e42387d92bae3949da4c6716f66e33558ab96';
+const PAYMENT_TOKEN = '0:77d36848bb159fa485628bc38dc37eadb74befa514395e09910f601b841f749e';
+const FACTORY_DIRECT_BUY = '0:c84e79f94f1dd7b68faa7920763d3d783a2a03e7acd33d43b17fa94d041c3d43';
 const START_TIME = 1710333200; //in sec
-const PRICE = 0.000001;
+
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function waitOfferCreated(collection_: Address, nftId: number) {
-  const collection: Contract<CollectionAbi> = await locklift.factory.getDeployedContract(
-    "Collection",
-    collection_,
-  );
-  let { nft: nftAddress } = await collection.methods.nftAddress({ answerId: 0, id: nftId }).call();
-  const Nft = await locklift.factory.getDeployedContract("Nft", nftAddress);
-  let manager = (await Nft.methods.getInfo({ answerId: 0 }).call()).manager.toString();
-  let owner = (await Nft.methods.getInfo({ answerId: 0 }).call()).owner.toString();
+async function waitOfferCreated(nftAddress: Address) {
 
-  if (owner == manager) {
-    console.log(`Nft(${nftAddress}) not on sale.`);
+  const event = await getLastOffer();
+  const isDeployed = event?.nft ? event?.nft == nftAddress : false;
+
+  if (!isDeployed) {
+    console.log(`Offer not created to Nft(${nftAddress}).`);
     await sleep(30000);
-    await waitOfferCreated(collection.address, nftId);
+    await waitOfferCreated(nftAddress);
   } else {
-    console.log(`Nft(${nftAddress}) ON SALE. DirectSell/DirectSellFactory = ${manager}`);
+    console.log(`Offer CREATED to Nft(${nftAddress}) DirectBuy = ${event?.directBuy}`);
   }
+}
+
+async function getLastOffer() {
+  const factoryDirectBuy: Contract<FactoryDirectBuyAbi> = await locklift.factory.getDeployedContract(
+    "FactoryDirectBuy",
+    new Address(FACTORY_DIRECT_BUY),
+  );
+  const lastDeploy = (
+    await factoryDirectBuy.getPastEvents<"DirectBuyDeployed">({
+      limit: 1,
+      filter: event => event.event === "DirectBuyDeployed",
+    })
+  ).events.shift();
+  return lastDeploy?.data ? lastDeploy?.data : null;
 }
 
 async function main() {
   const signer = await locklift.keystore.getSigner("0");
   const account = await migration.loadAccount("Account1");
+
+  const factoryDirectBuy = await locklift.factory.getDeployedContract(
+    "FactoryDirectBuy",
+    new Address(FACTORY_DIRECT_BUY.toString())
+  );
+
+  const tokenRoot = await locklift.factory.getDeployedContract('TokenRootUpgradeable', new Address(PAYMENT_TOKEN));
+
+  const addressFTW = (await tokenRoot.methods.walletOf({walletOwner: new Address(FACTORY_DIRECT_BUY), answerId: 0}).call()).value0;
+  console.log('addressFTW', addressFTW);
+  await tokenRoot.methods.deployWallet({
+    answerId: 0,
+    walletOwner: factoryDirectBuy.address,
+    deployWalletValue: toNano(0.1)
+  }).send({
+    from: account.address,
+    amount: toNano(3)
+  });
+
+  const factoryWallet = await locklift.factory.getDeployedContract('VaultTokenWallet_V1', addressFTW);
 
   const response = await prompts([
     {
@@ -54,6 +84,11 @@ async function main() {
         isValidEverAddress(value) || value === ""
           ? true
           : "Invalid Everscale address"
+    },
+    {
+        type: "number",
+        name: "amount",
+        message: "Get gift amount"
     },
   ]);
 
@@ -66,88 +101,69 @@ async function main() {
   const data = fs.readFileSync("nft_for_offer.json", 'utf8');
   if (data) nfts = JSON.parse(data);
 
-
-  const factoryDirectBuy = await locklift.factory.getDeployedContract(
-    "FactoryDirectBuy",
-    new Address(FACTORY_DIRECT_BUY.toString()),
-  );
-
   const gas = (await factoryDirectBuy.methods.getGasValue().call()).value0;
   const gasPrice = new BigNumber(1).shiftedBy(9).div(gas.gasK);
   let targetGas = new BigNumber(gas.make.dynamicGas).times(gasPrice).plus(gas.make.fixedValue).toNumber();
-  let requiredGas = new BigNumber(targetGas).plus(250000000).toString();
+  let transactionGas = new BigNumber(targetGas).plus(500000000);
+  let requiredGas = new BigNumber(targetGas).plus(500000000).times(nfts.length);
 
   const balanceStart = await locklift.provider.getBalance(account.address);
   if (requiredGas.gt(balanceStart)) {
     throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
   }
 
-  // build payload for directSell
-  logger.log("Build payload");
-  const targetPayload = (
-    await factoryDirectBuy.methods
-      .buildDirectSellCreationPayload({
-        _callbackId: 0,
-        _startTime: START_TIME,
-        _durationTime: 0,
-        _paymentToken: new Address(PAYMENT_TOKEN.toString()),
-        _price: toNano(PRICE),
-        _recipient: new Address(RECIPIENT.toString()),
-        _discountCollection: null,
-        _discountNftId: null,
-      })
-      .call()
-  ).value0;
+  const amountPerNft =  new BigNumber(response.amount).div(nfts.length).toNumber();
 
-  const totalMinted = await collection.methods.totalMinted({answerId: 0}).call();
-  const lastNFT = Number(totalMinted.count);
-  console.log(lastNFT);
+  console.log(`Start create offer for ${nfts.length} nfts.`)
 
-   // const balanceStart = await locklift.provider.getBalance(account.address);
-   // const requiredGas = new BigNumber(gasChangeManager).times(lastNFT).plus(1).shiftedBy(9);
-   // if (requiredGas.gt(balanceStart)) {
-   //   throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
-   // }
+  for (let i = 0; i <= nfts.length; i++) {
 
-    for (let i = 0; i < lastNFT; i++) {
+    let { nft: nftAddress } = await collection.methods.nftAddress({ answerId: 0, id: nfts[i] }).call();
 
-      let { nft: nftAddress } = await collection.methods.nftAddress({ answerId: 0, id: i }).call();
-      const Nft = await locklift.factory.getDeployedContract("NftWithRoyalty", nftAddress);
-      const nftInfo = await Nft.methods.getInfo({answerId: 0}).call();
+    console.log('Start create offer for nftId:', nfts[i]);
 
-      if (nftInfo.owner.toString() == nftInfo.manager.toString() && nftInfo.owner.toString() == account.address.toString()) {
+    // build payload for directBuy
+    logger.log("Build payload");
+    const targetPayload = (
+      await factoryDirectBuy.methods
+        .buildDirectBuyCreationPayload({
+          callbackId: 0,
+          buyer: new Address(account.address.toString()),
+          nft:  new Address(nftAddress.toString()),
+          startTime: START_TIME,
+          durationTime: 0,
+          discountCollection: null,
+          discountNftId: null,
+        }).call()
+    ).value0;
 
-          console.log('Start sell for nftId:', i);
+    let callback: CallbackType;
+    callback = [
+      factoryDirectBuy.address,
+      {
+        value: targetGas,
+        payload: targetPayload,
+      },
+    ];
+    const callbacks: CallbackType[] = [];
+    callbacks.push(callback);
 
-          let callback: CallbackType;
-          callback = [
-            factoryDirectBuy.address,
-            {
-              value: targetGas,
-              payload: targetPayload,
-            },
-          ];
-          const callbacks: CallbackType[] = [];
-          callbacks.push(callback);
+    // console.log("account balance", await locklift.provider.getBalance(account.address));
 
-          console.log("account balance", await locklift.provider.getBalance(account.address));
+    await factoryWallet.methods.acceptNative({
+      amount: amountPerNft,
+      deployWalletValue: toNano(0.1),
+      remainingGasTo: account.address,
+      payload: targetPayload
+    }).send({
+      from: account.address,
+      amount: toNano(amountPerNft + transactionGas)
+    });
 
-          (Nft.methods.changeManager({
-            newManager: factoryDirectBuy.address,
-            sendGasTo: account.address,
-            callbacks: callbacks
-          }).send({
-            from: account.address,
-            amount: gasChangeManager
-          }));
-    // (await locklift.tracing.trace(
-          // .traceTree?.beautyPrint()
+    await waitOfferCreated(new Address(nftAddress.toString()));
+  }
 
-          await waitOfferCreated(collection.address, i);
-      }
-    }
-
-    const response3 = await prompts([
+  const response3 = await prompts([
     {
       type: "text",
       name: "owner",

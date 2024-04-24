@@ -31,8 +31,8 @@ async function main() {
   if (data) array_json = JSON.parse(data);
 
   const requiredGas = new BigNumber(array_json.length)
-    .times(3.4)
-    .plus(5)
+    .times(1)
+    .plus(2)
     .shiftedBy(9);
   const balanceStart = await locklift.provider.getBalance(account.address);
 
@@ -98,8 +98,8 @@ async function main() {
         ],
         external_url: element.external_url,
         royalty: {
-          royaltyType: "Dynamic",
-          description: "The percentage of royalties depends on the time of existence of the NFT: up to a year - 10%, from 1-5 years - 20%, more than 5 years - 30%"
+          royaltyType: "Static",
+          description: "The percentage of royalties - 10%"
         }
       };
 
@@ -117,7 +117,7 @@ async function main() {
         })
         .send({
           from: account.address,
-          amount: locklift.utils.toNano(5),
+          amount: locklift.utils.toNano(1.05),
         });
 
       //console.log(` Tx: ${tx.transaction.id}`)

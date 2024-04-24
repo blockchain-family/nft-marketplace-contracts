@@ -69,6 +69,15 @@ You need prepare json file with similar structure (file nft_to_address.json):
 `npx locklift run --disable-build --network venom_mainet --script scripts/0-deploy-account.ts - b N`
 Where `N = (count of NFT * 1.6) + 2.5`
 
+or use giver as account. Create or change file `migration_log.json`
+```
+{
+  "Account1": "",
+}
+```
+where `Account1` - giver address.
+
+
 ### Deploy Collection and mint NFT
 
 `npx locklift run --disable-build --network venom_mainet --script scripts/1-deploy-collection-mint-nft-from-json.ts`
@@ -77,12 +86,16 @@ Where `N = (count of NFT * 1.6) + 2.5`
 
 `npx locklift run --disable-build --network venom_mainet --script scripts/151-put-nft-to-sell.ts`
 Set constant:
-`PAYMENT_TOKEN` - tip3 token, for Venom - wVenom
+`PAYMENT_TOKEN` - tip3 token, for Venom - wVenom (address 0:77d36848bb159fa485628bc38dc37eadb74befa514395e09910f601b841f749e)
 `RECIPIENT` - Nft's owner
-`FACTORY_DIRECT_SELL` - address root contract for sale on marketplace
+`FACTORY_DIRECT_SELL` - address root contract for sale on marketplace (valid for now 0:4444a335e94794c6869c061c0f657c761011fa229b67ee7101538be18d01ecef)
 `START_TIME` - start tile for sale
 `PRICE` - prise
 You also can set durationTime for sale.
+
+### Royalty 
+For deploy NFT with royalty use next script
+`npx locklift run --disable-build --network venom_mainet --script scripts/3-deploy-collection-nft-from-json-with-royalty.ts`
 
 
 <p align="center">

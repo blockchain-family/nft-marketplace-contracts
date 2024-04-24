@@ -104,7 +104,7 @@ async function main() {
   const data = fs.readFileSync("nft_metadata_venom_test.json", 'utf8');
   if (data) array_json = JSON.parse(data);
 
-  const requiredGas = new BigNumber(array_json.nfts.length).times(1.6).plus(1).shiftedBy(9);
+  const requiredGas = new BigNumber(array_json.nfts.length).times(1).plus(2).shiftedBy(9);
   const balanceStart = await locklift.provider.getBalance(account.address);
 
   if (requiredGas.gt(balanceStart)) {
@@ -126,7 +126,7 @@ async function main() {
       codeIndex: Index.code,
       codeIndexBasis: IndexBasis.code,
       owner: account.address,
-      remainOnNft: locklift.utils.toNano(0.5),
+      remainOnNft: locklift.utils.toNano(0.2),
       json: JSON.stringify(array_json.collection)
     },
     initParams: {

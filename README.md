@@ -66,7 +66,7 @@ You need prepare json file with similar structure (file nft_to_address.json):
 Сonfigure `.env` and `locklift.config.ts`
 
 ### Deploy account
-`npx locklift run --disable-build --network venom_mainet --script scripts/0-deploy-account.ts - b N`
+`npx locklift run --disable-build --network venom_mainnet --script scripts/0-deploy-account.ts - b N`
 Where `N = (count of NFT * 1.6) + 2.5`
 
 or use giver as account. Create or change file `migration_log.json`
@@ -80,11 +80,11 @@ where `Account1` - giver address.
 
 ### Deploy Collection and mint NFT
 
-`npx locklift run --disable-build --network venom_mainet --script scripts/1-deploy-collection-mint-nft-from-json.ts`
+`npx locklift run --disable-build --network venom_mainnet --script scripts/1-deploy-collection-mint-nft-from-json.ts`
 
 ### Then put NFTs on sell after deploy
 
-`npx locklift run --disable-build --network venom_mainet --script scripts/151-put-nft-to-sell.ts`
+`npx locklift run --disable-build --network venom_mainnet --script scripts/151-put-nft-to-sell.ts`
 Set constant:
 `PAYMENT_TOKEN` - tip3 token, for Venom - wVenom (address 0:77d36848bb159fa485628bc38dc37eadb74befa514395e09910f601b841f749e)
 `RECIPIENT` - Nft's owner

@@ -24,7 +24,7 @@ async function main() {
         value: toNano(balance),
         //owner publicKey
         publicKey: signer!.publicKey,
-        nonce: getRandomNonce()
+        // nonce: getRandomNonce()
     }));
 
     await locklift.provider.sendMessage({

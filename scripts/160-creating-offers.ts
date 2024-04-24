@@ -26,7 +26,7 @@ function sleep(ms: number) {
 async function waitOfferCreated(nftAddress: Address) {
 
   const event = await getLastOffer();
-  const isDeployed = event?.nft ? event?.nft == nftAddress : false;
+  const isDeployed = event?.nft ? event?.nft.toString() == nftAddress.toString() : false;
 
   if (!isDeployed) {
     console.log(`Offer not created to Nft(${nftAddress}).`);
@@ -60,10 +60,10 @@ async function main() {
     new Address(FACTORY_DIRECT_BUY.toString())
   );
 
-  const tokenRoot = await locklift.factory.getDeployedContract('TokenRootUpgradeable', new Address(PAYMENT_TOKEN));
+  const tokenRoot = await locklift.factory.getDeployedContract('VaultTokenRoot_V1', new Address(PAYMENT_TOKEN));
 
   const addressFTW = (await tokenRoot.methods.walletOf({walletOwner: new Address(FACTORY_DIRECT_BUY), answerId: 0}).call()).value0;
-  console.log('addressFTW', addressFTW);
+
   await tokenRoot.methods.deployWallet({
     answerId: 0,
     walletOwner: factoryDirectBuy.address,
@@ -104,37 +104,39 @@ async function main() {
   const gas = (await factoryDirectBuy.methods.getGasValue().call()).value0;
   const gasPrice = new BigNumber(1).shiftedBy(9).div(gas.gasK);
   let targetGas = new BigNumber(gas.make.dynamicGas).times(gasPrice).plus(gas.make.fixedValue).toNumber();
-  let transactionGas = new BigNumber(targetGas).plus(500000000);
-  let requiredGas = new BigNumber(targetGas).plus(500000000).times(nfts.length);
+  let transferValue = new BigNumber(targetGas).plus(500000000);
+  let requiredGas = new BigNumber(transferValue).times(nfts.length);
 
   const balanceStart = await locklift.provider.getBalance(account.address);
+
   if (requiredGas.gt(balanceStart)) {
     throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
   }
 
-  const amountPerNft =  new BigNumber(response.amount).div(nfts.length).toNumber();
+  const amountPerNft =  new BigNumber(response.amount).div(nfts.length).shiftedBy(9);
 
   console.log(`Start create offer for ${nfts.length} nfts.`)
 
-  for (let i = 0; i <= nfts.length; i++) {
-
-    let { nft: nftAddress } = await collection.methods.nftAddress({ answerId: 0, id: nfts[i] }).call();
+  for (let i = 0; i < nfts.length; i++) {
 
     console.log('Start create offer for nftId:', nfts[i]);
 
+    let { nft: nftAddress } = await collection.methods.nftAddress({ answerId: 0, id: nfts[i] }).call();
+
     // build payload for directBuy
     logger.log("Build payload");
-    const targetPayload = (
+    let targetPayload = (
       await factoryDirectBuy.methods
         .buildDirectBuyCreationPayload({
           callbackId: 0,
-          buyer: new Address(account.address.toString()),
+          buyer: account.address,
           nft:  new Address(nftAddress.toString()),
           startTime: START_TIME,
           durationTime: 0,
           discountCollection: null,
           discountNftId: null,
-        }).call()
+        })
+      .call()
     ).value0;
 
     let callback: CallbackType;
@@ -148,16 +150,16 @@ async function main() {
     const callbacks: CallbackType[] = [];
     callbacks.push(callback);
 
-    // console.log("account balance", await locklift.provider.getBalance(account.address));
+    console.log(amountPerNft.plus(transferValue).toString());
 
     await factoryWallet.methods.acceptNative({
-      amount: amountPerNft,
+      amount: amountPerNft.toString(),
       deployWalletValue: toNano(0.1),
       remainingGasTo: account.address,
       payload: targetPayload
     }).send({
       from: account.address,
-      amount: toNano(amountPerNft + transactionGas)
+      amount: amountPerNft.plus(transferValue).toString()
     });
 
     await waitOfferCreated(new Address(nftAddress.toString()));

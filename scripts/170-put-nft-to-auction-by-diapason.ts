@@ -12,8 +12,7 @@ const prompts = require("prompts");
 const logger = require("mocha-logger");
 
 const PAYMENT_TOKEN = '0:77d36848bb159fa485628bc38dc37eadb74befa514395e09910f601b841f749e';
-// const FACTORY_AUCTION = '0:a9408caeabb9a443ebca91c7f7d23c0f285f5734ae8ee1ce60dc0de1341aa58e';
-const FACTORY_AUCTION = '0:2b5c3c032595d94aa9d0cf5c604819c0426f03db9d6dd50eee110aabe3feae7d';
+const FACTORY_AUCTION = '0:a9408caeabb9a443ebca91c7f7d23c0f285f5734ae8ee1ce60dc0de1341aa58e';
 const START_TIME = 1710333200; //in sec
 const DURAION_TIME = 86400; //one day
 const PRICE = 0.000001;

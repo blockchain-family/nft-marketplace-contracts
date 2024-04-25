@@ -11,8 +11,8 @@ const BigNumber = require("bignumber.js");
 const prompts = require("prompts");
 const logger = require("mocha-logger");
 
-// const FACTORY_AUCTION = '0:a9408caeabb9a443ebca91c7f7d23c0f285f5734ae8ee1ce60dc0de1341aa58e';
-const FACTORY_AUCTION = '0:07731ec88ff1ab5343116786a471b10ae87eb06b50c48e657d0ca7eb8bbcc39f';
+const FACTORY_AUCTION = '0:a9408caeabb9a443ebca91c7f7d23c0f285f5734ae8ee1ce60dc0de1341aa58e';
+// const FACTORY_AUCTION = '0:07731ec88ff1ab5343116786a471b10ae87eb06b50c48e657d0ca7eb8bbcc39f';
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));

@@ -5,6 +5,8 @@ import { Address } from "everscale-inpage-provider";
 import { FactoryDirectBuy } from "../test/wrappers/directBuy";
 import { FactoryDirectBuyAbi} from "../build/factorySource";
 import {TokenWallet} from "../test/wrappers/token_wallet";
+import {appendFileSync, writeFileSync} from "fs";
+import { appendFile } from 'fs';
 const fs = require('fs')
 
 const migration = new Migration();
@@ -12,7 +14,8 @@ const BigNumber = require("bignumber.js");
 const prompts = require("prompts");
 const logger = require("mocha-logger");
 
-let nfts: any;
+let offersData: any;
+let createdOffer = new Array();
 
 const PAYMENT_TOKEN = '0:77d36848bb159fa485628bc38dc37eadb74befa514395e09910f601b841f749e';
 const FACTORY_DIRECT_BUY = '0:c84e79f94f1dd7b68faa7920763d3d783a2a03e7acd33d43b17fa94d041c3d43';
@@ -34,6 +37,7 @@ async function waitOfferCreated(nftAddress: Address) {
     await waitOfferCreated(nftAddress);
   } else {
     console.log(`Offer CREATED to Nft(${nftAddress}) DirectBuy = ${event?.directBuy}`);
+    return event?.directBuy;
   }
 }
 
@@ -55,6 +59,9 @@ async function main() {
   const signer = await locklift.keystore.getSigner("0");
   const account = await migration.loadAccount("Account1");
 
+  const data = fs.readFileSync("nft_for_offer.json", 'utf8');
+  if (data) offersData = JSON.parse(data);
+
   const factoryDirectBuy = await locklift.factory.getDeployedContract(
     "FactoryDirectBuy",
     new Address(FACTORY_DIRECT_BUY.toString())
@@ -75,37 +82,17 @@ async function main() {
 
   const factoryWallet = await locklift.factory.getDeployedContract('VaultTokenWallet_V1', addressFTW);
 
-  const response = await prompts([
-    {
-      type: "text",
-      name: "collection",
-      message: "Get Collection Address",
-      validate: (value: any) =>
-        isValidEverAddress(value) || value === ""
-          ? true
-          : "Invalid Everscale address"
-    },
-    {
-        type: "number",
-        name: "amount",
-        message: "Get gift amount"
-    },
-  ]);
-
   const collection = (await locklift.factory.getDeployedContract(
       'Collection',
-      new Address(response.collection.toString()))
+      new Address(offersData.collection.toString()))
   );
-  console.log('Collection', response.collection.toString());
-
-  const data = fs.readFileSync("nft_for_offer.json", 'utf8');
-  if (data) nfts = JSON.parse(data);
+  console.log('Collection', offersData.collection.toString());
 
   const gas = (await factoryDirectBuy.methods.getGasValue().call()).value0;
   const gasPrice = new BigNumber(1).shiftedBy(9).div(gas.gasK);
   let targetGas = new BigNumber(gas.make.dynamicGas).times(gasPrice).plus(gas.make.fixedValue).toNumber();
   let transferValue = new BigNumber(targetGas).plus(500000000);
-  let requiredGas = new BigNumber(transferValue).times(nfts.length);
+  let requiredGas = new BigNumber(transferValue).times(offersData.ids.length);
 
   const balanceStart = await locklift.provider.getBalance(account.address);
 
@@ -113,9 +100,11 @@ async function main() {
     throw Error('NOT ENOUGH BALANCE ON ' + account.address + '. REQUIRES: ' + requiredGas.shiftedBy(-9).toString() + ' EVER')
   }
 
-  const amountPerNft =  new BigNumber(response.amount).div(nfts.length).shiftedBy(9);
+  console.log(`Start create offer for collection ${offersData.collection}.`);
+  console.log(`Start create offer for ${offersData.ids.length} nfts.`);
+  console.log(`Amount per offer ${offersData.amountPerNft} nfts.`);
 
-  console.log(`Start create offer for ${nfts.length} nfts.`)
+  let nfts = offersData.ids;
 
   for (let i = 0; i < nfts.length; i++) {
 
@@ -150,47 +139,32 @@ async function main() {
     const callbacks: CallbackType[] = [];
     callbacks.push(callback);
 
-    console.log(amountPerNft.plus(transferValue).toString());
-
     await factoryWallet.methods.acceptNative({
-      amount: amountPerNft.toString(),
+      amount: offersData.amountPerOffer,
       deployWalletValue: toNano(0.1),
       remainingGasTo: account.address,
       payload: targetPayload
     }).send({
       from: account.address,
-      amount: amountPerNft.plus(transferValue).toString()
+      amount: new BigNumber(offersData.amountPerOffer).plus(transferValue).toString()
     });
 
-    await waitOfferCreated(new Address(nftAddress.toString()));
-  }
+    let directBuy = await waitOfferCreated(new Address(nftAddress.toString()));
 
-  const response3 = await prompts([
-    {
-      type: "text",
-      name: "owner",
-      message: "Get Collection Owner Address (default " + account.address + ")",
-      validate: (value: any) =>
-        isValidEverAddress(value) || value === ""
-          ? true
-          : "Invalid Everscale address",
-    },
-  ]);
+    let offers = fs.readFileSync('offers_result.json', 'utf-8');
+    if (offers) createdOffer = JSON.parse(offers);
 
-  console.log("account balance", await locklift.provider.getBalance(account.address));
-  if (response3.owner) {
-    console.log(response3.owner);
-    console.log(`Transfer ownership for collection`);
-    await collection.methods
-      .transferOwnership({
-        newOwner: response3.owner,
-      })
-      .send({
-        from: account.address,
-        amount: locklift.utils.toNano(1),
-      });
+    let newCreatedOffer = createdOffer.concat([{
+      collection:  collection.address,
+      id: nfts[i],
+      nftAddress: nftAddress,
+      offer: directBuy
+    }]);
+
+    console.log("Start Write")
+    const json = JSON.stringify(newCreatedOffer, null, 2);
+    fs.writeFileSync('offers_result.json', json);
   }
-  console.log("account balance", await locklift.provider.getBalance(account.address));
 }
 
 main()
